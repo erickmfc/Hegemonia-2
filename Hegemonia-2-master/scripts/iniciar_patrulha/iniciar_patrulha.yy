@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"iniciar_patrulha",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"iniciar_patrulha",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

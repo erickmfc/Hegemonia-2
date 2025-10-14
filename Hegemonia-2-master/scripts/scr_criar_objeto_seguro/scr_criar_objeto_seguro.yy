@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_criar_objeto_seguro",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_criar_objeto_seguro",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

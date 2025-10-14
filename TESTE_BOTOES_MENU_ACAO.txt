@@ -1,0 +1,119 @@
+# 🎯 **TESTE DOS BOTÕES DO MENU DE AÇÃO**
+
+## 🔍 **DIAGNÓSTICO DO PROBLEMA**
+
+### **❌ Problema Identificado:**
+Os botões do menu não estão executando as ações esperadas.
+
+### **🔧 Possíveis Causas:**
+1. **Detecção de clique incorreta**
+2. **Posicionamento dos botões errado**
+3. **Variáveis não inicializadas**
+4. **Conflito com outros objetos**
+
+## 🧪 **COMO TESTAR**
+
+### **📋 Passos para Teste:**
+
+1. **Iniciar o jogo**
+2. **Clicar em uma unidade de infantaria** (deve aparecer azul)
+3. **Verificar se o menu aparece** no canto superior direito
+4. **Clicar nos botões** e verificar as mensagens de debug
+
+### **🎮 Teste dos Comandos:**
+
+#### **🔄 PATRULHAR:**
+1. Clique no botão **PATRULHAR** (deve ficar verde)
+2. Clique com **botão direito** em dois pontos diferentes
+3. A unidade deve patrulhar entre esses pontos
+
+#### **➡️ SEGUIR:**
+1. Clique no botão **SEGUIR** (deve ficar azul)
+2. Clique com **botão direito** em outra unidade
+3. A unidade deve seguir a outra
+
+#### **⚔️ ATACAR:**
+1. Clique no botão **ATACAR** (deve ficar vermelho)
+2. Clique com **botão direito** em um alvo
+3. A unidade deve atacar o alvo
+
+## 🐛 **MENSAGENS DE DEBUG**
+
+### **✅ Mensagens Esperadas:**
+
+**Ao clicar nos botões:**
+```
+CLIQUE DETECTADO - Mouse: (x, y)
+CLIQUE NO BOTÃO PATRULHAR!
+✅ PATRULHA ATIVADA - INFANTARIA
+```
+
+**Ao passar o mouse:**
+```
+HOVER DETECTADO - Mouse: (x, y)
+```
+
+**Se algo der errado:**
+```
+❌ ERRO: Unidade não tem comando_atual
+❌ CLIQUE FORA DOS BOTÕES - Posições dos botões:
+```
+
+## 🔧 **SOLUÇÃO IMPLEMENTADA**
+
+### **📝 Melhorias no Código:**
+
+1. **Debug detalhado** para cada clique
+2. **Verificação de posições** dos botões
+3. **Mensagens de erro** específicas
+4. **Confirmação visual** das ações
+
+### **🎯 Verificações Automáticas:**
+
+- ✅ **Menu visível** quando unidade selecionada
+- ✅ **Posições dos botões** calculadas corretamente
+- ✅ **Detecção de hover** funcionando
+- ✅ **Detecção de clique** funcionando
+- ✅ **Variáveis da unidade** existem
+
+## 🚀 **COMO USAR CORRETAMENTE**
+
+### **📱 Fluxo Completo:**
+
+1. **Selecionar unidade:**
+   - Clique esquerdo na infantaria
+   - Menu deve aparecer no canto superior direito
+
+2. **Ativar comando:**
+   - Clique no botão desejado (PATRULHAR/SEGUIR/ATACAR)
+   - Botão deve mudar de cor
+   - Mensagem de confirmação deve aparecer
+
+3. **Executar ação:**
+   - **PATRULHAR:** Clique direito em dois pontos
+   - **SEGUIR:** Clique direito em outra unidade
+   - **ATACAR:** Clique direito em um alvo
+
+4. **Desativar comando:**
+   - Clique novamente no mesmo botão
+   - Botão volta à cor normal
+
+## 🎯 **RESULTADO ESPERADO**
+
+### **✅ Funcionalidades:**
+- **Menu aparece** quando unidade selecionada
+- **Botões respondem** aos cliques
+- **Comandos são ativados** corretamente
+- **Unidade executa** as ações
+- **Feedback visual** funciona
+
+### **🔍 Debug Funcionando:**
+- **Mensagens no console** para cada ação
+- **Posições dos botões** mostradas
+- **Erros identificados** automaticamente
+
+---
+
+**Status: ✅ SISTEMA PRONTO PARA TESTE**
+
+Teste os botões e verifique as mensagens de debug para identificar qualquer problema! 🎯

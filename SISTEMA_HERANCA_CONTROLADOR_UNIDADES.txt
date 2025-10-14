@@ -1,0 +1,192 @@
+=========================================================
+HEGEMONIA GLOBAL - SISTEMA DE HERANÇA IMPLEMENTADO
+Controlador de Unidades como Classe Pai
+=========================================================
+
+DATA: 2025-01-27
+STATUS: SISTEMA DE HERANÇA COMPLETAMENTE IMPLEMENTADO
+
+## 🎯 **SISTEMA DE HERANÇA CRIADO:**
+
+### **📋 ESTRUTURA DE HERANÇA:**
+
+#### **🏗️ CLASSE PAI: `obj_controlador_unidades`**
+- ✅ **Variáveis de Movimento**: `destino_x`, `destino_y`, `path`, `velocidade`
+- ✅ **Variáveis de Patrulha**: `patrol_points`, `patrol_index`, `patrolling`, `drawing_patrol`
+- ✅ **Timers**: `timer_verificacao_pathfinding`
+- ✅ **Métodos**: `movimento_inteligente()`, `patrulha_inteligente()`, `iniciar_movimento()`, `iniciar_patrulha()`, `parar_movimento()`
+
+#### **👶 CLASSE FILHA: `obj_infantaria`**
+- ✅ **Herda Automaticamente**: Todas as variáveis e métodos do pai
+- ✅ **Configurações Específicas**: `velocidade = 2` (específica da infantaria)
+- ✅ **Estados**: Usa métodos herdados nos estados "movendo" e "patrulhando"
+
+---
+
+## ✅ **MÉTODOS HERDADOS IMPLEMENTADOS:**
+
+### **🎯 Método: `movimento_inteligente()`**
+```gml
+// Sistema de pathfinding melhorado com validação
+// - Verifica se grid existe
+// - Calcula pathfinding ou usa movimento direto
+// - Retorna true quando chega ao destino
+// - Otimizado com timer de 60 frames
+```
+
+### **🎯 Método: `patrulha_inteligente()`**
+```gml
+// Sistema de patrulha com pathfinding
+// - Move entre pontos da lista patrol_points
+// - Loop infinito (volta ao primeiro ponto)
+// - Usa pathfinding para evitar obstáculos
+// - Retorna true se está patrulhando
+```
+
+### **🎯 Método: `iniciar_movimento(dest_x, dest_y)`**
+```gml
+// Inicia movimento para coordenadas específicas
+// - Define destino_x e destino_y
+// - Limpa path anterior
+// - Cancela patrulha
+// - Atualiza direção visual
+```
+
+### **🎯 Método: `iniciar_patrulha(ponto_x, ponto_y)`**
+```gml
+// Inicia patrulha entre posição atual e ponto específico
+// - Limpa pontos anteriores
+// - Adiciona ponto atual e destino
+// - Ativa patrulha
+// - Limpa path anterior
+```
+
+### **🎯 Método: `parar_movimento()`**
+```gml
+// Para todo movimento e patrulha
+// - Desativa patrulha
+// - Limpa path atual
+// - Para movimento
+```
+
+---
+
+## 🔧 **ARQUIVOS MODIFICADOS:**
+
+### **1. Classe Pai - `obj_controlador_unidades`:**
+- ✅ `Create_0.gml` - Variáveis de herança definidas
+- ✅ `Step_0.gml` - Métodos de herança implementados
+- ✅ `Step_1.gml` - Controle de seleção e comandos
+
+### **2. Classe Filha - `obj_infantaria`:**
+- ✅ `Create_0.gml` - Configuração de herança
+- ✅ `Step_0.gml` - Estados usando métodos herdados
+
+### **3. Sistema de Comandos:**
+- ✅ `scripts/sc_comandos_infantaria/sc_comandos_infantaria.gml` - Comandos usando métodos herdados
+
+---
+
+## 🎮 **COMO USAR O SISTEMA DE HERANÇA:**
+
+### **1. MOVIMENTO:**
+```gml
+// Na infantaria (ou qualquer unidade filha):
+iniciar_movimento(100, 200); // Move para coordenadas
+estado = "movendo";
+
+// No Step Event:
+case "movendo":
+    if (movimento_inteligente()) {
+        estado = "parado"; // Chegou ao destino
+    }
+break;
+```
+
+### **2. PATRULHA:**
+```gml
+// Na infantaria (ou qualquer unidade filha):
+iniciar_patrulha(300, 400); // Patrulha entre posição atual e destino
+estado = "patrulhando";
+
+// No Step Event:
+case "patrulhando":
+    if (!patrulha_inteligente()) {
+        estado = "parado"; // Parou de patrulhar
+    }
+break;
+```
+
+### **3. COMANDOS:**
+```gml
+// Usar sistema de comandos:
+sc_comandos_infantaria("mover", 100, 200, noone);
+sc_comandos_infantaria("patrulhar", 300, 400, noone);
+sc_comandos_infantaria("parar", 0, 0, noone);
+```
+
+---
+
+## 🎯 **VANTAGENS DO SISTEMA DE HERANÇA:**
+
+### **✅ Reutilização de Código:**
+- **Métodos Únicos**: Um método serve para todas as unidades
+- **Manutenção Fácil**: Mudanças no pai afetam todos os filhos
+- **Consistência**: Comportamento uniforme entre unidades
+
+### **✅ Extensibilidade:**
+- **Novas Unidades**: Basta herdar do controlador pai
+- **Personalização**: Filhos podem sobrescrever variáveis específicas
+- **Modularidade**: Cada unidade pode ter comportamentos únicos
+
+### **✅ Organização:**
+- **Separação de Responsabilidades**: Pai = movimento, Filho = combate
+- **Código Limpo**: Lógica de movimento centralizada
+- **Fácil Debug**: Problemas de movimento em um lugar só
+
+---
+
+## 🚀 **EXPANSÃO FUTURA:**
+
+### **🎯 Outras Unidades que Podem Herdar:**
+- ✅ **Tanques**: `obj_tanque` → herda movimento e patrulha
+- ✅ **Aviação**: `obj_aviao` → herda movimento (com velocidade diferente)
+- ✅ **Navios**: `obj_navio` → herda movimento (com pathfinding aquático)
+- ✅ **Unidades Especiais**: Qualquer nova unidade
+
+### **🎯 Personalizações por Unidade:**
+```gml
+// Exemplo para tanque:
+// Create Event do obj_tanque:
+velocidade = 1.5; // Mais lento que infantaria
+patrol_points = ds_list_create(); // Herda automaticamente
+// Usa todos os métodos herdados automaticamente
+```
+
+---
+
+## 📊 **RESULTADO FINAL:**
+
+### **🎯 Sistema Modular:**
+- ✅ **Classe Pai**: Controla movimento e patrulha
+- ✅ **Classe Filha**: Controla combate e comportamentos específicos
+- ✅ **Herança Automática**: Variáveis e métodos herdados
+- ✅ **Personalização**: Cada unidade pode ter configurações únicas
+
+### **🎯 Funcionalidades Restauradas:**
+- ✅ **Movimento**: Clique direito para mover
+- ✅ **Patrulha**: Sistema de patrulha com pathfinding
+- ✅ **Formação**: Movimento em formação
+- ✅ **Comandos**: Sistema de comandos funcionando
+
+### **🎯 Benefícios:**
+- ✅ **Código Reutilizável**: Um sistema serve para todas as unidades
+- ✅ **Manutenção Fácil**: Mudanças centralizadas
+- ✅ **Extensível**: Fácil adicionar novas unidades
+- ✅ **Organizado**: Separação clara de responsabilidades
+
+---
+
+**STATUS: SISTEMA DE HERANÇA COMPLETAMENTE IMPLEMENTADO** ✅
+
+**NOTA**: O `obj_controlador_unidades` agora é a classe pai que fornece movimento e patrulha para todas as unidades filhas, incluindo a infantaria. O sistema é modular, reutilizável e facilmente extensível para novas unidades!

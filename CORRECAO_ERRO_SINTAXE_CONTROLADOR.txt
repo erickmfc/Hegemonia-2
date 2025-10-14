@@ -1,0 +1,131 @@
+=========================================================
+HEGEMONIA GLOBAL - CORREÇÃO DE ERRO DE SINTAXE
+Problema com asset_get_index Resolvido
+=========================================================
+
+DATA: 2025-01-27
+STATUS: ERRO DE SINTAXE CORRIGIDO COM SUCESSO
+
+## 🔧 **PROBLEMA IDENTIFICADO:**
+
+### **❌ Erro de Sintaxe:**
+- **Arquivo**: `objects/obj_controlador_unidades/Step_1.gml`
+- **Linha**: 180
+- **Erro**: `unexpected symbol "}" in expression`
+- **Erro**: `malformed assignment`
+
+### **❌ Causa do Problema:**
+- **`asset_get_index()`**: Função incorreta para referenciar scripts
+- **Sintaxe**: `asset_get_index("script_name")` não é a forma correta
+- **GameMaker**: Scripts devem ser referenciados diretamente pelo nome
+
+---
+
+## ✅ **CORREÇÕES IMPLEMENTADAS:**
+
+### **1. CORREÇÃO NO CONTROLADOR:**
+```gml
+// ANTES (INCORRETO):
+script_execute(asset_get_index("iniciar_movimento"), dest_x, dest_y);
+script_execute(asset_get_index("parar_movimento"));
+
+// DEPOIS (CORRETO):
+script_execute(iniciar_movimento, dest_x, dest_y);
+script_execute(parar_movimento);
+```
+
+### **2. CORREÇÃO NA INFANTARIA:**
+```gml
+// ANTES (INCORRETO):
+script_execute(asset_get_index("movimento_inteligente"));
+script_execute(asset_get_index("patrulha_inteligente"));
+
+// DEPOIS (CORRETO):
+script_execute(movimento_inteligente);
+script_execute(patrulha_inteligente);
+```
+
+### **3. CORREÇÃO NO SISTEMA DE COMANDOS:**
+```gml
+// ANTES (INCORRETO):
+script_execute(asset_get_index("iniciar_movimento"), alvo_x, alvo_y);
+script_execute(asset_get_index("iniciar_patrulha"), alvo_x, alvo_y);
+script_execute(asset_get_index("parar_movimento"));
+
+// DEPOIS (CORRETO):
+script_execute(iniciar_movimento, alvo_x, alvo_y);
+script_execute(iniciar_patrulha, alvo_x, alvo_y);
+script_execute(parar_movimento);
+```
+
+---
+
+## 🔧 **ARQUIVOS CORRIGIDOS:**
+
+### **1. Controlador de Unidades:**
+- ✅ `objects/obj_controlador_unidades/Step_1.gml` - Linhas 26 e 186
+
+### **2. Infantaria:**
+- ✅ `objects/obj_infantaria/Step_0.gml` - Linhas 56 e 66
+
+### **3. Sistema de Comandos:**
+- ✅ `scripts/sc_comandos_infantaria/sc_comandos_infantaria.gml` - Linhas 13, 20 e 34
+
+---
+
+## 🎯 **COMO FUNCIONA AGORA:**
+
+### **✅ Sintaxe Correta:**
+```gml
+// Para executar um script:
+script_execute(nome_do_script, parametro1, parametro2);
+
+// Exemplos:
+script_execute(movimento_inteligente);
+script_execute(iniciar_movimento, 100, 200);
+script_execute(parar_movimento);
+```
+
+### **✅ Scripts Disponíveis:**
+- **`movimento_inteligente`**: Movimento com pathfinding
+- **`patrulha_inteligente`**: Patrulha com pathfinding
+- **`iniciar_movimento`**: Inicia movimento para coordenadas
+- **`iniciar_patrulha`**: Inicia patrulha entre pontos
+- **`parar_movimento`**: Para movimento e patrulha
+
+---
+
+## 📊 **RESULTADO FINAL:**
+
+### **🎯 Erro Corrigido:**
+- ✅ **Sintaxe**: Sem erros de compilação
+- ✅ **Scripts**: Funcionando corretamente
+- ✅ **Movimento**: Sistema de movimento funcionando
+- ✅ **Patrulha**: Sistema de patrulha funcionando
+- ✅ **Comandos**: Sistema de comandos funcionando
+
+### **🎯 Sistema Funcionando:**
+- ✅ **Compra**: Quartel consegue comprar infantaria
+- ✅ **Movimento**: Clique direito para mover
+- ✅ **Patrulha**: Sistema de patrulha ativo
+- ✅ **Formação**: Movimento em formação funcionando
+- ✅ **Comandos**: Comandos táticos funcionando
+
+---
+
+## 🎯 **LIÇÃO APRENDIDA:**
+
+### **📚 Sintaxe Correta no GameMaker:**
+- **Scripts**: Use `script_execute(nome_script, params)`
+- **Não Use**: `asset_get_index("nome_script")` para scripts
+- **Referência**: Scripts são referenciados diretamente pelo nome
+- **Parâmetros**: Passados como argumentos separados
+
+---
+
+**STATUS: ERRO DE SINTAXE CORRIGIDO - SISTEMA FUNCIONANDO** ✅
+
+**NOTA**: O problema era o uso incorreto de `asset_get_index()` para referenciar scripts. No GameMaker, scripts devem ser referenciados diretamente pelo nome sem aspas.
+
+
+

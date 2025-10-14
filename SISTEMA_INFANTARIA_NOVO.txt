@@ -1,0 +1,185 @@
+=========================================================
+HEGEMONIA GLOBAL - SISTEMA DE INFANTARIA NOVO
+Sistema Limpo e Preciso - Recriado do Zero
+=========================================================
+
+DATA: 2025-01-27
+STATUS: SISTEMA LIMPO IMPLEMENTADO
+
+## 🧹 **SISTEMA ANTERIOR REMOVIDO:**
+
+### **Problemas Identificados:**
+- Código muito complexo e confuso
+- Muitas variáveis desnecessárias
+- Sistema de comandos táticos complicado
+- Debug excessivo e confuso
+- Performance comprometida
+
+### **Solução:**
+- ✅ **Código completamente limpo**
+- ✅ **Sistema simples e eficiente**
+- ✅ **Apenas funcionalidades essenciais**
+- ✅ **Performance otimizada**
+
+## 🎯 **NOVO SISTEMA IMPLEMENTADO:**
+
+### **1. CREATE EVENT - Variáveis Essenciais:**
+```gml
+// === VARIÁVEIS BÁSICAS ===
+nacao_proprietaria = 1; // 1 = Jogador, 2 = Inimigo
+image_blend = c_blue; // Cor baseada na nação
+
+// === ESTATÍSTICAS DE COMBATE ===
+vida_maxima = 100;
+vida_atual = vida_maxima;
+velocidade = 2.5;
+raio_de_visao = 200;
+raio_de_ataque = 150;
+dano_projetil = 25;
+cooldown_tiro = 60; // frames entre tiros
+
+// === SISTEMA DE IA ===
+estado = "parado"; // parado, perseguindo, atacando
+alvo_inimigo = noone;
+
+// === TIMERS ===
+alarm[1] = -1; // Timer de tiro
+```
+
+### **2. STEP EVENT - IA Simples e Eficiente:**
+```gml
+// === SISTEMA DE IA SIMPLES ===
+switch (estado) {
+    case "parado":
+        // Procurar inimigos próximos
+        // Se encontrar, mudar para "perseguindo"
+        break;
+        
+    case "perseguindo":
+        // Mover em direção ao alvo
+        // Se chegar no alcance, mudar para "atacando"
+        break;
+        
+    case "atacando":
+        // Manter posição e atirar
+        // Se alvo sair de alcance, voltar para "perseguindo"
+        break;
+}
+```
+
+### **3. DRAW EVENT - Visual Limpo:**
+```gml
+// === CÍRCULO DE ESTADO ===
+// Círculo transparente com borda colorida
+// Azul = parado, Amarelo = perseguindo, Vermelho = atacando
+
+// === BARRA DE VIDA ===
+// Barra simples mostrando vida atual
+
+// === INDICADORES DE COMBATE ===
+// Linha para o alvo quando atacando
+
+// === CÍRCULOS DE ALCANCE ===
+// Raio de visão (azul) e raio de ataque (vermelho)
+
+// === DEBUG VISUAL ===
+// Informações básicas: Estado, Alvo, Distância, Timer
+```
+
+### **4. ALARM 1 - Sistema de Tiro:**
+```gml
+// Verificar se tem alvo válido
+// Criar projétil com direção para o alvo
+// Programar próximo tiro
+// Se alvo perdido, parar de atirar
+```
+
+## ✅ **FUNCIONALIDADES MANTIDAS:**
+
+### **Sistema de Combate:**
+- ✅ **Detecção de inimigos** automática
+- ✅ **Perseguição** até alcance de ataque
+- ✅ **Sistema de tiro** com cooldown
+- ✅ **Projéteis** que causam dano
+
+### **Sistema Visual:**
+- ✅ **Círculos transparentes** com bordas
+- ✅ **Barras de vida** coloridas
+- ✅ **Indicadores de alcance** (visão e ataque)
+- ✅ **Linhas para alvos** durante combate
+- ✅ **Debug visual** limpo e informativo
+
+### **Sistema de IA:**
+- ✅ **3 estados simples**: parado, perseguindo, atacando
+- ✅ **Transições automáticas** entre estados
+- ✅ **Detecção de inimigos** por nação
+- ✅ **Sistema de alvos** único
+
+## 🚀 **BENEFÍCIOS DO NOVO SISTEMA:**
+
+### **1. Performance:**
+- ✅ **Código otimizado** e eficiente
+- ✅ **Menos variáveis** para processar
+- ✅ **Lógica simplificada** e rápida
+- ✅ **Menos verificações** desnecessárias
+
+### **2. Manutenibilidade:**
+- ✅ **Código limpo** e organizado
+- ✅ **Fácil de entender** e modificar
+- ✅ **Estrutura clara** e lógica
+- ✅ **Comentários** explicativos
+
+### **3. Funcionalidade:**
+- ✅ **Sistema de combate** funcional
+- ✅ **IA inteligente** e responsiva
+- ✅ **Visual claro** e informativo
+- ✅ **Debug útil** para desenvolvimento
+
+## 🎮 **COMO TESTAR:**
+
+### **Teste 1: Funcionamento Básico**
+1. Execute o jogo
+2. Observe as 3 unidades criadas (2 azuis, 1 vermelha)
+3. Verifique se as unidades azuis detectam a vermelha
+4. Confirme que perseguem e atacam automaticamente
+
+### **Teste 2: Sistema Visual**
+1. Observe os círculos transparentes com bordas
+2. Verifique as barras de vida
+3. Confirme os círculos de alcance (azul e vermelho)
+4. Observe as linhas para alvos durante combate
+
+### **Teste 3: Debug**
+1. Verifique as informações de debug na tela
+2. Confirme que mostram: Estado, Alvo, Distância, Timer
+3. Observe as mensagens no console
+
+## 📋 **PRÓXIMOS PASSOS:**
+
+### **Funcionalidades Futuras (Opcionais):**
+- [ ] Sistema de comandos táticos simples
+- [ ] Posturas de combate básicas
+- [ ] Sistema de experiência
+- [ ] Diferentes tipos de unidades
+- [ ] Sistema de moral simples
+
+### **Melhorias Visuais (Opcionais):**
+- [ ] Animações de movimento
+- [ ] Efeitos de tiro
+- [ ] Sons de combate
+- [ ] Partículas de impacto
+
+## 📞 **STATUS FINAL:**
+
+✅ **SISTEMA COMPLETAMENTE LIMPO E FUNCIONAL**
+- Código recriado do zero
+- Sistema simples e eficiente
+- Performance otimizada
+- Visual limpo e moderno
+- IA funcional e responsiva
+
+O **Sistema de Infantaria** agora está limpo, preciso e pronto para expansões futuras! 🎉
+
+=========================================================
+SISTEMA DE INFANTARIA NOVO - HEGEMONIA GLOBAL
+=========================================================

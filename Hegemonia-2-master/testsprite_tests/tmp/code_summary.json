@@ -1,0 +1,119 @@
+{
+  "project_name": "Hegemonia Global - Menu de Construção",
+  "tech_stack": {
+    "engine": "GameMaker Studio 2",
+    "language": "GML (GameMaker Language)",
+    "version": "2024.8.1.171",
+    "platform": "Desktop/Windows"
+  },
+  "project_type": "Estratégia Militar/Construção de Base",
+  "main_features": [
+    "Sistema de Construção de Edifícios",
+    "Sistema de Recursos e Economia",
+    "Sistema Militar (Infantaria, Tanques, Marinha)",
+    "Sistema de Pesquisa e Tecnologia",
+    "Sistema de Combate e Tiro",
+    "Sistema de Pathfinding",
+    "Interface de Usuário Completa",
+    "Sistema de Recrutamento",
+    "Sistema de Território e Fronteiras"
+  ],
+  "core_systems": {
+    "resource_management": {
+      "description": "Sistema completo de gerenciamento de recursos",
+      "resources": [
+        "Dinheiro", "Minério", "Petróleo", "População",
+        "Ouro", "Titânio", "Urânio", "Alumínio", "Cobre", "Lítio",
+        "Borracha", "Madeira", "Silício", "Aço", "Energia"
+      ],
+      "files": [
+        "objects/obj_resource_manager/",
+        "objects/obj_game_manager/Create_0.gml"
+      ]
+    },
+    "construction_system": {
+      "description": "Sistema de construção de edifícios com validação de terreno",
+      "buildings": [
+        "Casas", "Bancos", "Quarteis", "Minas", "Centro de Pesquisa",
+        "Serraria", "Plantação de Borracha", "Poço de Petróleo"
+      ],
+      "files": [
+        "objects/obj_controlador_construcao/",
+        "objects/obj_build_manager/",
+        "objects/obj_menu_construcao/"
+      ]
+    },
+    "military_system": {
+      "description": "Sistema militar completo com infantaria, tanques e marinha",
+      "units": [
+        "Infantaria", "Tanques", "Navios de Guerra", "Inimigos"
+      ],
+      "features": [
+        "Sistema de Combate", "Sistema de Tiro", "Comandos Táticos",
+        "Formações Militares", "Sistema de Patrulha"
+      ],
+      "files": [
+        "objects/obj_infantaria/",
+        "objects/obj_tanque/",
+        "objects/obj_controlador_unidades/",
+        "scripts/sc_comandos_militares/",
+        "scripts/sc_comandos_taticos/"
+      ]
+    },
+    "research_system": {
+      "description": "Sistema de pesquisa e desenvolvimento tecnológico",
+      "features": [
+        "Centro de Pesquisa", "Árvore de Tecnologias", "Slots de Pesquisa",
+        "Sistema de Desbloqueio"
+      ],
+      "files": [
+        "objects/obj_research_center/",
+        "objects/obj_menu_recrutamento/"
+      ]
+    },
+    "ui_system": {
+      "description": "Sistema de interface de usuário completo",
+      "components": [
+        "Menus de Construção", "Menus de Ação", "Dashboard Econômico",
+        "Painéis de Comando", "Interface de Recrutamento"
+      ],
+      "files": [
+        "objects/obj_ui_manager/",
+        "objects/obj_menu_de_acao/",
+        "objects/obj_economic_dashboard/"
+      ]
+    }
+  },
+  "file_structure": {
+    "objects": 50,
+    "scripts": 20,
+    "sprites": 60,
+    "rooms": 3,
+    "tilesets": 4,
+    "fonts": 1
+  },
+  "key_objects": [
+    "obj_game_manager - Gerenciador principal do jogo",
+    "obj_resource_manager - Gerenciador de recursos",
+    "obj_controlador_construcao - Controlador de construção",
+    "obj_controlador_unidades - Controlador de unidades militares",
+    "obj_research_center - Centro de pesquisa",
+    "obj_infantaria - Unidades de infantaria",
+    "obj_tanque - Unidades de tanques",
+    "obj_menu_construcao - Menu de construção",
+    "obj_menu_de_acao - Menu de ações",
+    "obj_ui_manager - Gerenciador de interface"
+  ],
+  "game_mechanics": [
+    "Construção de edifícios em grid",
+    "Sistema de recursos com múltiplos tipos",
+    "Combate baseado em alcance e dano",
+    "Sistema de pathfinding para unidades",
+    "Pesquisa tecnológica com desbloqueios",
+    "Sistema de território e fronteiras",
+    "Recrutamento de unidades militares",
+    "Sistema de comandos táticos"
+  ],
+  "development_status": "Em desenvolvimento ativo",
+  "complexity": "Alto - Jogo de estratégia complexo com múltiplos sistemas interconectados"
+}

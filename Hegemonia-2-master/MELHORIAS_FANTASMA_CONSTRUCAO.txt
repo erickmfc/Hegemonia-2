@@ -1,0 +1,131 @@
+=========================================================
+HEGEMONIA GLOBAL - MELHORIAS DO SISTEMA DE FANTASMA DE CONSTRUÇÃO
+=========================================================
+
+DATA: 2025-08-27
+PROBLEMAS REPORTADOS:
+1. "ao clicar com o direito e tiver com o fantasma a casa deve clicar sumir"
+2. "a casa nao pode afastar se o mouse mover rapido"
+
+PROBLEMAS IDENTIFICADOS:
+-----------------------
+1. CANCELAMENTO COM CLIQUE DIREITO:
+   - Sistema não tinha cancelamento com botão direito do mouse
+   - Usuário não conseguia cancelar seleção de construção facilmente
+   - Necessário cancelar tanto casa quanto banco
+
+2. ESPAÇAMENTO DO FANTASMA:
+   - Fantasma se afastava do mouse em movimentos rápidos
+   - Coordenadas não eram atualizadas instantaneamente
+   - Interpolação ou atraso causava desconexão visual
+
+SOLUÇÕES IMPLEMENTADAS:
+----------------------
+
+1. CANCELAMENTO COM CLIQUE DIREITO:
+   ✅ obj_controlador_construcao/Step_0.gml
+      - Adicionado mouse_check_button_pressed(mb_right)
+      - Cancela global.construindo_agora = noone
+      - Saída imediata com exit após cancelamento
+      - Debug message para confirmar cancelamento
+
+   ✅ obj_input_manager/Step_2.gml
+      - Cancelamento também no input_manager para consistência
+      - Suporte para ambos os sistemas (novo e legacy)
+      - Debug message coordenado
+
+2. MELHORIA DO SEGUIMENTO DO MOUSE:
+   ✅ obj_controlador_construcao/Step_0.gml
+      - Atualização instantânea das coordenadas grid_x e grid_y
+      - Removida qualquer interpolação que pudesse causar atraso
+      - Cálculo mais preciso das coordenadas do mundo
+      - Debug melhorado para detectar movimento rápido
+
+CÓDIGO IMPLEMENTADO:
+-------------------
+
+1. CANCELAMENTO COM CLIQUE DIREITO:
+```gml
+// CANCELAMENTO COM CLIQUE DIREITO
+if (mouse_check_button_pressed(mb_right) && global.construindo_agora != noone) {
+    global.construindo_agora = noone;
+    show_debug_message("[CONSTRUÇÃO] Fantasma cancelado com clique direito");
+    exit; // Sair imediatamente após cancelamento
+}
+```
+
+2. SEGUIMENTO MELHORADO:
+```gml
+// MELHORAR SEGUIMENTO DO MOUSE - usar coordenadas mais precisas
+var _new_grid_x = floor(_world_mouse_x / tile_size) * tile_size;
+var _new_grid_y = floor(_world_mouse_y / tile_size) * tile_size;
+
+// Atualizar posição imediatamente (sem interpolação para evitar atraso)
+grid_x = _new_grid_x;
+grid_y = _new_grid_y;
+```
+
+3. DEBUG MELHORADO:
+```gml
+// DEBUG: Mostrar informações quando movimento rápido detectado
+var _distance_moved = point_distance(grid_x, grid_y, _new_grid_x, _new_grid_y);
+if (_input_manager.zoom_level != 1.0 || _distance_moved > tile_size) {
+    // Mostrar informações detalhadas
+}
+```
+
+CONTROLES ATUALIZADOS:
+---------------------
+- Botão Esquerdo: Construir edifício
+- Botão Direito: Cancelar construção (NOVO!)
+- Movimento do Mouse: Fantasma segue instantaneamente
+- Tecla C: Ativar/desativar modo de construção
+
+TESTE RECOMENDADO:
+-----------------
+1. **TESTE DE CANCELAMENTO:**
+   - Pressione C para ativar modo
+   - Selecione "Construir Casa"
+   - Mova o mouse para ver o fantasma
+   - Clique direito - fantasma deve desaparecer
+   - Repita com "Construir Banco"
+
+2. **TESTE DE MOVIMENTO RÁPIDO:**
+   - Selecione um edifício para construção
+   - Mova o mouse muito rapidamente pela tela
+   - Fantasma deve seguir instantaneamente
+   - Não deve haver espaçamento ou atraso
+
+3. **TESTE COMBINADO COM ZOOM:**
+   - Teste cancelamento com clique direito em diferentes zooms
+   - Teste movimento rápido com zoom aplicado
+   - Sistema deve funcionar consistentemente
+
+ARQUIVOS MODIFICADOS:
+--------------------
+- obj_controlador_construcao/Step_0.gml
+  * Cancelamento com clique direito
+  * Melhoria do seguimento do mouse
+  * Debug melhorado para movimento rápido
+
+- obj_input_manager/Step_2.gml
+  * Cancelamento com clique direito no sistema principal
+  * Consistência entre sistemas novo e legacy
+
+RESULTADO ESPERADO:
+------------------
+✅ Clique direito cancela fantasma (casa ou banco)
+✅ Fantasma segue mouse instantaneamente mesmo em movimento rápido
+✅ Sem espaçamento entre mouse e fantasma
+✅ Funciona corretamente com zoom e movimento de câmera
+✅ Debug melhorado para troubleshooting
+✅ Consistência entre todos os sistemas de construção
+
+PRÓXIMAS MELHORIAS POSSÍVEIS:
+-----------------------------
+- Som de feedback para cancelamento
+- Animação suave de desaparecimento do fantasma
+- Confirmação visual do cancelamento
+- Atalho de teclado adicional para cancelar (ESC)
+
+=========================================================

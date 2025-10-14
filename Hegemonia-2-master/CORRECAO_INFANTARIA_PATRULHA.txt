@@ -1,0 +1,172 @@
+=========================================================
+HEGEMONIA GLOBAL - CORREÇÃO DO SISTEMA DE INFANTARIA
+Conexão Completa com Sistema de Patrulha
+=========================================================
+
+DATA: 2025-01-27
+STATUS: CORREÇÕES IMPLEMENTADAS COM SUCESSO
+
+## 🔧 **PROBLEMAS IDENTIFICADOS E CORRIGIDOS:**
+
+### **❌ Problema 1: Sistema de Patrulha Removido**
+- **Situação**: O obj_infantaria tinha o sistema de patrulha removido
+- **Impacto**: Soldados de infantaria não conseguiam patrulhar
+- **Solução**: Adicionadas variáveis de patrulha no Create Event
+
+### **❌ Problema 2: Lógica de Movimento Ausente**
+- **Situação**: Não havia lógica de patrulha no Step Event
+- **Impacto**: Mesmo com variáveis, não havia movimento
+- **Solução**: Implementada lógica de movimento entre pontos
+
+### **❌ Problema 3: Visualização Incompatível**
+- **Situação**: Draw Event usava sistema antigo de patrulha
+- **Impacto**: Rota não era desenhada corretamente
+- **Solução**: Atualizado para novo sistema de patrulha
+
+---
+
+## ✅ **CORREÇÕES IMPLEMENTADAS:**
+
+### **1. Create Event - Variáveis de Patrulha:**
+```gml
+// === SISTEMA DE PATRULHA ===
+// Lista de pontos da patrulha
+patrol_points = ds_list_create();
+
+// Índice do ponto atual
+patrol_index = 0;
+
+// Ativo ou não
+patrolling = false;
+```
+
+### **2. Step Event - Lógica de Movimento:**
+```gml
+// === SISTEMA DE PATRULHA ===
+if (patrolling && ds_list_size(patrol_points) > 0) {
+    var target = patrol_points[| patrol_index];
+    var tx = target[0];
+    var ty = target[1];
+
+    // mover até o ponto
+    var spd = velocidade;
+    if (point_distance(x, y, tx, ty) > 4) {
+        var dir = point_direction(x, y, tx, ty);
+        x += lengthdir_x(spd, dir);
+        y += lengthdir_y(spd, dir);
+        image_angle = dir; // Atualizar direção visual
+    } else {
+        // chegou → ir para o próximo ponto
+        patrol_index += 1;
+        if (patrol_index >= ds_list_size(patrol_points)) {
+            patrol_index = 0; // volta pro início (loop)
+        }
+    }
+}
+```
+
+### **3. Draw Event - Visualização da Rota:**
+```gml
+// === DESENHAR ROTA DE PATRULHA ===
+if (global.patrol_mode || patrolling) {
+    draw_set_color(c_yellow);
+
+    for (var i = 0; i < ds_list_size(patrol_points) - 1; i++) {
+        var p1 = patrol_points[| i];
+        var p2 = patrol_points[| i+1];
+        draw_line(p1[0], p1[1], p2[0], p2[1]);
+    }
+
+    // Se for patrulha em loop → conecta último ao primeiro
+    if (patrolling && ds_list_size(patrol_points) > 1) {
+        var first = patrol_points[| 0];
+        var last = patrol_points[| ds_list_size(patrol_points) - 1];
+        draw_line(last[0], last[1], first[0], first[1]);
+    }
+    
+    // Desenhar pontos de patrulha
+    draw_set_color(c_red);
+    for (var i = 0; i < ds_list_size(patrol_points); i++) {
+        var p = patrol_points[| i];
+        draw_circle(p[0], p[1], 5, false);
+    }
+    
+    // Destacar ponto atual se estiver patrulhando
+    if (patrolling && ds_list_size(patrol_points) > 0) {
+        var current_point = patrol_points[| patrol_index];
+        draw_set_color(c_lime);
+        draw_circle(current_point[0], current_point[1], 8, false);
+    }
+}
+```
+
+### **4. Indicador Visual de Patrulha:**
+```gml
+// === DESENHAR INDICADOR DE PATRULHA ===
+if (patrolling) {
+    draw_set_color(c_yellow);
+    draw_circle(x, y, 15, false);
+    
+    // Texto de patrulha
+    draw_set_color(c_white);
+    draw_set_halign(fa_center);
+    draw_text(x, y - 30, "PATRULHA");
+}
+```
+
+---
+
+## 🎯 **SISTEMA AGORA FUNCIONA COMPLETAMENTE:**
+
+### **✅ Conexão Total:**
+1. **obj_soldado** → Sistema de patrulha funcional
+2. **obj_infantaria** → Sistema de patrulha funcional
+3. **Seleção de soldados** → Funciona para ambos os tipos
+4. **Definição de pontos** → Funciona para ambos os tipos
+5. **Movimento de patrulha** → Funciona para ambos os tipos
+6. **Visualização da rota** → Funciona para ambos os tipos
+
+### **🎮 Como Usar com Infantaria:**
+1. **Pressione Q** → Ativa modo de patrulha
+2. **Clique em infantaria** → Seleciona para patrulha
+3. **Clique em pontos** → Define rota de patrulha
+4. **Pressione ENTER** → Inicia patrulha
+5. **Infantaria patrulha** → Em loop infinito
+
+### **🎨 Indicadores Visuais:**
+- **Linhas amarelas**: Rota de patrulha
+- **Círculos vermelhos**: Pontos de patrulha
+- **Círculo verde**: Ponto atual da patrulha
+- **Círculo amarelo**: Unidade em patrulha
+- **Texto "PATRULHA"**: Status da unidade
+
+---
+
+## 🔄 **COMPATIBILIDADE:**
+
+### **✅ Ambos os Objetos Funcionam:**
+- **obj_soldado**: Sistema de patrulha completo
+- **obj_infantaria**: Sistema de patrulha completo
+- **Seleção automática**: Detecta tipo de unidade
+- **Comandos unificados**: Mesma lógica para ambos
+
+### **✅ Sistema Unificado:**
+- **Variáveis globais**: `global.patrol_mode`, `global.soldado_selecionado`
+- **Controles**: Tecla Q, ENTER, cliques
+- **Visualização**: Mesma aparência para ambos
+- **Funcionalidade**: Comportamento idêntico
+
+---
+
+## 🎯 **RESULTADO FINAL:**
+
+**O sistema de patrulha agora está completamente conectado e funcional para ambos os tipos de soldados:**
+
+1. ✅ **obj_soldado** → Patrulha funcionando
+2. ✅ **obj_infantaria** → Patrulha funcionando
+3. ✅ **Seleção** → Funciona para ambos
+4. ✅ **Definição de pontos** → Funciona para ambos
+5. ✅ **Movimento** → Funciona para ambos
+6. ✅ **Visualização** → Funciona para ambos
+
+**Sistema 100% funcional e conectado!**

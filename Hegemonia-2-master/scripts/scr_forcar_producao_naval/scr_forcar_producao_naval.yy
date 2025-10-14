@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_forcar_producao_naval",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_forcar_producao_naval",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

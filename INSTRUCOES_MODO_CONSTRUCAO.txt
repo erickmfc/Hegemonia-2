@@ -1,0 +1,79 @@
+==========================================
+INSTRUÇÕES DE TESTE - MODO DE CONSTRUÇÃO
+==========================================
+
+SISTEMA IMPLEMENTADO:
+✓ Variável global de controle: global.modo_construcao
+✓ Controle via tecla C (removido clique no botão)
+✓ Botão visual apenas como indicador
+✓ Mensagens de debug para verificação
+✓ Interface moderna com indicadores visuais
+✓ Tecla M removida (não adiciona mais dinheiro)
+
+COMO TESTAR:
+
+1. COMPILAR E EXECUTAR
+   - Abra o projeto no GameMaker Studio
+   - Compile e execute o jogo
+   - O botão aparecerá no canto inferior direito (apenas indicador)
+
+2. VERIFICAR O BOTÃO VISUAL
+   - Procure um botão no canto inferior direito da tela
+   - Deve mostrar um ícone de martelo
+   - Texto "OFF" quando desativado
+   - Texto "ATIVO" quando ativado
+   - Texto "(Tecla C)" indicando o controle
+
+3. TESTAR ATIVAÇÃO/DESATIVAÇÃO COM TECLA C
+   - Pressione a tecla C para alternar o modo
+   - Observe as mudanças visuais:
+     * Cor muda de azul (desativado) para verde (ativo)
+     * Círculo verde pulsante aparece quando ativo
+     * Texto muda de "OFF" para "ATIVO"
+
+4. VERIFICAR MENSAGENS DE DEBUG
+   - Abra a janela de debug do GameMaker (F9)
+   - Pressione C várias vezes
+   - Procure por estas mensagens:
+     ✓ "MODO DE CONSTRUÇÃO: ATIVADO"
+     ✓ "MODO DE CONSTRUÇÃO: DESATIVADO"
+
+FUNCIONALIDADES IMPLEMENTADAS:
+
+1. CONTROLE POR TECLA
+   - Tecla C: Ativa/Desativa o modo de construção
+   - global.modo_construcao alternado automaticamente
+
+2. FEEDBACK VISUAL COMPLETO
+   - Botão customizado com desenho de martelo
+   - Cores diferentes para ativo/inativo
+   - Indicador pulsante quando ativo
+   - Texto de status claro
+   - Indicação da tecla de controle
+
+3. POSICIONAMENTO FIXO
+   - Canto inferior direito da tela
+   - Sempre visível independente da câmera
+   - Interface responsiva (GUI coordinates)
+
+4. DEBUG INTEGRADO
+   - Mensagens claras no console
+   - Facilita testes e verificação
+
+5. TECLA M REMOVIDA
+   - Não adiciona mais dinheiro automaticamente
+   - Sistema de economia mais controlado
+
+PRÓXIMOS PASSOS SUGERIDOS:
+- Integrar o modo de construção com sistemas de clique
+- Adicionar menus de construção quando ativo
+- Implementar cursor visual diferente no modo construção
+- Adicionar outros atalhos de teclado conforme necessário
+
+ARQUIVOS MODIFICADOS:
+- obj_input_manager/Step_2.gml (tecla C adicionada, M removida)
+- obj_botao_construir/Draw_64.gml (indicação de tecla C)
+- obj_botao_construir/obj_botao_construir.yy (evento Left Pressed removido)
+- obj_botao_construir/Left Pressed.gml (arquivo deletado)
+
+Execute o teste e pressione C para ver o modo alternando!

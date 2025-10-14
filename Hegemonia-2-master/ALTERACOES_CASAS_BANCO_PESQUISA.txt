@@ -1,0 +1,137 @@
+=========================================================
+HEGEMONIA GLOBAL - ALTERAÇÕES IMPLEMENTADAS
+Sistema de Casas, Banco e Centro de Pesquisa
+=========================================================
+
+DATA: 2025-01-27
+STATUS: ALTERAÇÕES IMPLEMENTADAS COM SUCESSO
+
+## 🏠 **SISTEMA DE CASAS MODIFICADO:**
+
+### ✅ **COMPORTAMENTO ALTERADO:**
+- **🏠 Seguir Mouse**: Casas agora seguem o mouse sem distância mínima
+- **🎯 Seleção**: Clique esquerdo para selecionar, direito para posicionar
+- **👥 População**: Cada casa adiciona 10 pessoas à cidade
+- **📊 Contador**: Sistema global de população da cidade
+
+### 🔧 **ARQUIVOS MODIFICADOS:**
+- ✅ `objects/obj_casa/Create_0.gml` - Variáveis de seleção e população
+- ✅ `objects/obj_casa/Step_0.gml` - Sistema de movimento e população
+
+---
+
+## 🏦 **SISTEMA DE BANCO MODIFICADO:**
+
+### ✅ **ECONOMIA BASEADA NA POPULAÇÃO:**
+- **💰 Taxa por Habitante**: $25 por pessoa a cada 3 segundos
+- **📈 Dinâmico**: Quanto mais pessoas, mais dinheiro gerado
+- **🏙️ População**: Baseado em global.populacao_cidade
+- **🎯 Seleção**: Mesmo sistema de casas (selecionar e mover)
+
+### 🔧 **ARQUIVOS MODIFICADOS:**
+- ✅ `objects/obj_banco/Create_0.gml` - Sistema de economia
+- ✅ `objects/obj_banco/Step_0.gml` - Geração de dinheiro dinâmica
+
+---
+
+## 🔬 **CENTRO DE PESQUISA MODIFICADO:**
+
+### ✅ **ÍCONES REPOSICIONADOS:**
+- **⬅️ Esquerda**: Ícones movidos 15% para a esquerda
+- **⬇️ Baixo**: Ícones movidos 40% para baixo
+- **🎨 Layout**: Melhor distribuição visual nos cards
+
+### ✅ **VALORES REDUZIDOS:**
+- **💸 Redução**: Todos os custos de pesquisa reduzidos em 50%
+- **📊 Exemplos**:
+  - Borracha: $6.000 → $3.000
+  - Petróleo: $7.500 → $3.750
+  - Silício: $8.000 → $4.000
+  - Mina: $5.000 → $2.500
+  - Alumínio: $9.000 → $4.500
+  - Centro: $10.000 → $5.000
+  - Ouro: $15.000 → $7.500
+  - Serraria: $4.000 → $2.000
+  - Cobre: $7.000 → $3.500
+  - Urânio: $25.000 → $12.500
+  - Lítio: $12.000 → $6.000
+  - Titânio: $18.000 → $9.000
+
+### 🔧 **ARQUIVOS MODIFICADOS:**
+- ✅ `objects/obj_research_center/Draw_64.gml` - Posicionamento e valores
+
+---
+
+## 🎮 **COMO USAR O NOVO SISTEMA:**
+
+### **1. CONSTRUIR CASAS:**
+```
+1. Clique esquerdo na casa para selecionar
+2. Casa seguirá o mouse automaticamente
+3. Clique direito para posicionar
+4. Cada casa adiciona 10 pessoas à cidade (LIMITE MÁXIMO)
+5. Cidade tem limite total de 1000 pessoas
+```
+
+### **2. CONSTRUIR BANCOS:**
+```
+1. Clique esquerdo no banco para selecionar
+2. Banco seguirá o mouse automaticamente
+3. Clique direito para posicionar
+4. Banco gera dinheiro baseado na população
+```
+
+### **3. ECONOMIA AUTOMÁTICA:**
+```
+- População: Cada casa = +10 pessoas (LIMITE POR CASA)
+- Limite Total: Máximo 1000 pessoas na cidade
+- Dinheiro: Cada pessoa = +$25 a cada 3s
+- Exemplo: 100 pessoas = $2.500 a cada 3s
+- Controle: Sistema previne crescimento infinito
+```
+
+---
+
+## 🔧 **VARIÁVEIS GLOBAIS ADICIONADAS:**
+
+### **🏙️ População:**
+- `global.populacao_cidade` - Total de habitantes
+- Inicializada em 0
+- Incrementada por casas
+
+### **💰 Dinheiro:**
+- `global.dinheiro_pais` - Dinheiro total do país
+- Inicializado em $10.000
+- Incrementado por bancos
+
+---
+
+## 🎯 **FUNCIONALIDADES IMPLEMENTADAS:**
+
+### **✅ NOVAS FUNCIONALIDADES:**
+- Sistema de população baseado em casas
+- Economia dinâmica baseada na população
+- Casas e bancos seguem o mouse
+- Valores de pesquisa reduzidos
+- Ícones reposicionados no centro de pesquisa
+
+### **✅ SISTEMAS INTEGRADOS:**
+- População → Banco → Dinheiro
+- Construção → Seleção → Posicionamento
+- Interface → Valores → Layout
+
+---
+
+## 🏆 **RESULTADO:**
+
+O sistema agora possui:
+
+- **🏠 Casas Funcionais**: Adicionam população e seguem o mouse
+- **🏦 Banco Inteligente**: Gera dinheiro baseado na população
+- **🔬 Pesquisa Acessível**: Valores reduzidos e layout melhorado
+- **💰 Economia Dinâmica**: Sistema integrado de recursos
+- **🎮 Controles Intuitivos**: Seleção e posicionamento simples
+
+**Status**: ALTERAÇÕES IMPLEMENTADAS ✅  
+**Sistema**: Casas, Banco e Pesquisa Funcionais  
+**Próximo**: Pode ser expandido com mais funcionalidades

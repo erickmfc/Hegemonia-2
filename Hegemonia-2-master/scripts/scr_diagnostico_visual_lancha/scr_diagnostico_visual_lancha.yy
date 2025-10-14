@@ -1,0 +1,10 @@
+{
+  "$GMScript":"",
+  "%Name":"scr_diagnostico_visual_lancha",
+  "isDnD":false,
+  "isTemplate":false,
+  "isHidden":false,
+  "name":"scr_diagnostico_visual_lancha",
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

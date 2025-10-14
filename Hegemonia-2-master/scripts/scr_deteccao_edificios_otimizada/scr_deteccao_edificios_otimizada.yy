@@ -1,0 +1,11 @@
+{
+  "$GMScript":"",
+  "%Name":"scr_deteccao_edificios_otimizada",
+  "isDnD":false,
+  "isTemplate":false,
+  "isHidden":false,
+  "isHidden":false,
+  "name":"scr_deteccao_edificios_otimizada",
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

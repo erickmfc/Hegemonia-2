@@ -1,0 +1,173 @@
+=========================================================
+HEGEMONIA GLOBAL - SISTEMA DE TESTE COM INIMIGO ARRASTÁVEL
+Teste do Sistema de Ataque da Infantaria
+=========================================================
+
+DATA: 2025-01-27
+STATUS: SISTEMA DE TESTE IMPLEMENTADO COM SUCESSO
+
+## 🎯 **SISTEMA DE TESTE COM INIMIGO ARRASTÁVEL:**
+
+### ✅ **FUNCIONALIDADES IMPLEMENTADAS:**
+
+#### 1. **Sistema de Arrastar e Soltar:**
+- **🎯 Clique Esquerdo**: Seleciona o inimigo para arrastar
+- **🖱️ Arrastar**: Inimigo segue o mouse automaticamente
+- **📍 Soltar**: Posiciona o inimigo na nova localização
+- **🔄 Reposicionamento**: Pode ser movido quantas vezes quiser
+
+#### 2. **Visualização Clara:**
+- **🔴 Cor Vermelha**: Identifica claramente como inimigo
+- **📊 Barra de HP**: Mostra HP atual/máximo
+- **💛 Indicador de Seleção**: Círculo amarelo quando selecionado
+- **📝 Texto de Status**: Mostra quando está sendo arrastado
+
+#### 3. **Compatibilidade com Sistema de Ataque:**
+- **⚔️ Detectável**: Sistema de tiro reconhece como inimigo
+- **🎯 Alvo Válido**: Pode ser atacado pela infantaria
+- **💥 Dano Aplicável**: Recebe dano dos tiros
+- **💀 Destruição**: É destruído quando HP chega a 0
+
+---
+
+## 🎮 **COMO USAR O SISTEMA DE TESTE:**
+
+### **1. ARRASTAR O INIMIGO:**
+```
+1. Clique esquerdo no inimigo (círculo vermelho)
+2. Mantenha o botão pressionado
+3. Arraste para a posição desejada
+4. Solte o botão para posicionar
+```
+
+### **2. TESTAR O SISTEMA DE ATAQUE:**
+```
+1. Posicione o inimigo onde quiser
+2. Selecione uma unidade amiga (azul)
+3. Clique direito no inimigo para atacar
+4. Observe o tiro sendo criado e seguindo o alvo
+5. Verifique o dano sendo aplicado
+```
+
+### **3. REPOSICIONAR PARA NOVOS TESTES:**
+```
+1. Clique esquerdo no inimigo novamente
+2. Arraste para nova posição
+3. Solte para posicionar
+4. Teste o ataque da nova posição
+```
+
+---
+
+## 🔧 **PROPRIEDADES DO INIMIGO TESTE:**
+
+### **Características Básicas:**
+```
+HP Atual: 100
+HP Máximo: 100
+Nação: 2 (Inimigo - Vermelho)
+Velocidade: 2 pixels por frame
+Raio de Seleção: 30 pixels
+```
+
+### **Sistema de Dano:**
+```
+Dano por Tiro: 25 HP
+Tiros para Destruir: 4 tiros
+Status: Destruído automaticamente quando HP = 0
+```
+
+---
+
+## 🎯 **INTEGRAÇÃO COM SISTEMA DE ATAQUE:**
+
+### **Detecção Automática:**
+```
+1. Sistema de tiro verifica nacao_proprietaria
+2. Se nacao_proprietaria != 1 (jogador), é inimigo
+3. Tiro é criado automaticamente
+4. Dano é aplicado ao atingir
+5. HP é reduzido progressivamente
+```
+
+### **Compatibilidade Total:**
+```
+✅ Detectado como inimigo
+✅ Pode receber tiros
+✅ Dano é aplicado corretamente
+✅ HP é atualizado em tempo real
+✅ Destruição automática
+✅ Sistema de seleção funcional
+```
+
+---
+
+## 🔧 **ARQUIVOS MODIFICADOS:**
+
+### **obj_inimigo:**
+- ✅ `objects/obj_inimigo/Create_0.gml` - Configuração básica
+- ✅ `objects/obj_inimigo/Step_0.gml` - Sistema de arrastar/soltar
+- ✅ `objects/obj_inimigo/Draw_64.gml` - Visualização e interface
+- ✅ `objects/obj_inimigo/obj_inimigo.yy` - Eventos atualizados
+
+---
+
+## 🎮 **CENÁRIOS DE TESTE:**
+
+### **Teste Básico de Ataque:**
+```
+1. Arrastar inimigo para posição visível
+2. Selecionar unidade amiga
+3. Atacar o inimigo
+4. Verificar tiro e dano
+```
+
+### **Teste de Reposicionamento:**
+```
+1. Mover inimigo para outra área
+2. Testar ataque da nova posição
+3. Verificar se sistema ainda funciona
+```
+
+### **Teste de Múltiplos Tiros:**
+```
+1. Posicionar inimigo
+2. Fazer múltiplos ataques
+3. Verificar redução progressiva de HP
+4. Observar destruição final
+```
+
+---
+
+## 🏆 **RESULTADO:**
+
+O sistema agora possui:
+
+- **🎯 Inimigo Testável**: Pode ser arrastado e posicionado livremente
+- **⚔️ Sistema de Ataque Funcional**: Detecta e ataca corretamente
+- **📊 Visualização Clara**: HP, status e seleção visíveis
+- **🔄 Reposicionamento**: Pode ser movido para diferentes áreas
+- **💥 Dano Real**: Sistema de HP e destruição funcional
+- **🎮 Teste Intuitivo**: Arrastar e soltar simples
+
+---
+
+## 🎯 **PRÓXIMOS PASSOS POSSÍVEIS:**
+
+### **Melhorias Futuras:**
+- **🎨 Sprites**: Substituir círculos por sprites reais
+- **🔊 Som**: Efeitos sonoros de seleção e movimento
+- **📊 IA**: Comportamento automático do inimigo
+- **🎯 Alcance**: Limitar área onde pode ser posicionado
+- **🔄 Respawn**: Sistema de renascimento automático
+
+---
+
+## 🏆 **STATUS FINAL:**
+
+**Status**: SISTEMA DE TESTE IMPLEMENTADO ✅  
+**Funcionalidade**: Inimigo Arrastável para Teste  
+**Integração**: Sistema de Ataque Totalmente Compatível  
+**Próximo**: Teste completo do sistema de combate
+
+Agora você pode arrastar o inimigo para qualquer lugar e testar o sistema de ataque da infantaria! 🚀

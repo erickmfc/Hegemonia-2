@@ -1,0 +1,222 @@
+=========================================================
+HEGEMONIA GLOBAL - SISTEMA INIMIGO SIMPLES
+Implementação Funcional e Testável
+=========================================================
+
+DATA: 2025-01-27
+STATUS: SISTEMA IMPLEMENTADO COM SUCESSO
+
+## 🎯 **SISTEMA INIMIGO SIMPLES IMPLEMENTADO:**
+
+### **✅ OBJETO obj_inimigo ATUALIZADO:**
+
+#### **Create Event:**
+```gml
+// === PROPRIEDADES BÁSICAS ===
+vida = 100;
+vel = 1; // movimento simples
+direcao = 1;
+
+// === PROPRIEDADES DE COMBATE ===
+nacao_proprietaria = 2; // 2 = inimigo
+dano_ataque = 25;
+alcance_visao = 150;
+alcance_ataque = 50;
+
+// === COR E VISUAL ===
+image_blend = make_color_rgb(255, 0, 0); // Vermelho
+```
+
+#### **Step Event:**
+```gml
+// === MOVIMENTO BÁSICO ===
+// Movimento básico só pra não ficar parado
+x += vel * direcao;
+
+// Se bater nas bordas da sala, troca direção
+if (x < 32 || x > room_width - 32) {
+    direcao *= -1;
+}
+
+// === VERIFICAÇÃO DE DESTRUIÇÃO ===
+// Se morrer → destrói
+if (vida <= 0) {
+    instance_destroy();
+}
+```
+
+#### **Draw Event:**
+```gml
+// === DESENHAR O SPRITE BASE ===
+draw_self();
+
+// === BARRA DE VIDA SIMPLES ===
+var w = 40;
+var h = 5;
+var perc = max(0, vida) / 100;
+
+// Background da barra (vermelho)
+draw_set_color(make_color_rgb(255, 0, 0));
+draw_rectangle(x - w/2, y - 40, x + w/2, y - 40 + h, false);
+
+// Vida restante (verde)
+draw_set_color(make_color_rgb(0, 255, 0));
+draw_rectangle(x - w/2, y - 40, x - w/2 + (w * perc), y - 40 + h, false);
+
+// Reset da cor
+draw_set_color(make_color_rgb(255, 255, 255));
+```
+
+---
+
+## ⚔️ **SISTEMA DE COMBATE ATUALIZADO:**
+
+### **✅ obj_tiro_simples COMPATÍVEL:**
+- **Compatível com obj_inimigo** (usa variável `vida`)
+- **Compatível com obj_infantaria** (usa variável `hp_atual`)
+- **Detecção automática** de tipo de unidade
+- **Dano aplicado corretamente** em ambos os tipos
+
+### **Código de Compatibilidade:**
+```gml
+// Aplicar dano (compatível com obj_inimigo e obj_infantaria)
+if (variable_instance_exists(alvo, "vida")) {
+    alvo.vida -= dano;
+} else if (variable_instance_exists(alvo, "hp_atual")) {
+    alvo.hp_atual -= dano;
+}
+
+// Verificar se alvo morreu
+var vida_atual = 0;
+if (variable_instance_exists(alvo, "vida")) {
+    vida_atual = alvo.vida;
+} else if (variable_instance_exists(alvo, "hp_atual")) {
+    vida_atual = alvo.hp_atual;
+}
+
+if (vida_atual <= 0) {
+    instance_destroy(alvo);
+}
+```
+
+---
+
+## 🎮 **TESTE PRÁTICO IMPLEMENTADO:**
+
+### **Cenário de Teste:**
+1. **Coloque 1 soldado seu** (obj_infantaria)
+2. **Coloque 1 inimigo** (obj_inimigo) na mesma sala
+3. **Observe o comportamento:**
+   - Soldado detecta inimigo automaticamente
+   - Soldado anda até o inimigo
+   - Soldado atira quando está no alcance
+   - Barra de vida do inimigo diminui
+   - Inimigo morre quando vida chega a 0
+
+### **Comportamento do Inimigo:**
+- **Movimento:** Move-se horizontalmente pela tela
+- **Bordas:** Inverte direção ao bater nas bordas
+- **Vida:** 100 HP inicial
+- **Visual:** Círculo vermelho com barra de vida
+- **Destruição:** Desaparece quando vida = 0
+
+---
+
+## 🔥 **CARACTERÍSTICAS DO SISTEMA:**
+
+### **Inimigo (obj_inimigo):**
+- **Vida:** 100 HP
+- **Velocidade:** 1 pixel/frame
+- **Movimento:** Horizontal com inversão de direção
+- **Cor:** Vermelho
+- **Barra de Vida:** Visual simples (vermelho → verde)
+
+### **Soldado (obj_infantaria):**
+- **Detecção:** Automática de inimigos
+- **Movimento:** Segue inimigos automaticamente
+- **Ataque:** Atira quando no alcance
+- **Dano:** 25 por tiro
+- **Alcance:** 50 pixels
+
+### **Tiro (obj_tiro_simples):**
+- **Velocidade:** 8 pixels/frame
+- **Dano:** 25 HP
+- **Compatibilidade:** Funciona com ambos os tipos de unidade
+- **Destruição:** Auto-destrói ao atingir alvo
+
+---
+
+## 📊 **RESULTADOS ESPERADOS:**
+
+### **Teste 1: Combate Básico**
+- ✅ Soldado detecta inimigo
+- ✅ Soldado segue inimigo
+- ✅ Soldado atira quando próximo
+- ✅ Inimigo perde vida
+- ✅ Inimigo morre após 4 tiros
+
+### **Teste 2: Movimento do Inimigo**
+- ✅ Inimigo move-se horizontalmente
+- ✅ Inimigo inverte direção nas bordas
+- ✅ Movimento contínuo e suave
+
+### **Teste 3: Barra de Vida**
+- ✅ Barra vermelha (background)
+- ✅ Barra verde (vida restante)
+- ✅ Barra diminui conforme dano
+- ✅ Barra desaparece quando inimigo morre
+
+---
+
+## 🎯 **COMO TESTAR:**
+
+### **Passo 1: Configurar Cena**
+1. Abra o jogo
+2. Crie uma instância de `obj_infantaria` (soldado azul)
+3. Crie uma instância de `obj_inimigo` (inimigo vermelho)
+4. Posicione-os na mesma sala
+
+### **Passo 2: Observar Comportamento**
+1. **Soldado:** Deve detectar inimigo automaticamente
+2. **Movimento:** Soldado segue, inimigo move horizontalmente
+3. **Combate:** Soldado atira quando próximo
+4. **Vida:** Barra de vida do inimigo diminui
+5. **Morte:** Inimigo desaparece quando vida = 0
+
+### **Passo 3: Verificar Funcionamento**
+- ✅ Sistema de detecção automática
+- ✅ Sistema de movimento funcional
+- ✅ Sistema de combate operacional
+- ✅ Sistema de vida visual
+- ✅ Sistema de destruição
+
+---
+
+## 📁 **ARQUIVOS MODIFICADOS:**
+
+### **Objeto Inimigo:**
+- ✅ `objects/obj_inimigo/Create_0.gml` - Sistema simples
+- ✅ `objects/obj_inimigo/Step_0.gml` - Movimento básico
+- ✅ `objects/obj_inimigo/Draw_64.gml` - Barra de vida
+
+### **Sistema de Tiro:**
+- ✅ `objects/obj_tiro_simples/Step_0.gml` - Compatibilidade
+
+---
+
+## 🚀 **STATUS FINAL:**
+
+✅ **SISTEMA INIMIGO SIMPLES IMPLEMENTADO**
+
+**Funcionalidades:**
+- ✅ Movimento horizontal com inversão
+- ✅ Barra de vida visual
+- ✅ Sistema de combate funcional
+- ✅ Compatibilidade com soldados
+- ✅ Destruição automática
+
+**O sistema está pronto para teste!** 🎯⚔️
+
+=========================================================
+SISTEMA INIMIGO SIMPLES - HEGEMONIA GLOBAL
+=========================================================

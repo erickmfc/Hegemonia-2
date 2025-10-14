@@ -1,0 +1,51 @@
+==========================================
+SISTEMA CENTRALIZADO - MENU DE CONSTRUÇÃO
+==========================================
+
+REESTRUTURAÇÃO COMPLETA REALIZADA:
+✓ Objetos individuais removidos (obj_botao_construir_casa, obj_botao_construir_banco)
+✓ Lógica centralizada no obj_menu_construcao
+✓ Interface desenhada manualmente com texto
+✓ Sistema de cliques unificado
+✓ Variável global.construindo_agora implementada
+
+COMO FUNCIONA AGORA:
+
+1. ATIVAÇÃO DO MODO
+   - Pressione C para ativar modo de construção
+   - Menu aparece automaticamente na parte inferior
+   - Mostra dois botões de texto: "Construir Casa" e "Construir Banco"
+
+2. SELEÇÃO DE EDIFÍCIO
+   - Clique em "Construir Casa" ou "Construir Banco"
+   - Menu desaparece automaticamente após seleção
+   - global.construindo_agora é definido para obj_casa ou obj_banco
+
+3. CONSTRUÇÃO NO MAPA
+   - Com edifício selecionado, clique no mapa
+   - Sistema verifica dinheiro automaticamente
+   - Desconta custo e cria edifício no local
+   - Limpa seleção após construção bem-sucedida
+
+MELHORIAS IMPLEMENTADAS:
+
+✓ Centralização completa da lógica
+✓ Interface mais limpa (apenas texto)
+✓ Menos objetos = melhor performance
+✓ Código mais organizado e fácil de manter
+✓ Sistema de cliques mais eficiente
+
+FLUXO SIMPLIFICADO:
+C → Clique no botão → Clique no mapa → Edifício construído
+
+CUSTOS:
+- Casa: $1000 (gera população)
+- Banco: $2500 (gera dinheiro)
+
+ARQUIVOS PRINCIPAIS:
+- obj_menu_construcao/Draw_64.gml (interface)
+- obj_menu_construcao/Mouse_56.gml (cliques)
+- obj_input_manager/Step_2.gml (construção no mapa)
+- obj_game_manager/Create_0.gml (variáveis globais)
+
+Sistema pronto para teste!

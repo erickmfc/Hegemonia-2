@@ -1,0 +1,141 @@
+=========================================================
+HEGEMONIA GLOBAL - REMOÇÃO COMPLETA DO SISTEMA DE PATRULHA E MOVIMENTO
+Sistema de Infantaria Simplificado
+=========================================================
+
+DATA: 2025-01-27
+STATUS: REMOÇÃO COMPLETA REALIZADA COM SUCESSO
+
+## 🗑️ **SISTEMAS REMOVIDOS:**
+
+### **📋 SISTEMA DE PATRULHA COMPLETAMENTE REMOVIDO:**
+
+#### **❌ Variáveis Removidas:**
+- ✅ `patrol_points` - Lista de pontos da patrulha
+- ✅ `patrol_index` - Índice do ponto atual
+- ✅ `patrolling` - Flag de patrulha ativa
+- ✅ `drawing_patrol` - Flag de desenho da rota
+
+#### **❌ Estados Removidos:**
+- ✅ `case "patrulhando"` - Estado de patrulha
+- ✅ Lógica de movimento entre pontos
+- ✅ Sistema de loop infinito
+- ✅ Detecção de inimigos durante patrulha
+
+#### **❌ Comandos Removidos:**
+- ✅ `case "patrulhar"` - Comando de patrulha
+- ✅ Definição de pontos de patrulha
+- ✅ Inicialização do sistema de patrulha
+
+---
+
+### **📋 SISTEMA DE MOVIMENTO COMPLETAMENTE REMOVIDO:**
+
+#### **❌ Variáveis Removidas:**
+- ✅ `destino_x` - Coordenada X de destino
+- ✅ `destino_y` - Coordenada Y de destino
+- ✅ `path` - Recurso de pathfinding
+- ✅ `timer_verificacao_pathfinding` - Timer de pathfinding
+
+#### **❌ Estados Removidos:**
+- ✅ `case "movendo"` - Estado de movimento
+- ✅ Sistema de pathfinding
+- ✅ Movimento direto como fallback
+- ✅ Validação de caminhos
+
+#### **❌ Comandos Removidos:**
+- ✅ `case "mover"` - Comando de movimento
+- ✅ Clique direito para mover
+- ✅ Movimento em formação
+- ✅ Cálculo de posições de formação
+
+---
+
+### **📋 SISTEMA DE SEGUIR COMPLETAMENTE REMOVIDO:**
+
+#### **❌ Variáveis Removidas:**
+- ✅ `seguir_alvo` - Unidade alvo para seguir
+
+#### **❌ Estados Removidos:**
+- ✅ `case "seguindo"` - Estado de seguir
+- ✅ Lógica de distância ideal
+- ✅ Pathfinding para seguir
+- ✅ Controle de proximidade
+
+#### **❌ Comandos Removidos:**
+- ✅ `case "seguir"` - Comando de seguir
+- ✅ Tecla E para seguir
+- ✅ Tecla X para cancelar seguir
+
+---
+
+## ✅ **SISTEMA SIMPLIFICADO RESULTANTE:**
+
+### **🎯 Estados Restantes:**
+- ✅ `"parado"` - Estado padrão, procura inimigos
+- ✅ `"atacando"` - Estado de combate
+
+### **🎯 Comandos Restantes:**
+- ✅ `"atacar"` - Atacar unidade específica
+- ✅ `"parar"` - Parar e voltar ao estado parado
+
+### **🎯 Funcionalidades Restantes:**
+- ✅ **Detecção de Inimigos**: Procura inimigos no raio de visão
+- ✅ **Combate**: Sistema de tiro e dano
+- ✅ **Seleção**: Sistema de seleção de unidades
+- ✅ **IA Básica**: Ataca inimigos automaticamente quando detectados
+
+---
+
+## 🔧 **ARQUIVOS MODIFICADOS:**
+
+### **1. Sistema Principal:**
+- ✅ `objects/obj_infantaria/Create_0.gml` - Variáveis removidas
+- ✅ `objects/obj_infantaria/Step_0.gml` - Lógica removida
+- ✅ `scripts/sc_comandos_infantaria/sc_comandos_infantaria.gml` - Comandos removidos
+
+### **2. Remoções Realizadas:**
+- ✅ **Variáveis de Patrulha**: Todas removidas
+- ✅ **Variáveis de Movimento**: Todas removidas
+- ✅ **Variáveis de Seguir**: Todas removidas
+- ✅ **Estados de Movimento**: Todos removidos
+- ✅ **Comandos de Movimento**: Todos removidos
+- ✅ **Timers de Pathfinding**: Removidos
+- ✅ **Lógica de Formação**: Removida
+- ✅ **Sistema de Pathfinding**: Removido
+
+---
+
+## 📊 **RESULTADO FINAL:**
+
+### **🎯 Infantaria Simplificada:**
+- ✅ **Apenas Combate**: Foca apenas em atacar inimigos
+- ✅ **IA Básica**: Detecta e ataca inimigos automaticamente
+- ✅ **Sem Movimento**: Não se move por comandos
+- ✅ **Sem Patrulha**: Não patrulha áreas
+- ✅ **Sem Seguir**: Não segue outras unidades
+
+### **🎯 Comportamento Atual:**
+1. **Estado Parado**: Procura inimigos no raio de visão
+2. **Detecção**: Quando encontra inimigo, muda para "atacando"
+3. **Combate**: Atira no inimigo até eliminá-lo
+4. **Retorno**: Volta para "parado" após eliminar inimigo
+
+### **🎯 Comandos Disponíveis:**
+- **Atacar**: `sc_comandos_infantaria("atacar", 0, 0, unidade_alvo)`
+- **Parar**: `sc_comandos_infantaria("parar", 0, 0, noone)`
+
+---
+
+## 🎯 **PRÓXIMOS PASSOS RECOMENDADOS:**
+
+1. **Teste do Sistema**: Verificar se a infantaria ainda funciona corretamente
+2. **Ajustes de IA**: Otimizar detecção e combate
+3. **Expansão**: Aplicar simplificação a outras unidades se necessário
+4. **Documentação**: Atualizar manuais de uso
+
+---
+
+**STATUS: REMOÇÃO COMPLETA - SISTEMA SIMPLIFICADO** ✅
+
+**NOTA**: A infantaria agora é uma unidade puramente defensiva que apenas ataca inimigos que se aproximam, sem capacidade de movimento ou patrulha.

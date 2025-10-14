@@ -1,0 +1,10 @@
+{
+  "$GMScript":"",
+  "%Name":"scr_backup_sistema_edificios",
+  "isDnD":false,
+  "isTemplate":false,
+  "isHidden":false,
+  "name":"scr_backup_sistema_edificios",
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

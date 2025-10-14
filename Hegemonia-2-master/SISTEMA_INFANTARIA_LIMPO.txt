@@ -1,0 +1,160 @@
+=========================================================
+HEGEMONIA GLOBAL - SISTEMA DE INFANTARIA LIMPO
+Sistema Básico - Completamente Limpo
+=========================================================
+
+DATA: 2025-01-27
+STATUS: SISTEMA COMPLETAMENTE LIMPO
+
+## 🧹 **SISTEMA COMPLETAMENTE LIMPO:**
+
+### **O que foi removido:**
+- ✅ **Sistema de IA complexo** (detecção, perseguição, ataque)
+- ✅ **Sistema de combate** (tiros, projéteis, cooldowns)
+- ✅ **Variáveis de combate** (raio de visão, raio de ataque, dano)
+- ✅ **Sistema de alvos** (alvo_inimigo, timers)
+- ✅ **Indicadores complexos** (círculos de alcance, linhas para alvos)
+- ✅ **Debug excessivo** (muitas informações na tela)
+
+### **O que foi mantido:**
+- ✅ **Variáveis básicas** (nação, cor, vida, velocidade)
+- ✅ **Sistema de estados** simples (apenas "parado")
+- ✅ **Visual básico** (círculo de estado, barra de vida)
+- ✅ **Debug mínimo** (estado e vida)
+
+## 🎯 **SISTEMA ATUAL:**
+
+### **1. CREATE EVENT - Mínimo:**
+```gml
+// === VARIÁVEIS BÁSICAS ===
+nacao_proprietaria = 1; // 1 = Jogador, 2 = Inimigo
+image_blend = c_blue; // Cor baseada na nação
+
+// === ESTATÍSTICAS BÁSICAS ===
+vida_maxima = 100;
+vida_atual = vida_maxima;
+velocidade = 2.0;
+
+// === SISTEMA BÁSICO ===
+estado = "parado";
+```
+
+### **2. STEP EVENT - Mínimo:**
+```gml
+// === VERIFICAÇÃO DE DESTRUIÇÃO ===
+if (vida_atual <= 0) {
+    instance_destroy();
+    exit;
+}
+
+// === ATUALIZAR COR BASEADA NA NAÇÃO ===
+if (nacao_proprietaria == 2) {
+    image_blend = c_red;
+} else {
+    image_blend = c_blue;
+}
+```
+
+### **3. DRAW EVENT - Básico:**
+```gml
+// === CÍRCULO DE ESTADO ===
+// Círculo transparente com borda colorida
+
+// === BARRA DE VIDA ===
+// Barra simples mostrando vida atual
+
+// === DEBUG BÁSICO ===
+// Estado e vida apenas
+```
+
+### **4. ALARM 1 - Limpo:**
+```gml
+// Alarm 1 limpo - pronto para futuras implementações
+show_debug_message("ALARM 1 - INFANTARIA ID: " + string(id));
+```
+
+## ✅ **FUNCIONALIDADES ATUAIS:**
+
+### **Sistema Básico:**
+- ✅ **Criação** de unidades
+- ✅ **Cor baseada na nação** (azul/vermelho)
+- ✅ **Sistema de vida** básico
+- ✅ **Destruição** quando vida = 0
+
+### **Sistema Visual:**
+- ✅ **Círculo de estado** transparente
+- ✅ **Barra de vida** colorida
+- ✅ **Debug básico** (estado e vida)
+
+### **Sistema de Estados:**
+- ✅ **Estado "parado"** apenas
+- ✅ **Sem IA** ou comportamentos complexos
+
+## 🚀 **BENEFÍCIOS:**
+
+### **1. Performance:**
+- ✅ **Código mínimo** e rápido
+- ✅ **Sem processamento** de IA
+- ✅ **Sem verificações** complexas
+- ✅ **Sem timers** ativos
+
+### **2. Manutenibilidade:**
+- ✅ **Código ultra limpo**
+- ✅ **Fácil de entender**
+- ✅ **Base sólida** para expansões
+- ✅ **Sem dependências** complexas
+
+### **3. Flexibilidade:**
+- ✅ **Pronto para expansões**
+- ✅ **Base simples** e estável
+- ✅ **Fácil de modificar**
+- ✅ **Sem conflitos**
+
+## 🎮 **COMO TESTAR:**
+
+### **Teste 1: Criação**
+1. Execute o jogo
+2. Crie uma unidade de infantaria
+3. Verifique se aparece com cor correta
+4. Confirme que tem vida e estado
+
+### **Teste 2: Visual**
+1. Observe o círculo transparente
+2. Verifique a barra de vida
+3. Confirme o debug básico
+4. Teste mudança de cor por nação
+
+### **Teste 3: Funcionalidade**
+1. Teste destruição (vida = 0)
+2. Verifique mensagens no console
+3. Confirme que não há comportamentos complexos
+
+## 📋 **PRÓXIMOS PASSOS:**
+
+### **Funcionalidades Futuras (Opcionais):**
+- [ ] Sistema de movimento básico
+- [ ] Sistema de combate simples
+- [ ] Sistema de comandos básicos
+- [ ] Sistema de IA simples
+- [ ] Sistema de experiência básico
+
+### **Melhorias Visuais (Opcionais):**
+- [ ] Animações básicas
+- [ ] Efeitos visuais simples
+- [ ] Sons básicos
+- [ ] Partículas simples
+
+## 📞 **STATUS FINAL:**
+
+✅ **SISTEMA COMPLETAMENTE LIMPO E BÁSICO**
+- Código mínimo e eficiente
+- Base sólida para expansões
+- Performance máxima
+- Visual limpo e simples
+- Sem complexidades desnecessárias
+
+O **Sistema de Infantaria** agora está completamente limpo e pronto para ser expandido conforme necessário! 🎉
+
+=========================================================
+SISTEMA DE INFANTARIA LIMPO - HEGEMONIA GLOBAL
+=========================================================

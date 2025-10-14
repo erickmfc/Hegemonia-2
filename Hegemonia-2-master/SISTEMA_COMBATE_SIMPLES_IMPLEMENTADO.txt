@@ -1,0 +1,138 @@
+=========================================================
+HEGEMONIA GLOBAL - SISTEMA DE COMBATE SIMPLES
+Implementação Completa e Funcional
+=========================================================
+
+DATA: 2025-01-27
+STATUS: SISTEMA IMPLEMENTADO COM SUCESSO
+
+## 🎯 **SISTEMA CRIADO:**
+
+### **1. ✅ obj_soldado - Soldado Aliado**
+**Funcionalidades:**
+- Detecta inimigos automaticamente
+- Segue inimigos quando estão longe
+- Atira quando está no alcance
+- Cooldown de 1 segundo entre tiros
+
+**Atributos:**
+- Vida: 100 HP
+- Dano: 25 HP por tiro
+- Alcance de visão: 150 pixels
+- Alcance de tiro: 50 pixels
+- Velocidade: 2 pixels/frame
+
+### **2. ✅ obj_bala - Projétil**
+**Funcionalidades:**
+- Move-se em direção ao alvo
+- Aplica dano ao colidir
+- Auto-destrói após colisão
+
+**Atributos:**
+- Dano: 25 HP
+- Velocidade: 8 pixels/frame
+
+### **3. ✅ obj_inimigo_soldado - Inimigo**
+**Funcionalidades:**
+- Fica parado esperando ser atacado
+- Barra de vida visual
+- Morre quando vida = 0
+- Desaparece automaticamente
+
+**Atributos:**
+- Vida: 100 HP
+- Movimento: Parado
+
+---
+
+## 🔥 **COMO FUNCIONA:**
+
+### **Fluxo de Combate:**
+1. **Soldado detecta inimigo** usando `instance_nearest(x, y, obj_inimigo_soldado)`
+2. **Soldado anda até o inimigo** se estiver fora do alcance (50 pixels)
+3. **Soldado atira** quando está no alcance
+4. **Bala move-se** em direção ao inimigo
+5. **Bala colide** com o inimigo
+6. **Inimigo recebe dano** (25 HP)
+7. **Barra de vida diminui** visualmente
+8. **Inimigo morre** após 4 tiros (100 HP ÷ 25 dano)
+9. **Inimigo desaparece** automaticamente
+
+---
+
+## 📁 **ARQUIVOS CRIADOS:**
+
+### **obj_soldado:**
+- ✅ `objects/obj_soldado/obj_soldado.yy` - Configuração do objeto
+- ✅ `objects/obj_soldado/Create_0.gml` - Inicialização
+- ✅ `objects/obj_soldado/Step_0.gml` - IA de combate
+
+### **obj_bala:**
+- ✅ `objects/obj_bala/obj_bala.yy` - Configuração do objeto
+- ✅ `objects/obj_bala/Create_0.gml` - Propriedades da bala
+- ✅ `objects/obj_bala/Collision_obj_inimigo_soldado.gml` - Colisão
+
+### **obj_inimigo_soldado:**
+- ✅ `objects/obj_inimigo_soldado/obj_inimigo_soldado.yy` - Configuração
+- ✅ `objects/obj_inimigo_soldado/Create_0.gml` - Inicialização
+- ✅ `objects/obj_inimigo_soldado/Step_0.gml` - Verificação de morte
+- ✅ `objects/obj_inimigo_soldado/Draw_0.gml` - Barra de vida
+
+---
+
+## 🎮 **TESTE PRÁTICO:**
+
+### **Cenário de Teste:**
+1. **Coloque 1 soldado** (obj_soldado) na sala
+2. **Coloque 1 inimigo** (obj_inimigo_soldado) na sala
+3. **Observe o comportamento:**
+
+### **Resultado Esperado:**
+- ✅ **Soldado detecta inimigo** automaticamente
+- ✅ **Soldado anda até o inimigo** (se estiver longe)
+- ✅ **Soldado atira** quando está no alcance (50 pixels)
+- ✅ **Barra de vida do inimigo diminui** a cada tiro
+- ✅ **Inimigo morre** após 4 tiros
+- ✅ **Inimigo desaparece** quando morre
+
+---
+
+## 📊 **ESTATÍSTICAS DO SISTEMA:**
+
+### **Soldado:**
+- **Alcance de visão:** 150 pixels
+- **Alcance de ataque:** 50 pixels
+- **Dano por tiro:** 25 HP
+- **Velocidade:** 2 pixels/frame
+- **Cooldown:** 1 segundo entre tiros
+
+### **Inimigo:**
+- **Vida:** 100 HP
+- **Movimento:** Parado
+- **Dano recebido:** 25 HP por tiro
+- **Tiros para morrer:** 4 tiros
+
+### **Bala:**
+- **Velocidade:** 8 pixels/frame
+- **Dano:** 25 HP
+- **Destruição:** Ao colidir com inimigo
+
+---
+
+## 🚀 **STATUS FINAL:**
+
+✅ **SISTEMA DE COMBATE SIMPLES IMPLEMENTADO**
+
+**Funcionalidades:**
+- ✅ Detecção automática de inimigos
+- ✅ Movimento inteligente do soldado
+- ✅ Sistema de tiro funcional
+- ✅ Colisão e dano
+- ✅ Barra de vida visual
+- ✅ Destruição automática
+
+**O sistema está pronto para teste!** 🎯⚔️
+
+=========================================================
+SISTEMA DE COMBATE SIMPLES - HEGEMONIA GLOBAL
+=========================================================

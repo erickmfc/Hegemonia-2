@@ -1,0 +1,145 @@
+=========================================================
+HEGEMONIA GLOBAL - SISTEMA DE LIMITE DE POPULAÇÃO
+Controle de População por Casa
+=========================================================
+
+DATA: 2025-01-27
+STATUS: SISTEMA DE LIMITE IMPLEMENTADO COM SUCESSO
+
+## 🏠 **SISTEMA DE LIMITE DE POPULAÇÃO POR CASA:**
+
+### ✅ **LIMITES IMPLEMENTADOS:**
+
+#### 1. **Limite por Casa Individual:**
+- **🏠 Máximo**: 10 pessoas por casa
+- **📊 Controle**: Cada casa tem contador individual
+- **🔄 Verificação**: Sistema previne exceder limite por casa
+
+#### 2. **Limite Total da Cidade:**
+- **🏙️ Máximo**: 1000 pessoas na cidade
+- **🚫 Prevenção**: Casas não podem ser construídas se limite for atingido
+- **💥 Destruição**: Casa é destruída automaticamente se não puder adicionar população
+
+---
+
+## 🔧 **VARIÁVEIS DE CONTROLE:**
+
+### **Por Casa (obj_casa):**
+```gml
+limite_pessoas_por_casa = 10;        // Máximo de pessoas por casa
+limite_maximo_cidade = 1000;         // Limite máximo da cidade
+pessoas_esta_casa = 0;               // Pessoas desta casa específica
+populacao_adicionada = false;        // Controle de inicialização
+```
+
+### **Globais:**
+```gml
+global.populacao_cidade              // Total de habitantes na cidade
+```
+
+---
+
+## 🎯 **COMO FUNCIONA:**
+
+### **1. Construção de Casa:**
+```
+1. Casa é criada
+2. Sistema verifica se cidade pode receber mais pessoas
+3. Se SIM: Adiciona 10 pessoas e registra na casa
+4. Se NÃO: Destrói a casa automaticamente
+```
+
+### **2. Verificações de Segurança:**
+```
+✅ Limite por casa: Máximo 10 pessoas
+✅ Limite da cidade: Máximo 1000 pessoas
+✅ Controle individual: Cada casa tem seu contador
+✅ Prevenção de bugs: Sistema não permite crescimento infinito
+```
+
+---
+
+## 📊 **EXEMPLOS DE FUNCIONAMENTO:**
+
+### **Cenário 1: Casa Normal**
+```
+🏠 Casa construída
+👥 Adiciona 10 pessoas
+📊 Total cidade: 10 pessoas
+✅ Casa funcionando normalmente
+```
+
+### **Cenário 2: Múltiplas Casas**
+```
+🏠 Casa 1: +10 pessoas (Total: 10)
+🏠 Casa 2: +10 pessoas (Total: 20)
+🏠 Casa 3: +10 pessoas (Total: 30)
+📊 Sistema funcionando perfeitamente
+```
+
+### **Cenário 3: Limite Atingido**
+```
+🏠 Casa 99: +10 pessoas (Total: 990)
+🏠 Casa 100: +10 pessoas (Total: 1000)
+🚫 Casa 101: NÃO PODE SER CONSTRUÍDA
+💥 Casa é destruída automaticamente
+📊 Cidade mantém limite de 1000 pessoas
+```
+
+---
+
+## 🎮 **BENEFÍCIOS DO SISTEMA:**
+
+### **✅ Para o Jogador:**
+- **🎯 Controle**: Sabe exatamente quantas pessoas pode ter
+- **💰 Economia**: Planejamento financeiro baseado em população
+- **🏗️ Estratégia**: Decisões de construção mais inteligentes
+
+### **✅ Para o Sistema:**
+- **🚫 Prevenção**: Não permite crescimento infinito
+- **📊 Estabilidade**: População sempre controlada
+- **⚡ Performance**: Sistema mais eficiente
+- **🐛 Sem Bugs**: Previne problemas de overflow
+
+---
+
+## 🔧 **ARQUIVOS MODIFICADOS:**
+
+### **Create Event:**
+- ✅ `objects/obj_casa/Create_0.gml` - Variáveis de controle
+
+### **Step Event:**
+- ✅ `objects/obj_casa/Step_0.gml` - Sistema de limite implementado
+
+---
+
+## 🏆 **RESULTADO:**
+
+O sistema agora possui:
+
+- **🏠 Controle Individual**: Cada casa tem limite de 10 pessoas
+- **🏙️ Limite Total**: Cidade máxima de 1000 pessoas
+- **🚫 Prevenção**: Sistema impede crescimento infinito
+- **📊 Estabilidade**: População sempre controlada e previsível
+- **🎮 Estratégia**: Jogador deve planejar construção inteligentemente
+
+---
+
+## 🎯 **PRÓXIMOS PASSOS POSSÍVEIS:**
+
+### **Melhorias Futuras:**
+- **🏗️ Upgrade de Casas**: Aumentar limite por casa com melhorias
+- **🏙️ Expansão de Cidade**: Aumentar limite total com tecnologias
+- **👥 Migração**: Sistema de pessoas se movendo entre casas
+- **📈 Crescimento Natural**: População aumentando com o tempo
+
+---
+
+## 🏆 **STATUS FINAL:**
+
+**Status**: SISTEMA DE LIMITE IMPLEMENTADO ✅  
+**Funcionalidade**: Controle de População por Casa  
+**Segurança**: Prevenção de Crescimento Infinito  
+**Próximo**: Sistema estável e controlado
+
+O sistema de casas agora tem controle total sobre a população! 🚀

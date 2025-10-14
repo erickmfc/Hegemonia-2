@@ -1,0 +1,140 @@
+=========================================================
+HEGEMONIA GLOBAL - DEBUG SISTEMA DE TIRO
+Solução para Problema: "Soldado não atira"
+=========================================================
+
+## 🎯 **PROBLEMA IDENTIFICADO:**
+O soldado vai até o lugar mas não atira no inimigo.
+
+## 🔧 **CORREÇÕES IMPLEMENTADAS:**
+
+### 1. **Sistema de Debug Adicionado**
+- ✅ **Debug Visual**: Informações de estado, alvo e timer na tela
+- ✅ **Debug Console**: Mensagens detalhadas no console
+- ✅ **Teste Manual**: Pressione T para forçar tiro
+
+### 2. **Melhorias no Sistema de Tiro**
+- ✅ **Verificação de Variáveis**: Garantia de que todas as variáveis existem
+- ✅ **Timer Corrigido**: Sistema de timer próprio (`timer_verificacao`)
+- ✅ **Alarme Melhorado**: Debug detalhado no Alarm[1]
+
+### 3. **Sistema de Projétil Otimizado**
+- ✅ **Criação Segura**: Verificação de variáveis antes de criar
+- ✅ **Movimento Garantido**: Fallback para velocidade e direção
+- ✅ **Debug Completo**: Rastreamento de criação e movimento
+
+## 🎮 **COMO TESTAR:**
+
+### **Teste 1: Debug Visual**
+1. Execute o jogo
+2. Observe as informações na tela:
+   - **Estado**: Deve mostrar "parado", "perseguindo", "atacando"
+   - **Alvo**: Deve mostrar o ID do inimigo quando detectado
+   - **Dist**: Distância até o alvo / alcance de ataque
+   - **Timer**: Deve diminuir quando atacando
+
+### **Teste 2: Debug Console**
+1. Abra o console do GameMaker (F12)
+2. Observe as mensagens:
+   - "INIMIGO DETECTADO" quando encontra alvo
+   - "INICIANDO ATAQUE" quando entra no alcance
+   - "TIMER DE TIRO ATIVADO" quando programa tiro
+   - "ATIRANDO" quando executa tiro
+   - "PROJÉTIL CRIADO" quando cria projétil
+
+### **Teste 3: Teste Manual**
+1. Pressione **T** no teclado
+2. Isso deve forçar um tiro imediato
+3. Verifique se aparecem as mensagens de debug
+
+## 🔍 **POSSÍVEIS CAUSAS DO PROBLEMA:**
+
+### **1. Problema de Detecção**
+- ❌ Unidades não estão sendo detectadas
+- ❌ `nacao_proprietaria` não está configurada corretamente
+- ❌ `raio_de_visao` muito pequeno
+
+### **2. Problema de Alcance**
+- ❌ `raio_de_ataque` muito pequeno
+- ❌ Unidades não chegam no alcance
+- ❌ Estado não muda para "atacando"
+
+### **3. Problema de Timer**
+- ❌ `alarm[1]` não está sendo ativado
+- ❌ `cooldown_tiro` muito alto
+- ❌ Timer sendo resetado incorretamente
+
+### **4. Problema de Projétil**
+- ❌ `obj_impacto` não existe
+- ❌ Variáveis não estão sendo passadas
+- ❌ Projétil não se move
+
+## 📋 **CHECKLIST DE VERIFICAÇÃO:**
+
+### **Configurações Básicas:**
+- [ ] `obj_impacto` existe no projeto
+- [ ] `nacao_proprietaria` está definida (1 ou 2)
+- [ ] `raio_de_visao` > `raio_de_ataque`
+- [ ] `cooldown_tiro` > 0
+
+### **Debug Visual:**
+- [ ] Informações aparecem na tela
+- [ ] Estado muda corretamente
+- [ ] Alvo é detectado
+- [ ] Timer diminui
+
+### **Debug Console:**
+- [ ] Mensagens aparecem no console
+- [ ] Sequência: DETECTADO → ATAQUE → TIRO → PROJÉTIL
+- [ ] Sem erros de variáveis
+
+### **Teste Manual:**
+- [ ] Pressionar T funciona
+- [ ] Tiro é executado imediatamente
+- [ ] Projétil é criado
+
+## 🛠️ **SOLUÇÕES ESPECÍFICAS:**
+
+### **Se não detecta inimigos:**
+```gml
+// Verificar se nacao_proprietaria está correta
+show_debug_message("Minha nação: " + string(nacao_proprietaria));
+```
+
+### **Se não ativa timer:**
+```gml
+// Verificar se alarm[1] está sendo definido
+show_debug_message("Timer definido: " + string(alarm[1]));
+```
+
+### **Se projétil não é criado:**
+```gml
+// Verificar se obj_impacto existe
+if (object_exists(obj_impacto)) {
+    show_debug_message("obj_impacto existe");
+} else {
+    show_debug_message("ERRO: obj_impacto não existe");
+}
+```
+
+## 🎯 **PRÓXIMOS PASSOS:**
+
+1. **Execute o jogo** com as correções
+2. **Observe o debug visual** na tela
+3. **Verifique o console** para mensagens
+4. **Teste manual** pressionando T
+5. **Reporte** o que você observa
+
+## 📞 **INFORMAÇÕES PARA REPORTE:**
+
+Quando testar, me informe:
+- ✅ O que aparece no debug visual
+- ✅ Quais mensagens aparecem no console
+- ✅ Se o teste manual (T) funciona
+- ✅ Se há algum erro específico
+
+Com essas informações, posso identificar exatamente onde está o problema e corrigi-lo! 🚀
+
+=========================================================
+DEBUG SISTEMA DE TIRO - HEGEMONIA GLOBAL
+=========================================================

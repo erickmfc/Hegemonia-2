@@ -1,0 +1,241 @@
+=========================================================
+HEGEMONIA GLOBAL - SISTEMA DE COMANDOS TÁTICOS COMPLETO
+Implementação Avançada de Controle Militar
+=========================================================
+
+DATA: 2025-01-27
+STATUS: SISTEMA COMPLETO - Comandos Táticos Implementados
+
+## 🎯 **SISTEMA DE COMANDOS TÁTICOS AVANÇADOS**
+
+### ✅ **IMPLEMENTAÇÕES COMPLETAS:**
+
+#### 1. **Sistema de Comandos na Infantaria**
+- ✅ **Comando SEGUIR**: Unidades seguem outra unidade mantendo distância
+- ✅ **Comando PATRULHAR**: Unidades patrulham entre dois pontos
+- ✅ **Posturas de Combate**: Agressiva, Defensiva, Passiva
+- ✅ **Regras de Engajamento**: Comportamento inteligente durante comandos
+
+#### 2. **Interface de Comando no Quartel**
+- ✅ **Atalhos de Teclado**: S, P, A, D, F, C para comandos rápidos
+- ✅ **Sistema de Seleção**: Modo de seleção de unidades
+- ✅ **Aplicação de Comandos**: Funções para aplicar comandos em múltiplas unidades
+- ✅ **Controle de Posturas**: Mudança global de posturas de combate
+
+#### 3. **Sistema Visual Avançado**
+- ✅ **Indicadores de Comando**: Texto e cores para comandos ativos
+- ✅ **Indicadores de Postura**: Cores diferentes para cada postura
+- ✅ **Visualização de Patrulha**: Linhas e pontos de patrulha
+- ✅ **Visualização de Seguir**: Linhas e círculos de distância
+
+## 🎮 **COMO USAR O SISTEMA:**
+
+### **Comandos Táticos (Atalhos de Teclado):**
+
+#### **S - Comando SEGUIR**
+1. Pressione **S** para ativar modo seguir
+2. Selecione as unidades que devem seguir
+3. Clique na unidade alvo
+4. As unidades seguirão automaticamente
+
+#### **P - Comando PATRULHAR**
+1. Pressione **P** para ativar modo patrulhar
+2. Selecione as unidades para patrulha
+3. Clique no ponto inicial da patrulha
+4. Clique no ponto final da patrulha
+5. As unidades patrulharão automaticamente
+
+#### **A - Postura AGRESSIVA**
+- Pressione **A** para definir postura agressiva
+- Unidades atacam qualquer inimigo no raio de visão
+
+#### **D - Postura DEFENSIVA**
+- Pressione **D** para definir postura defensiva
+- Unidades só atacam no raio de ataque, não perseguem
+
+#### **F - Postura PASSIVA**
+- Pressione **F** para definir postura passiva
+- Unidades nunca atacam automaticamente
+
+#### **C - Cancelar Comando**
+- Pressione **C** para cancelar comando atual
+- Volta ao comportamento padrão
+
+## 🔧 **FUNCIONALIDADES IMPLEMENTADAS:**
+
+### **INFANTARIA - Sistema de Comandos:**
+
+#### 1. **Comando SEGUIR**
+```gml
+function executar_comando_seguir() {
+    // Mantém distância ideal de 80 pixels
+    // Acompanha movimento da unidade alvo
+    // Auxilia automaticamente em combate
+    // Retorna ao comportamento padrão se alvo perdido
+}
+```
+
+#### 2. **Comando PATRULHAR**
+```gml
+function executar_comando_patrulhar() {
+    // Move entre dois pontos continuamente
+    // Detecta inimigos durante patrulha
+    // Quebra patrulha temporariamente para atacar
+    // Retorna à patrulha após eliminar inimigo
+}
+```
+
+#### 3. **Posturas de Combate**
+```gml
+// AGRESSIVA: Ataca qualquer inimigo no raio de visão
+// DEFENSIVA: Só ataca no raio de ataque, não persegue
+// PASSIVA: Nunca ataca automaticamente
+```
+
+### **QUARTEL - Interface de Comando:**
+
+#### 1. **Sistema de Atalhos**
+```gml
+// S - Modo SEGUIR
+// P - Modo PATRULHAR
+// A - Postura AGRESSIVA
+// D - Postura DEFENSIVA
+// F - Postura PASSIVA
+// C - Cancelar comando
+```
+
+#### 2. **Funções de Aplicação**
+```gml
+function aplicar_postura_unidades(postura)
+function aplicar_comando_seguir(unidades, alvo)
+function aplicar_comando_patrulhar(unidades, ponto_inicio, ponto_fim)
+```
+
+## 🎨 **SISTEMA VISUAL:**
+
+### **Indicadores de Comando:**
+- **SEGUIR**: Texto verde "SEGUIR"
+- **PATRULHA**: Texto azul "PATRULHA"
+- **Linhas de conexão** entre unidades
+- **Círculos de distância** para seguir
+
+### **Indicadores de Postura:**
+- **AGRESSIVA**: Texto vermelho "AGRESSIVA"
+- **DEFENSIVA**: Texto amarelo "DEFENSIVA"
+- **PASSIVA**: Texto cinza "PASSIVA"
+
+### **Visualização de Patrulha:**
+- **Linha azul** entre pontos de patrulha
+- **Círculos azuis** nos pontos de início e fim
+- **Círculo amarelo** no ponto atual da patrulha
+
+### **Visualização de Seguir:**
+- **Linha verde** para unidade alvo
+- **Círculo verde** mostrando distância ideal
+
+## 📊 **COMPORTAMENTOS TÁTICOS:**
+
+### **Regras de Engajamento:**
+
+#### **Durante SEGUIR:**
+- Unidade mantém distância de 80 pixels
+- Se alvo ataca inimigo, auxilia automaticamente
+- Se alvo é destruído, volta ao comportamento padrão
+- Ajusta velocidade para manter distância
+
+#### **Durante PATRULHAR:**
+- Move continuamente entre dois pontos
+- Detecta inimigos durante patrulha
+- Quebra patrulha para atacar inimigos
+- Retorna à patrulha após eliminar inimigo
+- Velocidade reduzida (80% da normal)
+
+#### **Posturas de Combate:**
+- **Agressiva**: Comportamento padrão atual
+- **Defensiva**: Só ataca no raio de ataque, não persegue
+- **Passiva**: Nunca ataca automaticamente
+
+## 🎯 **BENEFÍCIOS DO SISTEMA:**
+
+### 1. **Controle Tático Avançado**
+- ✅ Comandos precisos para unidades
+- ✅ Comportamentos táticos realistas
+- ✅ Sistema de posturas estratégicas
+
+### 2. **Automação Inteligente**
+- ✅ Unidades seguem automaticamente
+- ✅ Patrulhas contínuas e eficientes
+- ✅ Engajamento automático quando necessário
+
+### 3. **Interface Intuitiva**
+- ✅ Atalhos de teclado rápidos
+- ✅ Feedback visual claro
+- ✅ Sistema de cancelamento
+
+### 4. **Flexibilidade Estratégica**
+- ✅ Múltiplas opções de comando
+- ✅ Posturas adaptáveis
+- ✅ Comportamentos contextuais
+
+## 🚀 **EXEMPLOS DE USO:**
+
+### **Cenário 1: Defesa de Base**
+1. Pressione **P** para modo patrulhar
+2. Selecione unidades de infantaria
+3. Defina pontos de patrulha ao redor da base
+4. Unidades patrulharão automaticamente
+
+### **Cenário 2: Ataque Coordenado**
+1. Pressione **S** para modo seguir
+2. Selecione unidades de suporte
+3. Clique na unidade principal
+4. Unidades seguirão e auxiliarão automaticamente
+
+### **Cenário 3: Reconhecimento**
+1. Pressione **F** para postura passiva
+2. Envie unidades para explorar
+3. Elas não atacarão automaticamente
+4. Pressione **A** para voltar à postura agressiva
+
+## 📋 **ARQUIVOS MODIFICADOS:**
+
+### **INFANTARIA:**
+- ✅ `objects/obj_infantaria/Create_0.gml` - Sistema de comandos adicionado
+- ✅ `objects/obj_infantaria/Step_0.gml` - Lógica de comandos implementada
+- ✅ `objects/obj_infantaria/Draw_0.gml` - Interface visual expandida
+
+### **QUARTEL:**
+- ✅ `objects/obj_quartel/Create_0.gml` - Sistema de interface adicionado
+- ✅ `objects/obj_quartel/Step_0.gml` - Lógica de comandos implementada
+
+## 🎯 **PRÓXIMAS MELHORIAS POSSÍVEIS:**
+
+### **Funcionalidades Futuras:**
+- [ ] Sistema de formação (linha, coluna, círculo)
+- [ ] Comandos de grupo (seleção múltipla)
+- [ ] Waypoints múltiplos para patrulha
+- [ ] Comandos condicionais (se inimigo aparecer, então...)
+- [ ] Sistema de prioridades de alvo
+- [ ] Comandos de retirada tática
+
+### **Interface Futura:**
+- [ ] Interface gráfica para comandos
+- [ ] Mini-mapa com comandos
+- [ ] Histórico de comandos
+- [ ] Templates de comandos salvos
+
+## 🎯 **CONCLUSÃO:**
+
+O **Sistema de Comandos Táticos** foi implementado com sucesso, oferecendo:
+
+1. **Controle Tático Avançado** com comandos SEGUIR e PATRULHAR
+2. **Posturas de Combate** flexíveis (Agressiva, Defensiva, Passiva)
+3. **Interface Intuitiva** com atalhos de teclado
+4. **Comportamentos Inteligentes** com regras de engajamento
+5. **Feedback Visual** completo para todos os comandos
+
+O sistema transforma completamente a experiência de combate, permitindo controle tático profundo e estratégico sobre as unidades militares! 🚀
+
+=========================================================
+SISTEMA DE COMANDOS TÁTICOS - HEGEMONIA GLOBAL
+=========================================================

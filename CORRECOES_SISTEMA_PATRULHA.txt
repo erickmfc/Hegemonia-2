@@ -1,0 +1,168 @@
+# 🔧 **CORREÇÕES DO SISTEMA DE PATRULHA**
+
+## ✅ **PROBLEMAS IDENTIFICADOS E CORRIGIDOS**
+
+### **📻 Problema 1: Rádio na Frequência Errada**
+
+#### **❌ Problema Original:**
+- Menu não armazenava o ID específico da unidade que o criou
+- Usava apenas `global.unidade_selecionada` que podia mudar
+- Ordem se perdia no ar sem destinatário específico
+
+#### **✅ Correção Implementada:**
+```gml
+// Adicionado em obj_menu_de_acao/Create_0.gml
+unidade_id_especifica = noone;
+
+// Adicionado em obj_menu_de_acao/Step_0.gml
+if (unidade_id_especifica == noone) {
+    unidade_id_especifica = global.unidade_selecionada;
+    show_debug_message("📻 RÁDIO SINTONIZADO - Menu conectado à unidade ID: " + string(unidade_id_especifica));
+}
+```
+
+#### **🎯 Resultado:**
+- Menu agora "lembra" exatamente qual unidade o criou
+- Comunicação direta e específica entre menu e unidade
+- Debug mostra claramente qual unidade está sendo comandada
+
+---
+
+### **🔧 Problema 2: Botão "Quebrado"**
+
+#### **❌ Problema Original:**
+- Botão não verificava se a unidade ainda existia
+- Falta de validação antes de enviar comandos
+- Possível crash se unidade fosse destruída
+
+#### **✅ Correção Implementada:**
+```gml
+// Adicionado em obj_menu_de_acao/Step_0.gml
+if (instance_exists(unidade_id_especifica)) {
+    // Comandos enviados com segurança
+    global.modo_patrulha = true;
+    global.unidade_a_comandar = unidade_id_especifica;
+    
+    if (variable_instance_exists(unidade_id_especifica, "rota_de_patrulha")) {
+        ds_list_clear(unidade_id_especifica.rota_de_patrulha);
+    }
+} else {
+    show_debug_message("❌ ERRO: Unidade não existe mais! ID: " + string(unidade_id_especifica));
+}
+```
+
+#### **🎯 Resultado:**
+- Verificação de segurança antes de enviar comandos
+- Debug detalhado para identificar problemas
+- Sistema robusto contra unidades destruídas
+
+---
+
+### **👂 Problema 3: Soldado "Surdo"**
+
+#### **❌ Problema Original:**
+- Unidade não verificava se foi comandada para patrulhar
+- Estado "patrulhando" não era ativado corretamente
+- Falta de feedback sobre recebimento de ordens
+
+#### **✅ Correção Implementada:**
+
+**1. Verificação de Comando:**
+```gml
+// Adicionado em obj_infantaria/Step_0.gml
+if (global.unidade_a_comandar == id && global.modo_patrulha) {
+    show_debug_message("🎯 UNIDADE RECEBEU ORDEM DE PATRULHA - ID: " + string(id));
+    show_debug_message("📻 RÁDIO FUNCIONANDO - Unidade pronta para receber pontos da rota");
+}
+```
+
+**2. Ativação Correta do Estado:**
+```gml
+// Corrigido em obj_controlador_unidades/Step_0.gml
+global.unidade_a_comandar.estado = "patrulhando";
+global.unidade_a_comandar.ponto_da_patrulha_atual = 0;
+
+show_debug_message("🎯 Unidade ID " + string(global.unidade_a_comandar) + " mudou para estado: " + global.unidade_a_comandar.estado);
+```
+
+**3. Debug no Estado Patrulhando:**
+```gml
+// Adicionado em obj_infantaria/Step_0.gml
+case "patrulhando":
+    show_debug_message("🔄 EXECUTANDO PATRULHA - Unidade ID: " + string(id));
+    // ... resto da lógica
+```
+
+#### **🎯 Resultado:**
+- Unidade agora "ouve" e responde aos comandos
+- Estado é ativado corretamente
+- Debug mostra execução da patrulha em tempo real
+
+---
+
+## 🎮 **COMO TESTAR AS CORREÇÕES:**
+
+### **🧪 Teste 1: Rádio na Frequência Correta**
+1. Selecione uma unidade
+2. Verifique no console: `📻 RÁDIO SINTONIZADO - Menu conectado à unidade ID: X`
+3. Confirme que o ID é específico da unidade selecionada
+
+### **🧪 Teste 2: Botão Funcionando**
+1. Clique em PATRULHAR
+2. Verifique no console: `📻 TRANSMITINDO ORDEM para unidade ID: X`
+3. Confirme que não há erros de unidade inexistente
+
+### **🧪 Teste 3: Soldado Respondendo**
+1. Adicione pontos à rota (clique esquerdo)
+2. Finalize a patrulha (clique direito)
+3. Verifique no console: `🎯 Unidade ID X mudou para estado: patrulhando`
+4. Confirme que a unidade executa a patrulha
+
+---
+
+## 🐛 **MENSAGENS DE DEBUG ESPERADAS:**
+
+### **✅ Fluxo Completo de Sucesso:**
+```
+🎯 Unidade selecionada - ID: 1001 | Estado: livre
+📻 RÁDIO SINTONIZADO - Menu conectado à unidade ID: 1001
+🎯 CLIQUE NO BOTÃO PATRULHAR!
+📻 TRANSMITINDO ORDEM para unidade ID: 1001
+🔄 MODO PATRULHA ATIVADO para a unidade: 1001
+🎯 UNIDADE RECEBEU ORDEM DE PATRULHA - ID: 1001
+📻 RÁDIO FUNCIONANDO - Unidade pronta para receber pontos da rota
+📍 Ponto de patrulha adicionado em: (200, 300)
+📊 Total de pontos na rota: 1
+📍 Ponto de patrulha adicionado em: (400, 300)
+📊 Total de pontos na rota: 2
+🔄 Rota de patrulha finalizada. Iniciando patrulha.
+🎯 Unidade ID 1001 mudou para estado: patrulhando
+📊 Pontos na rota: 2
+🔄 EXECUTANDO PATRULHA - Unidade ID: 1001
+🔄 Patrulhando - Indo para ponto 1 de 2
+```
+
+---
+
+## 🚀 **BENEFÍCIOS DAS CORREÇÕES:**
+
+### **🎯 Comunicação Robusta:**
+- **Rádio sintonizado** na frequência correta
+- **Verificações de segurança** em cada etapa
+- **Debug detalhado** para identificar problemas
+
+### **🔧 Sistema Confiável:**
+- **Prevenção de crashes** por unidades inexistentes
+- **Validação de dados** antes de executar comandos
+- **Feedback em tempo real** do status das operações
+
+### **👂 Unidades Responsivas:**
+- **Comandos recebidos** e processados corretamente
+- **Estados ativados** conforme esperado
+- **Execução visual** da patrulha funcionando
+
+---
+
+**Status: ✅ TODOS OS PROBLEMAS CORRIGIDOS**
+
+O sistema de patrulha agora funciona com comunicação robusta e confiável! 🎯📻🔄

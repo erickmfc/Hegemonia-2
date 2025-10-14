@@ -1,0 +1,209 @@
+# 🎯 **DOUTRINA DE COMBATE MILITAR - IMPLEMENTADA**
+
+## ⚔️ **SISTEMA TÁTICO DE COMANDOS MILITARES**
+
+### **📋 VISÃO GERAL:**
+
+O sistema implementa uma doutrina de combate militar realista, com três comandos táticos principais que transformam unidades simples em forças de combate inteligentes e coordenadas.
+
+---
+
+## 🎯 **COMANDO: ATACAR (ATAQUE-MOVIMENTO)**
+
+### **📖 Conceito:**
+Este é o principal comando ofensivo, conhecido como **"Ataque-Movimento" (Attack-Move)**. É uma ordem inteligente que diz à unidade para ser agressiva enquanto se move.
+
+### **🎮 Como Funciona:**
+1. **Selecionar unidade** e clicar no botão "ATACAR" (fica vermelho)
+2. **Clique direito** em um **inimigo específico** ou **ponto no chão**
+
+### **⚔️ Comportamento da Unidade:**
+
+#### **🎯 Ataque Específico (Clique em Inimigo):**
+- **Foca implacavelmente** no alvo selecionado
+- **Persegue** o alvo até destruí-lo
+- **Ignora outros inimigos** (a menos que seja atacada)
+- **Mensagem:** "⚔️ ATAQUE ESPECÍFICO - Alvo definido"
+
+#### **🚶 Ataque-Movimento (Clique no Chão):**
+- **Move** em direção ao ponto clicado
+- **Para e ataca** automaticamente inimigos no `raio_de_visao`
+- **Retoma movimento** após destruir ameaças
+- **Mensagem:** "⚔️ ATAQUE-MOVIMENTO - Destino definido"
+
+### **📋 Doutrina:**
+```
+"Ataca alvos específicos ou move atacando inimigos no caminho"
+```
+
+---
+
+## ➡️ **COMANDO: SEGUIR (ESCOLTA)**
+
+### **📖 Conceito:**
+Comando de apoio e escolta. Usado para manter unidades juntas, proteger unidades importantes ou seguir inimigos sem atacá-los (espionagem).
+
+### **🎮 Como Funciona:**
+1. **Selecionar unidade** e clicar no botão "SEGUIR" (fica azul)
+2. **Clique direito** na unidade que deve ser seguida
+
+### **🛡️ Comportamento da Unidade:**
+- **Mantém distância** de 30-60 pixels do alvo
+- **Segue automaticamente** quando a unidade se move
+- **Ajuda automaticamente** se o alvo entrar em combate
+- **Para de seguir** se a unidade seguida for destruída
+- **Mensagem:** "➡️ ESCOLTA - Unidade definida para seguir"
+
+### **📋 Doutrina:**
+```
+"Seguirá e ajudará automaticamente em combate"
+```
+
+---
+
+## 🔄 **COMANDO: PATRULHAR (VIGILÂNCIA)**
+
+### **📖 Conceito:**
+Comando de defesa e vigilância de área. Perfeito para proteger rotas, entradas da base ou pontos de recursos.
+
+### **🎮 Como Funciona:**
+1. **Selecionar unidade** e clicar no botão "PATRULHAR" (fica verde)
+2. **Clique direito** em um ponto para definir rota de vigilância
+
+### **🛡️ Comportamento da Unidade:**
+- **Patrulha** entre posição inicial e ponto definido
+- **Ciclo contínuo** de ida e volta
+- **Interrompe patrulha** para atacar inimigos detectados
+- **Retorna à rota** após destruir ameaças
+- **Mensagem:** "🔄 VIGILÂNCIA - Ponto definido"
+
+### **📋 Doutrina:**
+```
+"Patrulhará entre pontos, atacará e retornará à rota"
+```
+
+---
+
+## 🎯 **REGRAS DE ENGAJAMENTO**
+
+### **⚔️ Sistema Inteligente de Combate:**
+
+#### **🎯 ATAQUE-MOVIMENTO:**
+- **Sempre engaja** inimigos detectados
+- **Prioriza** alvos específicos se definidos
+- **Ataca no caminho** se movendo para ponto
+
+#### **🛡️ ESCOLTA:**
+- **Ajuda automaticamente** se alvo seguido estiver em combate
+- **Engaja** o mesmo inimigo que o alvo está atacando
+- **Mantém formação** de proteção
+
+#### **🔄 VIGILÂNCIA:**
+- **Interrompe patrulha** para atacar inimigos
+- **Retorna à rota** após combate
+- **Mantém vigilância** contínua
+
+#### **🚶 MODO LIVRE:**
+- **Não engaja** automaticamente
+- **Aguarda ordens** específicas
+
+---
+
+## 🛠️ **ARQUIVOS DO SISTEMA:**
+
+### **📁 Scripts Atualizados:**
+- `scripts/sc_comandos_militares/sc_comandos_militares.gml`
+  - `sc_comando_militar()` - Aplicar comandos táticos
+  - `sc_processar_clique_direito()` - Processar cliques seguindo doutrina
+  - `sc_regras_engajamento()` - Regras de engajamento inteligente
+
+### **📁 Objetos Atualizados:**
+- `objects/obj_menu_de_acao/Step_0.gml` - Menu tático de comandos
+- `objects/obj_infantaria/Step_0.gml` - Lógica tática da unidade
+
+---
+
+## 🎮 **TESTE DA DOUTRINA:**
+
+### **🧪 Como Testar:**
+
+1. **Criar unidades:**
+   ```
+   Construir Quartel → Recrutar Unidades
+   ```
+
+2. **Testar ATAQUE-MOVIMENTO:**
+   ```
+   Selecionar → ATACAR → Clique direito em inimigo ou ponto
+   ```
+
+3. **Testar ESCOLTA:**
+   ```
+   Selecionar → SEGUIR → Clique direito em outra unidade
+   ```
+
+4. **Testar VIGILÂNCIA:**
+   ```
+   Selecionar → PATRULHAR → Clique direito em ponto
+   ```
+
+---
+
+## 🐛 **MENSAGENS DE DEBUG:**
+
+### **✅ Comandos Ativados:**
+```
+🎯 CLIQUE NO BOTÃO ATACAR - ATAQUE-MOVIMENTO!
+⚔️ COMANDO ATACAR ATIVADO - INFANTARIA
+🎯 Clique em um inimigo ou ponto para ATAQUE-MOVIMENTO
+📋 Doutrina: Ataca alvos específicos ou move atacando inimigos no caminho
+```
+
+### **⚔️ Combate:**
+```
+⚔️ ATAQUE ESPECÍFICO - Alvo definido: (ID)
+⚔️ ATAQUE-MOVIMENTO - Destino: (x, y)
+⚔️ COMBATE - Atacando alvo: (ID)
+💥 Dano causado: (valor)
+```
+
+### **🛡️ Escolta:**
+```
+➡️ ESCOLTA - Unidade definida para seguir: (ID)
+➡️ ESCOLTA - Ajudando alvo seguido contra: (ID)
+```
+
+### **🔄 Vigilância:**
+```
+🔄 VIGILÂNCIA - Ponto definido: (x, y)
+🔄 VIGILÂNCIA - Interrompendo patrulha para atacar: (ID)
+🔄 VIGILÂNCIA - Retomando patrulha após combate
+```
+
+---
+
+## 🚀 **BENEFÍCIOS DA DOUTRINA:**
+
+### **🎯 Tático:**
+- **Comandos inteligentes** que simulam estratégia militar real
+- **Regras de engajamento** que fazem sentido tático
+- **Coordenação automática** entre unidades
+- **Comportamento previsível** mas inteligente
+
+### **🎮 Jogabilidade:**
+- **Controle granular** sobre unidades
+- **Feedback claro** sobre ações
+- **Sistema intuitivo** para jogadores
+- **Profundidade estratégica** real
+
+### **🔧 Técnico:**
+- **Código modular** e reutilizável
+- **Sistema escalável** para outras unidades
+- **Debug detalhado** para desenvolvimento
+- **Performance otimizada**
+
+---
+
+**Status: ✅ DOUTRINA DE COMBATE IMPLEMENTADA COM SUCESSO**
+
+O sistema agora simula comandos militares reais com comportamento tático inteligente! 🎯⚔️

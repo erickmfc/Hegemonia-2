@@ -1,0 +1,86 @@
+=========================================================
+HEGEMONIA GLOBAL - RESOLUÇÃO DE ERRO DE REGISTRO
+Problema: obj_controlador_construcao não registrado
+=========================================================
+
+ERRO ENCONTRADO:
+-----------------
+Variable <unknown_object>.obj_controlador_construcao(100020, -2147483648) not set before reading it.
+at gml_Room_Room1_Create (line 44)
+
+CAUSA:
+------
+O objeto obj_controlador_construcao foi criado programaticamente mas não foi 
+devidamente registrado no sistema do GameMaker Studio. Embora os arquivos tenham 
+sido adicionados aos arquivos .yyp e .resource_order, o GameMaker pode precisar 
+de uma atualização manual.
+
+SOLUÇÃO MANUAL (GameMaker Studio):
+----------------------------------
+
+1. ABRIR O GAMEMAKER STUDIO:
+   - Abra o projeto "menu de contrucao.yyp"
+   - Vá para a aba "Asset Browser" (navegador de recursos)
+
+2. VERIFICAR SE O OBJETO EXISTE:
+   - Expanda a pasta "Objects" (Objetos)
+   - Procure por "obj_controlador_construcao"
+   
+3. SE O OBJETO NÃO APARECER:
+   - Clique com botão direito na pasta "Objects"
+   - Selecione "Create Object" (Criar Objeto)
+   - Nomeie como "obj_controlador_construcao"
+   - Substitua o arquivo .yy gerado pelo nosso arquivo já criado
+
+4. ADICIONAR EVENTOS:
+   - Clique no objeto obj_controlador_construcao
+   - Adicione Event → Create
+   - Adicione Event → Step → Step
+   - Adicione Event → Draw → Draw
+   - Cole o código dos arquivos que criamos
+
+5. VERIFICAR REGISTRO:
+   - Compile o projeto (F5)
+   - Se ainda der erro, feche e reabra o GameMaker Studio
+
+ARQUIVOS CRIADOS:
+-----------------
+✅ objects/obj_controlador_construcao/obj_controlador_construcao.yy
+✅ objects/obj_controlador_construcao/Create_0.gml
+✅ objects/obj_controlador_construcao/Step_0.gml  
+✅ objects/obj_controlador_construcao/Draw_0.gml
+✅ Registro adicionado em menu de contrucao.yyp
+✅ Registro adicionado em menu de contrucao.resource_order
+
+SOLUÇÃO ALTERNATIVA:
+--------------------
+Se o problema persistir, modifique o Room Creation Code para remover 
+temporariamente a criação do controlador:
+
+// Comentar estas linhas no RoomCreationCode.gml:
+/*
+try {
+    var _controlador_construcao_instance = instance_create_layer(0, 0, "rm_mapa_principal", obj_controlador_construcao);
+    // ... resto do código
+} catch (_error) {
+    // ... código de erro
+}
+*/
+
+TESTE APÓS CORREÇÃO:
+--------------------
+1. Pressione C para abrir menu de construção
+2. Selecione "Construir Casa" ou "Construir Banco"  
+3. Mova o mouse - deve aparecer um fantasma do edifício
+4. Clique esquerdo para construir
+5. Clique direito para cancelar
+
+RESULTADO ESPERADO:
+-------------------
+✅ Fantasma aparece alinhado ao grid
+✅ Borda verde = posição válida
+✅ Borda vermelha = posição inválida
+✅ Transparência de 50%
+✅ Cancelamento com clique direito funciona
+
+=========================================================

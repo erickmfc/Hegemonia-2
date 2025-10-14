@@ -1,0 +1,10 @@
+{
+  "$GMScript":"",
+  "%Name":"scr_teste_lancha_simples",
+  "isDnD":false,
+  "isTemplate":false,
+  "isHidden":false,
+  "name":"scr_teste_lancha_simples",
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

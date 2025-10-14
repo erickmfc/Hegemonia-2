@@ -1,0 +1,10 @@
+{
+  "$GMScript":"",
+  "%Name":"scr_deselecionar_unidades_edificio_clicado",
+  "isDnD":false,
+  "isTemplate":false,
+  "isHidden":false,
+  "name":"scr_deselecionar_unidades_edificio_clicado",
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

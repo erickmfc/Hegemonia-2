@@ -1,0 +1,119 @@
+=========================================================
+HEGEMONIA GLOBAL - SISTEMA LIMPO
+Apenas Movimentação Básica
+=========================================================
+
+DATA: 2025-01-27
+STATUS: SISTEMA LIMPO - Apenas Movimentação Básica
+
+## 🧹 **LIMPEZA COMPLETA REALIZADA:**
+
+### ✅ **SISTEMAS REMOVIDOS:**
+
+#### 1. **Menu de Ação (obj_menu_acao)**
+- ❌ **DELETADO**: Create Event
+- ❌ **DELETADO**: Step Event  
+- ❌ **DELETADO**: Draw Event
+- ❌ **DELETADO**: Todas as ligações com a infantaria
+
+#### 2. **Sistema de Tiro (obj_tiro_infantaria)**
+- ❌ **DELETADO**: Create Event
+- ❌ **DELETADO**: Step Event
+- ❌ **DELETADO**: Sistema de projéteis
+
+#### 3. **Efeitos de Impacto (obj_impacto)**
+- ❌ **DELETADO**: Create Event
+- ❌ **DELETADO**: Step Event
+- ❌ **DELETADO**: Sistema de partículas
+
+#### 4. **Scripts de Combate**
+- ❌ **DELETADO**: aplicar_dano.gml
+- ❌ **DELETADO**: Sistema de experiência
+
+#### 5. **Inimigos do Mapa**
+- ❌ **REMOVIDOS**: 3 inimigos de infantaria
+- ❌ **REMOVIDO**: 1 quartel inimigo
+- ❌ **REMOVIDO**: Sistema de criação automática
+
+### ✅ **SISTEMAS MANTIDOS E SIMPLIFICADOS:**
+
+#### 1. **Infantaria (obj_infantaria)**
+- ✅ **MANTIDO**: Sistema de seleção com mouse
+- ✅ **MANTIDO**: Movimentação básica com clique direito
+- ✅ **SIMPLIFICADO**: Apenas estado "livre"
+- ✅ **SIMPLIFICADO**: Sem combate, apenas movimento
+
+#### 2. **Quartel (obj_quartel)**
+- ✅ **MANTIDO**: Estrutura básica
+- ✅ **MANTIDO**: Sistema de HP
+- ✅ **SIMPLIFICADO**: Sem funcionalidades de combate
+
+#### 3. **Sistema de Movimento**
+- ✅ **MANTIDO**: Clique esquerdo para selecionar
+- ✅ **MANTIDO**: Clique direito para mover
+- ✅ **MANTIDO**: Pathfinding básico
+
+## 🎮 **COMO USAR O SISTEMA LIMPO:**
+
+### **1. SELEÇÃO:**
+```
+Clique esquerdo na unidade para selecionar
+Círculo branco aparecerá ao redor da unidade selecionada
+```
+
+### **2. MOVIMENTO:**
+```
+Com a unidade selecionada, clique direito em qualquer lugar
+Linha verde aparecerá mostrando o destino
+Unidade se moverá automaticamente para o ponto
+```
+
+### **3. INTERFACE:**
+```
+- Unidades: Círculos azuis
+- Seleção: Círculo branco ao redor
+- Destino: Linha verde + círculo verde
+- Sem menus complexos
+- Sem sistema de combate
+```
+
+## 🔧 **ARQUIVOS MODIFICADOS:**
+
+### **MODIFICAÇÕES:**
+- ✅ `objects/obj_infantaria/Step_0.gml` - Simplificado para apenas movimento
+- ✅ `objects/obj_infantaria/Draw_64.gml` - Interface simplificada
+- ✅ `rooms/Room1/RoomCreationCode.gml` - Removidos inimigos
+
+### **ARQUIVOS DELETADOS:**
+- ❌ `objects/obj_menu_acao/` - Menu de ação completo
+- ❌ `objects/obj_tiro_infantaria/` - Sistema de tiro
+- ❌ `objects/obj_impacto/` - Efeitos visuais
+- ❌ `scripts/aplicar_dano/` - Sistema de dano
+
+## 🎯 **FUNCIONALIDADES ATUAIS:**
+
+### **✅ FUNCIONANDO:**
+- Seleção de unidades
+- Movimentação básica
+- Pathfinding simples
+- Interface visual limpa
+
+### **❌ REMOVIDO:**
+- Sistema de combate
+- Menu de comandos táticos
+- Inimigos automáticos
+- Efeitos de tiro
+- Sistema de experiência
+
+## 🏆 **CONCLUSÃO:**
+
+O sistema foi **completamente limpo** e agora possui:
+
+- **🎯 Funcionalidade Básica**: Apenas seleção e movimento
+- **🧹 Código Limpo**: Sem sistemas complexos desnecessários
+- **⚡ Performance**: Sistema leve e rápido
+- **🎮 Simplicidade**: Interface clara e intuitiva
+
+**Status**: SISTEMA LIMPO ✅
+**Funcionalidade**: Apenas Movimentação Básica
+**Próximo**: Pode ser expandido conforme necessário

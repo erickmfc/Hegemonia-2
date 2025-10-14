@@ -1,0 +1,10 @@
+{
+  "$GMScript":"",
+  "%Name":"scr_teste_quartel_etapa4",
+  "isDnD":false,
+  "isTemplate":false,
+  "isHidden":false,
+  "name":"scr_teste_quartel_etapa4",
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

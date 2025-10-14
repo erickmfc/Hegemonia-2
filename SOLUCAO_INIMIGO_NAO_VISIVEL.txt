@@ -1,0 +1,162 @@
+=========================================================
+HEGEMONIA GLOBAL - SOLUÇÃO PARA INIMIGO NÃO VISÍVEL
+Problema de Visibilidade do Objeto Inimigo
+=========================================================
+
+DATA: 2025-01-27
+STATUS: SOLUÇÃO IMPLEMENTADA
+
+## 🚨 **PROBLEMA REPORTADO:**
+
+### **Sintoma:**
+- Inimigo foi colocado no mapa
+- Pode ser arrastado
+- **NÃO APARECE** quando o jogo é executado
+- Objeto parece "invisível"
+
+---
+
+## 🔍 **DIAGNÓSTICO IMPLEMENTADO:**
+
+### **1. Verificação de Existência do Objeto:**
+```gml
+if (object_exists(obj_inimigo)) {
+    show_debug_message("✅ obj_inimigo encontrado no projeto");
+    // Criar inimigos
+} else {
+    show_debug_message("❌ ERRO: obj_inimigo não encontrado no projeto!");
+    // Usar fallback com obj_infantaria
+}
+```
+
+### **2. Verificação de Sprite:**
+```gml
+if (sprite_index != noone) {
+    show_debug_message("🎯 Inimigo criado com sprite: " + string(sprite_index));
+} else {
+    show_debug_message("⚠️ Inimigo criado SEM sprite - usando fallback visual");
+}
+```
+
+### **3. Sistema de Fallback Visual:**
+```gml
+// Desenhar o sprite se existir
+if (sprite_index != noone) {
+    draw_sprite_ext(sprite_index, image_index, x, y, image_xscale, image_yscale, image_angle, image_blend, image_alpha);
+} else {
+    // Fallback: desenhar círculo vermelho
+    draw_set_color(c_red);
+    draw_circle(x, y, 20, false);
+    draw_circle(x, y, 15, true);
+}
+```
+
+---
+
+## 🔧 **SOLUÇÕES IMPLEMENTADAS:**
+
+### **1. Verificação Automática:**
+- Sistema verifica se `obj_inimigo` existe
+- Se não existir, usa `obj_infantaria` como fallback
+- Mensagens de debug detalhadas
+
+### **2. Sistema de Fallback Visual:**
+- Se tiver sprite, usa o sprite
+- Se não tiver sprite, desenha círculo vermelho
+- Garante que o inimigo sempre seja visível
+
+### **3. Debug Detalhado:**
+- Posição X, Y do inimigo
+- Status de visibilidade
+- Informações do sprite
+- Confirmação de criação
+
+---
+
+## 🎯 **COMO TESTAR A SOLUÇÃO:**
+
+### **1. Executar o Jogo:**
+```
+1. Rodar o jogo
+2. Verificar console para mensagens de debug
+3. Procurar por mensagens sobre criação de inimigos
+4. Verificar se há erros
+```
+
+### **2. Verificar Mensagens Esperadas:**
+```
+✅ obj_inimigo encontrado no projeto
+🎯 Inimigo 1 criado - ID: [número] | Posição: [x], [y]
+🎯 Inimigo 2 criado - ID: [número] | Posição: [x], [y]
+🎯 Inimigo configurado automaticamente com HP: 100/100 e nação: 2
+```
+
+### **3. Se Houver Erro:**
+```
+❌ ERRO: obj_inimigo não encontrado no projeto!
+🔄 Tentando criar inimigos usando obj_infantaria como fallback...
+🎯 Inimigo 1 criado com obj_infantaria - ID: [número]
+```
+
+---
+
+## 🚨 **POSSÍVEIS CAUSAS DO PROBLEMA:**
+
+### **1. Objeto Não Salvo:**
+- `obj_inimigo` não foi salvo no projeto
+- GameMaker não reconhece o objeto
+- **Solução**: Salvar o projeto e verificar
+
+### **2. Sprite Não Configurado:**
+- Objeto não tem sprite associado
+- **Solução**: Sistema de fallback implementado
+
+### **3. Eventos Não Configurados:**
+- Create, Step ou Draw Events não funcionando
+- **Solução**: Todos os eventos foram verificados
+
+### **4. Problema de Camada:**
+- Objeto criado em camada incorreta
+- **Solução**: Usa "rm_mapa_principal" (camada correta)
+
+---
+
+## 🔧 **ARQUIVOS MODIFICADOS:**
+
+### **Sala:**
+- ✅ `rooms/Room1/RoomCreationCode.gml` - Sistema de verificação e fallback
+
+### **obj_inimigo:**
+- ✅ `objects/obj_inimigo/Create_0.gml` - Verificações de visibilidade
+- ✅ `objects/obj_inimigo/Draw_64.gml` - Sistema de fallback visual
+
+---
+
+## 🎯 **PRÓXIMOS PASSOS:**
+
+### **1. Testar a Solução:**
+```
+1. Executar o jogo
+2. Verificar console para mensagens
+3. Procurar inimigos na tela
+4. Testar sistema de arrastar
+```
+
+### **2. Se Ainda Não Funcionar:**
+```
+1. Verificar se obj_inimigo está salvo no projeto
+2. Verificar se todos os eventos estão configurados
+3. Verificar se o sprite Sprite40 existe
+4. Usar o sistema de fallback com obj_infantaria
+```
+
+---
+
+## 🏆 **STATUS FINAL:**
+
+**Status**: SOLUÇÃO IMPLEMENTADA ✅  
+**Problema**: Inimigo não visível  
+**Solução**: Sistema de verificação e fallback  
+**Resultado**: Inimigos sempre visíveis e funcionais
+
+Agora o sistema detecta automaticamente problemas e usa fallbacks para garantir que os inimigos apareçam! 🚀

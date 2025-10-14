@@ -1,0 +1,175 @@
+=========================================================
+HEGEMONIA GLOBAL - SISTEMA DE QUARTEL E RECRUTAMENTO
+Bloco 4, Fase 2: Interface de Recrutamento Completa
+=========================================================
+
+DATA: 2025-08-27
+IMPLEMENTAÇÃO: Sistema completo de quartel com interface de recrutamento
+
+OBJETIVO:
+---------
+Implementar o quartel como estrutura construível que permite recrutar 
+unidades de infantaria através de uma interface dedicada.
+
+COMPONENTES IMPLEMENTADOS:
+-------------------------
+
+1. OBJETO QUARTEL:
+   ✅ obj_quartel/obj_quartel.yy
+      - Herda de obj_estrutura_producao
+      - Sprite: spr_quartel (a ser importado)
+      - Eventos: Create, Step, Draw_64, Mouse_53
+
+2. SISTEMA DE CONSTRUÇÃO:
+   ✅ Adicionado ao menu de construção (botão "Construir Quartel")
+   ✅ Integrado ao sistema de fantasma de construção
+   ✅ Custos: $800 dinheiro + 150 minério
+   ✅ Compatível com zoom e coordenadas GUI
+
+3. INTERFACE DE RECRUTAMENTO:
+   ✅ Menu responsivo (40% largura, 50% altura da tela)
+   ✅ Informações de recursos em tempo real
+   ✅ Status de recrutamento visual
+   ✅ Botão de recrutamento com custos
+   ✅ Botão fechar e clique fora para fechar
+
+4. SISTEMA DE RECRUTAMENTO:
+   ✅ Custo: $100 dinheiro + 1 população
+   ✅ Tempo de treinamento: 5 segundos
+   ✅ Criação automática da unidade
+   ✅ Spawn próximo ao quartel
+
+ESTRUTURA DE ARQUIVOS:
+---------------------
+
+1. OBJETO QUARTEL:
+   📁 objects/obj_quartel/
+   ├── obj_quartel.yy (configuração do objeto)
+   ├── Create_0.gml (custos e configurações)
+   ├── Step_0.gml (lógica de recrutamento)
+   ├── Draw_64.gml (interface GUI)
+   └── Mouse_53.gml (abertura do menu)
+
+2. INTEGRAÇÃO COM SISTEMA EXISTENTE:
+   ✅ menu de contrucao.yyp (registro do objeto)
+   ✅ menu de contrucao.resource_order (ordem de carregamento)
+   ✅ obj_menu_construcao/Draw_64.gml (botão visual)
+   ✅ obj_menu_construcao/Mouse_56.gml (clique do botão)
+   ✅ obj_controlador_construcao/Draw_0.gml (fantasma)
+   ✅ obj_controlador_construcao/Mouse_53.gml (custos)
+   ✅ obj_input_manager/Step_2.gml (construção alternativa)
+
+FUNCIONALIDADES DETALHADAS:
+---------------------------
+
+1. CONSTRUÇÃO DO QUARTEL:
+   - Acesso via tecla 'C' → "Construir Quartel"
+   - Custo: $800 + 150 minério
+   - Fantasma visual com 50% transparência
+   - Grid alignment automático
+   - Suporte completo a zoom
+
+2. INTERFACE DE RECRUTAMENTO:
+   - Abertura: Clique esquerdo no quartel construído
+   - Layout centralizado e responsivo
+   - Informações em tempo real:
+     * Dinheiro disponível
+     * População disponível
+     * Status do recrutamento
+   - Botões interativos:
+     * "RECRUTAR INFANTARIA" (se disponível)
+     * "FECHAR" (canto superior direito)
+
+3. PROCESSO DE RECRUTAMENTO:
+   - Verificação automática de recursos
+   - Consumo imediato: $100 + 1 população
+   - Timer visual: 5 segundos
+   - Criação automática da unidade
+   - Spawn estratégico próximo ao quartel
+
+4. CONTROLES E INTERAÇÃO:
+   - Menu abre/fecha com clique no quartel
+   - Botão "FECHAR" no canto superior direito
+   - Clique fora do menu também fecha
+   - Não interfere com modo de construção
+
+CÓDIGO PRINCIPAL:
+----------------
+
+1. CUSTOS E CONFIGURAÇÃO (Create_0.gml):
+```gml
+custo_dinheiro = 800;
+custo_minerio = 150;
+tipo_recurso = "militar";
+menu_recrutamento_ativo = false;
+recrutamento_em_andamento = false;
+```
+
+2. LÓGICA DE RECRUTAMENTO (Step_0.gml):
+```gml
+if (recrutamento_em_andamento) {
+    tempo_treinamento_restante--;
+    if (tempo_treinamento_restante <= 0) {
+        // Criar unidade e reset do sistema
+        var _nova_unidade = instance_create_layer(x + 40, y + 40, "Instances", obj_infantaria);
+        recrutamento_em_andamento = false;
+    }
+}
+```
+
+3. INTERFACE RESPONSIVA (Draw_64.gml):
+```gml
+var _menu_largura = display_get_gui_width() * 0.4;
+var _menu_altura = display_get_gui_height() * 0.5;
+var _menu_x = (display_get_gui_width() - _menu_largura) / 2;
+var _menu_y = (display_get_gui_height() - _menu_altura) / 2;
+```
+
+MELHORES PRÁTICAS APLICADAS:
+---------------------------
+✅ Herança de obj_estrutura_producao para consistência
+✅ Uso de coordenadas GUI para interface responsiva
+✅ Verificações de recursos antes de operações
+✅ Sistema de debug integrado para troubleshooting
+✅ Compatibilidade com sistema de zoom existente
+✅ Interface centralizada seguindo padrões do projeto
+✅ Nomenclatura consistente com convenções (_variavel)
+✅ Integração não-invasiva com sistemas existentes
+
+FLUXO DE USO:
+------------
+1. **Construção**: C → "Construir Quartel" → Clique no mapa
+2. **Verificação**: Quartel criado com $800 + 150 minério
+3. **Recrutamento**: Clique no quartel → Menu abre
+4. **Processo**: "RECRUTAR INFANTARIA" → $100 + 1 pop → 5s espera
+5. **Resultado**: Nova unidade de infantaria criada próxima ao quartel
+
+RECURSOS NECESSÁRIOS:
+--------------------
+- spr_quartel: Sprite do quartel (a ser importado manualmente)
+- spr_infantaria: Sprite da infantaria (já configurado)
+- fnt_ui_main: Fonte da interface (já existente)
+
+TESTES RECOMENDADOS:
+-------------------
+1. **Construção**: Verificar se quartel aparece no menu C
+2. **Fantasma**: Verificar preview visual durante construção
+3. **Custos**: Confirmar desconto correto ($800 + 150 minério)
+4. **Interface**: Clique no quartel construído
+5. **Recrutamento**: Teste com recursos suficientes/insuficientes
+6. **Spawn**: Verificar criação da unidade próxima ao quartel
+7. **Responsividade**: Teste em diferentes resoluções
+8. **Zoom**: Verificar funcionamento com zoom aplicado
+
+PRÓXIMAS EXPANSÕES POSSÍVEIS:
+----------------------------
+- Múltiplos tipos de unidades no mesmo quartel
+- Queue de recrutamento (várias unidades simultaneamente)
+- Upgrades do quartel (redução de tempo/custo)
+- Unidades especializadas (arqueiros, cavalaria)
+- Sistema de experiência para unidades
+- Formações e comandos de grupo
+
+=========================================================
+SISTEMA DE QUARTEL COMPLETAMENTE IMPLEMENTADO
+=========================================================

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_teste_quartel_multiplos_usos",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_teste_quartel_multiplos_usos",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

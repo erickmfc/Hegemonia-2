@@ -1,0 +1,1 @@
+// Construction menu drawing removed

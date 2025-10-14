@@ -1,0 +1,140 @@
+=========================================================
+HEGEMONIA GLOBAL - FASE 5: CONFIRMAÇÃO E FINALIZAÇÃO DA CONSTRUÇÃO
+=========================================================
+
+DATA: 2025-08-27
+IMPLEMENTAÇÃO: Bloco 3, Fase 5 - Lógica de Construção Final
+
+OBJETIVO:
+---------
+Implementar a última etapa do sistema de construção, que detecta o clique no mapa, 
+verifica recursos, deduz custos e cria a estrutura final.
+
+COMPONENTES IMPLEMENTADOS:
+-------------------------
+
+1. CUSTOS DAS ESTRUTURAS:
+   ✅ obj_casa/Create_0.gml
+      - custo_dinheiro = 150
+      - custo_minerio = 25
+   
+   ✅ obj_banco/Create_0.gml  
+      - custo_dinheiro = 500
+      - custo_minerio = 100
+
+2. LÓGICA DE CONSTRUÇÃO FINAL:
+   ✅ obj_controlador_construcao/Mouse_53.gml (Global Left Pressed)
+      - Verificação de seleção ativa
+      - Verificação de recursos suficientes
+      - Dedução automática de custos
+      - Criação da estrutura na posição do fantasma
+      - Limpeza da seleção após construção
+
+FLUXO DE EXECUÇÃO:
+-----------------
+
+1. VERIFICAÇÃO INICIAL:
+   - Se global.construindo_agora == noone → sair imediatamente
+   
+2. OBTENÇÃO DE CUSTOS:
+   - Identifica tipo de edifício selecionado
+   - Obtém custos de dinheiro e minério correspondentes
+   
+3. VERIFICAÇÃO DE RECURSOS:
+   - Verifica se global.dinheiro >= custo_dinheiro
+   - Verifica se global.minerio >= custo_minerio
+   
+4. EXECUÇÃO DA CONSTRUÇÃO (se recursos suficientes):
+   - Deduz custos: global.dinheiro -= custo_d; global.minerio -= custo_m
+   - Cria estrutura: instance_create_layer(grid_x, grid_y, "Instances", global.construindo_agora)
+   - Limpa seleção: global.construindo_agora = noone
+   
+5. CANCELAMENTO (se recursos insuficientes):
+   - Exibe mensagem de erro
+   - Cancela construção: global.construindo_agora = noone
+
+CÓDIGO IMPLEMENTADO:
+-------------------
+
+VERIFICAÇÃO DE RECURSOS:
+```gml
+// Identifica o tipo de edifício e obtém os custos
+if (global.construindo_agora == asset_get_index("obj_casa")) {
+    _custo_d = 150; // Equivalente a obj_casa.custo_dinheiro
+    _custo_m = 25;  // Equivalente a obj_casa.custo_minerio
+    _nome_edificio = "Casa";
+} else if (global.construindo_agora == asset_get_index("obj_banco")) {
+    _custo_d = 500; // Equivalente a obj_banco.custo_dinheiro
+    _custo_m = 100; // Equivalente a obj_banco.custo_minerio
+    _nome_edificio = "Banco";
+}
+```
+
+EXECUÇÃO DA CONSTRUÇÃO:
+```gml
+if (global.dinheiro >= _custo_d && global.minerio >= _custo_m) {
+    // Deduz os recursos do tesouro da nação
+    global.dinheiro -= _custo_d;
+    global.minerio -= _custo_m;
+    
+    // Cria a instância final do edifício na posição do fantasma
+    instance_create_layer(grid_x, grid_y, "Instances", global.construindo_agora);
+    
+    // Limpa a seleção para finalizar o modo de construção
+    global.construindo_agora = noone;
+}
+```
+
+FUNCIONALIDADES:
+---------------
+✅ Detecção automática do tipo de edifício selecionado
+✅ Verificação de recursos antes da construção
+✅ Dedução automática de custos (dinheiro + minério)
+✅ Criação da estrutura na posição exata do fantasma
+✅ Limpeza automática da seleção após construção
+✅ Cancelamento automático se recursos insuficientes
+✅ Debug detalhado para troubleshooting
+✅ Compatibilidade com sistema de zoom implementado anteriormente
+
+INTEGRAÇÃO COM FASES ANTERIORES:
+------------------------------
+- Fase 1: Ativação do modo (tecla C) ✅
+- Fase 2: Menu de seleção ✅
+- Fase 3: Estado de seleção ✅  
+- Fase 4: Posicionamento do fantasma ✅
+- Fase 5: Finalização da construção ✅ (IMPLEMENTADA)
+
+TESTE RECOMENDADO:
+-----------------
+1. Pressione C para ativar modo de construção
+2. Selecione "Construir Casa" (custo: $150 + 25 minério)
+3. Posicione o fantasma no mapa
+4. Clique esquerdo para construir
+5. Verifique se:
+   - Recursos foram deduzidos corretamente
+   - Casa foi criada na posição exata
+   - Fantasma desapareceu
+   - Modo de construção foi desativado
+6. Repita com banco (custo: $500 + 100 minério)
+7. Teste com recursos insuficientes
+
+MENSAGENS DE DEBUG:
+------------------
+- "Recursos verificados. Construindo [Nome]..."
+- "Construção de [Nome] concluída com sucesso!"
+- "Custo: $[valor] dinheiro, [valor] minério"
+- "Recursos restantes: $[valor] dinheiro, [valor] minério"
+- "RECURSOS INSUFICIENTES! Construção de [Nome] cancelada."
+
+PRÓXIMAS MELHORIAS POSSÍVEIS:
+----------------------------
+- Verificação de colisão com outras estruturas
+- Validação de terreno apropriado para construção
+- Som de feedback para construção bem-sucedida/falhada
+- Animação de construção
+- Sistema de dependências tecnológicas
+- Custos variáveis baseados em dificuldade
+
+=========================================================
+SISTEMA DE CONSTRUÇÃO COMPLETO - TODAS AS 5 FASES IMPLEMENTADAS
+=========================================================

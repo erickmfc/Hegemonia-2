@@ -1,0 +1,54 @@
+==========================================
+INSTRUÇÕES - TESTE DO MENU DE CONSTRUÇÃO
+==========================================
+
+CORREÇÃO APLICADA:
+✓ Erro do sprite_index corrigido
+✓ obj_menu_construcao adicionado à sala automaticamente
+✓ Verificação de sprite implementada
+✓ Valores fixos para dimensões do menu
+
+COMO TESTAR:
+
+1. COMPILAR E EXECUTAR
+   - Compile o projeto
+   - Execute o jogo
+   - Aguarde carregamento completo
+
+2. VERIFICAR CRIAÇÃO DOS OBJETOS
+   - Abra o console de debug (F9)
+   - Procure por estas mensagens:
+     ✓ "Menu de Construção criado com sucesso na sala Room1"
+     ✓ "Menu de construção inicializado"
+
+3. TESTAR ATIVAÇÃO DO MODO
+   - Pressione a tecla C
+   - Deve aparecer:
+     ✓ Mensagem: "MODO DE CONSTRUÇÃO: ATIVADO"
+     ✓ Menu na parte inferior da tela
+     ✓ Botões da casa e banco dentro do menu
+     ✓ Botão do martelo fica verde
+
+4. TESTAR DESATIVAÇÃO
+   - Pressione C novamente
+   - Deve acontecer:
+     ✓ Mensagem: "MODO DE CONSTRUÇÃO: DESATIVADO"
+     ✓ Menu desaparece
+     ✓ Botões são destruídos
+     ✓ Botão do martelo volta ao azul
+
+5. TESTAR BOTÕES DE CONSTRUÇÃO
+   - Com modo ativo, clique nos botões:
+     ✓ Casa ($1000) - Verde se tem dinheiro
+     ✓ Banco ($2500) - Verde se tem dinheiro
+
+CONTROLES:
+- Tecla C: Ativa/Desativa modo de construção
+- Botão martelo: Apenas indicador visual
+
+PROBLEMAS RESOLVIDOS:
+- sprite_get_height erro corrigido
+- Sprite não encontrado resolvido
+- Menu agora criado automaticamente
+
+Execute o teste agora!

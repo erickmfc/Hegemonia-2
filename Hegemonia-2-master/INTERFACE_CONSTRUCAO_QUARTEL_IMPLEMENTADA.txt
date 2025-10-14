@@ -1,0 +1,91 @@
+==========================================
+INTERFACE DE CONSTRUÇÃO - QUARTEL IMPLEMENTADA
+==========================================
+
+IMPLEMENTAÇÃO COMPLETA REALIZADA:
+✓ Menu de construção centralizado com botão do Quartel
+✓ Sistema de construção do Quartel funcional
+✓ Interface de recrutamento de infantaria
+✓ Integração completa com sistema existente
+
+COMO USAR A NOVA INTERFACE:
+
+1. ATIVAÇÃO DO MODO DE CONSTRUÇÃO
+   - Pressione a tecla C para ativar o modo de construção
+   - O menu aparece automaticamente na parte inferior da tela
+   - Mostra três botões: "CASA", "BANCO" e "QUARTEL"
+
+2. CONSTRUÇÃO DO QUARTEL
+   - Clique no botão "QUARTEL" no menu de construção
+   - Custo: $800 + 150 minério
+   - Menu desaparece automaticamente após seleção
+   - Clique no mapa para construir o quartel
+
+3. RECRUTAMENTO DE INFANTARIA
+   - Após construir o quartel, clique nele para abrir o menu de recrutamento
+   - Interface mostra recursos disponíveis
+   - Clique em "RECRUTAR INFANTARIA" para iniciar o treinamento
+   - Custo: $100 + 1 população
+   - Tempo de treinamento: 5 segundos
+
+4. CONTROLES
+   - Tecla C: Ativa/Desativa modo de construção
+   - Clique esquerdo: Seleciona construção ou recruta unidades
+   - Clique direito: Cancela construção em andamento
+   - Clique fora do menu: Fecha interface
+
+ARQUIVOS CRIADOS/MODIFICADOS:
+-----------------------------
+
+1. MENU DE CONSTRUÇÃO:
+   - obj_menu_construcao/Create_0.gml (configuração inicial)
+   - obj_menu_construcao/Draw_64.gml (interface visual)
+   - obj_menu_construcao/Mouse_56.gml (lógica de cliques)
+   - obj_menu_construcao/Step_0.gml (hover dos botões)
+   - obj_menu_construcao/obj_menu_construcao.yy (configuração do objeto)
+
+2. QUARTEL:
+   - obj_quartel/Create_0.gml (configuração do quartel)
+   - obj_quartel/Step_0.gml (lógica de recrutamento)
+   - obj_quartel/Mouse_53.gml (abertura do menu)
+   - obj_quartel/obj_quartel.yy (configuração do objeto)
+
+3. MENU DE RECRUTAMENTO:
+   - obj_menu_recrutamento/Create_0.gml (configuração do menu)
+   - obj_menu_recrutamento/Draw_64.gml (interface visual)
+   - obj_menu_recrutamento/Mouse_56.gml (lógica de cliques)
+   - obj_menu_recrutamento/Step_0.gml (hover dos botões)
+   - obj_menu_recrutamento/obj_menu_recrutamento.yy (configuração do objeto)
+
+4. SISTEMA DE INPUT:
+   - obj_input_manager/Step_2.gml (atualizado para mostrar/esconder menu)
+
+FUNCIONALIDADES IMPLEMENTADAS:
+------------------------------
+
+✓ Botão "QUARTEL" no menu de construção
+✓ Verificação de recursos antes da construção
+✓ Sistema de fantasma de construção (já existente)
+✓ Interface de recrutamento responsiva
+✓ Verificação de recursos para recrutamento
+✓ Timer visual de treinamento
+✓ Criação automática de unidades de infantaria
+✓ Sistema de fechamento de menus
+✓ Integração com sistema de recursos global
+
+CUSTOS E RECURSOS:
+------------------
+- Construção do Quartel: $800 + 150 minério
+- Recrutamento de Infantaria: $100 + 1 população
+- Tempo de treinamento: 5 segundos
+
+TESTE DA IMPLEMENTAÇÃO:
+-----------------------
+1. Compile o projeto
+2. Execute o jogo
+3. Pressione C para ativar modo de construção
+4. Clique em "QUARTEL" e construa no mapa
+5. Clique no quartel construído para abrir menu de recrutamento
+6. Recrute uma unidade de infantaria
+
+Sistema completo e funcional!

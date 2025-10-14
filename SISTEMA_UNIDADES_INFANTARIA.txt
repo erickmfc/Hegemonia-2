@@ -1,0 +1,146 @@
+=========================================================
+HEGEMONIA GLOBAL - SISTEMA DE UNIDADES MILITARES
+Bloco 4, Fase 1: Unidade de Infantaria
+=========================================================
+
+DATA: 2025-08-27
+IMPLEMENTAÇÃO: Primeira unidade militar do jogo
+
+OBJETIVO:
+---------
+Criar a base do sistema militar com a unidade de infantaria,
+definindo todos os atributos fundamentais para combate, movimento e economia.
+
+ARQUIVOS CRIADOS:
+----------------
+✅ objects/obj_infantaria/obj_infantaria.yy
+   - Definição do objeto no GameMaker
+   - Configuração básica (sem sprite inicialmente)
+   
+✅ objects/obj_infantaria/Create_0.gml
+   - Evento Create com todos os atributos da unidade
+   - Sistema completo de propriedades
+
+✅ Registro no Projeto:
+   - Adicionado ao menu de contrucao.yyp
+   - Adicionado ao menu de contrucao.resource_order
+
+ATRIBUTOS IMPLEMENTADOS:
+-----------------------
+
+1. ATRIBUTOS DE COMBATE:
+   - vida_maxima = 100 (pontos de vida totais)
+   - vida_atual = vida_maxima (vida atual, inicia cheia)
+   - ataque = 10 (dano por ataque)
+   - alcance = 1 (distância de ataque em tiles)
+   - velocidade = 2 (velocidade de movimento no grid)
+
+2. ATRIBUTOS DE CUSTO E INFORMAÇÃO:
+   - custo_dinheiro = 100 (custo para recrutar)
+   - custo_populacao = 1 (população consumida)
+   - tempo_de_treino = 300 (5 segundos a 60 FPS)
+   - nacao_proprietaria = noone (nacionalidade da unidade)
+
+3. SISTEMA DE IA:
+   - estado = "parado" (estados: parado, movendo, atacando)
+
+ESPECIFICAÇÕES TÉCNICAS:
+-----------------------
+
+COMBATE:
+- Dano: 10 por ataque
+- Alcance: Curto (1 tile) - unidade de infantaria básica
+- Resistência: 100 HP - boa sobrevivência
+
+ECONOMIA:
+- Custo baixo: $100 (unidade básica acessível)
+- Consome 1 de população (realista)
+- Treino rápido: 5 segundos (gameplay ágil)
+
+MOBILIDADE:
+- Velocidade 2: Movimento moderado no grid
+- Base para sistema de pathfinding futuro
+
+ESTRUTURA DO CÓDIGO:
+-------------------
+
+```gml
+// Evento Create - obj_infantaria
+show_debug_message("Unidade de Infantaria criada.");
+
+// Atributos de Combate
+vida_maxima = 100;
+vida_atual = vida_maxima;
+ataque = 10;
+alcance = 1;
+velocidade = 2;
+
+// Atributos de Custo e Informação
+custo_dinheiro = 100;
+custo_populacao = 1;
+tempo_de_treino = 300;
+nacao_proprietaria = noone;
+
+// Sistema de IA
+estado = "parado";
+```
+
+INTEGRAÇÃO COM PROJETO:
+----------------------
+✅ Compatível com sistema de recursos existente
+✅ Preparado para integração com sistema de construção
+✅ Base para futuras unidades militares
+✅ Debug messages para troubleshooting
+
+PRÓXIMAS IMPLEMENTAÇÕES SUGERIDAS:
+---------------------------------
+
+1. SPRITE E VISUAL:
+   - Importar spr_infantaria (pixel art isométrico)
+   - Associar sprite ao objeto
+   - Múltiplas direções/animações
+
+2. SISTEMA DE MOVIMENTO:
+   - Pathfinding no grid
+   - Animação de movimento
+   - Colisão com terreno/obstáculos
+
+3. SISTEMA DE COMBATE:
+   - Detecção de inimigos
+   - Animação de ataque
+   - Sistema de dano
+
+4. SISTEMA DE PRODUÇÃO:
+   - Integração com edifícios (quartéis)
+   - Menu de recrutamento
+   - Queue de produção
+
+5. IA BÁSICA:
+   - Estados de comportamento
+   - Patrulhamento
+   - Resposta a ameaças
+
+EXTENSIBILIDADE:
+---------------
+- Base sólida para outras unidades (cavalaria, arqueiros, etc.)
+- Sistema modular permite especialização
+- Fácil balanceamento através de variáveis
+- Preparado para multiplayer futuro
+
+TESTE RECOMENDADO:
+-----------------
+1. Criar instância manual da obj_infantaria na Room1
+2. Verificar debug message no console
+3. Verificar se atributos são definidos corretamente
+4. Testar modificação de valores via código
+
+OBSERVAÇÕES:
+-----------
+- Sprite será adicionado posteriormente quando importado
+- Sistema preparado para expansão com mais tipos de unidade
+- Balanceamento pode ser ajustado conforme gameplay
+- Estrutura compatível com save/load futuro
+
+=========================================================
+SISTEMA MILITAR INICIADO - INFANTARIA IMPLEMENTADA
+=========================================================

@@ -1,0 +1,147 @@
+# 🔍 **PLANO DE TESTES E REPAROS: CADEIA DE COMANDO**
+
+## ✅ **SISTEMA DE ESPIÕES IMPLEMENTADO**
+
+### **📋 VISÃO GERAL:**
+
+Implementei exatamente o plano de testes que você especificou. Agora temos três espiões estratégicos posicionados em pontos críticos da cadeia de comando para identificar onde está a falha.
+
+---
+
+## 🕵️ **OS TRÊS ESPIÕES IMPLEMENTADOS:**
+
+### **📻 Espião 1: Verificação de Alvo**
+**Localização:** `obj_infantaria/Step_0.gml` (quando clicado)
+**Mensagem:** `[TESTE 1] Ordem para criar menu. Enviando meu ID: X`
+**Função:** Confirma que o soldado está enviando seu ID corretamente
+
+### **🔧 Espião 2: Verificação de Transmissão**
+**Localização:** `obj_menu_de_acao/Step_0.gml` (clique no botão PATRULHAR)
+**Mensagem:** `[TESTE 2] Botão Patrulhar clicado! Ativando modo para unidade: X`
+**Função:** Confirma que o menu está transmitindo a ordem
+
+### **👂 Espião 3A: Verificação de Mudança de Estado**
+**Localização:** `obj_controlador_unidades/Step_0.gml` (clique direito para finalizar)
+**Mensagem:** `[TESTE 3A] Rota finalizada. Estado da unidade X mudado para 'patrulhando'.`
+**Função:** Confirma que o estado foi alterado corretamente
+
+### **👂 Espião 3B: Verificação de Execução**
+**Localização:** `obj_infantaria/Step_0.gml` (case "patrulhando")
+**Mensagem:** `[TESTE 3B] Unidade X está executando o estado 'patrulhando'.`
+**Função:** Confirma que a unidade está executando a patrulha
+
+---
+
+## 🎮 **COMO EXECUTAR OS TESTES:**
+
+### **🧪 Teste 1: Verificação de Alvo**
+1. **Execute o jogo**
+2. **Clique em uma unidade de infantaria**
+3. **Verifique no console:**
+   ```
+   [TESTE 1] Ordem para criar menu. Enviando meu ID: 100021
+   ```
+4. **Resultado esperado:** Mensagem aparece com um número de ID
+
+### **🧪 Teste 2: Verificação de Transmissão**
+1. **Após o Teste 1 passar**
+2. **Clique no botão "PATRULHAR" no menu**
+3. **Verifique no console:**
+   ```
+   [TESTE 2] Botão Patrulhar clicado! Ativando modo para unidade: 100021
+   ```
+4. **Resultado esperado:** Mesmo ID do Teste 1
+
+### **🧪 Teste 3: Verificação de Execução**
+1. **Após o Teste 2 passar**
+2. **Clique esquerdo em pontos do mapa** (adicionar à rota)
+3. **Clique direito** (finalizar patrulha)
+4. **Verifique no console:**
+   ```
+   [TESTE 3A] Rota finalizada. Estado da unidade 100021 mudado para 'patrulhando'.
+   [TESTE 3B] Unidade 100021 está executando o estado 'patrulhando'.
+   ```
+5. **Resultado esperado:** Ambas as mensagens aparecem
+
+---
+
+## 🔍 **DIAGNÓSTICO DE FALHAS:**
+
+### **❌ Se o Teste 1 falhar:**
+- **Problema:** Evento de clique não está sendo registrado
+- **Possíveis causas:**
+  - Interface invisível bloqueando o clique
+  - `raio_selecao` muito pequeno
+  - Unidade não está sendo detectada
+
+### **❌ Se o Teste 2 falhar:**
+- **Problema:** Botão "Patrulhar" não está funcionando
+- **Possíveis causas:**
+  - Lógica de detecção de clique do botão quebrada
+  - Variável `unidade_alvo` não está sendo definida
+  - Menu não está sendo criado corretamente
+
+### **❌ Se o Teste 3A falhar:**
+- **Problema:** Estado não está sendo alterado
+- **Possíveis causas:**
+  - Evento Global Right Pressed não está funcionando
+  - `global.unidade_a_comandar` não está definido
+  - Rota está vazia
+
+### **❌ Se o Teste 3B falhar:**
+- **Problema:** Máquina de estados não está funcionando
+- **Possíveis causas:**
+  - `case "patrulhando":` não existe
+  - Nome do estado está escrito incorretamente
+  - Switch statement não está sendo executado
+
+---
+
+## 📊 **FLUXO DE DEBUG ESPERADO:**
+
+### **✅ Sequência de Sucesso Completa:**
+```
+🎯 Unidade selecionada - ID: 100021 | Estado: livre
+[TESTE 1] Ordem para criar menu. Enviando meu ID: 100021
+📻 CONEXÃO CRÍTICA - Menu recebeu ID da unidade: 100021
+🎯 CLIQUE NO BOTÃO PATRULHAR!
+📻 TRANSMITINDO ORDEM para unidade ID: 100021
+[TESTE 2] Botão Patrulhar clicado! Ativando modo para unidade: 100021
+✅ Ordem de patrulha enviada para a unidade: 100021
+🎯 UNIDADE RECEBEU ORDEM DE PATRULHA - ID: 100021
+📍 Ponto de patrulha adicionado em: (200, 300)
+📍 Ponto de patrulha adicionado em: (400, 300)
+[TESTE 3A] Rota finalizada. Estado da unidade 100021 mudado para 'patrulhando'.
+🔄 Rota de patrulha finalizada. Iniciando patrulha.
+[TESTE 3B] Unidade 100021 está executando o estado 'patrulhando'.
+[TESTE 3B] Unidade 100021 está executando o estado 'patrulhando'.
+[TESTE 3B] Unidade 100021 está executando o estado 'patrulhando'.
+```
+
+---
+
+## 🎯 **INSTRUÇÕES PARA O USUÁRIO:**
+
+### **📋 Passo a Passo:**
+1. **Execute o jogo**
+2. **Crie uma unidade** (via quartel)
+3. **Clique na unidade** → Verifique Teste 1
+4. **Clique em PATRULHAR** → Verifique Teste 2
+5. **Adicione pontos** (clique esquerdo)
+6. **Finalize** (clique direito) → Verifique Teste 3A e 3B
+
+### **📝 Relatório:**
+- **Anote** quais testes passaram
+- **Identifique** onde a cadeia quebra
+- **Reporte** as mensagens de erro específicas
+
+---
+
+## ✅ **STATUS: ESPIÕES ATIVOS**
+
+### **🎯 Próximos Passos:**
+1. **Execute os testes** na ordem especificada
+2. **Identifique** qual elo está quebrado
+3. **Reporte** os resultados para correção específica
+
+**Os espiões estão posicionados e prontos para identificar a falha na cadeia de comando!** 🔍📻🔄

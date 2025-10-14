@@ -1,0 +1,124 @@
+=========================================================
+HEGEMONIA GLOBAL - CORREÇÃO COMPLETA DO SISTEMA DE CONSTRUÇÃO COM ZOOM
+=========================================================
+
+DATA: 2025-08-27
+PROBLEMA REPORTADO: "ao dar zoom nao consigo construir uma casa cou banco, o menu construcao 'c' nao pega ao fazer a zoom no jogo ou andar sobre o mouse"
+
+PROBLEMAS IDENTIFICADOS:
+-----------------------
+1. SISTEMA DE CONSTRUÇÃO:
+   - O sistema de construção estava usando coordenadas diretas do mouse (mouse_x, mouse_y)
+   - Não considerava transformações da câmera quando zoom ou movimento aplicados
+   - Fantasma do edifício aparecia na posição errada
+   - Construção era feita no local errado
+
+2. MENU DE CONSTRUÇÃO (TECLA 'C'):
+   - Menu desenhado em coordenadas GUI (Draw_64)
+   - Detecção de cliques usando coordenadas do mundo (mouse_x, mouse_y)
+   - Incompatibilidade causava falha nos cliques quando zoom != 1.0
+   - Menu inacessível com câmera movida ou zoom aplicado
+
+SOLUÇÕES IMPLEMENTADAS:
+----------------------
+
+1. CORREÇÃO DO SISTEMA DE CONSTRUÇÃO:
+   ✅ obj_controlador_construcao/Step_0.gml
+      - Conversão de coordenadas do mouse para mundo
+      - Cálculo correto do grid com zoom
+      - Debug específico para situações com zoom
+      - Fallback de segurança
+
+   ✅ obj_input_manager/Step_2.gml
+      - Construção com coordenadas do mundo convertidas
+      - Sistema legacy (global.construindo_edificio) também corrigido
+      - Debug melhorado mostrando zoom atual
+
+2. CORREÇÃO DO MENU DE CONSTRUÇÃO:
+   ✅ obj_menu_construcao/Mouse_56.gml
+      - Conversão para coordenadas GUI usando device_mouse_x_to_gui(0)
+      - Detecção de cliques consistente com desenho do menu
+      - Debug melhorado mostrando coordenadas GUI
+      - Uso de asset_get_index() para melhor compatibilidade
+   
+   ✅ obj_menu_construcao/Draw_64.gml
+      - Debug adicional para mostrar coordenadas GUI do mouse
+      - Confirmação de que menu é desenhado em coordenadas corretas
+
+FÓRMULAS DE CONVERSÃO:
+--------------------
+
+1. COORDENADAS DO MUNDO (para construção):
+```gml
+// Obter posição da câmera
+var _cam_x = camera_x - (room_width * zoom_level) / 2;
+var _cam_y = camera_y - (room_height * zoom_level) / 2;
+
+// Converter mouse para coordenadas do mundo
+var _world_mouse_x = _cam_x + (mouse_x * zoom_level);
+var _world_mouse_y = _cam_y + (mouse_y * zoom_level);
+
+// Aplicar ao grid
+var _grid_x = floor(_world_mouse_x / tile_size) * tile_size;
+var _grid_y = floor(_world_mouse_y / tile_size) * tile_size;
+```
+
+2. COORDENADAS GUI (para menus):
+```gml
+// Converter coordenadas do mouse para GUI
+var _mouse_gui_x = device_mouse_x_to_gui(0);
+var _mouse_gui_y = device_mouse_y_to_gui(0);
+
+// Usar para detecção de cliques em elementos GUI
+if (point_in_rectangle(_mouse_gui_x, _mouse_gui_y, x1, y1, x2, y2)) {
+    // Clique detectado corretamente
+}
+```
+
+CONTROLES DE CÂMERA:
+-------------------
+- Mouse Wheel: Zoom in/out (0.1x até 2.0x)
+- Botão do meio + arrastar: Mover câmera
+- WASD: Mover câmera com teclado
+- Velocidade de movimento ajustada automaticamente com zoom
+
+TESTE RECOMENDADO:
+-----------------
+1. **TESTE DO MENU:**
+   - Pressione C para ativar modo de construção
+   - Use mouse wheel para dar zoom in/out
+   - Mova a câmera com WASD ou botão do meio
+   - Pressione C novamente - menu deve aparecer na posição correta
+   - Clique em "Construir Casa" ou "Construir Banco" - deve funcionar
+
+2. **TESTE DE CONSTRUÇÃO:**
+   - Com edifício selecionado, use zoom em diferentes níveis
+   - Mova o mouse - fantasma deve seguir corretamente
+   - Clique para construir - edifício deve aparecer onde esperado
+   - Teste em diferentes níveis de zoom (0.5x, 1.5x, 2.0x)
+
+3. **TESTE COMBINADO:**
+   - Zoom para 0.5x, mova câmera, pressione C
+   - Selecione casa, construa
+   - Zoom para 2.0x, mova câmera, pressione C
+   - Selecione banco, construa
+   - Ambos devem funcionar perfeitamente
+
+ARQUIVOS MODIFICADOS:
+--------------------
+- obj_controlador_construcao/Step_0.gml (conversão de coordenadas)
+- obj_input_manager/Step_2.gml (construção com zoom, sistema legacy)
+- obj_menu_construcao/Mouse_56.gml (detecção de cliques GUI)
+- obj_menu_construcao/Draw_64.gml (debug melhorado)
+
+RESULTADO ESPERADO:
+------------------
+✅ Menu de construção (tecla C) funciona em qualquer zoom/posição
+✅ Cliques nos botões do menu funcionam corretamente
+✅ Construção funciona corretamente em qualquer nível de zoom
+✅ Fantasma do edifício aparece na posição correta
+✅ Sistema responsivo a mudanças de câmera
+✅ Debug melhorado para troubleshooting
+✅ Compatibilidade total entre sistemas GUI e mundo
+
+=========================================================

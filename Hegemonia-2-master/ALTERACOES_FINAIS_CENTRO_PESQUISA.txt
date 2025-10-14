@@ -1,0 +1,102 @@
+=========================================================
+HEGEMONIA GLOBAL - ALTERAÇÕES FINAIS
+Centro de Pesquisa - Ajustes de Layout
+=========================================================
+
+DATA: 2025-01-27
+STATUS: ALTERAÇÕES FINAIS IMPLEMENTADAS COM SUCESSO
+
+## 🔬 **CENTRO DE PESQUISA - AJUSTES FINAIS:**
+
+### ✅ **ÍCONES REPOSICIONADOS:**
+- **➡️ Direita**: Ícones movidos 10% para a direita
+- **⬇️ Baixo**: Ícones mantidos 40% para baixo
+- **🎨 Layout**: Melhor distribuição visual nos cards
+
+### ✅ **VALORES REPOSICIONADOS:**
+- **⬇️ Baixo**: Valores de custo e tempo movidos 20% para baixo
+- **📊 Posicionamento**: Melhor espaçamento entre elementos
+
+### ✅ **VALORES REDUZIDOS:**
+- **💸 Redução Total**: Todos os custos reduzidos em 60% (50% + 20%)
+- **📊 Valores Finais**:
+  - Borracha: $6.000 → $2.400
+  - Petróleo: $7.500 → $3.000
+  - Silício: $8.000 → $3.200
+  - Mina: $5.000 → $2.000
+  - Alumínio: $9.000 → $3.600
+  - Centro: $10.000 → $4.000
+  - Ouro: $15.000 → $6.000
+  - Serraria: $4.000 → $1.600
+  - Cobre: $7.000 → $2.800
+  - Urânio: $25.000 → $10.000
+  - Lítio: $12.000 → $4.800
+  - Titânio: $18.000 → $7.200
+
+---
+
+## 🎯 **BOTÕES MELHORADOS:**
+
+### ✅ **Botão de Slot Extra:**
+- **➡️ Posição**: Movido 10% para a direita
+- **📏 Tamanho**: Largura aumentada em 20%
+- **🎨 Cor**: Verde mais proeminente
+
+### ✅ **Botão de Fechar:**
+- **🔴 Cor**: Vermelho aumentado em 10%
+- **📱 Detecção**: Melhor área de clique
+- **🎯 Posicionamento**: Mantido no canto direito
+
+---
+
+## 📍 **POSICIONAMENTOS ATUALIZADOS:**
+
+### **Ícones:**
+```
+Posição X: card_x + card_w/2 + (card_w * 0.10)  // 10% para direita
+Posição Y: card_y + 25 + (card_h * 0.40)         // 40% para baixo
+```
+
+### **Valores:**
+```
+Custo: card_y + 70 + (card_h * 0.20)            // 20% para baixo
+Tempo: card_y + 85 + (card_h * 0.20)            // 20% para baixo
+```
+
+### **Frase "Desenvolva...":**
+```
+Posição Y: header_y + 40 + (header_h * 0.07)     // 7% para baixo
+```
+
+---
+
+## 🔧 **ARQUIVOS MODIFICADOS:**
+
+### **Draw Event:**
+- ✅ `objects/obj_research_center/Draw_64.gml` - Layout e posicionamento
+
+### **Step Event:**
+- ✅ `objects/obj_research_center/Step_0.gml` - Valores de custo atualizados
+
+---
+
+## 🎮 **RESULTADO FINAL:**
+
+O centro de pesquisa agora possui:
+
+- **🎯 Ícones Bem Posicionados**: 10% direita, 40% baixo
+- **💰 Valores Acessíveis**: Reduzidos em 60% total
+- **📱 Botões Funcionais**: Melhor detecção e cores
+- **🎨 Layout Otimizado**: Espaçamento e distribuição melhorados
+- **📝 Texto Legível**: Frase "Desenvolva..." reposicionada
+
+---
+
+## 🏆 **STATUS FINAL:**
+
+**Status**: ALTERAÇÕES FINAIS IMPLEMENTADAS ✅  
+**Sistema**: Centro de Pesquisa Otimizado  
+**Layout**: Ícones e Valores Reposicionados  
+**Funcionalidade**: Botões e Detecção Melhorados
+
+O centro de pesquisa está agora com layout otimizado e funcionalidades aprimoradas! 🚀

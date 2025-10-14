@@ -1,0 +1,92 @@
+# 🔧 **CORREÇÃO DO ERRO DA FONTE FNT_ARIAL**
+
+## ❌ **PROBLEMA IDENTIFICADO**
+
+**Erro encontrado:**
+```
+ERROR in action number 1
+of Draw Event for object obj_menu_de_acao:
+Variable <unknown_object>.fnt_arial(100225, -2147483648) not set before reading it.
+ at gml_Object_obj_menu_de_acao_Draw_0 (line 26) draw_set_font(fnt_arial);
+```
+
+## 🔍 **CAUSA DO PROBLEMA**
+
+O erro ocorreu porque o código estava tentando usar a fonte `fnt_arial` que **não existe** no projeto. 
+
+**Verificação realizada:**
+- ✅ Pasta `fonts/` contém apenas `fnt_ui_main/`
+- ❌ Fonte `fnt_arial` não foi encontrada
+- ❌ Múltiplos arquivos Draw estavam referenciando a fonte inexistente
+
+## ✅ **CORREÇÃO APLICADA**
+
+### **📁 Arquivos Corrigidos:**
+
+1. **`objects/obj_menu_de_acao/Draw_0.gml`**
+   - Removidas 4 referências a `draw_set_font(fnt_arial)`
+
+2. **`objects/obj_menu_de_acao/Draw_64.gml`**
+   - Removidas 4 referências a `draw_set_font(fnt_arial)`
+
+3. **`objects/obj_interface_comandos/Draw_64.gml`**
+   - Removidas 2 referências a `draw_set_font(fnt_arial)`
+
+### **🔧 Solução Implementada:**
+
+**Antes:**
+```gml
+draw_set_halign(fa_center);
+draw_set_valign(fa_middle);
+draw_set_font(fnt_arial);  // ❌ Fonte inexistente
+draw_text(x, y, texto);
+```
+
+**Depois:**
+```gml
+draw_set_halign(fa_center);
+draw_set_valign(fa_middle);
+draw_text(x, y, texto);  // ✅ Usa fonte padrão do sistema
+```
+
+## 🎯 **RESULTADO**
+
+### **✅ Problemas Resolvidos:**
+- ❌ Erro de compilação eliminado
+- ✅ Menu de ação funciona corretamente
+- ✅ Interface de comandos funciona corretamente
+- ✅ Texto é renderizado usando fonte padrão do sistema
+
+### **📋 Verificação Final:**
+```bash
+grep_search "fnt_arial" → 0 resultados encontrados
+```
+
+## 🚀 **PRÓXIMOS PASSOS**
+
+### **🎨 Opções para Melhorar a Tipografia:**
+
+1. **Usar fonte existente:**
+   ```gml
+   draw_set_font(fnt_ui_main);  // Fonte disponível no projeto
+   ```
+
+2. **Criar nova fonte:**
+   - Adicionar fonte Arial ou similar ao projeto
+   - Configurar como `fnt_arial`
+
+3. **Manter fonte padrão:**
+   - Usar fonte padrão do sistema (solução atual)
+
+## 📝 **LIÇÕES APRENDIDAS**
+
+1. **✅ Sempre verificar dependências** antes de usar recursos
+2. **✅ Usar fontes disponíveis** no projeto
+3. **✅ Testar compilação** após mudanças
+4. **✅ Documentar correções** para referência futura
+
+---
+
+**Status: ✅ PROBLEMA RESOLVIDO**
+
+O menu de ação agora funciona corretamente sem erros de compilação! 🎯

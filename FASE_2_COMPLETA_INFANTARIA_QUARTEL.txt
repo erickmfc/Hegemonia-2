@@ -1,0 +1,213 @@
+=========================================================
+HEGEMONIA GLOBAL - FASE 2 COMPLETA
+Sistema Militar Avançado - Expansões Implementadas
+=========================================================
+
+DATA: 2025-01-27
+STATUS: FASE 2 COMPLETA - Expansões Avançadas Implementadas
+
+## 🚀 **FASE 2 - EXPANSÕES AVANÇADAS IMPLEMENTADAS**
+
+### ✅ **INFANTARIA - SISTEMA DE IA AVANÇADO:**
+
+#### 1. **Sistema de Moral Funcional**
+- ✅ **Moral Dinâmica**: Diminui durante combate, recupera quando parado
+- ✅ **Retirada Inteligente**: Unidades fogem quando moral < 30% e vida < 50%
+- ✅ **Comportamento Baseado na Moral**: Velocidade e frequência de tiro ajustadas
+- ✅ **Recuperação de Moral**: Recupera gradualmente quando não está em combate
+
+#### 2. **IA Expandida (6 Estados)**
+- ✅ **"parado"**: Estado de detecção otimizada
+- ✅ **"perseguindo"**: Movimento tático com distância variável
+- ✅ **"atacando"**: Combate com frequência baseada na moral
+- ✅ **"retirando"**: NOVO - Fuga inteligente de combate
+- ✅ **"formacao"**: PREPARADO para futuras implementações
+- ✅ **"cobertura"**: PREPARADO para futuras implementações
+
+#### 3. **Comportamentos Táticos Avançados**
+- ✅ **Distância Tática**: Mantém distância quando moral baixa
+- ✅ **Velocidade Adaptativa**: Mais lento com moral baixa, mais rápido com moral alta
+- ✅ **Frequência de Tiro Inteligente**: Mais lento quando moral muito baixa
+- ✅ **Retirada Estratégica**: Move-se para longe de inimigos
+
+#### 4. **Sistema de Performance Otimizado**
+- ✅ **Timer de Verificação**: Verificação de inimigos a cada 10 frames
+- ✅ **Variável Própria**: `timer_verificacao` ao invés de `frame_count`
+- ✅ **Código Limpo**: Sem erros de variáveis não definidas
+
+### ✅ **QUARTEL - SISTEMA DE RECRUTAMENTO AVANÇADO:**
+
+#### 1. **Múltiplos Tipos de Unidades**
+- ✅ **Infantaria Básica**: $100, 1 população, 5s treino
+- ✅ **Infantaria Pesada**: $200, 2 população, 7.5s treino (+50% vida, -20% velocidade)
+- ✅ **Atirador de Elite**: $300, 1 população, 10s treino (+50% dano, +50% alcance, +5% precisão)
+
+#### 2. **Sistema de Fila de Recrutamento**
+- ✅ **Fila de 5 Unidades**: Máximo de 5 unidades aguardando
+- ✅ **Processamento Automático**: Próxima unidade inicia automaticamente
+- ✅ **Interface de Fila**: Mostra quantas unidades estão na fila
+- ✅ **Seleção de Unidades**: Clique para selecionar tipo de unidade
+
+#### 3. **Interface Avançada**
+- ✅ **Lista de Unidades**: Mostra todas as unidades disponíveis
+- ✅ **Seleção Visual**: Unidade selecionada destacada
+- ✅ **Informações Detalhadas**: Custo, população, tempo, descrição
+- ✅ **Status da Fila**: Mostra progresso e unidades aguardando
+
+#### 4. **Sistema de Estatísticas**
+- ✅ **Contador de Unidades**: Total de unidades treinadas
+- ✅ **Tempo Total**: Tempo total gasto em treinamento
+- ✅ **Feedback Visual**: Estatísticas mostradas na interface
+
+## 🔧 **CÓDIGO IMPLEMENTADO - FASE 2:**
+
+### INFANTARIA - Sistema de Moral:
+```gml
+// === SISTEMA DE MORAL FUNCIONAL (NOVO) ===
+if (estado == "atacando" || estado == "perseguindo") {
+    // Diminuir moral durante combate
+    moral -= moral_decrescimento;
+    if (moral < 0) moral = 0;
+    
+    // Verificar se a moral está baixa para retirada
+    if (moral < 30 && vida_atual < vida_maxima * 0.5) {
+        estado = "retirando";
+        alvo_inimigo = noone;
+        alarm[1] = -1; // Parar de atirar
+    }
+} else if (estado == "parado" || estado == "retirando") {
+    // Recuperar moral quando não está em combate
+    moral += moral_decrescimento * 0.5;
+    if (moral > moral_maxima) moral = moral_maxima;
+}
+```
+
+### QUARTEL - Sistema de Unidades Múltiplas:
+```gml
+// === SISTEMA DE UNIDADES MÚLTIPLAS (NOVO) ===
+unidades_disponiveis = ds_list_create();
+unidade_selecionada = 0;
+
+// Adicionar unidades disponíveis
+ds_list_add(unidades_disponiveis, {
+    nome: "Infantaria Básica",
+    objeto: obj_infantaria,
+    custo_dinheiro: 100,
+    custo_populacao: 1,
+    tempo_treino: 300,
+    descricao: "Unidade de combate básica com rifle"
+});
+```
+
+## 📊 **MELHORIAS DE PERFORMANCE - FASE 2:**
+
+### INFANTARIA:
+- ✅ **IA Mais Inteligente**: 6 estados com comportamentos táticos
+- ✅ **Sistema de Moral**: Comportamento realista baseado em moral
+- ✅ **Retirada Inteligente**: Unidades fogem quando em desvantagem
+- ✅ **Performance Otimizada**: Timer próprio para verificações
+
+### QUARTEL:
+- ✅ **Múltiplas Unidades**: 3 tipos diferentes com características únicas
+- ✅ **Fila de Recrutamento**: Sistema de fila eficiente
+- ✅ **Interface Rica**: Seleção visual e informações detalhadas
+- ✅ **Estatísticas**: Rastreamento de performance
+
+## 🎮 **FUNCIONALIDADES AVANÇADAS:**
+
+### INFANTARIA:
+1. **Comportamento Tático**
+   - Mantém distância quando moral baixa
+   - Velocidade adaptativa baseada na moral
+   - Retirada inteligente quando em desvantagem
+
+2. **Sistema de Estados**
+   - 6 estados diferentes
+   - Transições inteligentes entre estados
+   - Preparado para expansões futuras
+
+3. **Feedback Visual**
+   - Indicadores de estado expandidos
+   - Barra de moral sempre visível
+   - Texto de "RETIRADA" quando fugindo
+
+### QUARTEL:
+1. **Sistema de Unidades**
+   - 3 tipos diferentes de infantaria
+   - Características únicas para cada tipo
+   - Modificadores aplicados automaticamente
+
+2. **Fila de Recrutamento**
+   - Máximo de 5 unidades na fila
+   - Processamento automático
+   - Interface mostrando status da fila
+
+3. **Interface Avançada**
+   - Seleção visual de unidades
+   - Informações detalhadas de cada tipo
+   - Estatísticas de treinamento
+
+## 📈 **BENEFÍCIOS ALCANÇADOS - FASE 2:**
+
+### 1. **Gameplay Mais Estratégico**
+- ✅ Unidades com comportamento realista
+- ✅ Sistema de moral adiciona profundidade
+- ✅ Múltiplas opções de unidades
+- ✅ Fila de recrutamento para planejamento
+
+### 2. **Experiência Mais Rica**
+- ✅ Feedback visual expandido
+- ✅ Interface mais informativa
+- ✅ Comportamentos táticos visíveis
+- ✅ Estatísticas de performance
+
+### 3. **Sistema Mais Profundo**
+- ✅ IA mais inteligente e realista
+- ✅ Múltiplas opções estratégicas
+- ✅ Sistema de progression mais complexo
+- ✅ Preparado para expansões futuras
+
+## 🎯 **PRÓXIMAS MELHORIAS POSSÍVEIS (FASE 3):**
+
+### INFANTARIA:
+- [ ] Sistema de formação implementado
+- [ ] Busca por cobertura
+- [ ] Animações de movimento
+- [ ] Efeitos sonoros
+- [ ] Diferentes tipos de armas
+- [ ] Sistema de comandos
+
+### QUARTEL:
+- [ ] Sistema de upgrades do quartel
+- [ ] Mais tipos de unidades
+- [ ] Animações de construção
+- [ ] Sistema de notificações
+- [ ] Especializações militares
+- [ ] Modificadores de treinamento
+
+## 📋 **ARQUIVOS MODIFICADOS - FASE 2:**
+
+### INFANTARIA:
+- ✅ `objects/obj_infantaria/Create_0.gml` - Timer de verificação adicionado
+- ✅ `objects/obj_infantaria/Step_0.gml` - Sistema de moral e IA avançada
+- ✅ `objects/obj_infantaria/Draw_0.gml` - Interface visual expandida
+
+### QUARTEL:
+- ✅ `objects/obj_quartel/Create_0.gml` - Sistema de múltiplas unidades
+- ✅ `objects/obj_quartel/Step_0.gml` - Lógica de fila de recrutamento
+- ✅ `objects/obj_quartel/Draw_64.gml` - Interface avançada
+
+## 🎯 **CONCLUSÃO - FASE 2:**
+
+A **Fase 2** foi implementada com sucesso, resultando em:
+
+1. **Sistema de IA Avançado** com moral funcional e comportamentos táticos
+2. **Quartel Expandido** com múltiplas unidades e fila de recrutamento
+3. **Interface Rica** com feedback visual detalhado
+4. **Gameplay Estratégico** com opções múltiplas e comportamentos realistas
+
+O sistema militar agora oferece uma experiência muito mais profunda e estratégica, com unidades que se comportam de forma realista e um sistema de recrutamento que permite planejamento tático avançado.
+
+=========================================================
+FASE 2 COMPLETA - SISTEMA MILITAR AVANÇADO
+=========================================================

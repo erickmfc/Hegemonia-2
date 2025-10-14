@@ -1,0 +1,14 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_testar_sistema",
+  "isCompatibility":false,
+  "isDnd":false,
+  "isTemporary":false,
+  "name":"scr_testar_sistema",
+  "parent":{
+    "name":"scripts",
+    "path":"folders/scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"1.0",
+}

@@ -1,0 +1,238 @@
+# 🎯 **MENU DE AÇÃO COMPLETO - HEGEMONIA GLOBAL**
+
+## 📋 **DESCRIÇÃO GERAL**
+
+O `obj_menu_acao` é um sistema de interface tática universal que permite controlar unidades móveis (infantaria, aviões, navios) através de comandos intuitivos e visuais.
+
+---
+
+## 🎨 **APARÊNCIA VISUAL**
+
+### **🎯 Design Principal:**
+- **Posição**: Canto superior direito da tela
+- **Tamanho**: 220x200 pixels
+- **Fundo**: Escuro (RGB: 30,30,40) com bordas arredondadas
+- **Transparência**: Animada (0-95% de opacidade)
+- **Bordas**: 15px de raio com cor RGB(60,60,80)
+
+### **🔘 Botões (3 botões verticais):**
+1. **PATRULHAR** (verde quando ativo) - Ícone: Círculo com seta
+2. **SEGUIR** (azul quando ativo) - Ícone: Seta dupla
+3. **ATACAR** (vermelho quando ativo) - Ícone: Espadas cruzadas
+
+### **🎨 Estados Visuais:**
+- **Normal**: Cinza escuro RGB(50,50,70)
+- **Hover**: Cinza claro RGB(70,70,90)
+- **Ativo**: Cor específica por comando
+- **Tooltips**: Aparecem ao passar o mouse
+
+---
+
+## ⚙️ **FUNCIONAMENTO TÉCNICO**
+
+### **🖱️ Ativação:**
+```gml
+// Verifica se há unidade selecionada
+if (global.unidade_selecionada != noone && instance_exists(global.unidade_selecionada)) {
+    menu_visivel = true;
+    unidade_atual = global.unidade_selecionada;
+}
+```
+
+### **🎯 Detecção de Tipo:**
+- **INFANTARIA**: `obj_infantaria` → "Soldado"
+- **OUTROS**: "Unidade" (preparado para futuras expansões)
+
+### **🔄 Animações:**
+- **Entrada**: Fade-in suave (0.1s)
+- **Saída**: Fade-out automático
+- **Hover**: Mudança de cor instantânea
+- **Ativo**: Cor específica por comando
+
+---
+
+## 🎮 **COMANDOS DISPONÍVEIS**
+
+### **🔄 PATRULHAR:**
+```gml
+// Ativar patrulha
+unidade_atual.comando_atual = "PATRULHAR";
+unidade_atual.patrulha_ativa = true;
+unidade_atual.ponto_patrulha_a_x = unidade_atual.x;
+unidade_atual.ponto_patrulha_a_y = unidade_atual.y;
+unidade_atual.ponto_patrulha_b_x = unidade_atual.x + 100;
+unidade_atual.ponto_patrulha_b_y = unidade_atual.y + 100;
+```
+
+**Funcionalidade:**
+- Ativa patrulha automática entre 2 pontos
+- Unidade patrulha automaticamente
+- Clique novamente para desativar
+
+### **➡️ SEGUIR:**
+```gml
+// Ativar seguir
+unidade_atual.comando_atual = "SEGUIR";
+// Aguarda clique em alvo para seguir
+```
+
+**Funcionalidade:**
+- Permite seguir outras unidades
+- Clique em uma unidade para seguir
+- Clique novamente para parar de seguir
+
+### **⚔️ ATACAR:**
+```gml
+// Ativar ataque
+unidade_atual.comando_atual = "ATACAR";
+// Aguarda clique em alvo para atacar
+```
+
+**Funcionalidade:**
+- Permite atacar alvos específicos
+- Clique em um alvo para atacar
+- Clique novamente para parar de atacar
+
+---
+
+## 🔧 **VARIÁVEIS GLOBAIS**
+
+### **📊 Controle Principal:**
+```gml
+global.unidade_selecionada = noone;        // Unidade atualmente selecionada
+global.mostrar_painel_comandos = true;     // Controla visibilidade
+```
+
+### **🎯 Estados do Menu:**
+```gml
+menu_visivel = false;                      // Se o menu deve aparecer
+menu_animado = false;                      // Estado da animação
+opacidade_atual = 0;                       // Opacidade atual (0-0.95)
+```
+
+### **🔘 Estados dos Botões:**
+```gml
+botao_patrulhar.ativo = false;             // Se patrulha está ativa
+botao_seguir.ativo = false;                // Se seguir está ativo
+botao_atacar.ativo = false;                // Se atacar está ativo
+botao_*.hover = false;                     // Se mouse está sobre o botão
+```
+
+---
+
+## 🎨 **SISTEMA DE CORES**
+
+### **🎨 Paleta Principal:**
+```gml
+cor_fundo = make_color_rgb(30, 30, 40);           // Fundo escuro
+cor_borda = make_color_rgb(60, 60, 80);           // Bordas
+cor_botao = make_color_rgb(50, 50, 70);           // Botões normais
+cor_botao_hover = make_color_rgb(70, 70, 90);     // Botões hover
+cor_texto = make_color_rgb(220, 220, 240);        // Texto normal
+cor_texto_ativo = make_color_rgb(255, 255, 255);  // Texto ativo
+```
+
+### **🎯 Cores de Comandos Ativos:**
+```gml
+cor_botao_ativo_patrulhar = make_color_rgb(80, 120, 80);   // Verde
+cor_botao_ativo_seguir = make_color_rgb(80, 80, 120);      // Azul
+cor_botao_ativo_atacar = make_color_rgb(120, 80, 80);      // Vermelho
+```
+
+---
+
+## 🐛 **SISTEMA DE DEBUG**
+
+### **📝 Logs Automáticos:**
+```gml
+// Ativação do menu
+show_debug_message("🎯 MENU DE AÇÃO ATIVO - Tipo: " + tipo_unidade + " | Nome: " + nome_unidade);
+
+// Comandos executados
+show_debug_message("🔄 PATRULHA ATIVADA - " + tipo_unidade);
+show_debug_message("➡️ COMANDO SEGUIR ATIVADO - " + tipo_unidade);
+show_debug_message("⚔️ COMANDO ATACAR ATIVADO - " + tipo_unidade);
+```
+
+### **🔧 Configuração de Debug:**
+```gml
+debug_ativo = true;                         // Ativa/desativa logs
+ultimo_comando = "";                        // Último comando executado
+```
+
+---
+
+## 🎮 **EXPERIÊNCIA DO USUÁRIO**
+
+### **📱 Fluxo de Uso:**
+1. **Selecionar**: Clique em uma unidade
+2. **Menu aparece**: No canto superior direito com animação
+3. **Escolher comando**: Clique no botão desejado
+4. **Executar**: Clique no alvo (se necessário)
+5. **Desativar**: Clique novamente no botão
+
+### **🎯 Feedback Visual:**
+- **Tooltips**: Descrições ao passar o mouse
+- **Cores**: Mudança visual por estado
+- **Animações**: Transições suaves
+- **Indicadores**: Mostra comando ativo
+
+### **🔊 Feedback de Áudio:**
+- Sons de hover (planejado)
+- Sons de clique (planejado)
+- Sons de comando ativado (planejado)
+
+---
+
+## 🚀 **MELHORIAS IMPLEMENTADAS**
+
+### **✨ Versão 2.0:**
+- ✅ Interface moderna e responsiva
+- ✅ Animações suaves de entrada/saída
+- ✅ Sistema de tooltips informativos
+- ✅ Ícones visuais para cada comando
+- ✅ Cores específicas por estado
+- ✅ Sistema de debug completo
+- ✅ Detecção automática de tipo de unidade
+- ✅ Feedback visual em tempo real
+- ✅ Tratamento de erros robusto
+
+### **🎯 Próximas Melhorias:**
+- 🔄 Sons de interface
+- 🔄 Efeitos visuais avançados
+- 🔄 Suporte a mais tipos de unidades
+- 🔄 Comandos táticos adicionais
+- 🔄 Sistema de atalhos de teclado
+
+---
+
+## 📁 **ARQUIVOS DO SISTEMA**
+
+### **📄 Estrutura:**
+```
+objects/obj_menu_acao/
+├── Create_0.gml      # Inicialização e configurações
+├── Step_0.gml        # Lógica principal e interações
+├── Draw_64.gml       # Renderização visual
+└── obj_menu_acao.yy  # Configurações do objeto
+```
+
+### **🔗 Dependências:**
+- `global.unidade_selecionada` (variável global)
+- `global.mostrar_painel_comandos` (variável global)
+- `obj_infantaria` (objeto de unidade principal)
+- `fnt_arial` (fonte do sistema)
+
+---
+
+## 🎯 **CONCLUSÃO**
+
+O Menu de Ação é um sistema **intuitivo, responsivo e visualmente atrativo** que segue os padrões de jogos de estratégia modernos. Ele oferece:
+
+- **🎨 Interface moderna** com animações suaves
+- **🎮 Controles intuitivos** com feedback visual
+- **🔧 Sistema robusto** com tratamento de erros
+- **🐛 Debug completo** para desenvolvimento
+- **📱 Experiência fluida** para o usuário
+
+O sistema está pronto para uso e pode ser facilmente expandido para suportar novos tipos de unidades e comandos! 🚀

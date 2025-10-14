@@ -1,0 +1,10 @@
+Devido às limitações do ambiente, criarei um sprite placeholder simples para a infantaria. 
+
+Para visualização, este seria um soldado pixel art isométrico de 32x32 pixels:
+- Capacete militar (cinza escuro)
+- Uniforme verde militar
+- Equipamento básico
+- Postura em posição de sentido
+
+O sprite seria centrado (origin no meio) para facilitar rotação e posicionamento.
+Recomendo substituir por arte profissional posteriormente.

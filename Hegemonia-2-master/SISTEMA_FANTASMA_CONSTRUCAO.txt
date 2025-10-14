@@ -1,0 +1,71 @@
+=========================================================
+HEGEMONIA GLOBAL - SISTEMA DE POSICIONAMENTO TÁTICO
+Controlador de Construção com Imagem Fantasma
+=========================================================
+
+ARQUIVO: obj_controlador_construcao
+VERSÃO: 1.0
+DATA: 2025-08-27
+
+DESCRIÇÃO:
+----------
+Este sistema implementa uma pré-visualização visual ("fantasma") para o 
+posicionamento de edifícios no grid do jogo. O fantasma aparece 
+automaticamente quando um edifício é selecionado para construção.
+
+FUNCIONALIDADES:
+----------------
+1. Visualização em tempo real da posição do edifício no grid
+2. Alinhamento automático ao grid baseado no tile_size global
+3. Feedback visual com cores:
+   - Verde: Posição válida para construção
+   - Vermelho: Posição inválida (fora dos limites)
+4. Transparência ajustável para efeito fantasma
+5. Cancelamento com clique direito do mouse
+
+INTEGRAÇÃO:
+-----------
+- Usa global.construindo_agora para detectar seleção
+- Usa global.tile_size para alinhamento consistente
+- Compatível com o sistema existente em obj_input_manager
+- Não interfere com a lógica de construção existente
+
+CONTROLES:
+----------
+- Movimento do mouse: Move o fantasma no grid
+- Clique direito: Cancela a seleção atual
+- A construção real ainda é feita pelo input_manager
+
+ARQUIVOS RELACIONADOS:
+----------------------
+- obj_controlador_construcao/Create_0.gml
+- obj_controlador_construcao/Step_0.gml  
+- obj_controlador_construcao/Draw_0.gml
+- obj_controlador_construcao/obj_controlador_construcao.yy
+- rooms/Room1/RoomCreationCode.gml (instância criada automaticamente)
+
+COMO USAR:
+----------
+1. O sistema é ativado automaticamente quando global.construindo_agora != noone
+2. Selecione um edifício no menu de construção (tecla C)
+3. Mova o mouse para ver a pré-visualização
+4. Clique esquerdo para construir (gerenciado pelo input_manager)
+5. Clique direito para cancelar a seleção
+
+CONFIGURAÇÕES:
+--------------
+- tile_size: Automaticamente sincronizado com global.tile_size
+- Transparência fantasma válido: 0.5 (50%)
+- Transparência fantasma inválido: 0.3 (30%)
+- Cor borda válida: c_lime (verde claro)
+- Cor borda inválida: c_red (vermelho)
+
+PRÓXIMAS MELHORIAS POSSÍVEIS:
+-----------------------------
+- Verificação de colisão com outros edifícios
+- Validação de terreno apropriado
+- Som de feedback para posições válidas/inválidas
+- Animação do fantasma (pulsação, rotação suave)
+- Múltiplos modos de visualização
+
+=========================================================

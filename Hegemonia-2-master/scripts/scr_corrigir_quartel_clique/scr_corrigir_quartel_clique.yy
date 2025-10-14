@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_corrigir_quartel_clique",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_corrigir_quartel_clique",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

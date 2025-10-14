@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_corrigir_objeto_automaticamente",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_corrigir_objeto_automaticamente",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

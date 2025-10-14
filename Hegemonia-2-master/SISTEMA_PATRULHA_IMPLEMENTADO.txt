@@ -1,0 +1,188 @@
+# 🎯 **SISTEMA DE PATRULHA - IMPLEMENTADO**
+
+## ✅ **SISTEMA COMPLETO DE PATRULHA FUNCIONANDO**
+
+### **📋 VISÃO GERAL:**
+
+O sistema implementa um modo de definição de patrulha completo, onde o jogador pode criar rotas personalizadas para suas unidades seguirem automaticamente.
+
+---
+
+## 🎮 **COMO USAR O SISTEMA:**
+
+### **📋 Passo a Passo:**
+
+1. **Selecionar unidade:**
+   - Clique esquerdo na infantaria (azul)
+   - Menu aparece no canto superior direito
+
+2. **Ativar modo patrulha:**
+   - Clique no botão "PATRULHAR" no menu
+   - Menu fecha automaticamente
+   - Sistema entra em modo de definição
+
+3. **Definir rota:**
+   - **Clique esquerdo** em pontos do mapa para adicionar à rota
+   - **Linhas amarelas** aparecem conectando os pontos
+   - **Círculos amarelos** marcam cada ponto
+
+4. **Finalizar patrulha:**
+   - **Clique direito** para finalizar e iniciar a patrulha
+   - Unidade começa a seguir a rota automaticamente
+
+---
+
+## 🛠️ **COMPONENTES DO SISTEMA:**
+
+### **📁 Controlador de Unidades (`obj_controlador_unidades`):**
+
+#### **Create Event:**
+```gml
+// Variáveis globais do sistema de patrulha
+global.modo_patrulha = false;
+global.unidade_a_comandar = noone;
+```
+
+#### **Draw Event:**
+- **Visualiza a rota** em tempo real
+- **Desenha linhas amarelas** conectando pontos
+- **Mostra linha** do último ponto até o mouse
+
+#### **Step Event:**
+- **Captura cliques esquerdos** para adicionar pontos
+- **Captura cliques direitos** para finalizar patrulha
+
+### **📁 Infantaria (`obj_infantaria`):**
+
+#### **Create Event:**
+```gml
+// Sistema de patrulha
+rota_de_patrulha = ds_list_create();
+ponto_da_patrulha_atual = 0;
+```
+
+#### **Clean Up Event:**
+```gml
+// Limpeza de memória
+ds_list_destroy(rota_de_patrulha);
+```
+
+#### **Step Event:**
+- **Máquina de estados** com estado "patrulhando"
+- **Pathfinding** para seguir a rota
+- **Ciclo contínuo** pelos pontos da rota
+
+### **📁 Menu de Ação (`obj_menu_de_acao`):**
+- **Botão PATRULHAR** funcional
+- **Ativa modo patrulha** ao ser clicado
+- **Fecha menu** automaticamente
+
+---
+
+## 🎯 **FUNCIONAMENTO TÉCNICO:**
+
+### **🔄 Modo de Definição:**
+1. **Botão clicado** → `global.modo_patrulha = true`
+2. **Unidade definida** → `global.unidade_a_comandar = unidade`
+3. **Rota limpa** → `ds_list_clear(rota_de_patrulha)`
+
+### **📍 Adicionando Pontos:**
+1. **Clique esquerdo** capturado no controlador
+2. **Ponto adicionado** → `ds_list_add(rota_de_patrulha, [mouse_x, mouse_y])`
+3. **Visualização atualizada** em tempo real
+
+### **✅ Finalizando Patrulha:**
+1. **Clique direito** capturado no controlador
+2. **Estado alterado** → `unidade.estado = "patrulhando"`
+3. **Modo desativado** → `global.modo_patrulha = false`
+
+### **🔄 Executando Patrulha:**
+1. **Pathfinding** para próximo ponto
+2. **Movimento automático** pela rota
+3. **Ciclo contínuo** → `ponto_atual = (ponto_atual + 1) mod tamanho_rota`
+
+---
+
+## 🐛 **MENSAGENS DE DEBUG:**
+
+### **✅ Ativação:**
+```
+🎯 CLIQUE NO BOTÃO PATRULHAR!
+🔄 MODO PATRULHA ATIVADO para a unidade: (ID)
+📋 Clique esquerdo para adicionar pontos, clique direito para finalizar
+```
+
+### **📍 Adicionando Pontos:**
+```
+📍 Ponto de patrulha adicionado em: (x, y)
+```
+
+### **✅ Finalização:**
+```
+🔄 Rota de patrulha finalizada. Iniciando patrulha.
+```
+
+### **🔄 Execução:**
+```
+🔄 Patrulhando - Indo para ponto 1 de 3
+🔄 Patrulhando - Indo para ponto 2 de 3
+🔄 Patrulhando - Indo para ponto 3 de 3
+```
+
+---
+
+## 🎮 **TESTE DO SISTEMA:**
+
+### **🧪 Como Testar:**
+
+1. **Criar unidades:**
+   ```
+   Construir Quartel → Recrutar Unidades
+   ```
+
+2. **Testar patrulha:**
+   ```
+   Selecionar unidade → PATRULHAR → Clique esquerdo em pontos → Clique direito
+   ```
+
+3. **Verificar execução:**
+   ```
+   Unidade deve seguir a rota automaticamente
+   ```
+
+---
+
+## 🚀 **BENEFÍCIOS:**
+
+### **🎯 Jogabilidade:**
+- **Controle preciso** sobre rotas de patrulha
+- **Visualização em tempo real** da rota
+- **Patrulha automática** contínua
+- **Interface intuitiva** e responsiva
+
+### **🔧 Técnico:**
+- **Sistema modular** e escalável
+- **Gerenciamento de memória** adequado
+- **Pathfinding integrado**
+- **Debug detalhado**
+
+---
+
+## 📋 **INSTRUÇÕES PARA O JOGADOR:**
+
+### **🎮 Controles:**
+- **Clique esquerdo:** Adicionar ponto à rota
+- **Clique direito:** Finalizar e iniciar patrulha
+- **Tecla T:** Teste manual (quando unidade selecionada)
+
+### **📋 Dicas:**
+- **Crie rotas complexas** com múltiplos pontos
+- **Use para proteger** entradas da base
+- **Patrulha contínua** até ser interrompida
+- **Visualize a rota** antes de finalizar
+
+---
+
+**Status: ✅ SISTEMA DE PATRULHA IMPLEMENTADO COM SUCESSO**
+
+O sistema permite criar rotas de patrulha personalizadas com visualização em tempo real! 🎯🔄

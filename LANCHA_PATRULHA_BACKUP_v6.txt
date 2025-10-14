@@ -1,0 +1,20 @@
+BACKUP DOS ARQUIVOS ATUAIS DA LANCHA PATRULHA v6.0
+==================================================
+
+Este arquivo contém o backup dos arquivos atuais antes da implementação da v4.0.
+
+ARQUIVOS BACKUP:
+- Create_0.gml: (vazio)
+- Step_0.gml: (vazio) 
+- Draw_0.gml: (vazio)
+- Draw_GUI_0.gml: Interface detalhada estilo F-5 com informações navais
+- CleanUp_0.gml: (vazio)
+
+A interface atual inclui:
+- Conversão de posição mundo para tela
+- Caixa de informações com gradiente naval
+- Informações de HP, estado, modo de combate
+- Timer de ataque
+- Design naval com cores azuis e douradas
+
+Data do backup: $(date)

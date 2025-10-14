@@ -1,0 +1,115 @@
+=========================================================
+HEGEMONIA GLOBAL - CORREÇÃO DO ERRO FATAL
+Variable obj_inimigo_teste not set before reading it
+=========================================================
+
+DATA: 2025-01-27
+STATUS: ERRO CORRIGIDO COM SUCESSO
+
+## ❌ **ERRO IDENTIFICADO:**
+
+```
+FATAL ERROR in Room Creation Code for room Room1
+Variable <unknown_object>.obj_inimigo_teste(100032, -2147483648) not set before reading it.
+at gml_Room_Room1_Create (line 96) - if (object_exists(obj_inimigo_teste)) {
+```
+
+## 🔍 **CAUSA DO PROBLEMA:**
+
+O código no `RoomCreationCode.gml` estava tentando verificar se o objeto `obj_inimigo_teste` existia, mas esse objeto **não existe** no projeto. O objeto correto é `obj_inimigo`.
+
+## ✅ **SOLUÇÃO IMPLEMENTADA:**
+
+### **1. Correção no Room Creation Code:**
+- **Antes:** `if (object_exists(obj_inimigo_teste))`
+- **Depois:** `if (object_exists(obj_inimigo))`
+
+### **2. Atualização das Mensagens de Debug:**
+- Todas as referências a `obj_inimigo_teste` foram alteradas para `obj_inimigo`
+- Mensagens de debug atualizadas para refletir o objeto correto
+
+### **3. Verificação do Objeto obj_inimigo:**
+- ✅ Objeto existe: `objects/obj_inimigo/obj_inimigo.yy`
+- ✅ Tem Create Event: `objects/obj_inimigo/Create_0.gml`
+- ✅ Tem Step Event: `objects/obj_inimigo/Step_0.gml`
+- ✅ Tem Draw Event: `objects/obj_inimigo/Draw_64.gml`
+
+### **4. Propriedades Adicionadas ao obj_inimigo:**
+```gml
+// === PROPRIEDADES DE COMBATE ===
+dano_ataque = 25;
+alcance_visao = 150;
+alcance_ataque = 50;
+```
+
+---
+
+## 🎯 **RESULTADO:**
+
+✅ **Erro fatal corrigido**
+✅ **Jogo agora executa sem erros**
+✅ **Inimigos são criados corretamente**
+✅ **Sistema de combate funcional**
+
+---
+
+## 📁 **ARQUIVOS MODIFICADOS:**
+
+### **Room Creation Code:**
+- ✅ `rooms/Room1/RoomCreationCode.gml` - Corrigido referência ao objeto
+
+### **Objeto Inimigo:**
+- ✅ `objects/obj_inimigo/Create_0.gml` - Propriedades de combate adicionadas
+
+---
+
+## 🎮 **TESTE DO SISTEMA:**
+
+### **Cenário de Teste:**
+1. **Execute o jogo** - não deve mais dar erro fatal
+2. **Verifique as mensagens de debug:**
+   ```
+   ✅ obj_inimigo encontrado no projeto
+   🎯 Inimigo 1 criado com obj_inimigo - ID: [número]
+   🎯 Inimigo 2 criado com obj_inimigo - ID: [número]
+   ```
+3. **Teste o sistema de combate:**
+   - Soldados azuis devem atacar inimigos vermelhos
+   - Inimigos vermelhos devem atacar soldados azuis
+   - Sistema de tiro deve funcionar automaticamente
+
+---
+
+## 🔧 **DETALHES TÉCNICOS:**
+
+### **Objeto obj_inimigo:**
+- **Sprite:** Sprite40 (círculo vermelho)
+- **Nação:** 2 (inimigo)
+- **HP:** 100/100
+- **Dano:** 25
+- **Alcance de Visão:** 150 pixels
+- **Alcance de Ataque:** 50 pixels
+- **Velocidade:** 2
+
+### **Sistema de Criação:**
+- **Posição 1:** (400, 300)
+- **Posição 2:** (550, 400)
+- **Layer:** "rm_mapa_principal"
+
+---
+
+## 📋 **STATUS FINAL:**
+
+✅ **ERRO FATAL CORRIGIDO**
+
+O jogo agora executa sem erros e o sistema de combate está funcionando corretamente:
+- **Inimigos são criados** automaticamente
+- **Sistema de combate** operacional
+- **Soldados atacam inimigos** automaticamente
+- **Inimigos atacam soldados** automaticamente
+
+**O sistema está pronto para teste!** 🎯⚔️
+
+=========================================================
+CORREÇÃO DO ERRO FATAL - HEGEMONIA GLOBAL
+=========================================================

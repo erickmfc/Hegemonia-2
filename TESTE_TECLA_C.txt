@@ -1,0 +1,90 @@
+=========================================================
+HEGEMONIA GLOBAL - TESTE DA TECLA C
+Diagnóstico do Sistema de Construção
+=========================================================
+
+PROBLEMA REPORTADO: 
+-------------------
+A tecla 'C' não está funcionando para ativar o modo de construção.
+
+TESTES ADICIONADOS:
+------------------
+✅ Debug contínuo a cada segundo mostrando status das variáveis
+✅ Debug específico quando tecla C é pressionada
+✅ Tecla X para testar se teclado está funcionando
+✅ Debug no menu de construção para confirmar desenho
+
+COMO TESTAR:
+-----------
+
+1. EXECUTAR O JOGO:
+   - Compile e execute o projeto (F5)
+   - Abra a janela de debug output (View → Output)
+
+2. VERIFICAR SE INPUT MANAGER ESTÁ ATIVO:
+   - Deve aparecer mensagens de debug a cada segundo:
+     "--- STATUS ATUAL ---"
+     "global.modo_construcao: false"
+     "Input Manager ativo: SIM"
+
+3. TESTAR FUNCIONAMENTO DO TECLADO:
+   - Pressione a tecla X
+   - DEVE APARECER: "*** TECLA X FUNCIONA! O TECLADO ESTÁ RESPONDENDO ***"
+   - Se não aparecer = problema no input manager
+
+4. TESTAR TECLA C:
+   - Pressione a tecla C
+   - DEVE APARECER:
+     "=== TECLA C PRESSIONADA ==="
+     "Estado atual global.modo_construcao: false"
+     "MODO DE CONSTRUÇÃO: ATIVADO"
+     "Novo estado global.modo_construcao: true"
+
+5. VERIFICAR MENU:
+   - Se tecla C funcionou, deve aparecer:
+     "*** MENU DE CONSTRUÇÃO SENDO DESENHADO ***"
+   - Menu visual deve aparecer na parte inferior da tela
+
+POSSÍVEIS PROBLEMAS E SOLUÇÕES:
+------------------------------
+
+PROBLEMA: Tecla X não funciona
+CAUSA: Input Manager não está ativo ou GameMaker não está detectando teclado
+SOLUÇÃO: Verificar se obj_input_manager foi criado na sala
+
+PROBLEMA: Tecla X funciona mas C não
+CAUSA: Conflito com outras teclas ou problema específico com 'C'
+SOLUÇÃO: Temporariamente trocar para outra tecla (ex: 'Z')
+
+PROBLEMA: Tecla C funciona mas menu não aparece
+CAUSA: obj_menu_construcao não foi criado ou está invisível
+SOLUÇÃO: Verificar criação do objeto na sala
+
+PROBLEMA: Menu aparece mas sem botões visíveis
+CAUSA: Sprite não encontrado ou posicionamento incorreto
+SOLUÇÃO: Verificar se spr_menu_construcao existe
+
+TECLAS DE TESTE DISPONÍVEIS:
+---------------------------
+X = Testar funcionamento do teclado
+C = Ativar/desativar modo de construção
+B = Abrir menu de pesquisa
+T = Debug do sistema de pesquisa
+R = Forçar pesquisa de borracha
+
+EXPECTATIVA FINAL:
+-----------------
+1. ✅ Tecla X deve mostrar mensagem
+2. ✅ Tecla C deve alternar global.modo_construcao
+3. ✅ Menu deve aparecer na tela quando ativo
+4. ✅ Botões "Construir Casa" e "Construir Banco" devem ser visíveis
+5. ✅ Clicar nos botões deve selecionar para construção
+
+SE NADA FUNCIONAR:
+-----------------
+1. Verificar se obj_input_manager existe na pasta Objects
+2. Verificar se foi adicionado ao Room1
+3. Recompilar o projeto completamente
+4. Verificar console de erros por mensagens de erro
+
+=========================================================

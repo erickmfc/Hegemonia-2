@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_diagnostico_navios_completo",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_diagnostico_navios_completo",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

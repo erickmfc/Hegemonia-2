@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_limpar_menus_recrutamento",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_limpar_menus_recrutamento",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

@@ -1,0 +1,116 @@
+=========================================================
+HEGEMONIA GLOBAL - CORREÇÃO: OBJETO CONSTRUÇÃO SAI DO ALCANCE DO MOUSE
+=========================================================
+
+DATA: 2025-01-27
+PROBLEMA REPORTADO: "olha quando eu ando sobre o mapa e dou zoom ou nao com um obj que tenho que construir , ele sai totalmente do alcance do mouse, ele se a fasta nao sei por que"
+
+PROBLEMA IDENTIFICADO:
+---------------------
+O problema estava na **dessincronia entre a atualização da câmera e o cálculo das coordenadas do mouse** para o fantasma de construção.
+
+CAUSA RAIZ:
+-----------
+1. **Ordem de execução incorreta**: A câmera era atualizada no FINAL do Step_2 do obj_input_manager
+2. **Cálculo antecipado**: O sistema de construção calculava as coordenadas do mouse ANTES da câmera ser atualizada
+3. **Coordenadas desatualizadas**: Isso causava uma diferença entre a posição real da câmera e as coordenadas usadas nos cálculos
+4. **Resultado**: O fantasma de construção aparecia em posições incorretas, especialmente durante zoom e movimento
+
+SOLUÇÕES IMPLEMENTADAS:
+----------------------
+
+1. **CORREÇÃO DA ORDEM DE ATUALIZAÇÃO DA CÂMERA:**
+   ✅ obj_input_manager/Step_2.gml (linhas 236-240)
+      - Movida a atualização da câmera para ANTES dos cálculos de coordenadas
+      - Adicionado comentário explicativo sobre sincronização
+      - Garantida consistência entre view da câmera e cálculos
+
+2. **MELHORIA DO SISTEMA DE COORDENADAS:**
+   ✅ obj_controlador_construcao/Step_0.gml (linhas 20-37)
+      - Adicionado comentário sobre uso de coordenadas já atualizadas
+      - Melhorada precisão do cálculo de coordenadas do mundo
+      - Mantida atualização imediata para evitar atraso
+
+3. **CORREÇÃO DO SISTEMA LEGACY:**
+   ✅ obj_input_manager/Step_2.gml (linhas 26-38)
+      - Aplicada mesma correção no sistema legacy (global.construindo_edificio)
+      - Garantida consistência entre ambos os sistemas
+      - Melhorada precisão dos cálculos
+
+4. **DEBUG MELHORADO:**
+   ✅ obj_controlador_construcao/Step_0.gml (linhas 42-47)
+      - Adicionada informação da posição da câmera no debug
+      - Facilita troubleshooting futuro
+      - Mostra sincronização entre câmera e coordenadas
+
+CÓDIGO CORRIGIDO:
+----------------
+
+1. **ATUALIZAÇÃO DA CÂMERA (obj_input_manager/Step_2.gml):**
+```gml
+// --- ATUALIZAÇÕES FINAIS ---
+mouse_x_previous = window_mouse_get_x();
+mouse_y_previous = window_mouse_get_y();
+
+// ATUALIZAR CÂMERA PRIMEIRO para sincronizar com cálculos de coordenadas
+var _cam_w = room_width * zoom_level;
+var _cam_h = room_height * zoom_level;
+camera_set_view_size(camera, _cam_w, _cam_h);
+camera_set_view_pos(camera, camera_x - _cam_w / 2, camera_y - _cam_h / 2);
+```
+
+2. **CÁLCULO DE COORDENADAS (obj_controlador_construcao/Step_0.gml):**
+```gml
+if (instance_exists(_input_manager)) {
+    // CORREÇÃO: Usar coordenadas da câmera já atualizadas
+    // Obter coordenadas da câmera (sincronizadas com a view)
+    var _cam_x = _input_manager.camera_x - (room_width * _input_manager.zoom_level) / 2;
+    var _cam_y = _input_manager.camera_y - (room_height * _input_manager.zoom_level) / 2;
+    
+    // Converter mouse para coordenadas do mundo com precisão melhorada
+    var _world_mouse_x = _cam_x + (mouse_x * _input_manager.zoom_level);
+    var _world_mouse_y = _cam_y + (mouse_y * _input_manager.zoom_level);
+    
+    // Atualizar posição imediatamente (sem interpolação para evitar atraso)
+    grid_x = floor(_world_mouse_x / tile_size) * tile_size;
+    grid_y = floor(_world_mouse_y / tile_size) * tile_size;
+}
+```
+
+RESULTADO ESPERADO:
+------------------
+✅ Fantasma de construção segue o mouse corretamente em qualquer nível de zoom
+✅ Construção funciona perfeitamente durante movimento da câmera
+✅ Sistema responsivo a mudanças rápidas de zoom
+✅ Coordenadas sempre sincronizadas entre câmera e cálculos
+✅ Debug melhorado para troubleshooting futuro
+✅ Compatibilidade mantida com sistema legacy
+
+TESTE RECOMENDADO:
+-----------------
+1. **TESTE BÁSICO:**
+   - Pressione C para ativar modo de construção
+   - Selecione uma casa ou banco
+   - Mova o mouse - fantasma deve seguir perfeitamente
+
+2. **TESTE COM ZOOM:**
+   - Com fantasma ativo, use mouse wheel para zoom in/out
+   - Mova o mouse - fantasma deve permanecer no cursor
+   - Teste em diferentes níveis (0.5x, 1.5x, 2.0x)
+
+3. **TESTE COM MOVIMENTO:**
+   - Com fantasma ativo, mova a câmera com WASD
+   - Mova o mouse - fantasma deve seguir corretamente
+   - Teste movimento rápido da câmera
+
+4. **TESTE COMBINADO:**
+   - Zoom + movimento + construção simultâneos
+   - Fantasma deve permanecer sempre no cursor
+   - Construção deve acontecer onde esperado
+
+ARQUIVOS MODIFICADOS:
+--------------------
+- obj_input_manager/Step_2.gml (ordem de atualização da câmera)
+- obj_controlador_construcao/Step_0.gml (cálculo de coordenadas melhorado)
+
+=========================================================

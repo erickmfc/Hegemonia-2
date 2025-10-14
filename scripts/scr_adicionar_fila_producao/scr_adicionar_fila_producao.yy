@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_adicionar_fila_producao",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_adicionar_fila_producao",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

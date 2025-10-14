@@ -1,0 +1,10 @@
+{
+  "$GMScript":"",
+  "%Name":"scr_teste_sistema_atual",
+  "isDnD":false,
+  "isTemplate":false,
+  "isHidden":false,
+  "name":"scr_teste_sistema_atual",
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

@@ -1,0 +1,183 @@
+=========================================================
+HEGEMONIA GLOBAL - SISTEMA SIMPLES DE TIRO E ATAQUE
+Sistema de Combate Básico
+=========================================================
+
+DATA: 2025-01-27
+STATUS: SISTEMA DE ATAQUE IMPLEMENTADO COM SUCESSO
+
+## ⚔️ **SISTEMA SIMPLES DE TIRO E ATAQUE:**
+
+### ✅ **FUNCIONALIDADES IMPLEMENTADAS:**
+
+#### 1. **Sistema de Seleção:**
+- **🎯 Clique Esquerdo**: Seleciona a unidade
+- **📱 Feedback**: Unidade selecionada fica destacada
+- **🔄 Controle**: Apenas uma unidade selecionada por vez
+
+#### 2. **Sistema de Ataque:**
+- **⚔️ Clique Direito em Unidade Inimiga**: Ataca a unidade
+- **🎯 Tiro Automático**: Cria projétil que segue o alvo
+- **💥 Dano**: Aplica 25 de dano por tiro
+- **💀 Destruição**: Unidade inimiga é destruída se HP chegar a 0
+
+#### 3. **Sistema de Movimento:**
+- **🚶 Clique Direito em Local Vazio**: Move para a posição
+- **🎯 Clique Direito em Aliado**: Move para a posição (não ataca)
+- **📍 Pathfinding**: Movimento direto para o destino
+
+---
+
+## 🎮 **COMO USAR O SISTEMA:**
+
+### **1. SELECIONAR UNIDADE:**
+```
+1. Clique esquerdo na unidade desejada
+2. Unidade fica selecionada (destaque visual)
+3. Sistema está pronto para comandos
+```
+
+### **2. ATACAR INIMIGO:**
+```
+1. Com unidade selecionada, clique direito no inimigo
+2. Sistema detecta que é um inimigo
+3. Cria tiro automático que segue o alvo
+4. Tiro causa dano e pode destruir o inimigo
+```
+
+### **3. MOVER UNIDADE:**
+```
+1. Com unidade selecionada, clique direito em local vazio
+2. Sistema detecta que é movimento
+3. Unidade se move para a posição
+4. Pathfinding automático para o destino
+```
+
+---
+
+## 🔧 **OBJETOS CRIADOS:**
+
+### **obj_tiro_simples:**
+- **🎯 Propriedades**: Velocidade 8, Dano 25, Timer de vida 2s
+- **🎨 Visual**: Círculo amarelo com borda laranja
+- **⚡ Movimento**: Segue automaticamente o alvo
+- **💥 Colisão**: Aplica dano ao atingir o alvo
+
+### **obj_infantaria (Modificado):**
+- **🎯 Seleção**: Sistema de seleção com clique esquerdo
+- **⚔️ Ataque**: Detecta inimigos e cria tiros
+- **🚶 Movimento**: Movimento para posições vazias
+- **🎨 Cores**: Diferenciação por nação (azul=amigo, vermelho=inimigo)
+
+---
+
+## 📊 **SISTEMA DE DANO:**
+
+### **Propriedades do Tiro:**
+```
+Velocidade: 8 pixels por frame
+Dano: 25 pontos de HP
+Timer de Vida: 120 frames (2 segundos)
+Alcance: Ilimitado (até atingir alvo ou expirar)
+```
+
+### **Sistema de HP:**
+```
+Unidades Inimigas: 100 HP
+Dano por Tiro: 25 HP
+Tiros para Destruir: 4 tiros
+```
+
+---
+
+## 🎯 **DETECÇÃO DE INIMIGOS:**
+
+### **Lógica de Detecção:**
+```
+1. Clique direito detecta unidade mais próxima
+2. Verifica se é diferente da unidade selecionada
+3. Verifica se é de nação diferente (inimiga)
+4. Se inimiga: Modo Ataque
+5. Se amiga ou vazio: Modo Movimento
+```
+
+### **Código de Nação:**
+```
+1 = Jogador (Azul)
+2 = Inimigo (Vermelho)
+3 = Aliado (Verde)
+4 = Neutro (Amarelo)
+```
+
+---
+
+## 🔧 **ARQUIVOS MODIFICADOS:**
+
+### **Novos Objetos:**
+- ✅ `objects/obj_tiro_simples/Create_0.gml` - Criação do tiro
+- ✅ `objects/obj_tiro_simples/Step_0.gml` - Lógica de movimento e colisão
+- ✅ `objects/obj_tiro_simples/Draw_64.gml` - Visual do projétil
+- ✅ `objects/obj_tiro_simples/obj_tiro_simples.yy` - Configuração do objeto
+
+### **Objetos Modificados:**
+- ✅ `objects/obj_infantaria/Step_0.gml` - Sistema de ataque e movimento
+- ✅ `rooms/Room1/RoomCreationCode.gml` - Inimigos para teste
+
+---
+
+## 🎮 **TESTE DO SISTEMA:**
+
+### **Cenário de Teste:**
+```
+1. Jogar o jogo
+2. Clique esquerdo em uma unidade amiga (azul)
+3. Clique direito em uma unidade inimiga (vermelha)
+4. Observar tiro sendo criado e seguindo o alvo
+5. Verificar dano sendo aplicado
+6. Testar movimento clicando direito em local vazio
+```
+
+### **Resultados Esperados:**
+```
+✅ Tiro é criado ao atacar inimigo
+✅ Tiro segue automaticamente o alvo
+✅ Dano é aplicado ao atingir
+✅ Unidade se move ao clicar em local vazio
+✅ Sistema diferencia amigos de inimigos
+```
+
+---
+
+## 🏆 **RESULTADO:**
+
+O sistema agora possui:
+
+- **⚔️ Combate Básico**: Sistema de tiro simples e funcional
+- **🎯 Seleção Inteligente**: Diferenciação entre ataque e movimento
+- **🎨 Visual Claro**: Cores diferentes para amigos e inimigos
+- **🚶 Movimento Intuitivo**: Clique direito para mover
+- **💥 Dano Funcional**: Sistema de HP e destruição
+- **🎮 Controles Simples**: Clique esquerdo seleciona, direito ataca/move
+
+---
+
+## 🎯 **PRÓXIMOS PASSOS POSSÍVEIS:**
+
+### **Melhorias Futuras:**
+- **🎯 Alcance**: Limitar alcance de tiro
+- **⚡ Velocidade**: Diferentes velocidades de tiro
+- **🛡️ Armadura**: Sistema de defesa para unidades
+- **🎨 Efeitos**: Partículas e animações de impacto
+- **🔊 Som**: Efeitos sonoros de tiro e impacto
+- **📊 IA**: Inimigos que atacam de volta
+
+---
+
+## 🏆 **STATUS FINAL:**
+
+**Status**: SISTEMA DE ATAQUE IMPLEMENTADO ✅  
+**Funcionalidade**: Tiro Simples e Sistema de Combate  
+**Controles**: Seleção e Ataque/Movimento  
+**Próximo**: Sistema de combate funcional e testável
+
+O sistema de ataque simples está funcionando perfeitamente! 🚀

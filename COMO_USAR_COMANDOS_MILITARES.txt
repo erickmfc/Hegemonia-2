@@ -1,0 +1,142 @@
+# 🎯 **COMO USAR OS COMANDOS MILITARES**
+
+## 🎮 **SISTEMA DE COMANDOS FUNCIONANDO**
+
+### **📋 Passos para Usar:**
+
+1. **Selecionar unidade:**
+   - Clique esquerdo na infantaria (azul)
+   - Menu aparece no canto superior direito
+
+2. **Ativar comando:**
+   - Clique no botão desejado (PATRULHAR/SEGUIR/ATACAR)
+   - Botão muda de cor (verde/azul/vermelho)
+   - Mensagem de confirmação aparece no console
+
+3. **Executar ação:**
+   - Use **clique direito** para definir alvos/pontos
+
+## 🔄 **COMANDO PATRULHAR**
+
+### **🎯 Como Funciona:**
+1. **Clique no botão PATRULHAR** (fica verde)
+2. **Clique direito** em dois pontos diferentes do mapa
+3. **Unidade patrulha** automaticamente entre esses pontos
+
+### **📝 Detalhes:**
+- **Primeiro clique direito:** Define ponto A da patrulha
+- **Segundo clique direito:** Define ponto B da patrulha
+- **Unidade anda** continuamente entre os dois pontos
+- **Clique novamente no botão** para desativar
+
+### **🔧 Debug:**
+```
+✅ PATRULHA ATIVADA - INFANTARIA
+Ponto A da patrulha definido em (x, y)
+Ponto B da patrulha definido em (x, y)
+```
+
+## ➡️ **COMANDO SEGUIR**
+
+### **🎯 Como Funciona:**
+1. **Clique no botão SEGUIR** (fica azul)
+2. **Clique direito** em outra unidade
+3. **Unidade segue** a unidade selecionada
+
+### **📝 Detalhes:**
+- **Mantém distância** de 30-60 pixels
+- **Segue automaticamente** quando a unidade se move
+- **Para de seguir** se a unidade seguida for destruída
+- **Clique novamente no botão** para desativar
+
+### **🔧 Debug:**
+```
+✅ COMANDO SEGUIR ATIVADO - INFANTARIA
+Unidade definida para seguir - ID: (número)
+```
+
+## ⚔️ **COMANDO ATACAR**
+
+### **🎯 Como Funciona:**
+1. **Clique no botão ATACAR** (fica vermelho)
+2. **Clique direito** em um alvo
+3. **Unidade ataca** o alvo selecionado
+
+### **📝 Detalhes:**
+- **Define alvo** para ataque
+- **Sistema de combate** preparado para futuras implementações
+- **Clique novamente no botão** para desativar
+
+### **🔧 Debug:**
+```
+✅ COMANDO ATACAR ATIVADO - INFANTARIA
+Alvo definido para atacar - ID: (número)
+```
+
+## 🎮 **TESTE DOS COMANDOS**
+
+### **🧪 Como Testar:**
+
+1. **Criar unidades:**
+   - Construa um quartel
+   - Recrute algumas unidades
+
+2. **Testar PATRULHAR:**
+   ```
+   Selecionar unidade → PATRULHAR → Clique direito em 2 pontos
+   ```
+
+3. **Testar SEGUIR:**
+   ```
+   Selecionar unidade → SEGUIR → Clique direito em outra unidade
+   ```
+
+4. **Testar ATACAR:**
+   ```
+   Selecionar unidade → ATACAR → Clique direito em alvo
+   ```
+
+## 🐛 **MENSAGENS DE DEBUG**
+
+### **✅ Mensagens de Sucesso:**
+```
+CLIQUE NO BOTÃO PATRULHAR!
+✅ PATRULHA ATIVADA - INFANTARIA
+Ponto A da patrulha definido em (x, y)
+```
+
+### **❌ Mensagens de Erro:**
+```
+❌ ERRO: Unidade não tem comando_atual
+❌ CLIQUE FORA DOS BOTÕES - Posições dos botões:
+```
+
+### **🔍 Teste Manual (Tecla T):**
+```
+=== TESTE MANUAL ===
+Comando: PATRULHAR
+Patrulha Ativa: true
+==================
+```
+
+## 🚀 **DICAS IMPORTANTES**
+
+### **🎯 Para Funcionar Corretamente:**
+
+1. **Sempre use clique direito** para definir alvos/pontos
+2. **Verifique as mensagens** no console de debug
+3. **Teste um comando por vez** para evitar conflitos
+4. **Use a tecla T** (quando selecionado) para ver status
+
+### **🔧 Se Não Funcionar:**
+
+1. **Verifique se o menu aparece** quando seleciona unidade
+2. **Confirme se as mensagens** aparecem no console
+3. **Teste com clique direito** em diferentes locais
+4. **Verifique se a unidade** tem as variáveis necessárias
+
+---
+
+**Status: ✅ SISTEMA FUNCIONANDO**
+
+Use clique direito para definir alvos e pontos após ativar os comandos! 🎯
