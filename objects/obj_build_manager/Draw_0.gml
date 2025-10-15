@@ -4,7 +4,7 @@
 // ===============================================
 
 // === DESENHAR CURSOR DE CONSTRUÇÃO ===
-if (global.modo_construcao && global.construcao_selecionada == "quartel") {
+if (global.construindo_agora == asset_get_index("obj_quartel")) {
     
     var mouse_x_local = mouse_x;
     var mouse_y_local = mouse_y;
@@ -23,8 +23,8 @@ if (global.modo_construcao && global.construcao_selecionada == "quartel") {
         draw_set_alpha(0.5);
     }
     
-    // Desenhar preview do quartel
-    draw_rectangle(world_x - 32, world_y - 32, world_x + 32, world_y + 32, false);
+    // Desenhar preview do quartel (aumentado em 70%)
+    draw_rectangle(world_x - 54, world_y - 54, world_x + 54, world_y + 54, false);
     
     // Resetar transparência
     draw_set_alpha(1.0);

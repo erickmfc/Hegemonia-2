@@ -74,6 +74,7 @@ if (!variable_global_exists("scr_mouse_to_world")) {
         // Usar nossa função centralizada
         return scr_mouse_to_world();
     };
+    show_debug_message("✅ Função global scr_mouse_to_world inicializada");
 }
 
 // --- LÓGICA DE INPUT DE JOGO (LEGACY COM SUPORTE A ZOOM) ---
@@ -356,5 +357,35 @@ if (keyboard_check_pressed(ord("R"))) {
         scr_teste_criacao_unidade_manual();
     } catch (e) {
         show_debug_message("⚠️ Função scr_teste_criacao_unidade_manual não encontrada");
+    }
+}
+
+// Tecla F: Diagnóstico do fantasma de construção
+if (keyboard_check_pressed(ord("F"))) {
+    show_debug_message("🔍 Iniciando diagnóstico do fantasma de construção...");
+    try {
+        scr_diagnostico_fantasma_construcao();
+    } catch (e) {
+        show_debug_message("⚠️ Função scr_diagnostico_fantasma_construcao não encontrada");
+    }
+}
+
+// Tecla G: Teste manual do fantasma
+if (keyboard_check_pressed(ord("G"))) {
+    show_debug_message("🧪 Iniciando teste manual do fantasma...");
+    try {
+        scr_teste_fantasma_manual();
+    } catch (e) {
+        show_debug_message("⚠️ Função scr_teste_fantasma_manual não encontrada");
+    }
+}
+
+// Tecla H: Forçar fantasma
+if (keyboard_check_pressed(ord("H"))) {
+    show_debug_message("🔥 Forçando fantasma de construção...");
+    try {
+        scr_forcar_fantasma();
+    } catch (e) {
+        show_debug_message("⚠️ Função scr_forcar_fantasma não encontrada");
     }
 }

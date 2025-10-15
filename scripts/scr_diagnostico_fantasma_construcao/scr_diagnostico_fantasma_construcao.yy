@@ -1,0 +1,13 @@
+{
+  "$GMScript":"",
+  "%Name":"scr_diagnostico_fantasma_construcao",
+  "IsCompatibility":false,
+  "IsDnD":false,
+  "name":"scr_diagnostico_fantasma_construcao",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

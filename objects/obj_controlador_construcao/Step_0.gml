@@ -19,7 +19,7 @@ if (global.construindo_agora != noone) {
     var _world_mouse_y = _coords[1];
     
     // CALCULA A POSIÇÃO NO GRID MAIS PRÓXIMO
-    var tile_size = 32; // Defina o tamanho do seu tile/grid aqui
+    var tile_size = global.tile_size; // Usar o tamanho global do tile
     grid_x = floor(_world_mouse_x / tile_size) * tile_size;
     grid_y = floor(_world_mouse_y / tile_size) * tile_size;
     

@@ -42,7 +42,7 @@ if (test_mode && keyboard_check_pressed(vk_q)) {
 if (test_mode && keyboard_check_pressed(vk_r)) {
     show_message("Testando Quartel Normal...");
     
-    if (scr_validacao_area_construcao(obj_quartel, mouse_x, mouse_y, 100, 100)) {
+    if (scr_validacao_area_construcao(obj_quartel, mouse_x, mouse_y, 170, 206)) {
         show_message("✓ Quartel Normal pode ser construído aqui!");
         show_debug_message("Validação: SUCESSO - Terreno é terra");
     } else {

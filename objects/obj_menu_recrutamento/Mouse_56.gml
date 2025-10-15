@@ -13,20 +13,20 @@ if (delay_abertura > 0) {
 var _mouse_gui_x = device_mouse_x_to_gui(0);
 var _mouse_gui_y = device_mouse_y_to_gui(0);
 
-show_debug_message("=== CLIQUE DETECTADO NO MENU ULTRA-MODERNO ===");
+show_debug_message("=== CLIQUE DETECTADO NO MENU MELHORADO ===");
 show_debug_message("Posição do mouse: (" + string(_mouse_gui_x) + ", " + string(_mouse_gui_y) + ")");
 
-// === DIMENSÕES DO MENU ULTRA-MODERNO (IGUAIS AO DRAW GUI) ===
-var _mw = display_get_gui_width() * 0.85;  // 85% da largura
-var _mh = display_get_gui_height() * 0.75; // 75% da altura
+// === DIMENSÕES DO MENU MELHORADO (IGUAIS AO DRAW GUI) ===
+var _mw = 1430; // Largura aumentada em 25%
+var _mh = 786;  // Altura aumentada em 25%
 var _mx = (display_get_gui_width() - _mw) / 2;
 var _my = (display_get_gui_height() - _mh) / 2;
 
-// === 1. VERIFICAR BOTÃO FECHAR PRIMEIRO (PRIORIDADE MÁXIMA) ===
-var _close_w = 140; // Botão maior
-var _close_h = 45;
-var _close_x = _mx + _mw - _close_w - 30;
-var _close_y = _my + _mh - 70 + 12; // Footer mais alto + offset
+// === 1. VERIFICAR BOTÃO FECHAR PRIMEIRO ===
+var _close_w = 114; // +25% de 91px
+var _close_h = 36;  // +25% de 29px
+var _close_x = _mx + _mw - _close_w - 20;
+var _close_y = _my + _mh - 58 + 10; // Footer ajustado (+25%)
 
 if (_mouse_gui_x >= _close_x && _mouse_gui_x <= _close_x + _close_w &&
     _mouse_gui_y >= _close_y && _mouse_gui_y <= _close_y + _close_h) {
@@ -47,17 +47,19 @@ if (_mouse_gui_x < _mx || _mouse_gui_x > _mx + _mw ||
     return;
 }
 
-// === 3. VERIFICAR CLIQUE NOS CARDS DAS UNIDADES MILITARES ===
-var _header_h = 90;
-var _info_w = 280; // Painel lateral mais largo
-var _info_x = _mx + 25; // Mais espaço da borda
-var _grid_x = _info_x + _info_w + 30; // Mais espaço entre painel e grid
-var _grid_y = _my + _header_h + 25; // Alinhado com painel lateral
-var _grid_w = _mw - _info_w - 85; // Mais espaço nas bordas
-var _grid_h = _mh - _header_h - 90; // Alinhado com painel lateral
+// === 3. VERIFICAR CLIQUE NOS CARDS DAS UNIDADES ===
+var _header_h = 90; // Altura ajustada (+25%)
+var _info_w = 358; // Largura aumentada em 25%
+var _info_x = _mx + _mw - _info_w - 20;
+var _grid_x = _mx + 20;
+var _grid_y = _my + _header_h + 20;
+var _grid_w = _mw - _info_w - 40;
+var _grid_h = _mh - _header_h - 92; // Footer ajustado (+25%)
 
-var _card_w = (_grid_w - 20) / 2;  // 2 colunas
-var _card_h = (_grid_h - 20) / 2;  // 2 linhas
+// Cards aumentados em 25% + 20% altura + 10% parte de baixo
+var _card_w = 293;  // +25% de 234px
+var _card_h = 216;  // +25% de 130px + 20% adicional + 10% parte de baixo = 216px
+var card_spacing = 33; // Espaçamento aumentado (+25%)
 
 // Obter unidades disponíveis
 var _unidades = [];
@@ -71,8 +73,16 @@ for (var i = 0; i < min(4, ds_list_size(_unidades)); i++) {
     var _row = i div 2;
     var _col = i mod 2;
     
-    var _card_x = _grid_x + _col * (_card_w + 20);
-    var _card_y = _grid_y + _row * (_card_h + 20);
+    var _card_x = _grid_x + _col * (_card_w + card_spacing);
+    var _card_y = _grid_y + _row * (_card_h + card_spacing);
+    
+    // Todos os cards descem 35%
+    _card_y += _card_h * 0.35; // Descer 35% da altura do card
+    
+    // Cards de infantaria e soldado anti sobem 25%
+    if (_unidade.nome == "Infantaria" || _unidade.nome == "Soldado Antiaéreo") {
+        _card_y -= _card_h * 0.25; // Subir 25% da altura do card
+    }
     
     // Verificar se o clique foi no card
     if (_mouse_gui_x >= _card_x && _mouse_gui_x <= _card_x + _card_w &&
@@ -124,5 +134,5 @@ for (var i = 0; i < min(4, ds_list_size(_unidades)); i++) {
 }
 
 // === 4. CLIQUE EM QUALQUER OUTRO LUGAR DENTRO DO PAINEL ===
-global.debug_log("Clique dentro do painel, mas fora dos elementos interativos");
+show_debug_message("Clique dentro do painel, mas fora dos elementos interativos");
 // Manter o menu aberto

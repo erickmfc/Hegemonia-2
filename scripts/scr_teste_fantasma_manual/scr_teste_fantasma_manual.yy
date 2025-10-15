@@ -1,0 +1,13 @@
+{
+  "$GMScript":"",
+  "%Name":"scr_teste_fantasma_manual",
+  "IsCompatibility":false,
+  "IsDnD":false,
+  "name":"scr_teste_fantasma_manual",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

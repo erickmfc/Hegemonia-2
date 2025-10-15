@@ -29,7 +29,13 @@ if (instance_exists(global.definindo_patrulha_unidade)) {
     // Clique direito FINALIZA a rota e inicia a patrulha
     if (mouse_check_button_pressed(mb_right)) {
         if (ds_list_size(_unidade.pontos_patrulha) > 1) {
-            _unidade.estado = "patrulhando";
+            // ✅ CORREÇÃO: Usar estados corretos baseados no tipo de unidade
+            if (object_get_name(_unidade.object_index) == "obj_caca_f5") {
+                _unidade.estado = "patrulhando";
+            } else if (object_get_name(_unidade.object_index) == "obj_lancha_patrulha") {
+                _unidade.estado = LanchaState.PATRULHANDO;
+            }
+            
             _unidade.indice_patrulha_atual = 0;
             var _ponto = _unidade.pontos_patrulha[| 0];
             _unidade.destino_x = _ponto[0];
@@ -38,10 +44,10 @@ if (instance_exists(global.definindo_patrulha_unidade)) {
             show_debug_message("🚢 Unidade começará a patrulhar automaticamente");
         } else {
             // ✅ CORREÇÃO: Usar estado correto baseado no tipo de unidade
-            if (object_get_name(_unidade.object_index) == "obj_f5") {
+            if (object_get_name(_unidade.object_index) == "obj_caca_f5") {
                 _unidade.estado = "pousado";
-            } else {
-                _unidade.estado = "parado";
+            } else if (object_get_name(_unidade.object_index) == "obj_lancha_patrulha") {
+                _unidade.estado = LanchaState.PARADO;
             }
             show_debug_message("❌ PATRULHA CANCELADA - mínimo de 2 pontos necessários");
         }
@@ -53,6 +59,7 @@ else {
     // Seleção com clique esquerdo
     if (mouse_check_button_pressed(mb_left)) {
         var _unidade_aerea = instance_position(_mx, _my, obj_caca_f5);
+        var _unidade_naval = instance_position(_mx, _my, obj_lancha_patrulha);
         
         // Desseleciona unidade anterior
         if (instance_exists(global.unidade_selecionada)) {
@@ -60,10 +67,15 @@ else {
         }
         
         if (instance_exists(_unidade_aerea)) {
-            // Seleciona nova unidade
+            // Seleciona nova unidade aérea
             global.unidade_selecionada = _unidade_aerea;
             _unidade_aerea.selecionado = true;
             show_debug_message("✈️ F-5 selecionado");
+        } else if (instance_exists(_unidade_naval)) {
+            // Seleciona nova unidade naval
+            global.unidade_selecionada = _unidade_naval;
+            _unidade_naval.selecionado = true;
+            show_debug_message("🚢 Lancha Patrulha selecionada");
         } else {
             // Desseleciona se clicou em lugar vazio
             global.unidade_selecionada = noone;
@@ -74,8 +86,13 @@ else {
     if (mouse_check_button_pressed(mb_right) && instance_exists(global.unidade_selecionada)) {
         var _unidade = global.unidade_selecionada;
         
-        // Dá a nova ordem de movimento
-        _unidade.estado = "movendo";
+        // ✅ CORREÇÃO: Usar estados corretos baseados no tipo de unidade
+        if (object_get_name(_unidade.object_index) == "obj_caca_f5") {
+            _unidade.estado = "movendo";
+        } else if (object_get_name(_unidade.object_index) == "obj_lancha_patrulha") {
+            _unidade.estado = LanchaState.MOVENDO;
+        }
+        
         _unidade.destino_x = _mx;
         _unidade.destino_y = _my;
 
@@ -88,7 +105,12 @@ else {
         }
         // ======================================================================
         
-        show_debug_message("🎯 Ordem de movimento para F-5");
+        // Mensagem adaptada ao tipo de unidade
+        if (object_get_name(_unidade.object_index) == "obj_caca_f5") {
+            show_debug_message("🎯 Ordem de movimento para F-5");
+        } else if (object_get_name(_unidade.object_index) == "obj_lancha_patrulha") {
+            show_debug_message("🎯 Ordem de movimento para Lancha Patrulha");
+        }
     }
 }
 

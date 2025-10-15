@@ -202,6 +202,8 @@ instance_create_layer(0, 0, "Instances", obj_ui_manager);
 instance_create_layer(0, 0, "Instances", obj_input_manager);
 instance_create_layer(0, 0, "Instances", obj_build_manager);
 instance_create_layer(0, 0, "Instances", obj_controlador_unidades); // Controlador de unidades
+// Sistema de barras de vida integrado ao game_manager
+global.barras_vida_ativas = true;
 
 
 /// ================= CONFIGURAÇÕES DO MAPA =================

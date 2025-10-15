@@ -1,172 +1,122 @@
-/// @description Renderização da Lancha Patrulha
+// ===============================================
+// HEGEMONIA GLOBAL - LANCHA PATRULHA (Draw Adaptado)
+// Sistema Visual Naval Completo
+// ===============================================
 
-// Desenha a sprite da lancha
-if (sprite_index != -1) {
-    draw_self();
-} else {
-    // Desenho simples caso não haja sprite
-    draw_set_color(c_aqua);
-    draw_circle(x, y, 12, false);
-    draw_set_color(c_white);
-}
+// Desenhar a lancha (sem efeito de altitude)
+draw_self();
 
-// Círculo de seleção (sempre visível quando selecionada)
+// --- FEEDBACK VISUAL (SE SELECIONADO) ---
 if (selecionado) {
-    draw_set_color(c_lime);
+    var _draw_y = y; // Sem altitude para lancha
+    
+    // Círculo de seleção
+    draw_set_color(c_green);
     draw_set_alpha(0.3);
-    draw_circle(x, y, 25, false);
-    draw_set_alpha(0.8);
-    draw_circle(x, y, 25, true);
-    draw_set_alpha(1.0);
+    draw_circle(x, _draw_y, 40, true);
     
-    // Linha para o destino quando movendo
-    if (estado == LanchaState.MOVENDO) {
-        draw_set_color(c_yellow);
-        draw_set_alpha(0.8);
-        draw_line_width(x, y, alvo_x, alvo_y, 2);
-        draw_circle(alvo_x, alvo_y, 8, false);
-        draw_set_alpha(1.0);
-    }
+    // Círculo do Radar
+    draw_set_color(modo_combate == LanchaMode.ATAQUE ? c_red : c_gray);
+    draw_set_alpha(0.2);
+    draw_circle(x, _draw_y, radar_alcance, false);
     
-    // Linha de ataque
-    if (estado == LanchaState.ATACANDO && instance_exists(alvo_unidade)) {
-        draw_set_color(c_red);
-        draw_set_alpha(0.8);
-        draw_line_width(x, y, alvo_unidade.x, alvo_unidade.y, 2);
-        draw_circle(alvo_unidade.x, alvo_unidade.y, 10, true);
-        draw_set_alpha(1.0);
-    }
-}
-
-// Visualização do modo de definição de patrulha
-if (selecionado && modo_definicao_patrulha && ds_list_size(pontos_patrulha) > 0) {
-    draw_set_color(c_yellow);
-    draw_set_alpha(0.9);
-    
-    for (var i = 0; i < ds_list_size(pontos_patrulha); i++) {
-        var ponto = pontos_patrulha[| i];
-        draw_circle(ponto[0], ponto[1], 8, false);
-        
-        // Número do ponto
-        draw_set_color(c_white);
-        draw_text(ponto[0] + 12, ponto[1] - 5, string(i + 1));
-        draw_set_color(c_yellow);
-        
-        // Linha para o próximo ponto
-        if (i < ds_list_size(pontos_patrulha) - 1) {
-            var proximo = pontos_patrulha[| i + 1];
-            draw_line_width(ponto[0], ponto[1], proximo[0], proximo[1], 2);
+    // Linha para o destino (CORRIGIDO: usar estado em vez de velocidade_atual)
+    if (estado != LanchaState.PARADO) {
+        if (estado == LanchaState.ATACANDO) {
+            draw_set_color(c_red); // Linha vermelha quando atacando
+            draw_set_alpha(0.7);
+        } else {
+            draw_set_color(c_yellow); // Linha amarela para movimento normal
+            draw_set_alpha(0.5);
         }
+        draw_line(x, _draw_y, alvo_x, alvo_y);
     }
     
-    // Linha do último ponto até o mouse
-    if (ds_list_size(pontos_patrulha) > 0) {
-        var ultimo = pontos_patrulha[| ds_list_size(pontos_patrulha) - 1];
-        var _coords = scr_mouse_to_world();
-        draw_set_alpha(0.5);
-        draw_line_width(ultimo[0], ultimo[1], _coords[0], _coords[1], 2);
-    }
-    
+    // --- INFORMAÇÕES DE STATUS E CONTROLES ---
     draw_set_alpha(1.0);
-}
-
-// Rota de patrulha ativa
-if (estado == LanchaState.PATRULHANDO && ds_list_size(pontos_patrulha) > 1) {
-    draw_set_color(c_aqua);
-    draw_set_alpha(0.6);
-    
-    for (var i = 0; i < ds_list_size(pontos_patrulha); i++) {
-        var p1 = pontos_patrulha[| i];
-        var p2 = pontos_patrulha[| (i + 1) % ds_list_size(pontos_patrulha)];
-        draw_line_width(p1[0], p1[1], p2[0], p2[1], 2);
-        draw_circle(p1[0], p1[1], 6, false);
-    }
-    
-    // Destaca ponto atual
-    var atual = pontos_patrulha[| indice_patrulha_atual];
-    draw_set_color(c_yellow);
-    draw_set_alpha(1);
-    draw_circle(atual[0], atual[1], 10, false);
-    
-    // Linha da lancha até o ponto atual
-    draw_set_color(c_lime);
-    draw_line_width(x, y, atual[0], atual[1], 2);
-}
-
-// Círculo de radar
-if (selecionado) {
-    if (modo_combate == LanchaMode.ATAQUE) {
-        draw_set_color(c_red);
-        draw_set_alpha(0.1);
-        draw_circle(x, y, radar_alcance, false);
-        draw_set_alpha(0.3);
-        draw_circle(x, y, radar_alcance, true);
-    } else {
-        draw_set_color(c_gray);
-        draw_set_alpha(0.05);
-        draw_circle(x, y, radar_alcance, false);
-        draw_set_alpha(0.2);
-        draw_circle(x, y, radar_alcance, true);
-    }
-}
-
-// ✅ SISTEMA DE STATUS VISUAL AVANÇADO (Adaptado do Avião)
-if (selecionado) {
     draw_set_halign(fa_center);
-    draw_set_valign(fa_top);
     
-    // Determina status e cor
-    var _status_text = "PARADA";
+    var _status_text = "PARADO";
+    if (estado == LanchaState.ATACANDO) _status_text = "ATACANDO";
+    else if (estado == LanchaState.PATRULHANDO) _status_text = "PATRULHANDO";
+    else if (estado == LanchaState.MOVENDO) _status_text = "NAVEGANDO";
+    else if (estado == LanchaState.DEFININDO_PATRULHA) _status_text = "DEFININDO ROTA";
+    
     var _status_color = c_gray;
-
-    if (estado == LanchaState.ATACANDO) {
-        _status_text = "ATACANDO";
-        _status_color = c_red;
-    } else if (estado == LanchaState.PATRULHANDO) {
-        _status_text = "PATRULHANDO";
-        _status_color = c_aqua;
-    } else if (modo_definicao_patrulha) {
-        _status_text = "DEFININDO ROTA";
-        _status_color = c_lime;
-    } else if (estado == LanchaState.MOVENDO) {
-        _status_text = "NAVEGANDO";
-        _status_color = c_yellow;
-    }
-
-    // Desenha o status principal acima da lancha
+    if (estado == LanchaState.ATACANDO) _status_color = c_red;
+    else if (estado == LanchaState.PATRULHANDO) _status_color = c_orange;
+    else if (estado == LanchaState.MOVENDO) _status_color = c_aqua;
+    else if (estado == LanchaState.DEFININDO_PATRULHA) _status_color = c_lime;
+    
+    // Desenha o status acima da lancha
     draw_set_color(_status_color);
-    draw_text(x, y - 60, _status_text);
+    draw_text(x, _draw_y - 60, _status_text);
     
-    // Desenha modo de combate
-    var _modo_text = (modo_combate == LanchaMode.ATAQUE) ? "MODO ATAQUE" : "MODO PASSIVO";
-    var _modo_color = (modo_combate == LanchaMode.ATAQUE) ? c_red : c_lime;
-    draw_set_color(_modo_color);
-    draw_text(x, y - 45, _modo_text);
-    
-    // Desenha os controles disponíveis
+    // Desenha os controles disponíveis (adaptados para lancha)
     draw_set_color(c_white);
-    draw_text(x, y - 30, "[K] Patrulha | [L] Parar");
-    draw_text(x, y - 15, "[P] Passivo | [O] Ataque");
-    
-    // Informações adicionais se em patrulha
-    if (estado == LanchaState.PATRULHANDO && ds_list_size(pontos_patrulha) > 0) {
-        draw_set_color(c_aqua);
-        draw_text(x, y + 5, "Ponto " + string(indice_patrulha_atual + 1) + "/" + string(ds_list_size(pontos_patrulha)));
-    }
-    
-    // Timer de recarga se aplicável
-    if (reload_timer > 0) {
-        draw_set_color(c_orange);
-        draw_text(x, y + 20, "Recarga: " + string(ceil(reload_timer / 60)) + "s");
-    } else if (modo_combate == LanchaMode.ATAQUE) {
-        draw_set_color(c_lime);
-        draw_text(x, y + 20, "Arma Pronta");
-    }
+    draw_text(x, _draw_y - 45, "[K] Patrulha | [L] Parar");
+    draw_text(x, _draw_y - 30, "[P] Passivo | [O] Ataque Agressivo");
 
     draw_set_halign(fa_left);
-    draw_set_valign(fa_top);
 }
 
-// Restaura configurações
-draw_set_color(c_white);
-draw_set_alpha(1.0);
+// ======================================================================
+// ✅ DESENHAR A ROTA DE PATRULHA (CORRIGIDO)
+// ======================================================================
+if (estado == LanchaState.PATRULHANDO || estado == LanchaState.DEFININDO_PATRULHA || 
+    (variable_global_exists("definindo_patrulha_unidade") && global.definindo_patrulha_unidade == id)) {
+
+    if (ds_list_size(pontos_patrulha) > 0) {
+        draw_set_color(c_blue); // Azul naval
+        draw_set_alpha(0.8);
+        
+        // Desenha as linhas conectando os pontos
+        for (var i = 0; i < ds_list_size(pontos_patrulha) - 1; i++) {
+            var _p1 = pontos_patrulha[| i];
+            var _p2 = pontos_patrulha[| i + 1];
+            draw_line(_p1[0], _p1[1], _p2[0], _p2[1]);
+        }
+        
+        // Desenha círculos nos pontos de patrulha
+        for (var i = 0; i < ds_list_size(pontos_patrulha); i++) {
+            var _ponto = pontos_patrulha[| i];
+            if (i == indice_patrulha_atual) {
+                draw_set_color(c_yellow); // Ponto atual em amarelo
+                draw_circle(_ponto[0], _ponto[1], 8, true);
+            } else {
+                draw_set_color(c_blue); // Outros pontos em azul naval
+                draw_circle(_ponto[0], _ponto[1], 5, true);
+            }
+        }
+        
+        // Se estiver definindo a rota, desenha uma linha do último ponto até o mouse
+        if (estado == LanchaState.DEFININDO_PATRULHA || 
+            (variable_global_exists("definindo_patrulha_unidade") && global.definindo_patrulha_unidade == id)) {
+            var _ultimo_ponto = pontos_patrulha[| ds_list_size(pontos_patrulha) - 1];
+            // Conversão de coordenadas do mouse para o mundo (com zoom)
+            var _mouse_gui_x = device_mouse_x_to_gui(0);
+            var _mouse_gui_y = device_mouse_y_to_gui(0);
+            var _cam = view_camera[0];
+            var _cam_x = camera_get_view_x(_cam);
+            var _cam_y = camera_get_view_y(_cam);
+            var _cam_w = camera_get_view_width(_cam);
+            var _cam_h = camera_get_view_height(_cam);
+            var _zoom_level_x = _cam_w / display_get_gui_width();
+            var _zoom_level_y = _cam_h / display_get_gui_height();
+            var _mouse_world_x = _cam_x + (_mouse_gui_x * _zoom_level_x);
+            var _mouse_world_y = _cam_y + (_mouse_gui_y * _zoom_level_y);
+            draw_set_color(c_lime);
+            draw_set_alpha(0.8);
+            draw_line(_ultimo_ponto[0], _ultimo_ponto[1], _mouse_world_x, _mouse_world_y);
+        }
+        // Se já estiver patrulhando, fecha o loop visual
+        else if (estado == LanchaState.PATRULHANDO && ds_list_size(pontos_patrulha) > 1) {
+            var _ultimo_ponto = pontos_patrulha[| ds_list_size(pontos_patrulha) - 1];
+            var _primeiro_ponto = pontos_patrulha[| 0];
+            draw_line(_ultimo_ponto[0], _ultimo_ponto[1], _primeiro_ponto[0], _primeiro_ponto[1]);
+        }
+        
+        draw_set_alpha(1.0);
+    }
+}
+// ======================================================================

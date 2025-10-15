@@ -1,0 +1,13 @@
+{
+  "$GMScript":"",
+  "%Name":"scr_forcar_fantasma",
+  "IsCompatibility":false,
+  "IsDnD":false,
+  "name":"scr_forcar_fantasma",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

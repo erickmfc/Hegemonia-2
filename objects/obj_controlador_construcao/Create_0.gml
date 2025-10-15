@@ -5,9 +5,8 @@
 
 // Evento Create de obj_controlador_construcao
 
-// Defina aqui o tamanho do seu tile.
-// Se cada quadrado do seu grid tem 32x32 pixels, use 32. Se for 64x64, use 64.
-tile_size = 32; // Usando 32 para alinhar com global.tile_size
+// Usar o tamanho global do tile
+tile_size = global.tile_size; // Sincronizar com global.tile_size
 
 // Variáveis que vão guardar a posição do fantasma, alinhada ao grid.
 grid_x = 0;
