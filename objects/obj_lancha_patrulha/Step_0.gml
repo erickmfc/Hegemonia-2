@@ -88,35 +88,76 @@ switch (estado) {
         }
         break;
         
-    // --- ESTADO DE COMBATE NAVAL ---
-    case LanchaState.ATACANDO:
-        // Se o alvo ainda existe, o persegue
-        if (instance_exists(alvo_unidade)) {
-            alvo_x = alvo_unidade.x;
-            alvo_y = alvo_unidade.y;
-            
-            // Atira se estiver no alcance e o timer permitir
-            if (point_distance(x, y, alvo_x, alvo_y) <= missil_alcance && reload_timer <= 0) {
-                // Cria míssil naval
-                var _missil = instance_create_layer(x, y, "Instances", obj_tiro_simples);
-                if (instance_exists(_missil)) {
-                    _missil.alvo = alvo_unidade;
-                    _missil.dono = id;
-                    _missil.dano = 25;
-                    _missil.speed = 8;
-                    _missil.direction = point_direction(x, y, alvo_unidade.x, alvo_unidade.y);
-                    reload_timer = reload_time;
-                    show_debug_message("🚀 Lancha lançou míssil em: " + string(alvo_unidade));
-                }
-            }
-        } 
-        // Se o alvo foi destruído...
-        else {
-            show_debug_message("✅ Alvo destruído! Retornando para: " + string(estado_anterior));
-            estado = estado_anterior; // RETORNA para o que estava fazendo antes
-            alvo_unidade = noone;       // Limpa a mira
-        }
-        break;
+           // --- ESTADO DE COMBATE NAVAL COM ORBITAÇÃO DINÂMICA ---
+           case LanchaState.ATACANDO:
+               if (instance_exists(alvo_unidade)) {
+                   var _distancia_alvo = point_distance(x, y, alvo_unidade.x, alvo_unidade.y);
+                   
+                   // ✅ SISTEMA DE ORBITAÇÃO DINÂMICA
+                   if (_distancia_alvo > missil_alcance) {
+                       // Fora do alcance - persegue o inimigo
+                       alvo_x = alvo_unidade.x;
+                       alvo_y = alvo_unidade.y;
+                   } else {
+                       // ✅ DENTRO DO ALCANCE - Sistema de órbita inteligente
+                       
+                       // Distância ideal para tiro (90% do alcance máximo)
+                       var _distancia_ideal = missil_alcance * 0.9;
+                       
+                       // Verifica se inimigo está se movendo
+                       var _inimigo_se_movendo = false;
+                       
+                       // Verifica velocidade_atual se existir
+                       if (variable_instance_exists(alvo_unidade, "velocidade_atual")) {
+                           _inimigo_se_movendo = (alvo_unidade.velocidade_atual > 0);
+                       }
+                       
+                       // Verifica estado se existir
+                       if (variable_instance_exists(alvo_unidade, "estado")) {
+                           _inimigo_se_movendo = _inimigo_se_movendo || (alvo_unidade.estado != "parado");
+                       }
+                       
+                       // Fallback: verifica se está se movendo pela distância
+                       if (!_inimigo_se_movendo) {
+                           // Se não tem variáveis de movimento, assume que está se movendo se mudou de posição
+                           _inimigo_se_movendo = (point_distance(x, y, alvo_unidade.x, alvo_unidade.y) > 5);
+                       }
+                       
+                       if (_inimigo_se_movendo) {
+                           // ✅ Inimigo se movendo - orbita para acompanhar
+                           var _angulo_atual = point_direction(alvo_unidade.x, alvo_unidade.y, x, y);
+                           var _angulo_orbita = _angulo_atual + 5; // Rotaciona 5 graus por frame
+                           
+                           alvo_x = alvo_unidade.x + lengthdir_x(_distancia_ideal, _angulo_orbita);
+                           alvo_y = alvo_unidade.y + lengthdir_y(_distancia_ideal, _angulo_orbita);
+                           
+                           show_debug_message("🔄 Lancha orbitando ao redor do inimigo em movimento");
+                       } else {
+                           // ✅ Inimigo parado - PARA completamente
+                           // Não atualiza alvo_x e alvo_y - lancha fica parada
+                           show_debug_message("⏸️ Lancha parada - inimigo estático");
+                       }
+                   }
+                   
+                   // Sistema de tiro à distância
+                   if (_distancia_alvo <= missil_alcance && reload_timer <= 0) {
+                       var _missil = instance_create_layer(x, y, "Instances", obj_tiro_simples);
+                       if (instance_exists(_missil)) {
+                           _missil.alvo = alvo_unidade;
+                           _missil.dono = id;
+                           _missil.dano = 25;
+                           _missil.speed = 8;
+                           _missil.direction = point_direction(x, y, alvo_unidade.x, alvo_unidade.y);
+                           reload_timer = reload_time;
+                           show_debug_message("🚀 Lancha atirou à distância (" + string(round(_distancia_alvo)) + "px)");
+                       }
+                   }
+               } else {
+                   show_debug_message("✅ Alvo destruído! Retornando para: " + string(estado_anterior));
+                   estado = estado_anterior;
+                   alvo_unidade = noone;
+               }
+               break;
 }
 
 // --- 4. LÓGICA DE MOVIMENTO NAVAL (ADAPTADA DO F5) ---

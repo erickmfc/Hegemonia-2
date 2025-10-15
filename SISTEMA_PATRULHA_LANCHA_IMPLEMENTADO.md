@@ -19,7 +19,13 @@
 - **Solução 7**: Corrigido obj_input_manager para incluir obj_lancha_patrulha na seleção
 - **Problema 8**: Estados incompatíveis entre sistema global e lancha
 - **Solução 8**: Corrigido obj_input_manager para usar LanchaState enums corretos
-- **Status**: ✅ **FUNCIONANDO PERFEITAMENTE COM SISTEMA GLOBAL**
+- **Problema 9**: Lancha perseguia inimigos em vez de atirar à distância
+- **Solução 9**: Implementado sistema inteligente de posicionamento e tiro à distância
+- **Problema 10**: Sistema de recuo não era ideal para combate naval
+- **Solução 10**: Implementado sistema de orbitação dinâmica - PARA quando inimigo parado, ORBITA quando inimigo se move
+- **Problema 11**: Inimigos não têm variável `velocidade_atual` causando erro
+- **Solução 11**: Implementado sistema robusto de detecção de movimento com fallbacks seguros
+- **Status**: ✅ **FUNCIONANDO PERFEITAMENTE COM SISTEMA GLOBAL E COMBATE NAVAL INTELIGENTE**
 
 ### **🎯 Funcionalidade Implementada:**
 Sistema completo de patrulha com tecla K para a lancha patrulha, baseado no sistema do F-5.

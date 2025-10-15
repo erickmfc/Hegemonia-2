@@ -17,7 +17,7 @@ enum LanchaMode {
 // Atributos básicos (adaptados para o jogo)
 hp_atual = 150;  // HP da lancha conforme documentação
 hp_max = 150;
-velocidade_movimento = 0.7; // velocidade conforme documentação
+velocidade_movimento = 1.4; // velocidade conforme documentação
 nacao_proprietaria = 1; // 1 = jogador (conforme obj_inimigo usa 2)
 
 
