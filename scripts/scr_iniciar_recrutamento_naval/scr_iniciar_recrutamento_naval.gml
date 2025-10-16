@@ -85,53 +85,31 @@ function scr_iniciar_recrutamento_naval(_quartel_id, _tipo_unidade) {
 
 function scr_verificar_recursos_naval(_tipo_unidade) {
     var _custo_dinheiro = 0;
-    var _custo_minerio = 0;
-    var _custo_petroleo = 0;
     
     switch (_tipo_unidade) {
         case "lancha_patrulha":
             _custo_dinheiro = 800;
-            _custo_minerio = 200;
-            _custo_petroleo = 100;
             break;
             
         case "fragata":
             _custo_dinheiro = 1500;
-            _custo_minerio = 400;
-            _custo_petroleo = 200;
             break;
             
         case "destroyer":
             _custo_dinheiro = 2500;
-            _custo_minerio = 600;
-            _custo_petroleo = 300;
             break;
             
         case "submarino":
             _custo_dinheiro = 3000;
-            _custo_minerio = 800;
-            _custo_petroleo = 400;
             break;
             
         default:
             return false;
     }
     
-    // Verificar dinheiro
+    // Verificar dinheiro (sistema unificado)
     if (global.dinheiro < _custo_dinheiro) {
         show_debug_message("❌ Dinheiro insuficiente: " + string(global.dinheiro) + " < " + string(_custo_dinheiro));
-        return false;
-    }
-    
-    // Verificar minério
-    if (global.nacao_recursos[? "Minério"] < _custo_minerio) {
-        show_debug_message("❌ Minério insuficiente: " + string(global.nacao_recursos[? "Minério"]) + " < " + string(_custo_minerio));
-        return false;
-    }
-    
-    // Verificar petróleo
-    if (global.nacao_recursos[? "Petróleo"] < _custo_petroleo) {
-        show_debug_message("❌ Petróleo insuficiente: " + string(global.nacao_recursos[? "Petróleo"]) + " < " + string(_custo_petroleo));
         return false;
     }
     
@@ -145,41 +123,29 @@ function scr_verificar_recursos_naval(_tipo_unidade) {
 
 function scr_deduzir_recursos_naval(_tipo_unidade) {
     var _custo_dinheiro = 0;
-    var _custo_minerio = 0;
-    var _custo_petroleo = 0;
     
     switch (_tipo_unidade) {
         case "lancha_patrulha":
             _custo_dinheiro = 800;
-            _custo_minerio = 200;
-            _custo_petroleo = 100;
             break;
             
         case "fragata":
             _custo_dinheiro = 1500;
-            _custo_minerio = 400;
-            _custo_petroleo = 200;
             break;
             
         case "destroyer":
             _custo_dinheiro = 2500;
-            _custo_minerio = 600;
-            _custo_petroleo = 300;
             break;
             
         case "submarino":
             _custo_dinheiro = 3000;
-            _custo_minerio = 800;
-            _custo_petroleo = 400;
             break;
     }
     
-    // Deduzir recursos
+    // Deduzir recursos (sistema unificado)
     global.dinheiro -= _custo_dinheiro;
-    global.nacao_recursos[? "Minério"] -= _custo_minerio;
-    global.nacao_recursos[? "Petróleo"] -= _custo_petroleo;
     
-    show_debug_message("💰 Recursos deduzidos: $" + string(_custo_dinheiro) + ", " + string(_custo_minerio) + " minério, " + string(_custo_petroleo) + " petróleo");
+    show_debug_message("💰 Recursos deduzidos: $" + string(_custo_dinheiro));
 }
 
 /// @function scr_cancelar_recrutamento_naval(_quartel_id)

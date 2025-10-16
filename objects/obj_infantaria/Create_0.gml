@@ -1,8 +1,11 @@
 // ====================
 // ATRIBUTOS DO SOLDADO
 // ====================
-vida = 100;
-vida_max = 100;
+hp_atual = 100;
+hp_max = 100;
+// Compatibilidade com código antigo
+vida = hp_atual;
+vida_max = hp_max;
 dano = 20;
 velocidade = 2;
 
@@ -21,7 +24,9 @@ modo_patrulha = false; // true quando está no modo de definir patrulha
 
 // Ataque
 alcance_visao = 200; // Maior que o alcance de tiro para detectar inimigos
-alcance_tiro  = 180; // 3x mais que antes (60 * 3 = 180)
+alcance = 180; // Alcance de tiro padronizado
+// Compatibilidade com código antigo
+alcance_tiro = alcance;
 atq_cooldown = 0;
 atq_rate = 30; // frames (meio segundo se FPS=60)
 

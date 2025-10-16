@@ -73,33 +73,79 @@ if (_click_detected) {
     selecionado = true;
     show_debug_message("✅ Quartel selecionado!");
     
-    // === CORREÇÃO: CRIAR MENU NA LAYER CORRETA ===
+    // === CORREÇÃO: CRIAR MENU COM SISTEMA ROBUSTO ===
     show_debug_message("Criando menu de recrutamento...");
     
-    // Verificar se layer GUI existe, se não, criar
-    if (!layer_exists("GUI")) {
-        show_debug_message("Criando layer GUI...");
-        layer_create(-100, "GUI");
+    // Verificar se objeto do menu existe
+    if (!object_exists(obj_menu_recrutamento_marinha)) {
+        show_debug_message("❌ ERRO: obj_menu_recrutamento_marinha não existe!");
+        return;
     }
     
-    if (object_exists(obj_menu_recrutamento_marinha)) {
-        // Criar menu na layer GUI com prioridade alta
-        menu_recrutamento = instance_create_layer(0, 0, "GUI", obj_menu_recrutamento_marinha);
-        
+    // Tentar criar menu na layer "Instances" (mais segura)
+    var _menu_criado = false;
+    
+    // Primeira tentativa: layer "Instances"
+    if (layer_exists("Instances")) {
+        menu_recrutamento = instance_create_layer(0, 0, "Instances", obj_menu_recrutamento_marinha);
         if (instance_exists(menu_recrutamento)) {
-            menu_recrutamento.meu_quartel_id = id;
-            global.menu_recrutamento_aberto = true;
-            
-            show_debug_message("=== MENU DE RECRUTAMENTO NAVAL ABERTO ===");
-            show_debug_message("Quartel de Marinha ID: " + string(id));
-            show_debug_message("Menu ID: " + string(menu_recrutamento));
-            show_debug_message("Layer: GUI");
-            show_debug_message("Posição: (" + string(menu_recrutamento.x) + ", " + string(menu_recrutamento.y) + ")");
-        } else {
-            show_debug_message("❌ Falha ao criar menu na layer GUI");
+            _menu_criado = true;
+            show_debug_message("✅ Menu criado na layer 'Instances'");
         }
+    }
+    
+    // Segunda tentativa: layer "GUI" (se existir)
+    if (!_menu_criado && layer_exists("GUI")) {
+        menu_recrutamento = instance_create_layer(0, 0, "GUI", obj_menu_recrutamento_marinha);
+        if (instance_exists(menu_recrutamento)) {
+            _menu_criado = true;
+            show_debug_message("✅ Menu criado na layer 'GUI'");
+        }
+    }
+    
+    // Terceira tentativa: criar layer GUI e tentar novamente
+    if (!_menu_criado) {
+        show_debug_message("Criando layer GUI...");
+        layer_create(-100, "GUI");
+        menu_recrutamento = instance_create_layer(0, 0, "GUI", obj_menu_recrutamento_marinha);
+        if (instance_exists(menu_recrutamento)) {
+            _menu_criado = true;
+            show_debug_message("✅ Menu criado na layer 'GUI' (criada)");
+        }
+    }
+    
+    // Configurar menu se foi criado com sucesso
+    if (_menu_criado && instance_exists(menu_recrutamento)) {
+        // Configurar menu
+        menu_recrutamento.meu_quartel_id = id;
+        global.menu_recrutamento_aberto = true;
+        
+        // Garantir que menu é visível
+        menu_recrutamento.visible = true;
+        menu_recrutamento.image_alpha = 1.0;
+        menu_recrutamento.depth = -1000; // Depth alto para ficar na frente
+        
+        show_debug_message("=== MENU DE RECRUTAMENTO NAVAL ABERTO ===");
+        show_debug_message("Quartel de Marinha ID: " + string(id));
+        show_debug_message("Menu ID: " + string(menu_recrutamento));
+        show_debug_message("Posição: (" + string(menu_recrutamento.x) + ", " + string(menu_recrutamento.y) + ")");
+        show_debug_message("Visível: " + string(menu_recrutamento.visible));
+        show_debug_message("Alpha: " + string(menu_recrutamento.image_alpha));
+        show_debug_message("Depth: " + string(menu_recrutamento.depth));
+        
+        // Verificar se Create event executou
+        if (variable_instance_exists(menu_recrutamento, "meu_quartel_id")) {
+            show_debug_message("✅ Create event do menu executou");
+        } else {
+            show_debug_message("⚠️ Create event do menu não executou, configurando manualmente");
+            menu_recrutamento.meu_quartel_id = id;
+        }
+        
     } else {
-        show_debug_message("ERRO: obj_menu_recrutamento_marinha não existe!");
+        show_debug_message("❌ FALHA CRÍTICA: Não foi possível criar menu em nenhuma layer!");
+        show_debug_message("   - Layer 'Instances' existe: " + string(layer_exists("Instances")));
+        show_debug_message("   - Layer 'GUI' existe: " + string(layer_exists("GUI")));
+        show_debug_message("   - Objeto menu existe: " + string(object_exists(obj_menu_recrutamento_marinha)));
     }
 } else {
     show_debug_message("❌ Clique não detectado ou fora do quartel");

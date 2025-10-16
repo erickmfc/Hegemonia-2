@@ -77,6 +77,61 @@ if (mouse_check_button_pressed(mb_left)) {
     if (hit_lp != noone) _instancia_selecionada = hit_lp;
     
     if (_instancia_selecionada == noone) {
+        // Debug: verificar se há Constellations no jogo
+        var _total_constellations = instance_number(obj_Constellation);
+        show_debug_message("🔍 Total de Constellations no jogo: " + string(_total_constellations));
+        
+        if (_total_constellations > 0) {
+            // Listar posições de todos os Constellations
+            with (obj_Constellation) {
+                show_debug_message("🚢 Constellation ID: " + string(id) + " em (" + string(x) + ", " + string(y) + ")");
+                show_debug_message("🚢 Bbox: left=" + string(bbox_left) + " right=" + string(bbox_right) + " top=" + string(bbox_top) + " bottom=" + string(bbox_bottom));
+            }
+        }
+        
+        // Tentar diferentes métodos de detecção
+        var hit_constellation = collision_point(_mouse_world_x, _mouse_world_y, obj_Constellation, false, true);
+        show_debug_message("🔍 Resultado collision_point: " + string(hit_constellation));
+        
+        // Método alternativo
+        var hit_constellation_alt = instance_position(_mouse_world_x, _mouse_world_y, obj_Constellation);
+        show_debug_message("🔍 Resultado instance_position: " + string(hit_constellation_alt));
+        
+        // Método manual - verificar se o mouse está dentro da bounding box
+        var hit_constellation_manual = noone;
+        with (obj_Constellation) {
+            show_debug_message("🔍 Verificando Constellation ID: " + string(id));
+            show_debug_message("🔍 Mouse: (" + string(_mouse_world_x) + ", " + string(_mouse_world_y) + ")");
+            show_debug_message("🔍 Bbox: (" + string(bbox_left) + ", " + string(bbox_top) + ") a (" + string(bbox_right) + ", " + string(bbox_bottom) + ")");
+            
+            if (_mouse_world_x >= bbox_left && _mouse_world_x <= bbox_right && 
+                _mouse_world_y >= bbox_top && _mouse_world_y <= bbox_bottom) {
+                hit_constellation_manual = id;
+                show_debug_message("🔍 Constellation detectado via bbox manual!");
+                break;
+            }
+        }
+        show_debug_message("🔍 Resultado bbox manual: " + string(hit_constellation_manual));
+        
+        // Usar o método que funcionar
+        if (hit_constellation_manual != noone) {
+            hit_constellation = hit_constellation_manual;
+        } else if (hit_constellation_alt != noone) {
+            hit_constellation = hit_constellation_alt;
+        }
+        
+        if (hit_constellation != noone) {
+            _instancia_selecionada = hit_constellation;
+            show_debug_message("🚢 CONSTELLATION DETECTADO VIA CONTROLADOR!");
+            show_debug_message("🚢 ID do Constellation: " + string(hit_constellation));
+            show_debug_message("🚢 Posição do mouse: (" + string(_mouse_world_x) + ", " + string(_mouse_world_y) + ")");
+            show_debug_message("🚢 Posição do Constellation: (" + string(hit_constellation.x) + ", " + string(hit_constellation.y) + ")");
+        } else {
+            show_debug_message("❌ NENHUM CONSTELLATION DETECTADO no clique!");
+        }
+    }
+    
+    if (_instancia_selecionada == noone) {
         var hit_inf = collision_point(_mouse_world_x, _mouse_world_y, obj_infantaria, false, true);
         if (hit_inf != noone) _instancia_selecionada = hit_inf;
     }
@@ -125,6 +180,7 @@ if (mouse_check_button_pressed(mb_left)) {
             with (obj_tanque) { selecionado = false; }
             with (obj_blindado_antiaereo) { selecionado = false; }
             with (obj_lancha_patrulha) { selecionado = false; }
+            with (obj_Constellation) { selecionado = false; }
             with (obj_caca_f5) { selecionado = false; }
             with (obj_helicoptero_militar) { selecionado = false; }
             
@@ -138,6 +194,15 @@ if (mouse_check_button_pressed(mb_left)) {
                 show_debug_message("🚢 ID da lancha: " + string(_instancia_selecionada));
                 show_debug_message("🚢 global.unidade_selecionada: " + string(global.unidade_selecionada));
                 show_debug_message("🚢 Tem pontos_patrulha: " + string(variable_instance_exists(_instancia_selecionada, "pontos_patrulha")));
+            }
+            
+            // Debug para verificar seleção do Constellation
+            if (object_get_name(_instancia_selecionada.object_index) == "obj_Constellation") {
+                show_debug_message("🚢 CONSTELLATION SELECIONADO VIA CONTROLADOR!");
+                show_debug_message("🚢 ID do Constellation: " + string(_instancia_selecionada));
+                show_debug_message("🚢 global.unidade_selecionada: " + string(global.unidade_selecionada));
+                show_debug_message("🚢 Estado: " + string(_instancia_selecionada.estado));
+                show_debug_message("🚢 Selecionado: " + string(_instancia_selecionada.selecionado));
             }
             
             // ======================================================================
@@ -169,6 +234,7 @@ if (mouse_check_button_pressed(mb_left)) {
             with (obj_tanque) { selecionado = false; }
             with (obj_blindado_antiaereo) { selecionado = false; }
             with (obj_lancha_patrulha) { selecionado = false; }
+            with (obj_Constellation) { selecionado = false; }
             with (obj_caca_f5) { selecionado = false; }
             with (obj_helicoptero_militar) { selecionado = false; }
             global.unidade_selecionada = noone;
@@ -194,6 +260,9 @@ if (mouse_check_button_pressed(mb_left)) {
             _lista_patrulha = _unidade.pontos_patrulha; // obj_caca_f5 usa 'pontos_patrulha'
         } else if (_unidade.object_index == obj_helicoptero_militar) {
             _lista_patrulha = _unidade.pontos_patrulha; // obj_helicoptero_militar usa 'pontos_patrulha'
+        } else if (_unidade.object_index == obj_Constellation) {
+            // Constellation não tem sistema de patrulha no código novo
+            _lista_patrulha = noone;
         } else {
             // Para outros objetos, tentar 'patrol_points' ou 'pontos_patrulha'
             if (variable_instance_exists(_unidade, "patrol_points")) {
@@ -374,21 +443,38 @@ if (instance_exists(global.unidade_selecionada)) {
         // Comando de Movimento (Clique Direito)
         if (mouse_check_button_pressed(mb_right)) {
             // Se estiver definindo patrulha, adiciona um ponto
-            if (global.definindo_patrulha == _unidade) {
+            if (global.definindo_patrulha == _unidade && variable_instance_exists(_unidade, "pontos_patrulha")) {
                 var _coords = global.scr_mouse_to_world();
                 ds_list_add(_unidade.pontos_patrulha, [_coords[0], _coords[1]]);
-                show_debug_message("📍 Ponto de patrulha F-5 adicionado");
+                show_debug_message("📍 Ponto de patrulha adicionado");
             } 
             // Senão, é uma ordem de movimento normal
             else {
                 var _coords = global.scr_mouse_to_world();
-                _unidade.destino_x = _coords[0];
-                _unidade.destino_y = _coords[1];
-                // Sistema simplificado - apenas define destino
-                // Cancela outros modos
-                _unidade.alvo_seguir = noone;
-                global.definindo_patrulha = noone;
-                show_debug_message("🎯 Ordem de movimento para F-5");
+                
+                // Verificar se a unidade tem as variáveis necessárias
+                if (variable_instance_exists(_unidade, "destino_x") && variable_instance_exists(_unidade, "destino_y")) {
+                    _unidade.destino_x = _coords[0];
+                    _unidade.destino_y = _coords[1];
+                    
+                    // Para Constellation, usar sistema simples
+                    if (_unidade.object_index == obj_Constellation) {
+                        _unidade.estado = "movendo";
+                        show_debug_message("🚢 Ordem de movimento para Constellation");
+                        show_debug_message("🚢 Constellation destino: (" + string(_coords[0]) + ", " + string(_coords[1]) + ")");
+                        show_debug_message("🚢 Constellation estado alterado para: " + _unidade.estado);
+                    }
+                    // Para outras unidades
+                    else {
+                        show_debug_message("🎯 Ordem de movimento para " + object_get_name(_unidade.object_index));
+                    }
+                    
+                    // Cancela outros modos se existirem
+                    if (variable_instance_exists(_unidade, "alvo_seguir")) {
+                        _unidade.alvo_seguir = noone;
+                    }
+                    global.definindo_patrulha = noone;
+                }
             }
         }
     }
@@ -402,7 +488,7 @@ if (instance_exists(global.unidade_selecionada)) {
         // Comando de Movimento (Clique Direito)
         if (mouse_check_button_pressed(mb_right)) {
             // Se estiver definindo patrulha, adiciona um ponto
-            if (global.definindo_patrulha == _unidade) {
+            if (global.definindo_patrulha == _unidade && variable_instance_exists(_unidade, "pontos_patrulha")) {
                 var _coords = global.scr_mouse_to_world();
                 ds_list_add(_unidade.pontos_patrulha, [_coords[0], _coords[1]]);
                 show_debug_message("📍 Ponto de patrulha adicionado");
@@ -410,14 +496,36 @@ if (instance_exists(global.unidade_selecionada)) {
             // Senão, é uma ordem de movimento normal
             else {
                 var _coords = global.scr_mouse_to_world();
-                _unidade.destino_x = _coords[0];
-                _unidade.destino_y = _coords[1];
-                _unidade.estado = _unidade.estado == ESTADO_HELICOPTERO.POUSADO ? ESTADO_HELICOPTERO.DECOLANDO : ESTADO_HELICOPTERO.MOVENDO;
-                if (_unidade.estado == ESTADO_HELICOPTERO.DECOLANDO) { _unidade.timer_transicao = 60; }
-                // Cancela outros modos
-                _unidade.alvo_seguir = noone;
-                global.definindo_patrulha = noone;
-                show_debug_message("🎯 Ordem de movimento para helicóptero");
+                
+                // Verificar se a unidade tem as variáveis necessárias
+                if (variable_instance_exists(_unidade, "destino_x") && variable_instance_exists(_unidade, "destino_y")) {
+                    _unidade.destino_x = _coords[0];
+                    _unidade.destino_y = _coords[1];
+                    
+                    // Para Constellation, usar sistema simples
+                    if (_unidade.object_index == obj_Constellation) {
+                        _unidade.estado = "movendo";
+                        show_debug_message("🚢 Ordem de movimento para Constellation");
+                        show_debug_message("🚢 Constellation destino: (" + string(_coords[0]) + ", " + string(_coords[1]) + ")");
+                        show_debug_message("🚢 Constellation estado alterado para: " + _unidade.estado);
+                    }
+                    // Para helicóptero, usar sistema específico
+                    else if (variable_instance_exists(_unidade, "ESTADO_HELICOPTERO")) {
+                        _unidade.estado = _unidade.estado == ESTADO_HELICOPTERO.POUSADO ? ESTADO_HELICOPTERO.DECOLANDO : ESTADO_HELICOPTERO.MOVENDO;
+                        if (_unidade.estado == ESTADO_HELICOPTERO.DECOLANDO) { _unidade.timer_transicao = 60; }
+                        show_debug_message("🎯 Ordem de movimento para helicóptero");
+                    }
+                    // Para outras unidades
+                    else {
+                        show_debug_message("🎯 Ordem de movimento para " + object_get_name(_unidade.object_index));
+                    }
+                    
+                    // Cancela outros modos se existirem
+                    if (variable_instance_exists(_unidade, "alvo_seguir")) {
+                        _unidade.alvo_seguir = noone;
+                    }
+                    global.definindo_patrulha = noone;
+                }
             }
         }
     }

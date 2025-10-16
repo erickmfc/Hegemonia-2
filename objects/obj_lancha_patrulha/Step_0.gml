@@ -9,12 +9,12 @@ if (selecionado) {
     if (keyboard_check_pressed(ord("P"))) { 
         modo_combate = LanchaMode.PASSIVO; 
         modo_ataque = false; // Atualizar variável de compatibilidade
-        show_debug_message("🛡️ Lancha Modo PASSIVO");
+        if (global.debug_enabled) show_debug_message("🛡️ Lancha Modo PASSIVO");
     }
     if (keyboard_check_pressed(ord("O"))) { 
         modo_combate = LanchaMode.ATAQUE; 
         modo_ataque = true; // Atualizar variável de compatibilidade
-        show_debug_message("⚔️ Lancha Modo ATAQUE AGRESSIVO");
+        if (global.debug_enabled) show_debug_message("⚔️ Lancha Modo ATAQUE AGRESSIVO");
     }
 
     // Comando de Parar (L) - adaptado para lancha
@@ -22,7 +22,7 @@ if (selecionado) {
         estado = LanchaState.PARADO;
         modo_definicao_patrulha = false;
         alvo_unidade = noone;
-        show_debug_message("⏹️ Lancha PAROU");
+        if (global.debug_enabled) show_debug_message("⏹️ Lancha PAROU");
     }
     
     // Comandos K, clique esquerdo e clique direito agora são gerenciados pelo obj_input_manager
@@ -60,10 +60,10 @@ if (modo_combate == LanchaMode.ATAQUE && estado != LanchaState.PARADO && estado 
         estado = LanchaState.ATACANDO;      // MUDA o estado para "atacando"
         alvo_unidade = _alvo_encontrado; // Trava a mira no inimigo
         
-        show_debug_message("🎯 Alvo " + _tipo_alvo + " detectado! Interrompendo tarefa para atacar " + string(alvo_unidade));
+        if (global.debug_enabled) show_debug_message("🎯 Alvo " + _tipo_alvo + " detectado! Interrompendo tarefa para atacar " + string(alvo_unidade));
     } else {
         // Debug: mostra por que não encontrou alvos
-        show_debug_message("🔍 Modo ataque ativo mas nenhum alvo inimigo encontrado no radar (alcance: " + string(radar_alcance) + ")");
+        if (global.debug_enabled) show_debug_message("🔍 Modo ataque ativo mas nenhum alvo inimigo encontrado no radar (alcance: " + string(radar_alcance) + ")");
     }
 }
 // ======================================================================
@@ -131,11 +131,11 @@ switch (estado) {
                            alvo_x = alvo_unidade.x + lengthdir_x(_distancia_ideal, _angulo_orbita);
                            alvo_y = alvo_unidade.y + lengthdir_y(_distancia_ideal, _angulo_orbita);
                            
-                           show_debug_message("🔄 Lancha orbitando ao redor do inimigo em movimento");
+                           if (global.debug_enabled) show_debug_message("🔄 Lancha orbitando ao redor do inimigo em movimento");
                        } else {
                            // ✅ Inimigo parado - PARA completamente
                            // Não atualiza alvo_x e alvo_y - lancha fica parada
-                           show_debug_message("⏸️ Lancha parada - inimigo estático");
+                           if (global.debug_enabled) show_debug_message("⏸️ Lancha parada - inimigo estático");
                        }
                    }
                    
@@ -149,11 +149,11 @@ switch (estado) {
                            _missil.speed = 8;
                            _missil.direction = point_direction(x, y, alvo_unidade.x, alvo_unidade.y);
                            reload_timer = reload_time;
-                           show_debug_message("🚀 Lancha atirou à distância (" + string(round(_distancia_alvo)) + "px)");
+                           if (global.debug_enabled) show_debug_message("🚀 Lancha atirou à distância (" + string(round(_distancia_alvo)) + "px)");
                        }
                    }
                } else {
-                   show_debug_message("✅ Alvo destruído! Retornando para: " + string(estado_anterior));
+                   if (global.debug_enabled) show_debug_message("✅ Alvo destruído! Retornando para: " + string(estado_anterior));
                    estado = estado_anterior;
                    alvo_unidade = noone;
                }

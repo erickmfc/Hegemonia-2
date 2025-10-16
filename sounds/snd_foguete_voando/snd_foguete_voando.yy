@@ -1,0 +1,25 @@
+{
+  "$GMSound":"",
+  "%Name":"snd_foguete_voando",
+  "audioGroupId":{
+    "name":"audiogroup_default",
+    "path":"audiogroups/audiogroup_default",
+  },
+  "bitDepth":1,
+  "bitRate":128,
+  "compression":0,
+  "conversionMode":0,
+  "duration":3.8080726,
+  "name":"snd_foguete_voando",
+  "parent":{
+    "name":"efeitos",
+    "path":"folders/Sprites/efeitos.yy",
+  },
+  "preload":false,
+  "resourceType":"GMSound",
+  "resourceVersion":"2.0",
+  "sampleRate":44100,
+  "soundFile":"snd_foguete_voando.mp3",
+  "type":0,
+  "volume":1.0,
+}

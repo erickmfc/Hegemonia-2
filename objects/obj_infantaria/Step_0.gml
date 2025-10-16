@@ -1,7 +1,7 @@
 /// STEP EVENT - Lógica do soldado
 
 // Verificação de vida
-if (vida <= 0) {
+if (hp_atual <= 0) {
     instance_destroy();
     exit;
 }
@@ -34,15 +34,15 @@ if (selecionado) {
             modo_patrulha = true;
             ds_list_clear(patrulha); // limpa patrulha anterior
             patrulha_indice = 0;
-            show_debug_message("Modo patrulha ativado - clique direito nos pontos");
+            if (global.debug_enabled) show_debug_message("Modo patrulha ativado - clique direito nos pontos");
         } else {
             // Sair do modo patrulha
             modo_patrulha = false;
             if (ds_list_size(patrulha) > 0) {
                 estado = "patrulhando";
-                show_debug_message("Patrulha iniciada com " + string(ds_list_size(patrulha)) + " pontos");
+                if (global.debug_enabled) show_debug_message("Patrulha iniciada com " + string(ds_list_size(patrulha)) + " pontos");
             } else {
-                show_debug_message("Modo patrulha desativado - nenhum ponto definido");
+                if (global.debug_enabled) show_debug_message("Modo patrulha desativado - nenhum ponto definido");
             }
         }
     }
@@ -52,9 +52,9 @@ if (selecionado) {
         modo_patrulha = false;
         if (ds_list_size(patrulha) > 0) {
             estado = "patrulhando";
-            show_debug_message("Patrulha iniciada com " + string(ds_list_size(patrulha)) + " pontos");
+            if (global.debug_enabled) show_debug_message("Patrulha iniciada com " + string(ds_list_size(patrulha)) + " pontos");
         } else {
-            show_debug_message("Modo patrulha desativado - nenhum ponto definido");
+            if (global.debug_enabled) show_debug_message("Modo patrulha desativado - nenhum ponto definido");
         }
     }
     
@@ -66,7 +66,7 @@ if (selecionado) {
         var world_y = _coords[1];
         var pos = [world_x, world_y];
         ds_list_add(patrulha, pos);
-        show_debug_message("[PATRULHA] Ponto adicionado (mundo): " + string(world_x) + ", " + string(world_y));
+        if (global.debug_enabled) show_debug_message("[PATRULHA] Ponto adicionado (mundo): " + string(world_x) + ", " + string(world_y));
     }
     
     // ANDAR (botão direito - só se não estiver no modo patrulha)
@@ -135,7 +135,7 @@ if (selecionado) {
                     indice_formacao++;
                 }
             }
-            show_debug_message("Movimento em formação com " + string(unidades_selecionadas) + " unidades");
+            if (global.debug_enabled) show_debug_message("Movimento em formação com " + string(unidades_selecionadas) + " unidades");
         } else {
             // UMA UNIDADE - MOVIMENTO NORMAL
             destino_x = world_x;
@@ -156,9 +156,9 @@ if (selecionado) {
         if (alvo_seg != noone && alvo_seg != id) {
             seguir_alvo = alvo_seg;
             estado = "seguindo";
-            show_debug_message("Seguindo unidade alvo");
+            if (global.debug_enabled) show_debug_message("Seguindo unidade alvo");
 } else {
-            show_debug_message("Nenhuma unidade encontrada para seguir");
+            if (global.debug_enabled) show_debug_message("Nenhuma unidade encontrada para seguir");
         }
     }
     
@@ -168,7 +168,7 @@ if (selecionado) {
         alvo = noone;
         seguir_alvo = noone;
         modo_patrulha = false;
-        show_debug_message("Soldado parado");
+        if (global.debug_enabled) show_debug_message("Soldado parado");
     }
     
     // CANCELAR SEGUIR (X)
@@ -177,7 +177,7 @@ if (selecionado) {
         if (estado == "seguindo") {
             estado = "parado";
         }
-        show_debug_message("Comando de seguir cancelado");
+        if (global.debug_enabled) show_debug_message("Comando de seguir cancelado");
     }
     
     // LIMPAR PATRULHA (R)
@@ -186,7 +186,7 @@ if (selecionado) {
         patrulha_indice = 0;
         modo_patrulha = false;
         estado = "parado";
-        show_debug_message("Patrulha limpa");
+        if (global.debug_enabled) show_debug_message("Patrulha limpa");
     }
 }
 
@@ -262,7 +262,7 @@ switch (estado) {
                 inimigo_movendo = true;
             }
             
-            if (dist_alvo <= alcance_tiro) {
+            if (dist_alvo <= alcance) {
                 // Atira se estiver no alcance
                 if (atq_cooldown <= 0) {
                     var b = instance_create_layer(x, y, layer, obj_tiro_infantaria);
@@ -279,12 +279,12 @@ switch (estado) {
                     // Fica parado atirando
                 } else {
                     // Se o inimigo está andando, pode seguir e atirar
-                    if (dist_alvo > alcance_tiro - 30) { // Mantém distância mínima
+                    if (dist_alvo > alcance - 30) { // Mantém distância mínima
                         var dir_x = alvo.x - x;
                         var dir_y = alvo.y - y;
                         var dist_norm = point_distance(0, 0, dir_x, dir_y);
                         if (dist_norm > 0) {
-                            var dist_ideal = alcance_tiro - 20;
+                            var dist_ideal = alcance - 20;
                             var target_x = x + (dir_x / dist_norm) * (dist - dist_ideal);
                             var target_y = y + (dir_y / dist_norm) * (dist - dist_ideal);
                             mp_potential_step(target_x, target_y, velocidade, false);
@@ -292,13 +292,13 @@ switch (estado) {
                         }
                     }
                 }
-            } else if (dist_alvo > alcance_tiro && dist_alvo <= alcance_visao) {
+            } else if (dist_alvo > alcance && dist_alvo <= alcance_visao) {
                 // Aproxima-se do inimigo
                 var dir_x = alvo.x - x;
                 var dir_y = alvo.y - y;
                 var dist_norm = point_distance(0, 0, dir_x, dir_y);
                 if (dist_norm > 0) {
-                    var dist_ideal = alcance_tiro - 20;
+                    var dist_ideal = alcance - 20;
                     var target_x = x + (dir_x / dist_norm) * (dist_norm - dist_ideal);
                     var target_y = y + (dir_y / dist_norm) * (dist_norm - dist_ideal);
                     mp_potential_step(target_x, target_y, velocidade, false);

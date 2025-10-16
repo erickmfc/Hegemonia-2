@@ -73,7 +73,7 @@ ordem_mover = function(dest_x, dest_y) {
     estado = LanchaState.MOVENDO;
     estado_string = "movendo"; // Sincronizar
     modo_definicao_patrulha = false;
-    show_debug_message("🚢 Ordem de movimento: (" + string(dest_x) + ", " + string(dest_y) + ")");
+    if (global.debug_enabled) show_debug_message("🚢 Ordem de movimento: (" + string(dest_x) + ", " + string(dest_y) + ")");
 }
 
 // Mantém compatibilidade
@@ -148,7 +148,7 @@ func_atacar_alvo = function() {
             _tiro.direction = point_direction(x, y, alvo_unidade.x, alvo_unidade.y);
             reload_timer = reload_time;
             timer_ataque = reload_timer; // Sincronizar
-            show_debug_message("🚢 Tiro disparado!");
+            if (global.debug_enabled) show_debug_message("🚢 Tiro disparado!");
         }
         estado = LanchaState.ATACANDO;
         estado_string = "atacando"; // Sincronizar
@@ -207,4 +207,4 @@ func_sincronizar_indice = function() {
     indice_patrulha = indice_patrulha_atual;
 }
 
-show_debug_message("🚢 Lancha Patrulha criada!");
+if (global.debug_enabled) show_debug_message("🚢 Lancha Patrulha criada!");

@@ -5,7 +5,7 @@
 
 // Prevenir fechamento imediato (evita bug de duplo clique)
 if (delay_abertura > 0) {
-    show_debug_message("Menu ainda em delay de abertura. Ignorando clique.");
+    if (global.debug_enabled) show_debug_message("Menu ainda em delay de abertura. Ignorando clique.");
     return;
 }
 
@@ -13,8 +13,10 @@ if (delay_abertura > 0) {
 var _mouse_gui_x = device_mouse_x_to_gui(0);
 var _mouse_gui_y = device_mouse_y_to_gui(0);
 
-show_debug_message("=== CLIQUE DETECTADO NO MENU MELHORADO ===");
-show_debug_message("Posição do mouse: (" + string(_mouse_gui_x) + ", " + string(_mouse_gui_y) + ")");
+if (global.debug_enabled) {
+    show_debug_message("=== CLIQUE DETECTADO NO MENU MELHORADO ===");
+    show_debug_message("Posição do mouse: (" + string(_mouse_gui_x) + ", " + string(_mouse_gui_y) + ")");
+}
 
 // === DIMENSÕES DO MENU MELHORADO (IGUAIS AO DRAW GUI) ===
 var _mw = 1430; // Largura aumentada em 25%
@@ -31,7 +33,7 @@ var _close_y = _my + _mh - 58 + 10; // Footer ajustado (+25%)
 if (_mouse_gui_x >= _close_x && _mouse_gui_x <= _close_x + _close_w &&
     _mouse_gui_y >= _close_y && _mouse_gui_y <= _close_y + _close_h) {
     
-    show_debug_message("Botão FECHAR clicado - fechando menu");
+    if (global.debug_enabled) show_debug_message("Botão FECHAR clicado - fechando menu");
     global.menu_recrutamento_aberto = false;
     instance_destroy();
     return;
@@ -41,7 +43,7 @@ if (_mouse_gui_x >= _close_x && _mouse_gui_x <= _close_x + _close_w &&
 if (_mouse_gui_x < _mx || _mouse_gui_x > _mx + _mw ||
     _mouse_gui_y < _my || _mouse_gui_y > _my + _mh) {
     
-    show_debug_message("Clique fora do menu - fechando");
+    if (global.debug_enabled) show_debug_message("Clique fora do menu - fechando");
     global.menu_recrutamento_aberto = false;
     instance_destroy();
     return;
@@ -51,15 +53,16 @@ if (_mouse_gui_x < _mx || _mouse_gui_x > _mx + _mw ||
 var _header_h = 90; // Altura ajustada (+25%)
 var _info_w = 358; // Largura aumentada em 25%
 var _info_x = _mx + _mw - _info_w - 20;
-var _grid_x = _mx + 20;
-var _grid_y = _my + _header_h + 20;
-var _grid_w = _mw - _info_w - 40;
+var _grid_x = _mx + 20; // Centralizado para novo layout
+var _grid_y = _my + _header_h + 30;
+var _grid_w = _mw - 40; // Margem ajustada para layout centralizado
 var _grid_h = _mh - _header_h - 92; // Footer ajustado (+25%)
 
-// Cards aumentados em 25% + 20% altura + 10% parte de baixo
-var _card_w = 293;  // +25% de 234px
-var _card_h = 216;  // +25% de 130px + 20% adicional + 10% parte de baixo = 216px
-var card_spacing = 33; // Espaçamento aumentado (+25%)
+// Cards reorganizados
+var _card_w = 300;  // Cards reorganizados
+var _card_h = 200;  // Altura ajustada
+var card_spacing_x = 40; // Espaçamento horizontal
+var card_spacing_y = 30; // Espaçamento vertical
 
 // Obter unidades disponíveis
 var _unidades = [];
@@ -73,8 +76,8 @@ for (var i = 0; i < min(4, ds_list_size(_unidades)); i++) {
     var _row = i div 2;
     var _col = i mod 2;
     
-    var _card_x = _grid_x + _col * (_card_w + card_spacing);
-    var _card_y = _grid_y + _row * (_card_h + card_spacing);
+    var _card_x = _grid_x + _col * (_card_w + card_spacing_x);
+    var _card_y = _grid_y + _row * (_card_h + card_spacing_y);
     
     // Todos os cards descem 35%
     _card_y += _card_h * 0.35; // Descer 35% da altura do card
@@ -88,8 +91,10 @@ for (var i = 0; i < min(4, ds_list_size(_unidades)); i++) {
     if (_mouse_gui_x >= _card_x && _mouse_gui_x <= _card_x + _card_w &&
         _mouse_gui_y >= _card_y && _mouse_gui_y <= _card_y + _card_h) {
         
-        show_debug_message("*** CARD DA UNIDADE " + string(i) + " CLICADO ***");
-        show_debug_message("Unidade: " + _unidade.nome);
+        if (global.debug_enabled) {
+            show_debug_message("*** CARD DA UNIDADE " + string(i) + " CLICADO ***");
+            show_debug_message("Unidade: " + _unidade.nome);
+        }
         
         // Verificar se pode recrutar
         var _can_afford = (global.dinheiro >= _unidade.custo_dinheiro && global.populacao >= _unidade.custo_populacao);
@@ -97,14 +102,14 @@ for (var i = 0; i < min(4, ds_list_size(_unidades)); i++) {
         var _disponivel = _can_afford && _quartel_livre;
         
         if (_disponivel) {
-            show_debug_message("Recrutando 1 unidade: " + _unidade.nome);
+            if (global.debug_enabled) show_debug_message("Recrutando 1 unidade: " + _unidade.nome);
             
             // Verificar se o quartel existe e não está treinando
             if (instance_exists(id_do_quartel)) {
                 if (id_do_quartel.esta_treinando) {
-                    show_debug_message("Quartel já está treinando uma unidade!");
+                    if (global.debug_enabled) show_debug_message("Quartel já está treinando uma unidade!");
                 } else {
-                    show_debug_message("Enviando ordem de recrutamento - Quartel ID: " + string(id_do_quartel));
+                    if (global.debug_enabled) show_debug_message("Enviando ordem de recrutamento - Quartel ID: " + string(id_do_quartel));
                     
                     // Definir a quantidade e unidade no quartel
                     id_do_quartel.quantidade_recrutar = 1;
@@ -116,17 +121,26 @@ for (var i = 0; i < min(4, ds_list_size(_unidades)); i++) {
                     }
                 }
             } else {
-                show_debug_message("ERRO: Quartel não encontrado (ID: " + string(id_do_quartel) + ")");
+                if (global.debug_enabled) show_debug_message("ERRO: Quartel não encontrado (ID: " + string(id_do_quartel) + ")");
             }
             
-            // Fechar o menu após a ação
-            global.menu_recrutamento_aberto = false;
-            instance_destroy();
+            // NÃO fechar o menu - manter aberto para recrutar mais unidades
+            // global.menu_recrutamento_aberto = false;
+            // instance_destroy();
+            
+            // Adicionar feedback visual de recrutamento
+            if (global.debug_enabled) show_debug_message("Unidade " + _unidade.nome + " adicionada à fila de recrutamento!");
+            
+            // Ativar animação de confirmação
+            recruitment_confirmation = true;
+            confirmation_timer = 30; // 30 frames de animação
+            confirmation_text = _unidade.nome + " em treinamento!";
+            confirmation_color = make_color_rgb(50, 205, 50);
         } else {
             if (!_can_afford) {
-                show_debug_message("Recursos insuficientes para recrutar " + _unidade.nome);
+                if (global.debug_enabled) show_debug_message("Recursos insuficientes para recrutar " + _unidade.nome);
             } else {
-                show_debug_message("Quartel ocupado - não é possível recrutar agora");
+                if (global.debug_enabled) show_debug_message("Quartel ocupado - não é possível recrutar agora");
             }
         }
         return;
@@ -134,5 +148,5 @@ for (var i = 0; i < min(4, ds_list_size(_unidades)); i++) {
 }
 
 // === 4. CLIQUE EM QUALQUER OUTRO LUGAR DENTRO DO PAINEL ===
-show_debug_message("Clique dentro do painel, mas fora dos elementos interativos");
+if (global.debug_enabled) show_debug_message("Clique dentro do painel, mas fora dos elementos interativos");
 // Manter o menu aberto
