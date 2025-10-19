@@ -5,6 +5,11 @@
 
 // === MENU DESABILITADO TEMPORARIAMENTE ===
 // Todo o código foi comentado para remover o menu
+
+// =========================================================================
+// EVENTO DESATIVADO PERMANENTEMENTE PARA EVITAR CONFLITOS DE SELEÇÃO
+exit;
+
 /*
 // === VERIFICAR SE DEVE MOSTRAR O MENU ===
 if (global.unidade_selecionada != noone && instance_exists(global.unidade_selecionada)) {
@@ -26,6 +31,8 @@ if (global.unidade_selecionada != noone && instance_exists(global.unidade_seleci
         tipo_unidade = "BLINDADO ANTI-AÉREO";
     } else if (unidade_atual.object_index == obj_lancha_patrulha) {
         tipo_unidade = "LANCHA PATRULHA";
+    } else if (unidade_atual.object_index == obj_Constellation) {
+        tipo_unidade = "CONSTELLATION";
     } else {
         tipo_unidade = "UNIDADE";
     }

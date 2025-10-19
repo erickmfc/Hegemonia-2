@@ -1,27 +1,21 @@
 // ===============================================
-// HEGEMONIA GLOBAL - CONSTELLATION FUNCIONAL
-// Sistema de Seleção
+// HEGEMONIA GLOBAL - CONSTELLATION
+// Clique Direito - Mover para Posição (APENAS SE SELECIONADO)
 // ===============================================
 
-// === SELEÇÃO ===
-if (mouse_check_button_pressed(mb_left)) {
-    // Desmarcar outras Constellations
-    with (obj_Constellation) {
-        selecionado = false;
-    }
+// === MOVER PARA POSIÇÃO (APENAS SE SELECIONADO) ===
+if (selecionado && mouse_check_button_pressed(mb_right)) {
+    // Converter coordenadas do mouse para coordenadas do mundo
+    var _world_x = camera_get_view_x(view_camera[0]) + mouse_x;
+    var _world_y = camera_get_view_y(view_camera[0]) + mouse_y;
     
-    // Marcar esta Constellation
-    selecionado = true;
-    ultima_acao = "Selecionada";
-    cor_feedback = c_blue;
-    feedback_timer = 60;
+    // Usar função herdada do obj_navio_base
+    func_ordem_mover(_world_x, _world_y);
     
-    // Atualizar debug_info
-    debug_info.acoes++;
+    // Feedback visual
+    ultima_acao = "Movendo para (" + string(round(_world_x)) + ", " + string(round(_world_y)) + ")";
+    cor_feedback = c_green;
+    feedback_timer = 90;
     
-    show_debug_message("🎯 Constellation SELECIONADA!");
-    show_debug_message("   Posição: (" + string(x) + ", " + string(y) + ")");
-    show_debug_message("   Estado: " + estado);
-    show_debug_message("   HP: " + string(hp_atual) + "/" + string(hp_max));
-    show_debug_message("   Ações: " + string(debug_info.acoes));
+    show_debug_message("🚢 Constellation movendo para: (" + string(round(_world_x)) + ", " + string(round(_world_y)) + ")");
 }

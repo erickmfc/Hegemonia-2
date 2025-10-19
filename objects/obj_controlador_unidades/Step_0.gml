@@ -1,6 +1,20 @@
 /// @description Controle de seleção de unidades - SISTEMA UNIVERSAL COM ZOOM
 
 // =========================================================================
+// LISTA CENTRAL DE UNIDADES SELECIONÁVEIS
+// =========================================================================
+var _unidades_selecionaveis = [
+    obj_Constellation,
+    obj_lancha_patrulha,
+    obj_infantaria,
+    obj_soldado_antiaereo,
+    obj_tanque,
+    obj_blindado_antiaereo,
+    obj_caca_f5,
+    obj_helicoptero_militar
+];
+
+// =========================================================================
 // INÍCIO DO CÓDIGO DE SELEÇÃO UNIVERSAL (COM ZOOM E QUALQUER MAPA)
 // =========================================================================
 
@@ -72,88 +86,15 @@ if (mouse_check_button_pressed(mb_left)) {
     // Agora, em vez de 'mouse_x', usamos nossas novas variáveis _mouse_world_x/y
     var _instancia_selecionada = noone;
     
-    // Verifica navios primeiro para melhor detecção
-    var hit_lp = collision_point(_mouse_world_x, _mouse_world_y, obj_lancha_patrulha, false, true);
-    if (hit_lp != noone) _instancia_selecionada = hit_lp;
-    
-    if (_instancia_selecionada == noone) {
-        // Debug: verificar se há Constellations no jogo
-        var _total_constellations = instance_number(obj_Constellation);
-        show_debug_message("🔍 Total de Constellations no jogo: " + string(_total_constellations));
-        
-        if (_total_constellations > 0) {
-            // Listar posições de todos os Constellations
-            with (obj_Constellation) {
-                show_debug_message("🚢 Constellation ID: " + string(id) + " em (" + string(x) + ", " + string(y) + ")");
-                show_debug_message("🚢 Bbox: left=" + string(bbox_left) + " right=" + string(bbox_right) + " top=" + string(bbox_top) + " bottom=" + string(bbox_bottom));
-            }
+    // --- PASSO 6: Usar as coordenadas CORRETAS para selecionar ---
+    // Itera sobre a lista para encontrar a unidade clicada
+    for (var i = 0; i < array_length(_unidades_selecionaveis); i++) {
+        var _obj = _unidades_selecionaveis[i];
+        var _inst = collision_point(_mouse_world_x, _mouse_world_y, _obj, true, true); // ✅ CORREÇÃO: Colisão precisa ativada
+        if (_inst != noone) {
+            _instancia_selecionada = _inst;
+            break; // Para na primeira unidade encontrada
         }
-        
-        // Tentar diferentes métodos de detecção
-        var hit_constellation = collision_point(_mouse_world_x, _mouse_world_y, obj_Constellation, false, true);
-        show_debug_message("🔍 Resultado collision_point: " + string(hit_constellation));
-        
-        // Método alternativo
-        var hit_constellation_alt = instance_position(_mouse_world_x, _mouse_world_y, obj_Constellation);
-        show_debug_message("🔍 Resultado instance_position: " + string(hit_constellation_alt));
-        
-        // Método manual - verificar se o mouse está dentro da bounding box
-        var hit_constellation_manual = noone;
-        with (obj_Constellation) {
-            show_debug_message("🔍 Verificando Constellation ID: " + string(id));
-            show_debug_message("🔍 Mouse: (" + string(_mouse_world_x) + ", " + string(_mouse_world_y) + ")");
-            show_debug_message("🔍 Bbox: (" + string(bbox_left) + ", " + string(bbox_top) + ") a (" + string(bbox_right) + ", " + string(bbox_bottom) + ")");
-            
-            if (_mouse_world_x >= bbox_left && _mouse_world_x <= bbox_right && 
-                _mouse_world_y >= bbox_top && _mouse_world_y <= bbox_bottom) {
-                hit_constellation_manual = id;
-                show_debug_message("🔍 Constellation detectado via bbox manual!");
-                break;
-            }
-        }
-        show_debug_message("🔍 Resultado bbox manual: " + string(hit_constellation_manual));
-        
-        // Usar o método que funcionar
-        if (hit_constellation_manual != noone) {
-            hit_constellation = hit_constellation_manual;
-        } else if (hit_constellation_alt != noone) {
-            hit_constellation = hit_constellation_alt;
-        }
-        
-        if (hit_constellation != noone) {
-            _instancia_selecionada = hit_constellation;
-            show_debug_message("🚢 CONSTELLATION DETECTADO VIA CONTROLADOR!");
-            show_debug_message("🚢 ID do Constellation: " + string(hit_constellation));
-            show_debug_message("🚢 Posição do mouse: (" + string(_mouse_world_x) + ", " + string(_mouse_world_y) + ")");
-            show_debug_message("🚢 Posição do Constellation: (" + string(hit_constellation.x) + ", " + string(hit_constellation.y) + ")");
-        } else {
-            show_debug_message("❌ NENHUM CONSTELLATION DETECTADO no clique!");
-        }
-    }
-    
-    if (_instancia_selecionada == noone) {
-        var hit_inf = collision_point(_mouse_world_x, _mouse_world_y, obj_infantaria, false, true);
-        if (hit_inf != noone) _instancia_selecionada = hit_inf;
-    }
-    if (_instancia_selecionada == noone) {
-        var hit_aa = collision_point(_mouse_world_x, _mouse_world_y, obj_soldado_antiaereo, false, true);
-        if (hit_aa != noone) _instancia_selecionada = hit_aa;
-    }
-    if (_instancia_selecionada == noone) {
-        var hit_tk = collision_point(_mouse_world_x, _mouse_world_y, obj_tanque, false, true);
-        if (hit_tk != noone) _instancia_selecionada = hit_tk;
-    }
-    if (_instancia_selecionada == noone) {
-        var hit_baa = collision_point(_mouse_world_x, _mouse_world_y, obj_blindado_antiaereo, false, true);
-        if (hit_baa != noone) _instancia_selecionada = hit_baa;
-    }
-    if (_instancia_selecionada == noone) {
-        var hit_f5 = collision_point(_mouse_world_x, _mouse_world_y, obj_caca_f5, false, true);
-        if (hit_f5 != noone) _instancia_selecionada = hit_f5;
-    }
-    if (_instancia_selecionada == noone) {
-        var hit_heli = collision_point(_mouse_world_x, _mouse_world_y, obj_helicoptero_militar, false, true);
-        if (hit_heli != noone) _instancia_selecionada = hit_heli;
     }
 
     // --- PASSO 7: Lógica de Seleção ---
@@ -175,14 +116,10 @@ if (mouse_check_button_pressed(mb_left)) {
         } else {
             // Seleção normal de unidades
             // Desselecionar todas as outras unidades primeiro
-            with (obj_infantaria) { selecionado = false; }
-            with (obj_soldado_antiaereo) { selecionado = false; }
-            with (obj_tanque) { selecionado = false; }
-            with (obj_blindado_antiaereo) { selecionado = false; }
-            with (obj_lancha_patrulha) { selecionado = false; }
-            with (obj_Constellation) { selecionado = false; }
-            with (obj_caca_f5) { selecionado = false; }
-            with (obj_helicoptero_militar) { selecionado = false; }
+            for (var i = 0; i < array_length(_unidades_selecionaveis); i++) {
+                var _obj = _unidades_selecionaveis[i];
+                with (_obj) { selecionado = false; }
+            }
             
             // Selecionar a unidade clicada
             _instancia_selecionada.selecionado = true;
@@ -229,14 +166,10 @@ if (mouse_check_button_pressed(mb_left)) {
             global.esperando_alvo_seguir = noone;
         } else {
             // Desseleção normal
-            with (obj_infantaria) { selecionado = false; }
-            with (obj_soldado_antiaereo) { selecionado = false; }
-            with (obj_tanque) { selecionado = false; }
-            with (obj_blindado_antiaereo) { selecionado = false; }
-            with (obj_lancha_patrulha) { selecionado = false; }
-            with (obj_Constellation) { selecionado = false; }
-            with (obj_caca_f5) { selecionado = false; }
-            with (obj_helicoptero_militar) { selecionado = false; }
+            for (var i = 0; i < array_length(_unidades_selecionaveis); i++) {
+                var _obj = _unidades_selecionaveis[i];
+                with (_obj) { selecionado = false; }
+            }
             global.unidade_selecionada = noone;
             
             show_debug_message("Clique no vazio.");
@@ -252,18 +185,9 @@ if (mouse_check_button_pressed(mb_left)) {
         var _lista_patrulha = noone;
         
         // Determinar qual lista de patrulha usar baseado no objeto
-        if (_unidade.object_index == obj_infantaria) {
-            _lista_patrulha = _unidade.patrulha; // obj_infantaria usa 'patrulha'
-        } else if (_unidade.object_index == obj_lancha_patrulha) {
-            _lista_patrulha = _unidade.pontos_patrulha; // obj_lancha_patrulha usa 'pontos_patrulha'
-        } else if (_unidade.object_index == obj_caca_f5) {
-            _lista_patrulha = _unidade.pontos_patrulha; // obj_caca_f5 usa 'pontos_patrulha'
-        } else if (_unidade.object_index == obj_helicoptero_militar) {
-            _lista_patrulha = _unidade.pontos_patrulha; // obj_helicoptero_militar usa 'pontos_patrulha'
-        } else if (_unidade.object_index == obj_Constellation) {
-            // Constellation não tem sistema de patrulha no código novo
-            _lista_patrulha = noone;
-        } else {
+        if (variable_instance_exists(_unidade, "pontos_patrulha")) {
+             _lista_patrulha = _unidade.pontos_patrulha;
+        } else { // Fallback para sistemas mais antigos
             // Para outros objetos, tentar 'patrol_points' ou 'pontos_patrulha'
             if (variable_instance_exists(_unidade, "patrol_points")) {
                 _lista_patrulha = _unidade.patrol_points;
@@ -333,44 +257,17 @@ if (mouse_check_button(mb_left)) {
         var min_y = min(inicio_selecao_y, world_y);
         var max_y = max(inicio_selecao_y, world_y);
         
-        with (obj_lancha_patrulha) {
-            if (x >= min_x && x <= max_x && y >= min_y && y <= max_y) {
-                selecionado = true;
-                show_debug_message("🚢 Navio incluído na seleção múltipla!");
+        // Refatorado: Itera sobre o array de unidades selecionáveis
+        for (var i = 0; i < array_length(_unidades_selecionaveis); i++) {
+            var _obj = _unidades_selecionaveis[i];
+            
+            with (_obj) {
+                if (x >= min_x && x <= max_x && y >= min_y && y <= max_y) {
+                    selecionado = true;
+                }
             }
         }
-        with (obj_infantaria) {
-            if (x >= min_x && x <= max_x && y >= min_y && y <= max_y) {
-                selecionado = true;
-            }
-        }
-        with (obj_soldado_antiaereo) {
-            if (x >= min_x && x <= max_x && y >= min_y && y <= max_y) {
-                selecionado = true;
-            }
-        }
-        with (obj_tanque) {
-            if (x >= min_x && x <= max_x && y >= min_y && y <= max_y) {
-                selecionado = true;
-            }
-        }
-        with (obj_blindado_antiaereo) {
-            if (x >= min_x && x <= max_x && y >= min_y && y <= max_y) {
-                selecionado = true;
-            }
-        }
-        with (obj_caca_f5) {
-            if (x >= min_x && x <= max_x && y >= min_y && y <= max_y) {
-                selecionado = true;
-                show_debug_message("✈️ F-5 incluído na seleção múltipla!");
-            }
-        }
-        with (obj_helicoptero_militar) {
-            if (x >= min_x && x <= max_x && y >= min_y && y <= max_y) {
-                selecionado = true;
-                show_debug_message("🚁 Helicóptero incluído na seleção múltipla!");
-            }
-        }
+        show_debug_message("🖱️ Seleção múltipla finalizada.");
     }
 }
 
@@ -381,7 +278,7 @@ if (instance_exists(global.unidade_selecionada)) {
     var _unidade = global.unidade_selecionada;
 
     // Comandos para F-5 (COMANDOS CENTRALIZADOS NO INPUT MANAGER)
-    if (_unidade.object_index == obj_caca_f5) {
+    //if (_unidade.object_index == obj_caca_f5) { // Condição removida para generalizar
         // Comandos P e O já estão no Step do próprio F-5
         // Comandos Q e E já estão no obj_input_manager
         // Aqui só mantemos comandos específicos do controlador
@@ -440,7 +337,7 @@ if (instance_exists(global.unidade_selecionada)) {
             show_debug_message("🔍 === FIM DO TESTE ===");
         }
 
-        // Comando de Movimento (Clique Direito)
+        // Comando de Movimento (Clique Direito) - UNIFICADO PARA TODAS AS UNIDADES
         if (mouse_check_button_pressed(mb_right)) {
             // Se estiver definindo patrulha, adiciona um ponto
             if (global.definindo_patrulha == _unidade && variable_instance_exists(_unidade, "pontos_patrulha")) {
@@ -452,81 +349,30 @@ if (instance_exists(global.unidade_selecionada)) {
             else {
                 var _coords = global.scr_mouse_to_world();
                 
-                // Verificar se a unidade tem as variáveis necessárias
-                if (variable_instance_exists(_unidade, "destino_x") && variable_instance_exists(_unidade, "destino_y")) {
-                    _unidade.destino_x = _coords[0];
-                    _unidade.destino_y = _coords[1];
-                    
-                    // Para Constellation, usar sistema simples
-                    if (_unidade.object_index == obj_Constellation) {
-                        _unidade.estado = "movendo";
-                        show_debug_message("🚢 Ordem de movimento para Constellation");
-                        show_debug_message("🚢 Constellation destino: (" + string(_coords[0]) + ", " + string(_coords[1]) + ")");
-                        show_debug_message("🚢 Constellation estado alterado para: " + _unidade.estado);
-                    }
-                    // Para outras unidades
-                    else {
-                        show_debug_message("🎯 Ordem de movimento para " + object_get_name(_unidade.object_index));
-                    }
-                    
-                    // Cancela outros modos se existirem
-                    if (variable_instance_exists(_unidade, "alvo_seguir")) {
-                        _unidade.alvo_seguir = noone;
-                    }
-                    global.definindo_patrulha = noone;
-                }
-            }
-        }
-    }
-    
-    // Comandos para Helicóptero (COMANDOS CENTRALIZADOS NO INPUT MANAGER)
-    if (_unidade.object_index == obj_helicoptero_militar) {
-        // Comandos P e O já estão no Step do próprio helicóptero
-        // Comandos Q e E já estão no obj_input_manager
-        // Aqui só mantemos comandos específicos do controlador
-
-        // Comando de Movimento (Clique Direito)
-        if (mouse_check_button_pressed(mb_right)) {
-            // Se estiver definindo patrulha, adiciona um ponto
-            if (global.definindo_patrulha == _unidade && variable_instance_exists(_unidade, "pontos_patrulha")) {
-                var _coords = global.scr_mouse_to_world();
-                ds_list_add(_unidade.pontos_patrulha, [_coords[0], _coords[1]]);
-                show_debug_message("📍 Ponto de patrulha adicionado");
-            } 
-            // Senão, é uma ordem de movimento normal
-            else {
-                var _coords = global.scr_mouse_to_world();
-                
-                // Verificar se a unidade tem as variáveis necessárias
-                if (variable_instance_exists(_unidade, "destino_x") && variable_instance_exists(_unidade, "destino_y")) {
-                    _unidade.destino_x = _coords[0];
-                    _unidade.destino_y = _coords[1];
-                    
-                    // Para Constellation, usar sistema simples
-                    if (_unidade.object_index == obj_Constellation) {
-                        _unidade.estado = "movendo";
-                        show_debug_message("🚢 Ordem de movimento para Constellation");
-                        show_debug_message("🚢 Constellation destino: (" + string(_coords[0]) + ", " + string(_coords[1]) + ")");
-                        show_debug_message("🚢 Constellation estado alterado para: " + _unidade.estado);
-                    }
-                    // Para helicóptero, usar sistema específico
-                    else if (variable_instance_exists(_unidade, "ESTADO_HELICOPTERO")) {
+                // ✅ CORREÇÃO: Usar a função interna da unidade para dar a ordem de movimento.
+                // Isso garante que a própria unidade lide com seus estados e destinos.
+                if (variable_instance_exists(_unidade, "ordem_mover")) {
+                    _unidade.ordem_mover(_coords[0], _coords[1]);
+                    show_debug_message("🚢 Ordem de movimento enviada para " + object_get_name(_unidade.object_index) + " via função interna.");
+                } 
+                // Fallback para unidades mais antigas que não têm a função 'ordem_mover'
+                else if (variable_instance_exists(_unidade, "ESTADO_HELICOPTERO")) {
                         _unidade.estado = _unidade.estado == ESTADO_HELICOPTERO.POUSADO ? ESTADO_HELICOPTERO.DECOLANDO : ESTADO_HELICOPTERO.MOVENDO;
                         if (_unidade.estado == ESTADO_HELICOPTERO.DECOLANDO) { _unidade.timer_transicao = 60; }
                         show_debug_message("🎯 Ordem de movimento para helicóptero");
-                    }
-                    // Para outras unidades
-                    else {
-                        show_debug_message("🎯 Ordem de movimento para " + object_get_name(_unidade.object_index));
-                    }
-                    
-                    // Cancela outros modos se existirem
-                    if (variable_instance_exists(_unidade, "alvo_seguir")) {
-                        _unidade.alvo_seguir = noone;
-                    }
-                    global.definindo_patrulha = noone;
+                } else {
+                    // Sistema legado para unidades que não usam a função
+                    _unidade.destino_x = _coords[0];
+                    _unidade.destino_y = _coords[1];
+                    show_debug_message("🎯 Ordem de movimento (legado) para " + object_get_name(_unidade.object_index));
                 }
+                    
+                // Cancela outros modos se existirem
+                if (variable_instance_exists(_unidade, "alvo_seguir")) {
+                    _unidade.alvo_seguir = noone;
+                }
+                global.definindo_patrulha = noone;
             }
         }
-    }
+    //} // Fim do if que foi removido
 }

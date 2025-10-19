@@ -3,7 +3,7 @@
   "%Name":"Spr_SkyFury_ar",
   "bboxMode":0,
   "bbox_bottom":3,
-  "bbox_left":1,
+  "bbox_left":0,
   "bbox_right":23,
   "bbox_top":0,
   "collisionKind":1,

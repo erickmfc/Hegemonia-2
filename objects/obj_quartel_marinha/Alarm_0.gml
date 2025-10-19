@@ -26,7 +26,12 @@ if (produzindo && !ds_queue_empty(fila_producao)) {
         show_debug_message("✅ Objeto válido: " + string(_obj_unidade));
         
         // ✅ CORRIGIDO: Usar instance_create_layer em vez de instance_create
-        var _unidade_criada = instance_create_layer(_spawn_x, _spawn_y, "rm_mapa_principal", _obj_unidade);
+        var _unidade_criada = instance_create_layer(_spawn_x, _spawn_y, "Instances", _obj_unidade);
+        
+        // ADICIONAR DEBUG:
+        show_debug_message("🔍 Objeto a ser criado: " + string(_obj_unidade));
+        show_debug_message("🔍 Nome da unidade: " + _unidade_data.nome);
+        show_debug_message("🔍 Posição: (" + string(_spawn_x) + ", " + string(_spawn_y) + ")");
         
         show_debug_message("🔍 Resultado da criação: " + string(_unidade_criada));
         
@@ -38,14 +43,7 @@ if (produzindo && !ds_queue_empty(fila_producao)) {
             show_debug_message("❌ Falha ao criar unidade!");
         }
     } else {
-        // Fallback: usar obj_lancha_patrulha diretamente
-        var _unidade_criada = instance_create_layer(_spawn_x, _spawn_y, "rm_mapa_principal", obj_lancha_patrulha);
-        
-        if (instance_exists(_unidade_criada)) {
-            unidades_produzidas++;
-            _unidade_criada.nacao_proprietaria = nacao_proprietaria;
-            show_debug_message("✅ " + _unidade_data.nome + " criada (fallback)!");
-        }
+        show_debug_message("❌ ERRO: Objeto " + string(_obj_unidade) + " não existe!");
     }
     
     // Próxima unidade da fila

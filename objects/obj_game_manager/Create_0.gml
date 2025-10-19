@@ -32,6 +32,9 @@ if (global.debug_enabled) {
     show_debug_message("Sistema de debug ULTRA otimizado inicializado. Modo: " + string(global.debug_enabled));
 }
 
+// Inicializar enums navais globais
+scr_enums_navais();
+
 // === SISTEMA GLOBAL DE UI ===
 // Configurar sistema de interface global para resolver problemas de fonte
 scr_config_ui_global();

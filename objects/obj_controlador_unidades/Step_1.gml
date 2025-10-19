@@ -1,5 +1,9 @@
 /// @description Controlador de seleção e comandos
 
+// =========================================================================
+// EVENTO DESATIVADO PARA EVITAR CONFLITOS
+// Toda a lógica de seleção e comandos foi centralizada no Step_0.gml
+exit;
 // === COMANDOS AVANÇADOS PARA UNIDADES AÉREAS (REMOVIDOS - DUPLICADOS) ===
 // Comandos E e Q já estão centralizados no obj_input_manager
 // Este código foi removido para evitar duplicação
@@ -26,6 +30,15 @@ if (keyboard_check_pressed(ord("P"))) {
         }
     }
     with (obj_lancha_patrulha) {
+        if (selecionado) {
+            estado = "passivo";
+            alvo = noone;
+            if (variable_instance_exists(id, "modo_combate")) {
+                modo_combate = "passivo";
+            }
+        }
+    }
+    with (obj_Constellation) {
         if (selecionado) {
             estado = "passivo";
             alvo = noone;
@@ -66,6 +79,18 @@ if (keyboard_check_pressed(ord("O"))) {
         }
     }
     with (obj_lancha_patrulha) {
+        if (selecionado) {
+            var inimigo = instance_nearest(x, y, obj_inimigo);
+            if (inimigo != noone) {
+                alvo = inimigo;
+                estado = "atacando";
+                if (variable_instance_exists(id, "modo_combate")) {
+                    modo_combate = "atacando";
+                }
+            }
+        }
+    }
+    with (obj_Constellation) {
         if (selecionado) {
             var inimigo = instance_nearest(x, y, obj_inimigo);
             if (inimigo != noone) {
@@ -118,6 +143,9 @@ if (false && mouse_check_button_pressed(mb_left)) {
     }
     if (unidade_clicada == noone) {
         unidade_clicada = collision_point(world_x, world_y, obj_lancha_patrulha, false, true);
+    }
+    if (unidade_clicada == noone) {
+        unidade_clicada = collision_point(world_x, world_y, obj_Constellation, false, true);
     }
     if (unidade_clicada == noone) {
         unidade_clicada = collision_point(world_x, world_y, obj_nav122, false, true);
@@ -210,6 +238,27 @@ if (false && mouse_check_button_pressed(mb_left)) {
                 }
             }
         }
+        with (obj_Constellation) {
+            if (selecionado && drawing_patrol) {
+                if (ds_list_size(patrol_points) > 0) {
+                    // Há pontos definidos - finalizar e iniciar patrulha
+                    drawing_patrol = false;
+                    patrolling = true;
+                    patrol_index = 0;
+                    estado = "patrulhando";
+                    if (global.debug_enabled) {
+                        show_debug_message("Patrulha iniciada com " + string(ds_list_size(patrol_points)) + " pontos");
+                        show_debug_message("Estado: " + estado);
+                    }
+                } else {
+                    // Não há pontos definidos - cancelar desenho
+                    drawing_patrol = false;
+                    if (global.debug_enabled) {
+                        show_debug_message("Nenhum ponto definido - desenho de patrulha cancelado");
+                    }
+                }
+            }
+        }
     } else {
         // Seleção normal de unidades
         if (unidade_clicada != noone) {
@@ -220,6 +269,7 @@ if (false && mouse_check_button_pressed(mb_left)) {
                 with (obj_tanque) { selecionado = false; }
                 with (obj_blindado_antiaereo) { selecionado = false; }
                 with (obj_lancha_patrulha) { selecionado = false; }
+                with (obj_Constellation) { selecionado = false; }
                 with (obj_nav122) { selecionado = false; }
                 with (obj_porta_avioes) { selecionado = false; }
             }
@@ -235,6 +285,7 @@ if (false && mouse_check_button_pressed(mb_left)) {
                 with (obj_tanque) { selecionado = false; }
                 with (obj_blindado_antiaereo) { selecionado = false; }
                 with (obj_lancha_patrulha) { selecionado = false; }
+                with (obj_Constellation) { selecionado = false; }
                 with (obj_nav122) { selecionado = false; }
                 with (obj_porta_avioes) { selecionado = false; }
             }
@@ -277,6 +328,11 @@ if (mouse_check_button(mb_left)) {
             }
         }
         with (obj_lancha_patrulha) {
+            if (x >= min_x && x <= max_x && y >= min_y && y <= max_y) {
+                selecionado = true;
+            }
+        }
+        with (obj_Constellation) {
             if (x >= min_x && x <= max_x && y >= min_y && y <= max_y) {
                 selecionado = true;
             }
@@ -331,6 +387,12 @@ if (mouse_check_button_pressed(mb_right)) {
         if (selecionado) {
             navio_selecionado = true;
             show_debug_message("🚢 NAVIO SELECIONADO - Sistema de patrulha ignorado");
+        }
+    }
+    with (obj_Constellation) {
+        if (selecionado) {
+            navio_selecionado = true;
+            show_debug_message("🚢 CONSTELLATION SELECIONADO - Sistema de patrulha ignorado");
         }
     }
     
@@ -395,6 +457,11 @@ if (mouse_check_button_pressed(mb_right)) {
             }
         }
         with (obj_lancha_patrulha) {
+            if (selecionado) {
+                ds_list_add(lista_selecionadas, id);
+            }
+        }
+        with (obj_Constellation) {
             if (selecionado) {
                 ds_list_add(lista_selecionadas, id);
             }

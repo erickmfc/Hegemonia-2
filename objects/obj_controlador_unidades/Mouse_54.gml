@@ -1,5 +1,9 @@
 // =========================================================
 // HEGEMONIA GLOBAL - CONTROLE DE MOVIMENTO SIMPLIFICADO
+// EVENTO DESATIVADO PARA EVITAR CONFLITOS
+// Toda a lógica de movimento foi centralizada no Step_0.gml
+exit;
+
 // Sistema otimizado para evitar conflitos com navios
 // =========================================================
 
@@ -33,12 +37,15 @@ if (mouse_check_button_pressed(mb_right)) {
     with (obj_lancha_patrulha) {
         if (selecionado) unidade_selecionada = id;
     }
+    with (obj_Constellation) {
+        if (selecionado) unidade_selecionada = id;
+    }
     
     if (unidade_selecionada != noone) {
         show_debug_message("Unidade selecionada: ID " + string(unidade_selecionada));
         
         // ✅ CORREÇÃO: Aplicar movimento apenas para unidades terrestres
-        if (unidade_selecionada.object_index != obj_lancha_patrulha) {
+        if (unidade_selecionada.object_index != obj_lancha_patrulha && unidade_selecionada.object_index != obj_Constellation) {
             with (unidade_selecionada) {
                 estado = "movendo";
                 
@@ -54,7 +61,7 @@ if (mouse_check_button_pressed(mb_right)) {
         } else {
             show_debug_message("🚢 NAVIO DETECTADO - Executando movimento próprio");
             
-            // ✅ CORREÇÃO: Executar movimento do navio diretamente
+            // ✅ CORREÇÃO: Executar movimento do navio diretamente (Lancha ou Constellation)
             with (unidade_selecionada) {
                 // ✅ CORREÇÃO CRÍTICA: Usar coordenadas já calculadas com zoom
                 destino_x = world_x;
@@ -62,7 +69,8 @@ if (mouse_check_button_pressed(mb_right)) {
                 estado = "movendo";
                 movendo = true;
                 
-                show_debug_message("🚢 Lancha Patrulha movendo para: (" + string(destino_x) + ", " + string(destino_y) + ")");
+                var _nome_navio = (object_index == obj_lancha_patrulha) ? "Lancha Patrulha" : "Constellation";
+                show_debug_message("🚢 " + _nome_navio + " movendo para: (" + string(destino_x) + ", " + string(destino_y) + ")");
                 show_debug_message("🚢 Estado: " + string(estado) + " | Movendo: " + string(movendo));
             }
         }

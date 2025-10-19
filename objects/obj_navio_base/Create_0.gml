@@ -24,7 +24,6 @@ alvo_x = x;
 alvo_y = y;
 
 // Patrulha
-modo_definicao_patrulha = false;
 pontos_patrulha = ds_list_create();
 indice_patrulha_atual = 0;
 
@@ -40,6 +39,8 @@ nome_unidade = "Lancha Patrulha";
 
 // Variáveis auxiliares
 alvo_unidade = noone; // id da instancia inimiga a atacar
+alvo_pos_anterior_x = -1; // Rastreamento de posição anterior do alvo
+alvo_pos_anterior_y = -1; // Rastreamento de posição anterior do alvo
 
 // --- VARIÁVEIS ADAPTADAS DO F5 (APÓS DEFINIR TODAS AS VARIÁVEIS) ---
 estado_anterior = LanchaState.PARADO; // Guarda estado anterior para retorno após ataque
@@ -50,19 +51,15 @@ velocidade_atual = velocidade_movimento; // Mapeamento para compatibilidade
 timer_ataque = reload_timer; // Mapeamento para compatibilidade
 destino_x = alvo_x; // Mapeamento para compatibilidade
 destino_y = alvo_y; // Mapeamento para compatibilidade
-indice_patrulha = indice_patrulha_atual; // Mapeamento para compatibilidade
-estado_string = "parado"; // Estado em string para compatibilidade
 
 // Funções da lancha
 ordem_mover = function(dest_x, dest_y) {
-    alvo_x = dest_x;
-    alvo_y = dest_y;
-    destino_x = dest_x; // Sincronizar
-    destino_y = dest_y; // Sincronizar
+    destino_x = dest_x;
+    destino_y = dest_y;
     estado = LanchaState.MOVENDO;
-    estado_string = "movendo"; // Sincronizar
-    modo_definicao_patrulha = false;
-    if (global.debug_enabled) show_debug_message("🚢 Ordem de movimento: (" + string(dest_x) + ", " + string(dest_y) + ")");
+    alvo_unidade = noone; // Cancela qualquer alvo de ataque
+    
+    show_debug_message("🚢 " + nome_unidade + " recebeu ordem de movimento para (" + string(dest_x) + ", " + string(dest_y) + "). Estado: MOVENDO");
 }
 
 // Mantém compatibilidade
@@ -74,34 +71,25 @@ func_adicionar_ponto = function(px, py) {
 
 func_iniciar_patrulha = function() {
     if (ds_list_size(pontos_patrulha) > 0) {
-        indice_patrulha_atual = 0;
-        indice_patrulha = 0; // Sincronizar
+        indice_patrulha_atual = 0; 
         var p = pontos_patrulha[| indice_patrulha_atual];
-        alvo_x = p[0];
-        alvo_y = p[1];
-        destino_x = p[0]; // Sincronizar
-        destino_y = p[1]; // Sincronizar
+        destino_x = p[0];
+        destino_y = p[1];
         estado = LanchaState.PATRULHANDO;
-        estado_string = "patrulhando"; // Sincronizar
     } else {
         estado = LanchaState.PARADO;
-        estado_string = "parado"; // Sincronizar
     }
 }
 
 func_proximo_ponto = function() {
     if (ds_list_size(pontos_patrulha) == 0) {
         estado = LanchaState.PARADO;
-        estado_string = "parado"; // Sincronizar
         return;
     }
     indice_patrulha_atual = (indice_patrulha_atual + 1) mod ds_list_size(pontos_patrulha);
-    indice_patrulha = indice_patrulha_atual; // Sincronizar
     var p = pontos_patrulha[| indice_patrulha_atual];
-    alvo_x = p[0];
-    alvo_y = p[1];
-    destino_x = p[0]; // Sincronizar
-    destino_y = p[1]; // Sincronizar
+    destino_x = p[0];
+    destino_y = p[1];
 }
 
 func_procurar_inimigo = function() {
@@ -123,7 +111,6 @@ func_atacar_alvo = function() {
     if (!instance_exists(alvo_unidade)) {
         alvo_unidade = noone;
         estado = LanchaState.PARADO;
-        estado_string = "parado"; // Sincronizar
         return;
     }
     var d = point_distance(x, y, alvo_unidade.x, alvo_unidade.y);
@@ -137,10 +124,8 @@ func_atacar_alvo = function() {
             _tiro.direction = point_direction(x, y, alvo_unidade.x, alvo_unidade.y);
             reload_timer = reload_time;
             timer_ataque = reload_timer; // Sincronizar
-            if (global.debug_enabled) show_debug_message("🚢 Tiro disparado!");
         }
         estado = LanchaState.ATACANDO;
-        estado_string = "atacando"; // Sincronizar
     } else {
         ordem_mover(alvo_unidade.x, alvo_unidade.y);
     }
@@ -160,40 +145,4 @@ if (!ds_exists(pontos_patrulha, ds_type_list)) {
     pontos_patrulha = ds_list_create();
 }
 
-// --- FUNÇÕES DE SINCRONIZAÇÃO (ADICIONADAS) ---
-func_sincronizar_timers = function() {
-    velocidade_atual = velocidade_movimento;
-    timer_ataque = reload_timer;
-}
-
-func_atualizar_modo_ataque = function() {
-    modo_ataque = (modo_combate == LanchaMode.ATAQUE);
-}
-
-func_sincronizar_destino = function() {
-    destino_x = alvo_x;
-    destino_y = alvo_y;
-}
-
-func_sincronizar_estado = function() {
-    switch (estado) {
-        case LanchaState.PARADO:
-            estado_string = "parado";
-            break;
-        case LanchaState.MOVENDO:
-            estado_string = "movendo";
-            break;
-        case LanchaState.PATRULHANDO:
-            estado_string = "patrulhando";
-            break;
-        case LanchaState.ATACANDO:
-            estado_string = "atacando";
-            break;
-    }
-}
-
-func_sincronizar_indice = function() {
-    indice_patrulha = indice_patrulha_atual;
-}
-
-if (global.debug_enabled) show_debug_message("🚢 Lancha Patrulha criada!");
+show_debug_message("🚢 " + nome_unidade + " base criada!");

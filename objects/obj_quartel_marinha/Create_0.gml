@@ -39,6 +39,9 @@ if (object_exists(obj_Constellation)) {
         tempo_treino: 180,    // ✅ 3 SEGUNDOS (180 frames)
         descricao: "Navio de guerra avançado com sistema de mísseis"
     });
+    show_debug_message("✅ Constellation adicionado à lista de unidades!");
+} else {
+    show_debug_message("❌ ERRO: obj_Constellation não existe!");
 }
 
 // === SISTEMA DE SELEÇÃO ===

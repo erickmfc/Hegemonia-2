@@ -1,28 +1,21 @@
 // ===============================================
-// HEGEMONIA GLOBAL - CONSTELLATION FUNCIONAL
-// Sistema de Seleção e Movimento
+// HEGEMONIA GLOBAL - CONSTELLATION
+// Clique Esquerdo - Adicionar Ponto de Patrulha (APENAS SE SELECIONADO)
 // ===============================================
 
-// === SELEÇÃO ===
-if (mouse_check_button_pressed(mb_left)) {
-    // Desmarcar outras unidades
-    with (obj_infantaria) { selecionado = false; }
-    with (obj_soldado_antiaereo) { selecionado = false; }
-    with (obj_tanque) { selecionado = false; }
-    with (obj_blindado_antiaereo) { selecionado = false; }
-    with (obj_lancha_patrulha) { selecionado = false; }
-    with (obj_caca_f5) { selecionado = false; }
-    with (obj_helicoptero_militar) { selecionado = false; }
+// === ADICIONAR PONTO DE PATRULHA (APENAS SE SELECIONADO) ===
+if (selecionado && mouse_check_button_pressed(mb_left)) {
+    // Converter coordenadas do mouse para coordenadas do mundo
+    var _world_x = camera_get_view_x(view_camera[0]) + mouse_x;
+    var _world_y = camera_get_view_y(view_camera[0]) + mouse_y;
     
-    // Marcar este Constellation
-    selecionado = true;
-    ultima_acao = "Selecionado";
+    // Usar função herdada do obj_navio_base
+    func_adicionar_ponto(_world_x, _world_y);
+    
+    // Feedback visual
+    ultima_acao = "Ponto adicionado: (" + string(round(_world_x)) + ", " + string(round(_world_y)) + ")";
     cor_feedback = c_blue;
-    feedback_timer = 60;
-    debug_info.acoes++;
+    feedback_timer = 90;
     
-    show_debug_message("🎯 Constellation SELECIONADO!");
-    show_debug_message("   Posição: (" + string(x) + ", " + string(y) + ")");
-    show_debug_message("   Estado: " + estado);
-    show_debug_message("   HP: " + string(hp_atual) + "/" + string(hp_max));
+    show_debug_message("🚢 Constellation adicionou ponto de patrulha: (" + string(round(_world_x)) + ", " + string(round(_world_y)) + ")");
 }

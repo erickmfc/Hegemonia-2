@@ -17,6 +17,9 @@ function scr_inicializar_sistema() {
     global.construindo_agora = noone;
     global.unidade_selecionada = noone;
     
+    // Inicializar enums navais globais
+    scr_enums_navais();
+    
     // Inicializar sistema de recursos
     scr_inicializar_recursos();
     

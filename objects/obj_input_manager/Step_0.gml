@@ -34,6 +34,8 @@ if (instance_exists(global.definindo_patrulha_unidade)) {
                 _unidade.estado = "patrulhando";
             } else if (object_get_name(_unidade.object_index) == "obj_lancha_patrulha") {
                 _unidade.estado = LanchaState.PATRULHANDO;
+            } else if (object_get_name(_unidade.object_index) == "obj_Constellation") {
+                _unidade.estado = LanchaState.PATRULHANDO;
             }
             
             _unidade.indice_patrulha_atual = 0;
@@ -48,6 +50,8 @@ if (instance_exists(global.definindo_patrulha_unidade)) {
                 _unidade.estado = "pousado";
             } else if (object_get_name(_unidade.object_index) == "obj_lancha_patrulha") {
                 _unidade.estado = LanchaState.PARADO;
+            } else if (object_get_name(_unidade.object_index) == "obj_Constellation") {
+                _unidade.estado = LanchaState.PARADO;
             }
             show_debug_message("❌ PATRULHA CANCELADA - mínimo de 2 pontos necessários");
         }
@@ -60,6 +64,7 @@ else {
     if (mouse_check_button_pressed(mb_left)) {
         var _unidade_aerea = instance_position(_mx, _my, obj_caca_f5);
         var _unidade_naval = instance_position(_mx, _my, obj_lancha_patrulha);
+        var _unidade_constellation = instance_position(_mx, _my, obj_Constellation);
         
         // Desseleciona unidade anterior
         if (instance_exists(global.unidade_selecionada)) {
@@ -76,6 +81,11 @@ else {
             global.unidade_selecionada = _unidade_naval;
             _unidade_naval.selecionado = true;
             show_debug_message("🚢 Lancha Patrulha selecionada");
+        } else if (instance_exists(_unidade_constellation)) {
+            // Seleciona Constellation
+            global.unidade_selecionada = _unidade_constellation;
+            _unidade_constellation.selecionado = true;
+            show_debug_message("🚢 Constellation selecionado");
         } else {
             // Desseleciona se clicou em lugar vazio
             global.unidade_selecionada = noone;
@@ -90,6 +100,8 @@ else {
         if (object_get_name(_unidade.object_index) == "obj_caca_f5") {
             _unidade.estado = "movendo";
         } else if (object_get_name(_unidade.object_index) == "obj_lancha_patrulha") {
+            _unidade.estado = LanchaState.MOVENDO;
+        } else if (object_get_name(_unidade.object_index) == "obj_Constellation") {
             _unidade.estado = LanchaState.MOVENDO;
         }
         
@@ -110,6 +122,8 @@ else {
             show_debug_message("🎯 Ordem de movimento para F-5");
         } else if (object_get_name(_unidade.object_index) == "obj_lancha_patrulha") {
             show_debug_message("🎯 Ordem de movimento para Lancha Patrulha");
+        } else if (object_get_name(_unidade.object_index) == "obj_Constellation") {
+            show_debug_message("🎯 Ordem de movimento para Constellation");
         }
     }
 }
