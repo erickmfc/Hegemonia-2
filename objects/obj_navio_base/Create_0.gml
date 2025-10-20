@@ -54,8 +54,11 @@ destino_y = alvo_y; // Mapeamento para compatibilidade
 
 // Funções da lancha
 ordem_mover = function(dest_x, dest_y) {
-    destino_x = dest_x;
-    destino_y = dest_y;
+    // Clamp destino para dentro da sala
+    var _dx = clamp(dest_x, 8, room_width - 8);
+    var _dy = clamp(dest_y, 8, room_height - 8);
+    destino_x = _dx;
+    destino_y = _dy;
     estado = LanchaState.MOVENDO;
     alvo_unidade = noone; // Cancela qualquer alvo de ataque
     

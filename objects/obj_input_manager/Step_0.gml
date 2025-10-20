@@ -22,13 +22,17 @@ if (instance_exists(global.definindo_patrulha_unidade)) {
 
     // Clique esquerdo ADICIONA um ponto à rota
     if (mouse_check_button_pressed(mb_left)) {
-        ds_list_add(_unidade.pontos_patrulha, [_mx, _my]);
-        show_debug_message("📍 Ponto de patrulha adicionado: (" + string(_mx) + ", " + string(_my) + ")");
+        if (variable_instance_exists(_unidade, "pontos_patrulha") && ds_exists(_unidade.pontos_patrulha, ds_type_list)) {
+            ds_list_add(_unidade.pontos_patrulha, [_mx, _my]);
+            show_debug_message("📍 Ponto de patrulha adicionado: (" + string(_mx) + ", " + string(_my) + ")");
+        } else {
+            show_debug_message("❌ ERRO: pontos_patrulha não existe para " + object_get_name(_unidade.object_index));
+        }
     }
 
     // Clique direito FINALIZA a rota e inicia a patrulha
     if (mouse_check_button_pressed(mb_right)) {
-        if (ds_list_size(_unidade.pontos_patrulha) > 1) {
+        if (variable_instance_exists(_unidade, "pontos_patrulha") && ds_exists(_unidade.pontos_patrulha, ds_type_list) && ds_list_size(_unidade.pontos_patrulha) > 1) {
             // ✅ CORREÇÃO: Usar estados corretos baseados no tipo de unidade
             if (object_get_name(_unidade.object_index) == "obj_caca_f5") {
                 _unidade.estado = "patrulhando";
@@ -39,9 +43,11 @@ if (instance_exists(global.definindo_patrulha_unidade)) {
             }
             
             _unidade.indice_patrulha_atual = 0;
-            var _ponto = _unidade.pontos_patrulha[| 0];
-            _unidade.destino_x = _ponto[0];
-            _unidade.destino_y = _ponto[1];
+            if (ds_list_size(_unidade.pontos_patrulha) > 0) {
+                var _ponto = _unidade.pontos_patrulha[| 0];
+                _unidade.destino_x = _ponto[0];
+                _unidade.destino_y = _ponto[1];
+            }
             show_debug_message("🔄 PATRULHA INICIADA com " + string(ds_list_size(_unidade.pontos_patrulha)) + " pontos!");
             show_debug_message("🚢 Unidade começará a patrulhar automaticamente");
         } else {
@@ -108,13 +114,16 @@ else {
             _unidade.estado = "movendo";
         }
         
-        _unidade.destino_x = _mx;
-        _unidade.destino_y = _my;
+        // Clamp do destino para evitar ordens fora do mapa (área preta)
+        var _tx = clamp(_mx, 8, room_width - 8);
+        var _ty = clamp(_my, 8, room_height - 8);
+        _unidade.destino_x = _tx;
+        _unidade.destino_y = _ty;
 
         // ======================================================================
         // ✅ NOVA LÓGICA: CANCELAR E LIMPAR A PATRULHA ANTERIOR
         // ======================================================================
-        if (ds_list_size(_unidade.pontos_patrulha) > 0) {
+        if (variable_instance_exists(_unidade, "pontos_patrulha") && ds_exists(_unidade.pontos_patrulha, ds_type_list) && ds_list_size(_unidade.pontos_patrulha) > 0) {
             ds_list_clear(_unidade.pontos_patrulha);
             show_debug_message("🔄 Patrulha cancelada por nova ordem de movimento.");
         }

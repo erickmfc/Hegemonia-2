@@ -49,14 +49,31 @@ if (mouse_check_button_pressed(mb_right)) {
             with (unidade_selecionada) {
                 estado = "movendo";
                 
-                // ✅ CORREÇÃO: Usar coordenadas do mundo
-                var world_x_local = camera_get_view_x(view_camera[0]) + mouse_x;
-                var world_y_local = camera_get_view_y(view_camera[0]) + mouse_y;
+                // ✅ CORREÇÃO CRÍTICA: Usar função global para coordenadas consistentes
+                var _coords = global.scr_mouse_to_world();
+                var world_x_local = _coords[0];
+                var world_y_local = _coords[1];
                 
-                destino_x = world_x_local;
-                destino_y = world_y_local;
+                // Clamp para dentro da sala
+                var _tx = clamp(world_x_local, 8, room_width - 8);
+                var _ty = clamp(world_y_local, 8, room_height - 8);
                 
-                show_debug_message("Unidade terrestre movendo para: (" + string(world_x_local) + ", " + string(world_y_local) + ")");
+                // ✅ CORREÇÃO ADICIONAL: Verificar se o destino é muito diferente do atual
+                var _distancia_atual = point_distance(x, y, _tx, _ty);
+                var _distancia_anterior = point_distance(x, y, destino_x, destino_y);
+                
+                // Se o novo destino é muito diferente do anterior, pode ser um erro de zoom
+                if (_distancia_anterior > 0 && abs(_distancia_atual - _distancia_anterior) > 200) {
+                    show_debug_message("⚠️ AVISO: Destino muito diferente detectado - pode ser erro de zoom");
+                    show_debug_message("   Distância anterior: " + string(_distancia_anterior) + " | Nova: " + string(_distancia_atual));
+                    show_debug_message("   Destino anterior: (" + string(destino_x) + ", " + string(destino_y) + ")");
+                    show_debug_message("   Novo destino: (" + string(_tx) + ", " + string(_ty) + ")");
+                }
+                
+                destino_x = _tx;
+                destino_y = _ty;
+                
+                show_debug_message("Unidade terrestre movendo para: (" + string(destino_x) + ", " + string(destino_y) + ")");
             }
         } else {
             show_debug_message("🚢 NAVIO DETECTADO - Executando movimento próprio");

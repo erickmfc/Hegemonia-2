@@ -5,7 +5,7 @@ dano = 70; // Dano do míssil terrestre
 dono = noone; // Quem disparou
 // audio_play_sound(snd_foguete_voando, 0, true); // Temporariamente desabilitado para debug
 target = noone;
-alarm[0] = room_speed * 6;
+alarm[0] = room_speed * 2; // Autodestruição após 2 segundos se não acertar
 
 // Configurações visuais
 image_xscale = 1.0; // Escala horizontal

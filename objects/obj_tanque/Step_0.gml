@@ -28,9 +28,14 @@ if (estado != "movendo") {
 if (selecionado) {
     // Mover com clique direito
     if (mouse_check_button_pressed(mb_right) && !modo_patrulha) {
-        // Mesma conversão usada na infantaria (view -> mundo)
-        var world_x = camera_get_view_x(view_camera[0]) + mouse_x;
-        var world_y = camera_get_view_y(view_camera[0]) + mouse_y;
+        // ✅ CORREÇÃO: Usar função global para coordenadas precisas
+        var _coords = global.scr_mouse_to_world();
+        var world_x = _coords[0];
+        var world_y = _coords[1];
+        
+        // ✅ CORREÇÃO CRÍTICA: Clamp para dentro da sala
+        world_x = clamp(world_x, 8, room_width - 8);
+        world_y = clamp(world_y, 8, room_height - 8);
         
         // Contar unidades selecionadas (infantaria + tanque)
         var unidades_selecionadas = 0;
@@ -112,8 +117,15 @@ if (selecionado) {
     
     // Adicionar pontos de patrulha com clique direito quando em modo patrulha
     if (modo_patrulha && mouse_check_button_pressed(mb_right)) {
-        var px = camera_get_view_x(view_camera[0]) + mouse_x;
-        var py = camera_get_view_y(view_camera[0]) + mouse_y;
+        // ✅ CORREÇÃO: Usar função global para coordenadas precisas
+        var _coords = global.scr_mouse_to_world();
+        var px = _coords[0];
+        var py = _coords[1];
+        
+        // ✅ CORREÇÃO CRÍTICA: Clamp para dentro da sala
+        px = clamp(px, 8, room_width - 8);
+        py = clamp(py, 8, room_height - 8);
+        
         var pos = [px, py];
         ds_list_add(patrulha, pos);
         

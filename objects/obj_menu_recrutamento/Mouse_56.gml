@@ -102,40 +102,51 @@ for (var i = 0; i < min(4, ds_list_size(_unidades)); i++) {
         var _disponivel = _can_afford && _quartel_livre;
         
         if (_disponivel) {
-            if (global.debug_enabled) show_debug_message("Recrutando 1 unidade: " + _unidade.nome);
+            // Sistema de múltiplas unidades
+            var _quantidade = 1; // Quantidade padrão
             
-            // Verificar se o quartel existe e não está treinando
+            // Verificar se Shift está pressionado para 5 unidades
+            if (keyboard_check(vk_shift)) {
+                _quantidade = 5;
+                if (global.debug_enabled) show_debug_message("🚀 MODO RÁPIDO: Criando 5 unidades!");
+            }
+            // Verificar se Ctrl está pressionado para 10 unidades
+            else if (keyboard_check(vk_control)) {
+                _quantidade = 10;
+                if (global.debug_enabled) show_debug_message("🚀 MODO MASSIVO: Criando 10 unidades!");
+            }
+            
+            if (global.debug_enabled) show_debug_message("Recrutando " + string(_quantidade) + " unidades: " + _unidade.nome);
+            
+            // ✅ SISTEMA DE FILA - SEMPRE ADICIONAR À FILA
             if (instance_exists(id_do_quartel)) {
-                if (id_do_quartel.esta_treinando) {
-                    if (global.debug_enabled) show_debug_message("Quartel já está treinando uma unidade!");
-                } else {
-                    if (global.debug_enabled) show_debug_message("Enviando ordem de recrutamento - Quartel ID: " + string(id_do_quartel));
+                if (global.debug_enabled) show_debug_message("Adicionando à fila de recrutamento - Quartel ID: " + string(id_do_quartel));
+                
+                // Adicionar múltiplas unidades à fila
+                for (var j = 0; j < _quantidade; j++) {
+                    // Adicionar à fila de recrutamento (nome correto da variável)
+                    ds_queue_enqueue(id_do_quartel.fila_recrutamento, i); // Índice da unidade
                     
-                    // Definir a quantidade e unidade no quartel
-                    id_do_quartel.quantidade_recrutar = 1;
-                    id_do_quartel.unidade_selecionada = i; // Selecionar a unidade clicada
-                    
-                    // Enviar ordem para o quartel
+                    if (global.debug_enabled) show_debug_message("Unidade " + string(j+1) + "/" + string(_quantidade) + " adicionada à fila");
+                }
+                
+                // Se não está treinando, iniciar produção
+                if (!id_do_quartel.esta_treinando) {
                     with (id_do_quartel) {
-                        event_perform(ev_other, ev_user0);
+                        event_perform(ev_other, ev_user0); // Iniciar produção
                     }
                 }
+                
+                // Ativar animação de confirmação
+                recruitment_confirmation = true;
+                confirmation_timer = 30; // 30 frames de animação
+                confirmation_text = string(_quantidade) + "x " + _unidade.nome + " adicionado à fila!";
+                confirmation_color = make_color_rgb(50, 205, 50);
+                
+                if (global.debug_enabled) show_debug_message("✅ " + string(_quantidade) + " unidades adicionadas à fila de produção!");
             } else {
                 if (global.debug_enabled) show_debug_message("ERRO: Quartel não encontrado (ID: " + string(id_do_quartel) + ")");
             }
-            
-            // NÃO fechar o menu - manter aberto para recrutar mais unidades
-            // global.menu_recrutamento_aberto = false;
-            // instance_destroy();
-            
-            // Adicionar feedback visual de recrutamento
-            if (global.debug_enabled) show_debug_message("Unidade " + _unidade.nome + " adicionada à fila de recrutamento!");
-            
-            // Ativar animação de confirmação
-            recruitment_confirmation = true;
-            confirmation_timer = 30; // 30 frames de animação
-            confirmation_text = _unidade.nome + " em treinamento!";
-            confirmation_color = make_color_rgb(50, 205, 50);
         } else {
             if (!_can_afford) {
                 if (global.debug_enabled) show_debug_message("Recursos insuficientes para recrutar " + _unidade.nome);

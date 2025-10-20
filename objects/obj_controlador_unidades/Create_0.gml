@@ -15,3 +15,6 @@ if (!variable_global_exists("definindo_patrulha_unidade")) {
 if (!variable_global_exists("unidade_selecionada")) {
     global.unidade_selecionada = noone;
 }
+if (!variable_global_exists("unidades_selecionadas")) {
+    global.unidades_selecionadas = ds_list_create();
+}

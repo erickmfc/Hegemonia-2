@@ -185,6 +185,56 @@ if (ds_list_size(_unidades) > 1) {
     scr_desenhar_botao_ui(_btn_x, _btn_y, _btn_w, _btn_h, "PRODUZIR", _pode_produzir_heli, 0.9);
 }
 
+// === UNIDADE 3: C-100 TRANSPORTE ===
+if (ds_list_size(_unidades) > 2) {
+    var _unidade_c100 = ds_list_find_value(_unidades, 2);
+    
+    var _card_w = _mw - 40;
+    var _card_h = 100;
+    var _card_x = _mx + 20;
+    var _card_y = _content_start_y + 240;
+    
+    var _pode_produzir_c100 = (global.dinheiro >= _unidade_c100.custo_dinheiro);
+    var _card_color = _pode_produzir_c100 ? make_color_rgb(30, 45, 70) : make_color_rgb(45, 30, 30);
+    var _border_color = _pode_produzir_c100 ? make_color_rgb(70, 130, 200) : make_color_rgb(200, 80, 80);
+    
+    draw_set_color(_card_color);
+    draw_set_alpha(0.9);
+    draw_roundrect_ext(_card_x, _card_y, _card_x + _card_w, _card_y + _card_h, 8, 8, false);
+    draw_set_alpha(1);
+    
+    draw_set_color(_border_color);
+    draw_roundrect_ext(_card_x, _card_y, _card_x + _card_w, _card_y + _card_h, 8, 8, true);
+    
+    if (sprite_exists(spr_c100)) {
+        var _icon_x = _card_x + 20;
+        var _icon_y = _card_y + _card_h/2;
+        draw_sprite_ext(spr_c100, 0, _icon_x, _icon_y, 2.0, 2.0, 0, c_white, 1);
+    }
+    
+    var _info_x = _card_x + 80;
+    var _info_y = _card_y + 20;
+    draw_set_halign(fa_left);
+    draw_set_color(c_white);
+    scr_desenhar_texto_ui(_info_x, _info_y, _unidade_c100.nome, 1.0, 1.0);
+    _info_y += 25;
+    draw_set_color(make_color_rgb(180, 200, 220));
+    scr_desenhar_texto_ui(_info_x, _info_y, _unidade_c100.descricao, 0.8, 0.8);
+    _info_y += 20;
+    draw_set_color(make_color_rgb(255, 215, 0));
+    scr_desenhar_texto_ui(_info_x, _info_y, "Custo: $" + string(_unidade_c100.custo_dinheiro), 0.9, 0.9);
+    _info_y += 20;
+    draw_set_color(make_color_rgb(150, 150, 150));
+    scr_desenhar_texto_ui(_info_x, _info_y, "População: " + string(_unidade_c100.custo_populacao), 0.8, 0.8);
+    
+    var _btn_w = 120;
+    var _btn_h = 35;
+    var _btn_x = _card_x + _card_w - _btn_w - 15;
+    var _btn_y = _card_y + (_card_h - _btn_h) / 2;
+    
+    scr_desenhar_botao_ui(_btn_x, _btn_y, _btn_w, _btn_h, "PRODUZIR", _pode_produzir_c100, 0.9);
+}
+
 // === STATUS DE PRODUÇÃO ===
 if (id_do_aeroporto.produzindo) {
     var _status_y = _my + _mh - 60;

@@ -278,6 +278,20 @@ draw_set_color(make_color_rgb(255, 255, 255));
 draw_text_transformed(_close_x + _close_w/2, _close_y + _close_h/2, "FECHAR", 1.0, 1.0, 0);
 draw_set_alpha(1.0);
 
+// === CONTROLES DE QUANTIDADE ===
+var _controls_y = _close_y - 80;
+var _controls_x = _menu_x + 20;
+
+draw_set_halign(fa_left);
+draw_set_valign(fa_top);
+draw_set_color(make_color_rgb(100, 150, 200));
+draw_text_transformed(_controls_x, _controls_y, "CONTROLES DE QUANTIDADE:", 0.8, 0.8, 0);
+
+draw_set_color(make_color_rgb(255, 255, 255));
+draw_text_transformed(_controls_x, _controls_y + 20, "• Clique normal: 1 unidade", 0.7, 0.7, 0);
+draw_text_transformed(_controls_x, _controls_y + 35, "• Shift + Clique: 5 unidades", 0.7, 0.7, 0);
+draw_text_transformed(_controls_x, _controls_y + 50, "• Ctrl + Clique: 10 unidades", 0.7, 0.7, 0);
+
 // Reset
 draw_set_halign(fa_left);
 draw_set_valign(fa_top);

@@ -168,22 +168,28 @@ if (global.barras_vida_ativas) {
         desenhar_barra_avancada(id, -30);
     }
 
-    // UNIDADES TERRESTRES
+    // UNIDADES TERRESTRES - NÃO MOSTRAR STATUS SE ESTIVEREM DENTRO DO AVIÃO
     with (obj_infantaria) {
-        if (nacao_proprietaria == 1) {
+        if (nacao_proprietaria == 1 && visible) { // Só mostrar se estiver visível (não embarcada)
             desenhar_barra_basica(id, -20);
         }
     }
 
     with (obj_tanque) {
-        if (nacao_proprietaria == 1) {
+        if (nacao_proprietaria == 1 && visible) { // Só mostrar se estiver visível (não embarcada)
             desenhar_barra_basica(id, -25);
         }
     }
 
     with (obj_blindado_antiaereo) {
-        if (nacao_proprietaria == 1) {
+        if (nacao_proprietaria == 1 && visible) { // Só mostrar se estiver visível (não embarcada)
             desenhar_barra_basica(id, -25);
+        }
+    }
+
+    with (obj_soldado_antiaereo) {
+        if (nacao_proprietaria == 1 && visible) { // Só mostrar se estiver visível (não embarcada)
+            desenhar_barra_basica(id, -20);
         }
     }
 

@@ -29,6 +29,36 @@ if (target == noone) {
 if (instance_exists(target)) {
     var ang = point_direction(x, y, target.x, target.y);
     var _turn = (variable_instance_exists(id, "turn_rate") ? turn_rate : 0.14);
+    
+    // --- REDIRECIONAMENTO PARA FLARES (C-100) ---
+    // Se o alvo é um C-100 e está em modo evasivo, procurar flares
+    if (target.object_index == obj_c100 && target.modo_evadindo) {
+        var _flare_mais_quente = noone;
+        var _maior_calor = 0;
+        var _menor_distancia = 999999;
+        
+        // Procurar flares ativos do C-100
+        with (obj_fumaca_missil) {
+            if (variable_instance_exists(id, "is_flare") && is_flare && 
+                variable_instance_exists(id, "dono") && dono == target.id &&
+                variable_instance_exists(id, "heat") && heat > _maior_calor) {
+                
+                var _dist = point_distance(other.x, other.y, x, y);
+                if (_dist <= 120) { // Raio de atração dos flares
+                    _flare_mais_quente = id;
+                    _maior_calor = heat;
+                    _menor_distancia = _dist;
+                }
+            }
+        }
+        
+        // Se encontrou flare, redirecionar para ele
+        if (instance_exists(_flare_mais_quente)) {
+            ang = point_direction(x, y, _flare_mais_quente.x, _flare_mais_quente.y);
+            show_debug_message("🎯 SkyFury redirecionado para flare do C-100");
+        }
+    }
+    
     direction = lerp(direction, ang, _turn); // curva agressiva
 }
 

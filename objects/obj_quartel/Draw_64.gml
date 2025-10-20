@@ -81,14 +81,26 @@ if (mostrar_menu) {
     
     // Recursos disponíveis
     var _res_y = _info_y + 50;
+    var _res_x = _info_x + 15 + (_info_w * 0.05); // Mover 5% para a direita
+    
+    // Diminuir tamanho da fonte em 10%
+    var _font_size = draw_get_font_size();
+    draw_set_font_size(_font_size * 0.9);
+    
     draw_set_color(make_color_rgb(255, 215, 0));
-    draw_text(_info_x + 15, _res_y, "💰 Dinheiro: $" + string(global.dinheiro));
+    draw_text(_res_x, _res_y, "💰 Dinheiro: $" + string(global.dinheiro));
     
     draw_set_color(make_color_rgb(192, 192, 192));
-    draw_text(_info_x + 15, _res_y + 25, "👥 População: " + string(global.populacao) + "/20");
+    draw_text(_res_x, _res_y + 25, "👥 População: " + string(global.populacao) + "/20");
     
-    // Status do quartel
+    // Restaurar tamanho da fonte
+    draw_set_font_size(_font_size);
+    
+    // Status do quartel - diminuir tamanho em 5%
     var _status_y = _res_y + 60;
+    var _status_font_size = draw_get_font_size();
+    draw_set_font_size(_status_font_size * 0.95); // Diminuir 5%
+    
     draw_set_color(make_color_rgb(200, 220, 240));
     draw_text(_info_x + 15, _status_y, "🏛️ Status do Quartel:");
     
@@ -107,9 +119,12 @@ if (mostrar_menu) {
         draw_text(_info_x + 15, _status_y + 25, "❌ Erro");
     }
     
-    // === GRID DE UNIDADES (2x2) ===
+    // Restaurar tamanho da fonte
+    draw_set_font_size(_status_font_size);
+    
+    // === GRID DE UNIDADES (2x2) - descer em 10% ===
     var _grid_x = _mx + 20;
-    var _grid_y = _my + _header_h + 20;
+    var _grid_y = _my + _header_h + 20 + (_mh * 0.1); // Descer 10%
     var _grid_w = _mw - _info_w - 40;
     var _grid_h = _mh - _header_h - 100; // Footer space
     
@@ -170,15 +185,16 @@ if (mostrar_menu) {
         draw_set_color(c_white);
         draw_text(_card_x + _card_w/2, _card_y + 80, _unidade.nome);
         
-        // Custos
-        draw_set_color(make_color_rgb(255, 215, 0));
-        draw_text(_card_x + _card_w/2, _card_y + 105, "💰 $" + string(_unidade.custo_dinheiro));
-        draw_set_color(make_color_rgb(192, 192, 192));
-        draw_text(_card_x + _card_w/2, _card_y + 125, "👥 " + string(_unidade.custo_populacao) + " pop");
+        // Custos - subir 20% e mover 7% para a direita
+        var _custo_y = _card_y + 105 - (_card_h * 0.2); // Subir 20%
+        var _custo_x = _card_x + _card_w/2 + (_card_w * 0.07); // Mover 7% para direita
         
-        // Tempo de treino
+        draw_set_color(make_color_rgb(255, 215, 0));
+        draw_text(_custo_x, _custo_y, "💰 $" + string(_unidade.custo_dinheiro));
+        
+        // Tempo de treino - também ajustar posição
         draw_set_color(make_color_rgb(180, 180, 180));
-        draw_text(_card_x + _card_w/2, _card_y + 145, "⏱️ " + string(_unidade.tempo_treino / 60) + "s");
+        draw_text(_custo_x, _custo_y + 20, "⏱️ " + string(_unidade.tempo_treino / 60) + "s");
         
         // Botão de recrutar
         var _btn_x = _card_x + 15;

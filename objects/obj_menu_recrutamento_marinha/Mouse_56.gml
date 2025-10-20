@@ -79,27 +79,57 @@ for (var i = 0; i < min(_total_navios, 6); i++) {
             show_debug_message("💰 Custo: $" + string(_navio.custo_dinheiro));
             show_debug_message("👥 População: " + string(_navio.custo_populacao));
             
-            // Deduzir recursos
-            global.dinheiro -= _navio.custo_dinheiro;
-            if (variable_global_exists("populacao")) {
-                global.populacao -= _navio.custo_populacao;
+            // Sistema de múltiplas unidades
+            var _quantidade = 1; // Quantidade padrão
+            
+            // Verificar se Shift está pressionado para 5 unidades
+            if (keyboard_check(vk_shift)) {
+                _quantidade = 5;
+                show_debug_message("🚀 MODO RÁPIDO: Criando 5 unidades!");
+            }
+            // Verificar se Ctrl está pressionado para 10 unidades
+            else if (keyboard_check(vk_control)) {
+                _quantidade = 10;
+                show_debug_message("🚀 MODO MASSIVO: Criando 10 unidades!");
             }
             
-            // Adicionar à fila
-            ds_queue_enqueue(meu_quartel_id.fila_producao, _navio);
+            // Verificar se tem recursos suficientes para a quantidade
+            var _custo_total_dinheiro = _navio.custo_dinheiro * _quantidade;
+            var _custo_total_populacao = _navio.custo_populacao * _quantidade;
             
-            show_debug_message("📋 Adicionado à fila. Tamanho: " + string(ds_queue_size(meu_quartel_id.fila_producao)));
-            
-            // Iniciar produção se quartel estiver ocioso
-            if (!meu_quartel_id.produzindo) {
-                meu_quartel_id.produzindo = true;
-                var _proxima_unidade = ds_queue_head(meu_quartel_id.fila_producao);
-                meu_quartel_id.alarm[0] = _proxima_unidade.tempo_treino;
-                show_debug_message("🚀 Iniciando produção de " + _proxima_unidade.nome);
-                show_debug_message("⏱️ Tempo: " + string(_proxima_unidade.tempo_treino) + " frames");
+            if (global.dinheiro >= _custo_total_dinheiro && _populacao >= _custo_total_populacao) {
+                // Deduzir recursos
+                global.dinheiro -= _custo_total_dinheiro;
+                if (variable_global_exists("populacao")) {
+                    global.populacao -= _custo_total_populacao;
+                }
+                
+                // Adicionar múltiplas unidades à fila
+                for (var j = 0; j < _quantidade; j++) {
+                    ds_queue_enqueue(meu_quartel_id.fila_producao, _navio);
+                }
+                
+                show_debug_message("📋 Adicionadas " + string(_quantidade) + " unidades à fila. Tamanho: " + string(ds_queue_size(meu_quartel_id.fila_producao)));
+                
+                // Iniciar produção se quartel estiver ocioso
+                if (!meu_quartel_id.produzindo) {
+                    meu_quartel_id.produzindo = true;
+                    var _proxima_unidade = ds_queue_head(meu_quartel_id.fila_producao);
+                    meu_quartel_id.alarm[0] = _proxima_unidade.tempo_treino;
+                    show_debug_message("🚀 Iniciando produção de " + _proxima_unidade.nome);
+                    show_debug_message("⏱️ Tempo: " + string(_proxima_unidade.tempo_treino) + " frames");
+                }
+                
+                show_debug_message("✅ " + string(_quantidade) + "x " + _navio.nome + " adicionadas à fila!");
+            } else {
+                show_debug_message("❌ Recursos insuficientes para " + string(_quantidade) + " unidades!");
+                if (global.dinheiro < _custo_total_dinheiro) {
+                    show_debug_message("   - Dinheiro insuficiente: $" + string(global.dinheiro) + " < $" + string(_custo_total_dinheiro));
+                }
+                if (_populacao < _custo_total_populacao) {
+                    show_debug_message("   - População insuficiente: " + string(_populacao) + " < " + string(_custo_total_populacao));
+                }
             }
-            
-            show_debug_message("✅ " + _navio.nome + " adicionado à fila!");
         } else {
             show_debug_message("❌ Recursos insuficientes ou quartel ocupado!");
             if (global.dinheiro < _navio.custo_dinheiro) {

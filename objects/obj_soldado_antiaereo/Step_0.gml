@@ -70,9 +70,15 @@ if (selecionado) {
     
     // ADICIONAR PONTO DE PATRULHA (botão direito no modo patrulha)
     if (modo_patrulha && mouse_check_button_pressed(mb_right)) {
-        // Converter mouse -> mundo com base na view atual (método robusto do GM)
-        var world_x = camera_get_view_x(view_camera[0]) + mouse_x;
-        var world_y = camera_get_view_y(view_camera[0]) + mouse_y;
+        // ✅ CORREÇÃO: Usar função global para coordenadas precisas
+        var _coords = global.scr_mouse_to_world();
+        var world_x = _coords[0];
+        var world_y = _coords[1];
+        
+        // ✅ CORREÇÃO CRÍTICA: Clamp para dentro da sala
+        world_x = clamp(world_x, 8, room_width - 8);
+        world_y = clamp(world_y, 8, room_height - 8);
+        
         var pos = [world_x, world_y];
         ds_list_add(patrulha, pos);
         show_debug_message("[PATRULHA] Ponto adicionado (mundo): " + string(world_x) + ", " + string(world_y));
@@ -80,9 +86,14 @@ if (selecionado) {
     
     // ANDAR (botão direito - só se não estiver no modo patrulha)
     if (!modo_patrulha && mouse_check_button_pressed(mb_right)) {
-        // Usar coordenadas do mundo (considerando zoom e câmera)
-        var world_x = camera_get_view_x(view_camera[0]) + mouse_x / camera_get_view_width(view_camera[0]) * camera_get_view_width(view_camera[0]);
-        var world_y = camera_get_view_y(view_camera[0]) + mouse_y / camera_get_view_height(view_camera[0]) * camera_get_view_height(view_camera[0]);
+        // ✅ CORREÇÃO: Usar função global para coordenadas precisas
+        var _coords = global.scr_mouse_to_world();
+        var world_x = _coords[0];
+        var world_y = _coords[1];
+        
+        // ✅ CORREÇÃO CRÍTICA: Clamp para dentro da sala
+        world_x = clamp(world_x, 8, room_width - 8);
+        world_y = clamp(world_y, 8, room_height - 8);
         
         // Verificar se há múltiplas unidades selecionadas (incluindo soldados anti-aéreos)
         var unidades_selecionadas = 0;

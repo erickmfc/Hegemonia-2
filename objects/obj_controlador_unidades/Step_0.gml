@@ -116,15 +116,46 @@ if (mouse_check_button_pressed(mb_left)) {
             global.esperando_alvo_seguir = noone; // Reseta o modo
         } else {
             // Seleção normal de unidades
-            // Desselecionar todas as outras unidades primeiro
-            for (var i = 0; i < array_length(_unidades_selecionaveis); i++) {
-                var _obj = _unidades_selecionaveis[i];
-                with (_obj) { selecionado = false; }
+            // ✅ CORREÇÃO: Sistema de seleção múltipla com Shift
+            if (keyboard_check(vk_shift)) {
+                // Seleção múltipla com Shift
+                if (!_instancia_selecionada.selecionado) {
+                    _instancia_selecionada.selecionado = true;
+                    if (!variable_global_exists("unidades_selecionadas")) {
+                        global.unidades_selecionadas = ds_list_create();
+                    }
+                    ds_list_add(global.unidades_selecionadas, _instancia_selecionada);
+                    show_debug_message("➕ Unidade adicionada à seleção múltipla: " + object_get_name(_instancia_selecionada.object_index));
+                } else {
+                    // Remover da seleção se já estava selecionada
+                    _instancia_selecionada.selecionado = false;
+                    if (variable_global_exists("unidades_selecionadas")) {
+                        var _index = ds_list_find_index(global.unidades_selecionadas, _instancia_selecionada);
+                        if (_index >= 0) {
+                            ds_list_delete(global.unidades_selecionadas, _index);
+                        }
+                    }
+                    show_debug_message("➖ Unidade removida da seleção: " + object_get_name(_instancia_selecionada.object_index));
+                }
+            } else {
+                // Seleção única (limpa todas as outras)
+                for (var i = 0; i < array_length(_unidades_selecionaveis); i++) {
+                    var _obj = _unidades_selecionaveis[i];
+                    with (_obj) { selecionado = false; }
+                }
+                
+                // Selecionar a unidade clicada
+                _instancia_selecionada.selecionado = true;
+                global.unidade_selecionada = _instancia_selecionada;
+                
+                // Limpar lista de seleção múltipla e adicionar apenas esta unidade
+                if (!variable_global_exists("unidades_selecionadas")) {
+                    global.unidades_selecionadas = ds_list_create();
+                } else {
+                    ds_list_clear(global.unidades_selecionadas);
+                }
+                ds_list_add(global.unidades_selecionadas, _instancia_selecionada);
             }
-            
-            // Selecionar a unidade clicada
-            _instancia_selecionada.selecionado = true;
-            global.unidade_selecionada = _instancia_selecionada;
             
             // Debug para verificar seleção da lancha
             if (object_get_name(_instancia_selecionada.object_index) == "obj_lancha_patrulha") {
@@ -340,6 +371,12 @@ if (instance_exists(global.unidade_selecionada)) {
 
         // Comando de Movimento (Clique Direito) - UNIFICADO PARA TODAS AS UNIDADES
         if (mouse_check_button_pressed(mb_right)) {
+            // ✅ CORREÇÃO: Bloquear movimento do C-100 quando em modo de embarque
+            if (object_get_name(_unidade.object_index) == "obj_c100" && _unidade.modo_receber_carga) {
+                show_debug_message("🚁 C-100: Comando de movimento bloqueado - modo embarque ativo");
+                return; // Não processar movimento
+            }
+            
             // Se estiver definindo patrulha, adiciona um ponto
             if (global.definindo_patrulha == _unidade && variable_instance_exists(_unidade, "pontos_patrulha")) {
                 var _coords = global.scr_mouse_to_world();
@@ -353,7 +390,10 @@ if (instance_exists(global.unidade_selecionada)) {
                 // ✅ CORREÇÃO: Usar a função interna da unidade para dar a ordem de movimento.
                 // Isso garante que a própria unidade lide com seus estados e destinos.
                 if (variable_instance_exists(_unidade, "ordem_mover")) {
-                    _unidade.ordem_mover(_coords[0], _coords[1]);
+                    // Clamp destino para dentro da sala antes de delegar
+                    var _tx = clamp(_coords[0], 8, room_width - 8);
+                    var _ty = clamp(_coords[1], 8, room_height - 8);
+                    _unidade.ordem_mover(_tx, _ty);
                     show_debug_message("🚢 Ordem de movimento enviada para " + object_get_name(_unidade.object_index) + " via função interna.");
                 } 
                 // Fallback para unidades mais antigas que não têm a função 'ordem_mover'
@@ -362,10 +402,26 @@ if (instance_exists(global.unidade_selecionada)) {
                         if (_unidade.estado == ESTADO_HELICOPTERO.DECOLANDO) { _unidade.timer_transicao = 60; }
                         show_debug_message("🎯 Ordem de movimento para helicóptero");
                 } else {
-                    // Sistema legado para unidades que não usam a função
-                    _unidade.destino_x = _coords[0];
-                    _unidade.destino_y = _coords[1];
-                    show_debug_message("🎯 Ordem de movimento (legado) para " + object_get_name(_unidade.object_index));
+                    // ✅ CORREÇÃO CRÍTICA: Sistema legado com clamp para evitar movimento fora da sala
+                    var _tx = clamp(_coords[0], 8, room_width - 8);
+                    var _ty = clamp(_coords[1], 8, room_height - 8);
+                    
+                    // ✅ CORREÇÃO ADICIONAL: Verificar se o destino é muito diferente do atual
+                    var _distancia_atual = point_distance(_unidade.x, _unidade.y, _tx, _ty);
+                    var _distancia_anterior = point_distance(_unidade.x, _unidade.y, _unidade.destino_x, _unidade.destino_y);
+                    
+                    // Se o novo destino é muito diferente do anterior, pode ser um erro de zoom
+                    if (_distancia_anterior > 0 && abs(_distancia_atual - _distancia_anterior) > 200) {
+                        show_debug_message("⚠️ AVISO: Destino muito diferente detectado - pode ser erro de zoom");
+                        show_debug_message("   Distância anterior: " + string(_distancia_anterior) + " | Nova: " + string(_distancia_atual));
+                        show_debug_message("   Destino anterior: (" + string(_unidade.destino_x) + ", " + string(_unidade.destino_y) + ")");
+                        show_debug_message("   Novo destino: (" + string(_tx) + ", " + string(_ty) + ")");
+                    }
+                    
+                    _unidade.destino_x = _tx;
+                    _unidade.destino_y = _ty;
+                    _unidade.estado = "movendo";
+                    show_debug_message("🎯 Ordem de movimento (legado) para " + object_get_name(_unidade.object_index) + " - Destino: (" + string(_tx) + ", " + string(_ty) + ")");
                 }
                     
                 // Cancela outros modos se existirem

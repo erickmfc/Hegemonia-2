@@ -44,6 +44,8 @@ if (produzindo && !ds_queue_empty(fila_producao)) {
             _unidade_criada = instance_create_layer(_spawn_x, _spawn_y, "Instances", obj_caca_f5);
         } else if (_unidade_data_final.objeto == obj_helicoptero_militar) {
             _unidade_criada = instance_create_layer(_spawn_x, _spawn_y, "Instances", obj_helicoptero_militar);
+        } else if (_unidade_data_final.objeto == obj_c100) {
+            _unidade_criada = instance_create_layer(_spawn_x, _spawn_y, "Instances", obj_c100);
         }
         
         // Verificar se criação foi bem-sucedida

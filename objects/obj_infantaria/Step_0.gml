@@ -76,6 +76,10 @@ if (selecionado) {
         var world_x = _coords[0];
         var world_y = _coords[1];
         
+        // ✅ CORREÇÃO CRÍTICA: Clamp para dentro da sala
+        world_x = clamp(world_x, 8, room_width - 8);
+        world_y = clamp(world_y, 8, room_height - 8);
+        
         // Verificar se há múltiplas unidades selecionadas
         var unidades_selecionadas = 0;
         var primeira_unidade = noone;

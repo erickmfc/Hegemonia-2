@@ -39,6 +39,16 @@ ds_list_add(unidades_disponiveis, {
     descricao: "Helicóptero de ataque e transporte"
 });
 
+// C-100 Transporte
+ds_list_add(unidades_disponiveis, {
+    nome: "C-100 Transporte",
+    objeto: obj_c100,
+    custo_dinheiro: 1200,
+    custo_populacao: 4,
+    tempo_treino: 360, // 6 segundos
+    descricao: "Avião de transporte com embarque de tropas e flares defensivos"
+});
+
 // === SISTEMA DE SELEÇÃO ===
 selecionado = false;
 menu_recrutamento = noone;

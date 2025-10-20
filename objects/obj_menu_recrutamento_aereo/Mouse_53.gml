@@ -117,6 +117,35 @@ if (ds_list_size(_unidades) > 1) {
     }
 }
 
+// UNIDADE 3: C-100 TRANSPORTE
+if (ds_list_size(_unidades) > 2) {
+    var _unidade_c100 = ds_list_find_value(_unidades, 2);
+    
+    var _card_w = _mw - 40;
+    var _card_h = 100;
+    var _card_x = _mx + 20;
+    var _card_y = _content_start_y + 240;
+    
+    var _btn_w = 120;
+    var _btn_h = 35;
+    var _btn_x = _card_x + _card_w - _btn_w - 15;
+    var _btn_y = _card_y + (_card_h - _btn_h) / 2;
+    
+    if (point_in_rectangle(_mouse_gui_x, _mouse_gui_y, _btn_x, _btn_y, _btn_x + _btn_w, _btn_y + _btn_h)) {
+        if (global.dinheiro >= _unidade_c100.custo_dinheiro) {
+            global.dinheiro -= _unidade_c100.custo_dinheiro;
+            ds_queue_enqueue(id_do_aeroporto.fila_producao, _unidade_c100);
+            id_do_aeroporto.produzindo = true;
+            show_debug_message("✅ Ordem de produção para " + _unidade_c100.nome + " enviada ao aeroporto!");
+            show_debug_message("💰 Dinheiro restante: $" + string(global.dinheiro));
+            instance_destroy();
+        } else {
+            show_debug_message("❌ Dinheiro insuficiente para produzir " + _unidade_c100.nome);
+            show_debug_message("💰 Necessário: $" + string(_unidade_c100.custo_dinheiro) + " | Disponível: $" + string(global.dinheiro));
+        }
+    }
+}
+
 // === CLIQUE FORA DO MENU ===
 // Se clicou fora do menu, não fazer nada (manter menu aberto)
 // O jogador pode clicar no botão fechar para sair

@@ -4,7 +4,7 @@ dano = 70; // Dano do míssil aéreo
 dono = noone; // Quem disparou
 target = noone;
 // audio_play_sound(snd_foguete_voando, 0, true); // Temporariamente desabilitado para debug
-alarm[0] = room_speed * 5; // Duração máxima de voo
+alarm[0] = room_speed * 2; // Autodestruição após 2 segundos se não acertar
 
 // Configurações visuais
 image_xscale = 1.0; // Escala horizontal
