@@ -1,0 +1,1 @@
+// arquivo intencionalmente limpo: funções scr_config_* canônicas vivem em scripts/scr_config_estruturas

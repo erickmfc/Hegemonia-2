@@ -5,6 +5,7 @@
 // =========================================================================
 var _unidades_selecionaveis = [
     obj_Constellation,
+    obj_c100,
     obj_lancha_patrulha,
     obj_infantaria,
     obj_soldado_antiaereo,

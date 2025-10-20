@@ -33,6 +33,8 @@ if (global.unidade_selecionada != noone && instance_exists(global.unidade_seleci
         tipo_unidade = "LANCHA PATRULHA";
     } else if (unidade_atual.object_index == obj_Constellation) {
         tipo_unidade = "CONSTELLATION";
+    } else if (unidade_atual.object_index == obj_c100) {
+        tipo_unidade = "C-100";
     } else {
         tipo_unidade = "UNIDADE";
     }

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_missil_prioridade_calor",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_missil_prioridade_calor",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

@@ -1,0 +1,1 @@
+// mantendo somente a lógica deste script; removida redefinição indevida de scr_check_water_area

@@ -63,6 +63,7 @@ else {
     // Seleção com clique esquerdo
     if (mouse_check_button_pressed(mb_left)) {
         var _unidade_aerea = instance_position(_mx, _my, obj_caca_f5);
+        if (_unidade_aerea == noone) _unidade_aerea = instance_position(_mx, _my, obj_c100);
         var _unidade_naval = instance_position(_mx, _my, obj_lancha_patrulha);
         var _unidade_constellation = instance_position(_mx, _my, obj_Constellation);
         
@@ -75,7 +76,7 @@ else {
             // Seleciona nova unidade aérea
             global.unidade_selecionada = _unidade_aerea;
             _unidade_aerea.selecionado = true;
-            show_debug_message("✈️ F-5 selecionado");
+            show_debug_message("✈️ Unidade aérea selecionada: " + object_get_name(_unidade_aerea.object_index));
         } else if (instance_exists(_unidade_naval)) {
             // Seleciona nova unidade naval
             global.unidade_selecionada = _unidade_naval;
@@ -103,6 +104,8 @@ else {
             _unidade.estado = LanchaState.MOVENDO;
         } else if (object_get_name(_unidade.object_index) == "obj_Constellation") {
             _unidade.estado = LanchaState.MOVENDO;
+        } else if (object_get_name(_unidade.object_index) == "obj_c100") {
+            _unidade.estado = "movendo";
         }
         
         _unidade.destino_x = _mx;
@@ -124,6 +127,8 @@ else {
             show_debug_message("🎯 Ordem de movimento para Lancha Patrulha");
         } else if (object_get_name(_unidade.object_index) == "obj_Constellation") {
             show_debug_message("🎯 Ordem de movimento para Constellation");
+        } else if (object_get_name(_unidade.object_index) == "obj_c100") {
+            show_debug_message("🎯 Ordem de movimento para C-100");
         }
     }
 }

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_c100_spawn_desembarque",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_c100_spawn_desembarque",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}
