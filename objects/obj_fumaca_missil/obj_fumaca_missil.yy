@@ -32,8 +32,8 @@
   "resourceVersion":"2.0",
   "solid":false,
   "spriteId":{
-    "name":"spr_impacto",
-    "path":"sprites/spr_impacto/spr_impacto.yy",
+    "name":"spr_fumaca",
+    "path":"sprites/spr_fumaca/spr_fumaca.yy",
   },
   "spriteMaskId":null,
   "visible":true,

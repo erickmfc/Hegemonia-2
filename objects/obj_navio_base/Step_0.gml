@@ -30,6 +30,8 @@ if (selecionado) {
 if (modo_combate == LanchaMode.ATAQUE && estado != LanchaState.ATACANDO) {
     // Prioriza alvos navais (qualquer objeto filho de obj_navio_base), depois aéreos e terrestres
     var _alvo_naval = instance_nearest(x, y, obj_navio_base);
+    var _alvo_f6 = instance_nearest(x, y, obj_f6);
+    var _alvo_f5 = instance_nearest(x, y, obj_caca_f5);
     var _alvo_helicoptero = instance_nearest(x, y, obj_helicoptero_militar);
     var _alvo_terrestre = instance_nearest(x, y, obj_inimigo);
     
@@ -40,6 +42,12 @@ if (modo_combate == LanchaMode.ATAQUE && estado != LanchaState.ATACANDO) {
     if (instance_exists(_alvo_naval) && _alvo_naval != id && _alvo_naval.nacao_proprietaria != nacao_proprietaria && point_distance(x, y, _alvo_naval.x, _alvo_naval.y) <= radar_alcance) {
         _alvo_encontrado = _alvo_naval; // Pode ser Lancha, Constellation, etc.
         _tipo_alvo = "naval (" + object_get_name(_alvo_naval.object_index) + ")";
+    } else if (instance_exists(_alvo_f6) && _alvo_f6.nacao_proprietaria != nacao_proprietaria && point_distance(x, y, _alvo_f6.x, _alvo_f6.y) <= radar_alcance) {
+        _alvo_encontrado = _alvo_f6;
+        _tipo_alvo = "aéreo (F-6 inimigo)";
+    } else if (instance_exists(_alvo_f5) && _alvo_f5.nacao_proprietaria != nacao_proprietaria && point_distance(x, y, _alvo_f5.x, _alvo_f5.y) <= radar_alcance) {
+        _alvo_encontrado = _alvo_f5;
+        _tipo_alvo = "aéreo (F-5 inimigo)";
     } else if (instance_exists(_alvo_helicoptero) && _alvo_helicoptero.nacao_proprietaria != nacao_proprietaria && point_distance(x, y, _alvo_helicoptero.x, _alvo_helicoptero.y) <= radar_alcance) {
         _alvo_encontrado = _alvo_helicoptero;
         _tipo_alvo = "aéreo (Helicóptero inimigo)";
@@ -125,17 +133,43 @@ switch (estado) {
                        }
                    }
                    
-                   // Sistema de tiro à distância
+                   // Sistema de tiro à distância com mísseis duplos
                    if (_distancia_alvo <= missil_alcance && reload_timer <= 0) {
-                       var _missil = instance_create_layer(x, y, "Instances", obj_tiro_simples);
+                       // Determinar tipo de míssil baseado no alvo
+                       var _missil_obj = obj_tiro_simples; // Padrão
+                       var _missil_nome = "Tiro Simples";
+                       
+                       // Verificar se é Constellation (usa mísseis especiais)
+                       if (object_get_name(object_index) == "obj_Constellation") {
+                           // Verificar tipo de alvo para escolher míssil
+                           if (object_get_name(alvo_unidade.object_index) == "obj_helicoptero_militar" || 
+                               object_get_name(alvo_unidade.object_index) == "obj_caca_f5" ||
+                               object_get_name(alvo_unidade.object_index) == "obj_f6") {
+                               // Alvo aéreo - usar SkyFury
+                               _missil_obj = obj_SkyFury_ar;
+                               _missil_nome = "SkyFury Ar-Ar";
+                           } else {
+                               // Alvo terrestre - usar Ironclad
+                               _missil_obj = obj_Ironclad_terra;
+                               _missil_nome = "Ironclad Terra-Terra";
+                           }
+                       }
+                       
+                       var _missil = instance_create_layer(x, y, "Instances", _missil_obj);
                        if (instance_exists(_missil)) {
-                           _missil.alvo = alvo_unidade;
+                           _missil.target = alvo_unidade;
                            _missil.dono = id;
-                           _missil.dano = 25;
-                           _missil.speed = 8;
                            _missil.direction = point_direction(x, y, alvo_unidade.x, alvo_unidade.y);
+                           
+                           // Configurações específicas para mísseis antigos
+                           if (_missil_obj == obj_tiro_simples) {
+                               _missil.alvo = alvo_unidade;
+                               _missil.dano = 25;
+                               _missil.speed = 8;
+                           }
+                           
                            reload_timer = reload_time; // Reseta o timer
-                           show_debug_message("🚀 " + nome_unidade + " disparou míssil! Distância: " + string(round(_distancia_alvo)) + "px");
+                           show_debug_message("🚀 " + nome_unidade + " disparou " + _missil_nome + "! Distância: " + string(round(_distancia_alvo)) + "px");
                        }
                    }
                } else {

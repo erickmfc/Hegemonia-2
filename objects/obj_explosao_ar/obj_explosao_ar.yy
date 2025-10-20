@@ -32,8 +32,8 @@
   "resourceVersion":"2.0",
   "solid":false,
   "spriteId":{
-    "name":"spr_explosao_aquatica",
-    "path":"sprites/spr_explosao_aquatica/spr_explosao_aquatica.yy",
+    "name":"spr_impacto",
+    "path":"sprites/spr_impacto/spr_impacto.yy",
   },
   "spriteMaskId":null,
   "visible":true,
