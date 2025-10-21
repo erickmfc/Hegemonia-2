@@ -99,7 +99,7 @@ var _cols = 3;
 var _rows = 2;
 var _card_spacing = 20;
 var _card_w = (_menu_w - 40 - (_cols - 1) * _card_spacing) / _cols;
-var _card_h = (_grid_h - (_rows - 1) * _card_spacing) / _rows;
+var _card_h = ((_grid_h - (_rows - 1) * _card_spacing) / _rows) * 0.8; // Encurtado em 20%
 
 // Obter lista de navios
 var _navios = meu_quartel_id.unidades_disponiveis;
@@ -201,12 +201,12 @@ if (_can_produce) {
     draw_set_color(_can_produce ? make_color_rgb(180, 200, 230) : make_color_rgb(120, 120, 120));
     draw_text_ext_transformed(_content_x, _desc_y, _navio.descricao, 18, _card_w - 30, 0.75, 0.75, 0);
     
-    // Informações
-    var _info_y = _card_y + _card_h - 80;
+    // Informações - Movido 15% para cima
+    var _info_y = _card_y + _card_h - 65; // Reduzido de 80 para 65 (15% para cima)
     
-    // Custo
+    // Custo - Aumentado em 10%
     draw_set_color(_can_produce ? make_color_rgb(255, 215, 0) : make_color_rgb(150, 150, 100));
-    draw_text_transformed(_content_x, _info_y, "$ " + string(_navio.custo_dinheiro), 0.9, 0.9, 0);
+    draw_text_transformed(_content_x, _info_y, "$ " + string(_navio.custo_dinheiro), 0.99, 0.99, 0); // Aumentado de 0.9 para 0.99 (10%)
     
     // População
     draw_set_color(_can_produce ? make_color_rgb(150, 200, 255) : make_color_rgb(120, 120, 120));
