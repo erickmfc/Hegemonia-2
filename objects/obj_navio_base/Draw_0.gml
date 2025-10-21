@@ -20,7 +20,7 @@ if (selecionado) {
     draw_set_alpha(0.2);
     draw_circle(x, _draw_y, radar_alcance, false);
     
-    // Linha para o destino (CORRIGIDO: usar estado em vez de velocidade_atual)
+    // Linha para o destino (CORRIGIDO: usar destino_x/destino_y em vez de alvo_x/alvo_y)
     if (estado != LanchaState.PARADO) {
         if (estado == LanchaState.ATACANDO) {
             draw_set_color(c_red); // Linha vermelha quando atacando
@@ -29,7 +29,7 @@ if (selecionado) {
             draw_set_color(c_yellow); // Linha amarela para movimento normal
             draw_set_alpha(0.5);
         }
-        draw_line(x, _draw_y, alvo_x, alvo_y);
+        draw_line(x, _draw_y, destino_x, destino_y);
     }
     
     // --- INFORMAÇÕES DE STATUS E CONTROLES ---
