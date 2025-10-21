@@ -181,18 +181,19 @@ if (_can_produce) {
     draw_set_color(_can_produce ? make_color_rgb(255, 255, 255) : make_color_rgb(150, 150, 150));
     draw_text_transformed(_content_x, _content_y, string_upper(_navio.nome), 1.1, 1.1, 0);
     
-    // Ícone/Sprite do navio (placeholder)
+    // Ícone/Sprite do navio (placeholder) - Movido 30% para a direita
     var _icon_y = _content_y + 35;
+    var _icon_x = _content_x + (_card_w * 0.6); // 60% da largura do card (30% mais à direita)
     draw_set_color(_can_produce ? make_color_rgb(80, 140, 220) : make_color_rgb(100, 100, 100));
     draw_set_alpha(0.3);
-    draw_circle(_content_x + 30, _icon_y, 25, false);
+    draw_circle(_icon_x, _icon_y, 25, false);
     draw_set_alpha(1.0);
     
     // Tentar desenhar sprite se existir
     if (_navio.nome == "Lancha Patrulha" && sprite_exists(spr_lancha_patrulha)) {
-        draw_sprite_ext(spr_lancha_patrulha, 0, _content_x + 30, _icon_y, 1.5, 1.5, 0, c_white, _anim.alpha);
+        draw_sprite_ext(spr_lancha_patrulha, 0, _icon_x, _icon_y, 1.5, 1.5, 0, c_white, _anim.alpha);
     } else if (_navio.nome == "Constellation" && sprite_exists(spr_Constellation)) {
-        draw_sprite_ext(spr_Constellation, 0, _content_x + 30, _icon_y, 1.5, 1.5, 0, c_white, _anim.alpha);
+        draw_sprite_ext(spr_Constellation, 0, _icon_x, _icon_y, 1.5, 1.5, 0, c_white, _anim.alpha);
     }
     
     // Descrição
