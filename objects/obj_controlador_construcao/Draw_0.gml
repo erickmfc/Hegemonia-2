@@ -20,6 +20,8 @@ if (global.construindo_agora != noone) {
         _sprite_fantasma = Spr_marinha; // ✅ SPRITE CORRETO DO QUARTEL DE MARINHA
     } else if (global.construindo_agora == asset_get_index("obj_aeroporto_militar")) {
         _sprite_fantasma = aeroporto; // ✅ SPRITE ORIGINAL DO AEROPORTO (350x350) - TESTE
+    } else if (global.construindo_agora == asset_get_index("obj_fazenda")) {
+        _sprite_fantasma = spr_fazenda; // ✅ SPRITE DA FAZENDA
     }
     
     // Verifica se o sprite foi definido corretamente

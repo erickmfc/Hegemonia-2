@@ -1,27 +1,35 @@
 // ===============================================
 // HEGEMONIA GLOBAL - ESTRUTURA: BANCO
-// Bloco 2, Fase 3: Produção de Dinheiro
+// Sistema Financeiro Avançado - Empréstimos e Dívida
 // ===============================================
 
 // Herda todos os eventos e lógicas do pai.
 event_inherited();
 
 // === CUSTOS DE CONSTRUÇÃO ===
-// No Evento Create do obj_banco
 custo_dinheiro = 500;
-custo_minerio = 100; // Exemplo
+custo_minerio = 100;
 
-// Especifica as variáveis para o banco.
-producao_por_ciclo = 0; // Será calculado dinamicamente baseado na população
-tipo_recurso = "dinheiro"; // Define o tipo de recurso.
-
-// === SISTEMA DE ECONOMIA BASEADA NA POPULAÇÃO ===
-taxa_por_habitante = 25; // Cada habitante gera 25 de dinheiro por ciclo
-timer_economia = 0;
-ciclo_economia = 180; // A cada 3 segundos (60 FPS * 3)
+// === SISTEMA FINANCEIRO ===
+// O banco não produz dinheiro automaticamente
+// Ele oferece serviços financeiros
+producao_por_ciclo = 0;           // Não produz recursos
+tipo_recurso = "";                 // Não produz recursos
 
 // === VARIÁVEIS DE SELEÇÃO ===
 selecionado = false;
 timer_feedback = 0;
 
-show_debug_message("Um banco foi construído e está gerando dinheiro baseado na população.");
+// === SISTEMA DE EMPRÉSTIMOS ===
+emprestimo_maximo = 20000000;      // $20M máximo de empréstimo
+emprestimo_atual = 0;              // Empréstimo atual desta instância
+taxa_juros_banco = 0.05;          // 5% ao mês
+juros_por_ciclo = 0;               // Juros calculados por ciclo
+
+// === ATIVAR SISTEMA FINANCEIRO ===
+// Marcar que o banco foi construído
+global.banco_construido = true;
+
+show_debug_message("🏦 Banco construído - Sistema financeiro ativado!");
+show_debug_message("💰 Empréstimo disponível: $" + string(global.emprestimo_disponivel));
+show_debug_message("📊 Taxa de juros: " + string(round(global.taxa_juros * 100)) + "% ao mês");

@@ -2,16 +2,14 @@
   "$GMObject":"",
   "%Name":"obj_mina",
   "eventList":[
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":2,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-  ],
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0"},
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":2,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0"}],
   "managed":true,
   "name":"obj_mina",
   "overriddenProperties":[],
   "parent":{
     "name":"construcao",
-    "path":"folders/Sprites/construcao.yy",
-  },
+    "path":"folders/Sprites/construcao.yy"},
   "parentObjectId":null,
   "persistent":false,
   "physicsAngularDamping":0.1,
@@ -32,8 +30,6 @@
   "solid":false,
   "spriteId":{
     "name":"spr_mina",
-    "path":"sprites/spr_mina/spr_mina.yy",
-  },
+    "path":"sprites/spr_mina/spr_mina.yy"},
   "spriteMaskId":null,
-  "visible":true,
-}
+  "visible":true}

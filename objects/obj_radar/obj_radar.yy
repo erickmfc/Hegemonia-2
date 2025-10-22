@@ -2,17 +2,15 @@
   "$GMObject":"",
   "%Name":"obj_radar",
   "eventList":[
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":8,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-  ],
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0"},
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0"},
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":8,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0"}],
   "managed":true,
   "name":"obj_radar",
   "overriddenProperties":[],
   "parent":{
     "name":"equipamentos",
-    "path":"folders/Sprites/naval/equipamentos.yy",
-  },
+    "path":"folders/Sprites/naval/equipamentos.yy"},
   "parentObjectId":null,
   "persistent":false,
   "physicsAngularDamping":0.1,
@@ -33,8 +31,6 @@
   "solid":false,
   "spriteId":{
     "name":"radar",
-    "path":"sprites/radar/radar.yy",
-  },
+    "path":"sprites/radar/radar.yy"},
   "spriteMaskId":null,
-  "visible":true,
-}
+  "visible":true}

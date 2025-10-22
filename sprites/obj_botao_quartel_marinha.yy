@@ -2,15 +2,13 @@
   "$GMObject":"",
   "%Name":"obj_botao_quartel_marinha",
   "eventList":[
-    {"$GMEvent":"","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0","resourceType":"GMEvent","resourceVersion":"2.0",},
-    {"$GMEvent":"","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":10,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0","resourceType":"GMEvent","resourceVersion":"2.0",},
-  ],
+    {"$GMEvent":"","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0","resourceType":"GMEvent","resourceVersion":"2.0"},
+    {"$GMEvent":"","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":10,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0","resourceType":"GMEvent","resourceVersion":"2.0"}],
   "maskSpriteId":null,
   "name":"obj_botao_quartel_marinha",
   "parent":{
     "name":"Objects",
-    "path":"folders/Objects.yy",
-  },
+    "path":"folders/Objects.yy"},
   "parentObjectId":null,
   "persistent":false,
   "physicsAngularDamping":0.1,
@@ -32,8 +30,6 @@
   "solid":false,
   "spriteId":{
     "name":"spr_botao_construir_quartel",
-    "path":"sprites/spr_botao_construir_quartel/spr_botao_construir_quartel.yy",
-  },
+    "path":"sprites/spr_botao_construir_quartel/spr_botao_construir_quartel.yy"},
   "spriteMaskId":null,
-  "visible":true,
-}
+  "visible":true}

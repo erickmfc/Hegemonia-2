@@ -8,8 +8,7 @@
   "isTemplate": false,
   "parent": {
     "name": "Scripts",
-    "path": "folders/Scripts.yy",
-  },
+    "path": "folders/Scripts.yy"},
   "resourceType": "GMScript",
   "resourceVersion": "1.0",
   "tags": []

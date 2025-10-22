@@ -3,6 +3,23 @@
 // Sistema de Cliques no Grid
 // ===============================================
 
+show_debug_message("🚀 MOUSE_56 EVENTO EXECUTADO!");
+show_debug_message("🔍 Mouse button released: " + string(mouse_check_button_released(mb_left)));
+show_debug_message("🔍 Mouse button pressed: " + string(mouse_check_button_pressed(mb_left)));
+show_debug_message("🔍 Mouse button down: " + string(mouse_check_button(mb_left)));
+show_debug_message("🔍 Mouse button up: " + string(mouse_check_button_pressed(mb_left)));
+
+// === PROTEÇÃO CONTRA CLIQUE AUTOMÁTICO ===
+// Evitar que cliques sejam processados imediatamente após abrir o menu
+if (menu_aberto_frames < frames_minimos_antes_clique) {
+    show_debug_message("⏳ Menu aberto há " + string(menu_aberto_frames) + " frames. Aguardando " + string(frames_minimos_antes_clique) + " frames antes de aceitar cliques.");
+    exit; // Sair sem processar cliques
+}
+
+show_debug_message("✅ Mouse_56 executado - Menu aberto há " + string(menu_aberto_frames) + " frames. Processando cliques...");
+show_debug_message("🔍 Mouse position: (" + string(mouse_x) + ", " + string(mouse_y) + ")");
+show_debug_message("🔍 Mouse GUI position: (" + string(device_mouse_x_to_gui(0)) + ", " + string(device_mouse_y_to_gui(0)) + ")");
+
 var _mouse_gui_x = device_mouse_x_to_gui(0);
 var _mouse_gui_y = device_mouse_y_to_gui(0);
 
@@ -13,6 +30,9 @@ var _menu_w = _gui_w * 0.9;
 var _menu_h = _gui_h * 0.9;
 var _menu_x = (_gui_w - _menu_w) / 2;
 var _menu_y = (_gui_h - _menu_h) / 2;
+
+show_debug_message("🔍 Menu dimensions: x=" + string(_menu_x) + ", y=" + string(_menu_y) + ", w=" + string(_menu_w) + ", h=" + string(_menu_h));
+show_debug_message("🔍 Mouse inside menu: " + string(_mouse_gui_x >= _menu_x && _mouse_gui_x <= _menu_x + _menu_w && _mouse_gui_y >= _menu_y && _mouse_gui_y <= _menu_y + _menu_h));
 
 // === BOTÃO FECHAR ===
 var _close_w = 140;
@@ -64,15 +84,38 @@ for (var i = 0; i < min(_total_navios, 6); i++) {
     if (_mouse_gui_x >= _card_x && _mouse_gui_x <= _card_x + _card_w &&
         _mouse_gui_y >= _card_y && _mouse_gui_y <= _card_y + _card_h) {
         
+        show_debug_message("🎯 CLIQUE DETECTADO NO CARD " + string(i) + " - " + _navio.nome);
+        show_debug_message("   Posição do mouse: (" + string(_mouse_gui_x) + ", " + string(_mouse_gui_y) + ")");
+        show_debug_message("   Área do card: (" + string(_card_x) + ", " + string(_card_y) + ") até (" + string(_card_x + _card_w) + ", " + string(_card_y + _card_h) + ")");
+        
         // Verificar se pode produzir
         var _populacao = 50;
+        var _dinheiro = 1000; // Valor padrão
+        
         if (variable_global_exists("populacao")) {
             _populacao = global.populacao;
         }
         
-        var _can_produce = (global.dinheiro >= _navio.custo_dinheiro && 
+        if (variable_global_exists("dinheiro")) {
+            _dinheiro = global.dinheiro;
+        } else {
+            show_debug_message("⚠️ AVISO: global.dinheiro não existe! Usando valor padrão: $" + string(_dinheiro));
+        }
+        
+        var _can_produce = (_dinheiro >= _navio.custo_dinheiro && 
                             _populacao >= _navio.custo_populacao &&
                             !meu_quartel_id.produzindo);
+        
+        // Debug detalhado das condições
+        show_debug_message("🔍 VERIFICAÇÃO DE RECURSOS:");
+        show_debug_message("   Dinheiro atual: $" + string(_dinheiro));
+        show_debug_message("   Custo necessário: $" + string(_navio.custo_dinheiro));
+        show_debug_message("   Dinheiro suficiente: " + string(_dinheiro >= _navio.custo_dinheiro));
+        show_debug_message("   População atual: " + string(_populacao));
+        show_debug_message("   População necessária: " + string(_navio.custo_populacao));
+        show_debug_message("   População suficiente: " + string(_populacao >= _navio.custo_populacao));
+        show_debug_message("   Quartel produzindo: " + string(meu_quartel_id.produzindo));
+        show_debug_message("   PODE PRODUZIR: " + string(_can_produce));
         
         if (_can_produce) {
             show_debug_message("🎯 CLIQUE NO NAVIO: " + _navio.nome);
@@ -97,7 +140,7 @@ for (var i = 0; i < min(_total_navios, 6); i++) {
             var _custo_total_dinheiro = _navio.custo_dinheiro * _quantidade;
             var _custo_total_populacao = _navio.custo_populacao * _quantidade;
             
-            if (global.dinheiro >= _custo_total_dinheiro && _populacao >= _custo_total_populacao) {
+            if (_dinheiro >= _custo_total_dinheiro && _populacao >= _custo_total_populacao) {
                 // Deduzir recursos
                 global.dinheiro -= _custo_total_dinheiro;
                 if (variable_global_exists("populacao")) {
@@ -123,8 +166,8 @@ for (var i = 0; i < min(_total_navios, 6); i++) {
                 show_debug_message("✅ " + string(_quantidade) + "x " + _navio.nome + " adicionadas à fila!");
             } else {
                 show_debug_message("❌ Recursos insuficientes para " + string(_quantidade) + " unidades!");
-                if (global.dinheiro < _custo_total_dinheiro) {
-                    show_debug_message("   - Dinheiro insuficiente: $" + string(global.dinheiro) + " < $" + string(_custo_total_dinheiro));
+                if (_dinheiro < _custo_total_dinheiro) {
+                    show_debug_message("   - Dinheiro insuficiente: $" + string(_dinheiro) + " < $" + string(_custo_total_dinheiro));
                 }
                 if (_populacao < _custo_total_populacao) {
                     show_debug_message("   - População insuficiente: " + string(_populacao) + " < " + string(_custo_total_populacao));

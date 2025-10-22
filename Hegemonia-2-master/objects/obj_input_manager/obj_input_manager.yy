@@ -2,17 +2,15 @@
   "$GMObject":"",
   "%Name":"obj_input_manager",
   "eventList":[
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":2,"eventType":3,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-  ],
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0"},
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":2,"eventType":3,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0"},
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0"}],
   "managed":true,
   "name":"obj_input_manager",
   "overriddenProperties":[],
   "parent":{
     "name":"Objetos",
-    "path":"folders/Objetos.yy",
-  },
+    "path":"folders/Objetos.yy"},
   "parentObjectId":null,
   "persistent":true,
   "physicsAngularDamping":0.1,
@@ -33,5 +31,4 @@
   "solid":false,
   "spriteId":null,
   "spriteMaskId":null,
-  "visible":true,
-}
+  "visible":true}

@@ -25,5 +25,4 @@
   "option_operagx_texture_page":"2048x2048",
   "option_operagx_version":"1.0.0.0",
   "resourceType":"GMOperaGXOptions",
-  "resourceVersion":"2.0",
-}
+  "resourceVersion":"2.0"}

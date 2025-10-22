@@ -44,6 +44,30 @@ if (object_exists(obj_Constellation)) {
     show_debug_message("❌ ERRO: obj_Constellation não existe!");
 }
 
+// ✅ Independence - 3 segundos (se existir)
+if (object_exists(obj_Independence)) {
+    ds_list_add(unidades_disponiveis, {
+        nome: "Independence",
+        objeto: obj_Independence,
+        custo_dinheiro: 5000, // Custo maior que Constellation
+        custo_populacao: 20, // População maior
+        tempo_treino: 180,    // ✅ 3 SEGUNDOS (180 frames)
+        descricao: "Fragata pesada com canhão e sistema de metralhadora"
+    });
+    show_debug_message("✅ Independence adicionado à lista de unidades!");
+} else {
+    show_debug_message("❌ ERRO: obj_Independence não existe!");
+}
+
+// Verificar se obj_canhao existe
+if (object_exists(obj_canhao)) {
+    show_debug_message("✅ obj_canhao existe!");
+} else {
+    show_debug_message("❌ ERRO: obj_canhao não existe!");
+}
+
+// NOTA: obj_tiro_canhao será criado quando necessário pela Independence
+
 // === SISTEMA DE SELEÇÃO ===
 selecionado = false;
 menu_recrutamento = noone;

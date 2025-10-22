@@ -11,7 +11,7 @@ if (global.modo_construcao) {
     
     // === DIMENSÕES DO MENU MAIOR E MAIS ESPAÇADO ===
     var _menu_width = 600;   // Muito maior para mais espaço
-    var _menu_height = 470;  // Mais alto para acomodar 5 botões
+    var _menu_height = 540;  // Mais alto para acomodar 6 botões
     var _menu_x = display_get_gui_width() / 2 - _menu_width / 2;
     var _menu_y = display_get_gui_height() / 2 - _menu_height / 2;
     
@@ -67,20 +67,25 @@ if (global.modo_construcao) {
     var _btn2_y = _btn_start_y + _btn_spacing_y;
     scr_desenhar_botao_moderno(_btn2_x, _btn2_y, _btn_width, _btn_height, "Construir Banco", true);
     
-    // Botão 3: Quartel
+    // Botão 3: Fazenda
     var _btn3_x = _btn_start_x;
     var _btn3_y = _btn_start_y + (_btn_spacing_y * 2);
-    scr_desenhar_botao_moderno(_btn3_x, _btn3_y, _btn_width, _btn_height, "Construir Quartel", true);
+    scr_desenhar_botao_moderno(_btn3_x, _btn3_y, _btn_width, _btn_height, "Construir Fazenda", true);
     
-    // Botão 4: Quartel Marinha
+    // Botão 4: Quartel
     var _btn4_x = _btn_start_x;
     var _btn4_y = _btn_start_y + (_btn_spacing_y * 3);
-    scr_desenhar_botao_moderno(_btn4_x, _btn4_y, _btn_width, _btn_height, "Quartel Marinha", true);
+    scr_desenhar_botao_moderno(_btn4_x, _btn4_y, _btn_width, _btn_height, "Construir Quartel", true);
     
-    // Botão 5: Aeroporto Militar
+    // Botão 5: Quartel Marinha
     var _btn5_x = _btn_start_x;
     var _btn5_y = _btn_start_y + (_btn_spacing_y * 4);
-    scr_desenhar_botao_moderno(_btn5_x, _btn5_y, _btn_width, _btn_height, "Aeroporto Militar", true);
+    scr_desenhar_botao_moderno(_btn5_x, _btn5_y, _btn_width, _btn_height, "Quartel Marinha", true);
+    
+    // Botão 6: Aeroporto Militar
+    var _btn6_x = _btn_start_x;
+    var _btn6_y = _btn_start_y + (_btn_spacing_y * 5);
+    scr_desenhar_botao_moderno(_btn6_x, _btn6_y, _btn_width, _btn_height, "Aeroporto Militar", true);
     
     // === SEÇÃO DE RECURSOS REMOVIDA ===
     // Recursos e instruções desnecessárias removidas para interface mais limpa

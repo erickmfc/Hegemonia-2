@@ -1,29 +1,41 @@
 // ===============================================
 // HEGEMONIA GLOBAL - ESTRUTURA: CASA
-// Bloco 2, Fase 3: Produção de População
+// Sistema de Níveis e Evolução de Habitação
 // ===============================================
 
 // Herda todos os eventos e lógicas do pai (obj_estrutura_producao).
 event_inherited();
 
 // === CUSTOS DE CONSTRUÇÃO ===
-// No Evento Create do obj_casa
 custo_dinheiro = 150;
-custo_minerio = 25; // Exemplo
+custo_minerio = 25;
 
-// Agora, apenas especificamos as variáveis deste filho em particular.
-// Estas linhas 'sobrescrevem' os valores padrão do pai.
-producao_por_ciclo = 10; // A casa gera 10 pessoas por ciclo.
-tipo_recurso = "populacao"; // Define o tipo de recurso que esta estrutura gera.
+// === SISTEMA DE NÍVEIS DE CASA ===
+nivel_casa = 1;                    // Nível atual da casa (1, 2, 3)
+capacidade_por_nivel = [10, 20, 30]; // Capacidade por nível
+capacidade_atual = 10;             // Capacidade atual (nível 1)
+pessoas_ocupadas = 0;              // Pessoas atualmente na casa
+
+// === CUSTOS DE EVOLUÇÃO ===
+custo_evolucao_nivel2_dinheiro = 300;  // Custo para evoluir para nível 2
+custo_evolucao_nivel2_minerio = 50;
+custo_evolucao_nivel3_dinheiro = 600;  // Custo para evoluir para nível 3
+custo_evolucao_nivel3_minerio = 100;
 
 // === VARIÁVEIS DE SELEÇÃO ===
 selecionado = false;
 timer_feedback = 0;
-populacao_adicionada = false;
+pode_evoluir = true;
 
-// === VARIÁVEIS DE POPULAÇÃO ===
-limite_pessoas_por_casa = 10;        // Máximo de pessoas por casa
-limite_maximo_cidade = 1000;         // Limite máximo da cidade
-pessoas_esta_casa = 0;               // Pessoas desta casa específica
+// === SISTEMA DE HABITAÇÃO ===
+// A casa não produz população automaticamente
+// Ela apenas aumenta o limite populacional
+producao_por_ciclo = 0;           // Não produz população
+tipo_recurso = "";                 // Não produz recursos
 
-show_debug_message("Uma casa foi construída e está gerando 10 pessoas de população.");
+// === ATUALIZAR LIMITE POPULACIONAL ===
+// Adiciona a capacidade desta casa ao limite global
+global.limite_populacional += capacidade_atual;
+
+show_debug_message("🏠 Casa Nível " + string(nivel_casa) + " construída - Capacidade: " + string(capacidade_atual) + " pessoas");
+show_debug_message("📊 Limite populacional total: " + string(global.limite_populacional) + " pessoas");

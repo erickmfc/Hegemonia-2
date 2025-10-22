@@ -22,7 +22,7 @@ if (global.menu_construcao_aberto) {
             {nome: "Serraria", objeto: obj_serraria, custo: 800},
             {nome: "Po\u00e7o Petr\u00f3leo", objeto: obj_poco_petroleo, custo: 3000},
             {nome: "Plant. Borracha", objeto: obj_plantacao_borracha, custo: 1200},
-            {nome: "Aeroporto Militar", objeto: obj_aeroporto_militar, custo: 1000} // ✅ ADICIONADO
+            {nome: "Aeroporto Militar", objeto: obj_aeroporto_militar, custo: 1000}, // ✅ ADICIONADO
         ];
         
         var btn_w = 120;

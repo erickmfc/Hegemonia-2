@@ -2,16 +2,14 @@
   "$GMObject":"",
   "%Name":"obj_pintor_territorio",
   "eventList":[
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":2,"eventType":7,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-  ],
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0"},
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":2,"eventType":7,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0"}],
   "managed":true,
   "name":"obj_pintor_territorio",
   "overriddenProperties":[],
   "parent":{
     "name":"Objetos",
-    "path":"folders/Objetos.yy",
-  },
+    "path":"folders/Objetos.yy"},
   "parentObjectId":null,
   "persistent":false,
   "physicsAngularDamping":0.1,
@@ -32,5 +30,4 @@
   "solid":false,
   "spriteId":null,
   "spriteMaskId":null,
-  "visible":true,
-}
+  "visible":true}

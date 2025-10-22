@@ -1,60 +1,87 @@
 // ================================================
 // HEGEMONIA GLOBAL - ESTRUTURA: BANCO
-// Step Event - Sistema de Economia Baseada na População
+// Sistema Financeiro - Empréstimos e Gestão de Dívida
 // ================================================
 
-// === SISTEMA DE ECONOMIA BASEADA NA POPULAÇÃO ===
-timer_economia++;
+// === SISTEMA DE SELEÇÃO ===
+// Verifica se o mouse está sobre o banco
+var _mouse_sobre = position_meeting(mouse_x, mouse_y, id);
 
-if (timer_economia >= ciclo_economia) {
-    // Calcular dinheiro baseado na população
-    if (variable_global_exists("populacao_cidade")) {
-        var dinheiro_gerado = global.populacao_cidade * taxa_por_habitante;
+// Detecta clique esquerdo para selecionar
+if (_mouse_sobre && mouse_check_button_pressed(mb_left)) {
+    selecionado = true;
+    show_debug_message("🏦 Banco selecionado - Sistema financeiro ativo");
+}
+
+// Desseleciona se clicar fora
+if (!_mouse_sobre && mouse_check_button_pressed(mb_left)) {
+    selecionado = false;
+}
+
+// === SISTEMA DE EMPRÉSTIMOS ===
+// Clique direito para acessar serviços financeiros
+if (selecionado && _mouse_sobre && mouse_check_button_pressed(mb_right)) {
+    // Verificar se pode pegar empréstimo
+    if (global.divida_total == 0 && global.emprestimo_disponivel > 0) {
+        // Oferecer empréstimo
+        var _emprestimo_valor = global.emprestimo_disponivel;
         
-        // Adicionar dinheiro ao país
-        if (variable_global_exists("dinheiro_pais")) {
-            global.dinheiro_pais += dinheiro_gerado;
+        // Verificar se o jogador quer o empréstimo
+        // Por simplicidade, vamos assumir que o jogador aceita
+        // Em um jogo real, isso seria uma interface de confirmação
+        
+        // Processar empréstimo
+        global.dinheiro += _emprestimo_valor;
+        global.divida_total = _emprestimo_valor;
+        global.juros_mensais = _emprestimo_valor * global.taxa_juros;
+        global.emprestimo_disponivel = 0; // Não pode pegar mais empréstimos
+        
+        show_debug_message("💰 EMPRÉSTIMO APROVADO!");
+        show_debug_message("💵 Valor: $" + string(_emprestimo_valor));
+        show_debug_message("📊 Dívida total: $" + string(global.divida_total));
+        show_debug_message("💸 Juros mensais: $" + string(global.juros_mensais));
+        show_debug_message("⚠️ ATENÇÃO: Juros serão deduzidos automaticamente!");
+        
+    } else if (global.divida_total > 0) {
+        // Mostrar informações da dívida
+        show_debug_message("📊 SITUAÇÃO FINANCEIRA:");
+        show_debug_message("💸 Dívida total: $" + string(global.divida_total));
+        show_debug_message("📈 Juros mensais: $" + string(global.juros_mensais));
+        show_debug_message("💰 Dinheiro atual: $" + string(global.dinheiro));
+        
+        // Verificar se pode pagar a dívida
+        if (global.dinheiro >= global.divida_total) {
+            show_debug_message("✅ Você pode pagar a dívida completa!");
+            show_debug_message("💡 Pressione 'P' para pagar a dívida");
         } else {
-            global.dinheiro_pais = dinheiro_gerado;
+            var _falta = global.divida_total - global.dinheiro;
+            show_debug_message("❌ Faltam $" + string(_falta) + " para quitar a dívida");
         }
         
-        show_debug_message("🏦 Banco gerou " + string(dinheiro_gerado) + " de dinheiro!");
-        show_debug_message("👥 População: " + string(global.populacao_cidade) + " | 💰 Dinheiro total: " + string(global.dinheiro_pais));
     } else {
-        show_debug_message("🏦 Banco aguardando população para gerar dinheiro...");
-    }
-    
-    timer_economia = 0;
-}
-
-// === SISTEMA DE SELEÇÃO E MOVIMENTO ===
-if (selecionado) {
-    // Seguir o mouse quando selecionado (sem distância mínima)
-    x = mouse_x;
-    y = mouse_y;
-    
-    // Mostrar feedback visual
-    if (timer_feedback <= 0) {
-        show_debug_message("🏦 Banco seguindo mouse - Posição: " + string(x) + ", " + string(y));
-        timer_feedback = 30; // Feedback a cada 30 frames
-    }
-    timer_feedback--;
-}
-
-// === SISTEMA DE SELEÇÃO COM MOUSE ===
-if (mouse_check_button_pressed(mb_left)) {
-    // Verificar se clicou no banco
-    if (point_distance(mouse_x, mouse_y, x, y) <= 30) {
-        // Selecionar o banco
-        selecionado = true;
-        timer_feedback = 0;
-        show_debug_message("🏦 Banco selecionado - Clique direito para posicionar");
+        show_debug_message("🏦 Banco sem serviços disponíveis");
+        show_debug_message("💡 Construa mais bancos para mais empréstimos");
     }
 }
 
-// === POSICIONAMENTO COM CLIQUE DIREITO ===
-if (selecionado && mouse_check_button_pressed(mb_right)) {
-    // Posicionar o banco
-    selecionado = false;
-    show_debug_message("🏦 Banco posicionado em: " + string(x) + ", " + string(y));
+// === SISTEMA DE PAGAMENTO DE DÍVIDA ===
+// Tecla P para pagar dívida
+if (selecionado && keyboard_check_pressed(vk_p)) {
+    if (global.divida_total > 0 && global.dinheiro >= global.divida_total) {
+        // Pagar dívida completa
+        global.dinheiro -= global.divida_total;
+        global.divida_total = 0;
+        global.juros_mensais = 0;
+        global.emprestimo_disponivel = 20000000; // Resetar empréstimo
+        
+        show_debug_message("✅ DÍVIDA QUITADA!");
+        show_debug_message("💰 Dinheiro restante: $" + string(global.dinheiro));
+        show_debug_message("🏦 Novo empréstimo disponível!");
+    } else if (global.divida_total > 0) {
+        show_debug_message("❌ Dinheiro insuficiente para quitar a dívida");
+        show_debug_message("💵 Necessário: $" + string(global.divida_total));
+        show_debug_message("💵 Disponível: $" + string(global.dinheiro));
+    } else {
+        show_debug_message("✅ Nenhuma dívida pendente");
+    }
 }

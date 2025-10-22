@@ -40,40 +40,6 @@ if (object_exists(obj_research_center)) {
     global.menu_pesquisa_aberto = false;
 }
 
-// === INICIALIZAR VARIÁVEIS DE PESQUISA ===
-if (!variable_global_exists("menu_pesquisa_aberto")) {
-    global.menu_pesquisa_aberto = false;
-    show_debug_message("🔬 Menu de pesquisa inicializado: fechado");
-}
-
-// Cria uma instância do menu de construção
-if (object_exists(obj_menu_construcao)) {
-    var _menu_construcao_instance = instance_create_layer(0, 0, "rm_mapa_principal", obj_menu_construcao);
-    
-    if (instance_exists(_menu_construcao_instance)) {
-        show_debug_message("Menu de Construção criado com sucesso na sala Room1. ID: " + string(_menu_construcao_instance));
-    } else {
-        show_debug_message("ERRO: Falha ao criar Menu de Construção!");
-    }
-} else {
-    show_debug_message("AVISO: obj_menu_construcao não existe no projeto. Sistema de construção desabilitado temporariamente.");
-}
-
-// Cria uma instância do controlador de construção para gerenciar o fantasma
-// Abordagem direta - tenta criar diretamente sem object_exists() que pode falhar
-try {
-    var _controlador_construcao_instance = instance_create_layer(0, 0, "rm_mapa_principal", obj_controlador_construcao);
-    
-    if (instance_exists(_controlador_construcao_instance)) {
-        show_debug_message("Controlador de Construção criado com sucesso na sala Room1. ID: " + string(_controlador_construcao_instance));
-    } else {
-        show_debug_message("ERRO: Falha ao criar Controlador de Construção!");
-    }
-} catch (_error) {
-    show_debug_message("AVISO: obj_controlador_construcao não registrado no projeto. Erro: " + string(_error));
-    show_debug_message("Sistema de fantasma de construção temporiamente desabilitado.");
-}
-
 // Cria uma instância do UI Manager para gerenciar menus
 if (object_exists(obj_ui_manager)) {
     var _ui_manager_instance = instance_create_layer(0, 0, "rm_mapa_principal", obj_ui_manager);

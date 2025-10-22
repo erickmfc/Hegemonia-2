@@ -7,8 +7,7 @@
   "overriddenProperties":[],
   "parent":{
     "name":"menu de contrucao",
-    "path":"menu de contrucao.yyp",
-  },
+    "path":"menu de contrucao.yyp"},
   "parentObjectId":null,
   "persistent":false,
   "physicsAngularDamping":0.1,
@@ -29,5 +28,4 @@
   "solid":false,
   "spriteId":null,
   "spriteMaskId":null,
-  "visible":true,
-}
+  "visible":true}

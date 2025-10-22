@@ -8,6 +8,15 @@ if (irandom(2) == 0) {
 
 // Se o alvo não existir mais, destruir o míssil
 if (!instance_exists(target)) {
+    // Explosão automática quando o alvo desaparece
+    if (object_exists(obj_explosao_terra)) {
+        var _explosao = instance_create_layer(x, y, "Efeitos", obj_explosao_terra);
+        if (instance_exists(_explosao)) {
+            _explosao.image_blend = make_color_rgb(255, 100, 0); // Laranja para indicar que errou
+            _explosao.image_xscale = 1.2;
+            _explosao.image_yscale = 1.2;
+        }
+    }
     instance_destroy();
     exit;
 }
@@ -32,12 +41,19 @@ if (instance_exists(target)) {
     }
 }
 
-// Guiamento pesado com ajustes dinâmicos
+// Guiamento pesado - só segue alvo se estiver próximo
 if (instance_exists(target)) {
-    var ang = point_direction(x, y, target.x, target.y);
-    var _turn_base = (variable_instance_exists(id, "turn_rate") ? turn_rate : 0.06);
-    var _turn = alvo_parado ? max(_turn_base, 0.10) : _turn_base; // curva mais forte se parado
-    direction = lerp(direction, ang, _turn);
+    var _distancia_alvo = point_distance(x, y, target.x, target.y);
+    var _distancia_maxima_rastreamento = 400; // Só rastreia se estiver a menos de 400px
+    
+    // Só faz curva se estiver próximo do alvo
+    if (_distancia_alvo <= _distancia_maxima_rastreamento) {
+        var ang = point_direction(x, y, target.x, target.y);
+        var _turn_base = (variable_instance_exists(id, "turn_rate") ? turn_rate : 0.06);
+        var _turn = alvo_parado ? max(_turn_base, 0.10) : _turn_base; // curva mais forte se parado
+        direction = lerp(direction, ang, _turn);
+    }
+    // Se estiver longe do alvo, continua na direção atual (sem curva)
 }
 
 // Rotação da imagem para seguir a direção
@@ -74,4 +90,23 @@ if (instance_exists(target)) {
         instance_destroy();
         exit;
     }
+}
+
+// === TIMER DE VIDA PARA EXPLOSÃO AUTOMÁTICA ===
+// Corrigindo avisos GM2016 - declarar variáveis fora do Create com 'var'
+var timer_vida_maximo = variable_instance_exists(id, "timer_vida_maximo") ? timer_vida_maximo : 72;
+var timer_vida_atual = variable_instance_exists(id, "timer_vida_atual") ? timer_vida_atual : timer_vida_maximo;
+
+timer_vida_atual--;
+if (timer_vida_atual <= 0) {
+    // Explosão automática após 1,2 segundos
+    if (object_exists(obj_explosao_terra)) {
+        var _explosao = instance_create_layer(x, y, "Efeitos", obj_explosao_terra);
+        if (instance_exists(_explosao)) {
+            _explosao.image_blend = make_color_rgb(255, 100, 100); // Vermelho para indicar que errou
+            _explosao.image_xscale = 1.5;
+            _explosao.image_yscale = 1.5;
+        }
+    }
+    instance_destroy();
 }

@@ -126,25 +126,32 @@ if (instance_exists(global.construindo_edificio)) {
     // === TECLA C PARA ATIVAR/DESATIVAR MODO DE CONSTRUÇÃO ===
     if (keyboard_check_pressed(ord("C"))) {
         show_debug_message("=== TECLA C PRESSIONADA ===");
-        show_debug_message("Estado atual global.modo_construcao: " + string(global.modo_construcao));
-        
-        // DEBUG: Verificar se o menu de construção existe
-        var _menu_instance = instance_find(obj_menu_construcao, 0);
-        if (instance_exists(_menu_instance)) {
-            show_debug_message("MENU ENCONTRADO! ID: " + string(_menu_instance) + " | Visível: " + string(_menu_instance.visible));
-        } else {
-            show_debug_message("ERRO: Menu de construção NÃO encontrado!");
-        }
-        
         global.modo_construcao = !global.modo_construcao;
         
         if (global.modo_construcao) {
             show_debug_message("MODO DE CONSTRUÇÃO: ATIVADO");
-            show_debug_message("Verificar se menu aparece na tela");
+            // Criar menu e controlador se não existirem
+            if (!instance_exists(obj_menu_construcao)) {
+                instance_create_layer(0, 0, "Instances", obj_menu_construcao);
+                show_debug_message("✅ obj_menu_construcao criado.");
+            }
+            if (!instance_exists(obj_controlador_construcao)) {
+                instance_create_layer(0, 0, "Instances", obj_controlador_construcao);
+                show_debug_message("✅ obj_controlador_construcao criado.");
+            }
         } else {
             show_debug_message("MODO DE CONSTRUÇÃO: DESATIVADO");
-            global.construcao_selecionada = ""; // Limpa seleção ao desativar
-            global.construindo_agora = noone; // Limpa seleção de construção
+            // Limpa seleção e destrói os objetos de construção
+            global.construindo_agora = noone;
+            
+            with (obj_menu_construcao) {
+                instance_destroy();
+                show_debug_message("✅ obj_menu_construcao destruído.");
+            }
+            with (obj_controlador_construcao) {
+                instance_destroy();
+                show_debug_message("✅ obj_controlador_construcao destruído.");
+            }
         }
         
         show_debug_message("Novo estado global.modo_construcao: " + string(global.modo_construcao));
@@ -187,6 +194,9 @@ if (instance_exists(global.construindo_edificio)) {
             } else if (global.construindo_agora == asset_get_index("obj_quartel")) {
                 _building_cost = 800;
                 _building_name = "Quartel";
+            } else if (global.construindo_agora == asset_get_index("obj_quartel_marinha")) {
+                _building_cost = 1200; // Custo de exemplo
+                _building_name = "Quartel Marinha";
             }
             
             // Verificar se tem dinheiro e construir
@@ -204,6 +214,8 @@ if (instance_exists(global.construindo_edificio)) {
                     _new_building = instance_create_layer(_build_x, _build_y, "Instances", asset_get_index("obj_banco"));
                 } else if (global.construindo_agora == asset_get_index("obj_quartel")) {
                     _new_building = instance_create_layer(_build_x, _build_y, "Instances", asset_get_index("obj_quartel"));
+                } else if (global.construindo_agora == asset_get_index("obj_quartel_marinha")) {
+                    _new_building = instance_create_layer(_build_x, _build_y, "Instances", asset_get_index("obj_quartel_marinha"));
                 }
                 
                 if (instance_exists(_new_building)) {

@@ -265,7 +265,7 @@ if (estado == "caçando") {
 
 // --- 6. SISTEMA DE DEBUG DE VIDA ---
 // Mostrar informações de vida periodicamente (a cada 3 segundos)
-if (modo_teste && (room_speed % 180 == 0)) { // 180 frames = 3 segundos a 60 FPS
+if (modo_teste && (game_get_speed(gamespeed_fps) % 180 == 0)) { // 180 frames = 3 segundos a 60 FPS
     var _vida_percentual = (hp_atual / hp_max) * 100;
     show_debug_message("🛩️ F-6 Status: " + string(hp_atual) + "/" + string(hp_max) + " HP (" + string(_vida_percentual) + "%) | Estado: " + estado);
     

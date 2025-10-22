@@ -5,11 +5,11 @@ dano = 70; // Dano do míssil terrestre
 dono = noone; // Quem disparou
 // audio_play_sound(snd_foguete_voando, 0, true); // Temporariamente desabilitado para debug
 target = noone;
-alarm[0] = room_speed * 2; // Autodestruição após 2 segundos se não acertar
+alarm[0] = game_get_speed(gamespeed_fps) * 2; // Autodestruição após 2 segundos se não acertar
 
 // Configurações visuais
-image_xscale = 1.0; // Escala horizontal
-image_yscale = 1.0; // Escala vertical
+image_xscale = 0.7; // Escala horizontal
+image_yscale = 0.7; // Escala vertical
 image_angle = 0; // Ângulo inicial
 image_speed = 0.5; // Velocidade da animação
 

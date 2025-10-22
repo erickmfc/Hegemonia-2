@@ -4,5 +4,4 @@
   "isDnD":false,
   "name":"scr_padronizar_variaveis",
   "resourceType":"GMScript",
-  "resourceVersion":"2.0",
-}
+  "resourceVersion":"2.0"}

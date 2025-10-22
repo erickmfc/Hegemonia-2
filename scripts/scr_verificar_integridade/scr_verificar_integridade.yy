@@ -7,8 +7,6 @@
   "name":"scr_verificar_integridade",
   "parent":{
     "name":"scripts",
-    "path":"folders/scripts.yy",
-  },
+    "path":"folders/scripts.yy"},
   "resourceType":"GMScript",
-  "resourceVersion":"1.0",
-}
+  "resourceVersion":"1.0"}

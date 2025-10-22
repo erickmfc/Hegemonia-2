@@ -6,5 +6,4 @@
   "isHidden":false,
   "name":"scr_teste_sistema_atual",
   "resourceType":"GMScript",
-  "resourceVersion":"2.0",
-}
+  "resourceVersion":"2.0"}

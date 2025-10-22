@@ -2,15 +2,13 @@
   "$GMObject":"",
   "%Name":"obj_botao_sair",
   "eventList":[
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":4,"eventType":6,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-  ],
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":4,"eventType":6,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0"}],
   "managed":true,
   "name":"obj_botao_sair",
   "overriddenProperties":[],
   "parent":{
     "name":"menu",
-    "path":"folders/Sprites/menu.yy",
-  },
+    "path":"folders/Sprites/menu.yy"},
   "parentObjectId":null,
   "persistent":false,
   "physicsAngularDamping":0.1,
@@ -31,8 +29,6 @@
   "solid":false,
   "spriteId":{
     "name":"spr_botao_sair",
-    "path":"sprites/spr_botao_sair/spr_botao_sair.yy",
-  },
+    "path":"sprites/spr_botao_sair/spr_botao_sair.yy"},
   "spriteMaskId":null,
-  "visible":true,
-}
+  "visible":true}

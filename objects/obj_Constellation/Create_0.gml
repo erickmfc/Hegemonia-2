@@ -23,4 +23,9 @@ reload_time = 120;
 // Nome da unidade
 nome_unidade = "Constellation"; // Sobrescreve o nome do pai
 
+// === VARIÁVEIS DE FEEDBACK ===
+ultima_acao = "nenhuma";
+cor_feedback = c_white;
+feedback_timer = 0;
+
 show_debug_message("🚢 Constellation configurado - HP: " + string(hp_atual) + ", Dano: " + string(dano_ataque));

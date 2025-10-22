@@ -6,5 +6,4 @@
   "isHidden":false,
   "name":"scr_deselecionar_unidades_edificio_clicado",
   "resourceType":"GMScript",
-  "resourceVersion":"2.0",
-}
+  "resourceVersion":"2.0"}

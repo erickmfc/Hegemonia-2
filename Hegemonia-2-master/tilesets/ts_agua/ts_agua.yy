@@ -5,27 +5,23 @@
   "macroPageTiles":{
     "SerialiseHeight":0,
     "SerialiseWidth":0,
-    "TileSerialiseData":[],
-  },
+    "TileSerialiseData":[]},
   "name":"ts_agua",
   "out_columns":1,
   "out_tilehborder":2,
   "out_tilevborder":2,
   "parent":{
     "name":"Conjuntos de tiles",
-    "path":"folders/Conjuntos de tiles.yy",
-  },
+    "path":"folders/Conjuntos de tiles.yy"},
   "resourceType":"GMTileSet",
   "resourceVersion":"2.0",
   "spriteId":{
     "name":"spr_terreno_agua",
-    "path":"sprites/spr_terreno_agua/spr_terreno_agua.yy",
-  },
+    "path":"sprites/spr_terreno_agua/spr_terreno_agua.yy"},
   "spriteNoExport":false,
   "textureGroupId":{
     "name":"Default",
-    "path":"texturegroups/Default",
-  },
+    "path":"texturegroups/Default"},
   "tileAnimationFrames":[],
   "tileAnimationSpeed":15.0,
   "tileHeight":32,
@@ -34,5 +30,4 @@
   "tileWidth":32,
   "tilexoff":0,
   "tileyoff":0,
-  "tile_count":2,
-}
+  "tile_count":2}

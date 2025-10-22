@@ -109,7 +109,7 @@ if (modo_transporte == "desembarcando") {
 
 // Flares cooldown
 if (flare_cooldown > 0) {
-    var _cd = ceil(flare_cooldown / room_speed);
+    var _cd = ceil(flare_cooldown / game_get_speed(gamespeed_fps));
     draw_set_color(c_orange);
     draw_text(_screen_x, _screen_y + 48, "Flares: " + string(_cd) + "s");
 }

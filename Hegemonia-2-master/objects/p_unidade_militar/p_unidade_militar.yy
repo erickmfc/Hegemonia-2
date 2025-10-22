@@ -2,10 +2,9 @@
   "$GMObject":"",
   "%Name":"p_unidade_militar",
   "eventList":[
-    {"$GMEvent":"v1","%Name":"<undefined>","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"<undefined>","resourceType":"GMEvent","resourceVersion":"2.0",},
-    {"$GMEvent":"v1","%Name":"<undefined>","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,"name":"<undefined>","resourceType":"GMEvent","resourceVersion":"2.0",},
-    {"$GMEvent":"v1","%Name":"<undefined>","collisionObjectId":null,"eventNum":0,"eventType":2,"isDnD":false,"name":"<undefined>","resourceType":"GMEvent","resourceVersion":"2.0",},
-  ],
+    {"$GMEvent":"v1","%Name":"<undefined>","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"<undefined>","resourceType":"GMEvent","resourceVersion":"2.0"},
+    {"$GMEvent":"v1","%Name":"<undefined>","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,"name":"<undefined>","resourceType":"GMEvent","resourceVersion":"2.0"},
+    {"$GMEvent":"v1","%Name":"<undefined>","collisionObjectId":null,"eventNum":0,"eventType":2,"isDnD":false,"name":"<undefined>","resourceType":"GMEvent","resourceVersion":"2.0"}],
   "managed":true,
   "name":"p_unidade_militar",
   "overriddenProperties":[],
@@ -29,8 +28,6 @@
   "solid":false,
   "spriteId":{
     "name":"spr_tanque",
-    "path":"sprites/spr_tanque/spr_tanque.yy",
-  },
+    "path":"sprites/spr_tanque/spr_tanque.yy"},
   "spriteMaskId":null,
-  "visible":true,
-}
+  "visible":true}

@@ -240,6 +240,9 @@ if (instance_exists(global.construindo_edificio)) {
             if (_edificio_clicado == noone) {
                 _edificio_clicado = collision_point(_world_mouse_x, _world_mouse_y, obj_banco, false, true);
             }
+            if (_edificio_clicado == noone) {
+                _edificio_clicado = collision_point(_world_mouse_x, _world_mouse_y, obj_fazenda, false, true);
+            }
             
             // Se clicou em edifício, NÃO processar construção
             if (_edificio_clicado != noone) {
@@ -268,6 +271,9 @@ if (instance_exists(global.construindo_edificio)) {
             } else if (global.construindo_agora == asset_get_index("obj_quartel_marinha")) {
                 _building_cost = 600;
                 _building_name = "Quartel de Marinha";
+            } else if (global.construindo_agora == asset_get_index("obj_fazenda")) {
+                _building_cost = 2500000; // $2.500.000 CG
+                _building_name = "Fazenda";
             } else if (global.construindo_agora == asset_get_index("obj_aeroporto_militar")) {
                 // ✅ AEROPORTO PROCESSADO PELO obj_controlador_construcao
                 show_debug_message("[INPUT MANAGER] Aeroporto será processado pelo controlador de construção");

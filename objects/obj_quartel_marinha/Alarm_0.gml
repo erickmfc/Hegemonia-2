@@ -39,6 +39,15 @@ if (produzindo && !ds_queue_empty(fila_producao)) {
             unidades_produzidas++;
             _unidade_criada.nacao_proprietaria = nacao_proprietaria;
             show_debug_message("✅ " + _unidade_data.nome + " #" + string(unidades_produzidas) + " criada!");
+            
+            // Debug específico para Independence
+            if (_unidade_data.nome == "Independence") {
+                show_debug_message("🚢 INDEPENDENCE CRIADA COM SUCESSO!");
+                show_debug_message("🚢 ID: " + string(_unidade_criada));
+                show_debug_message("🚢 HP: " + string(_unidade_criada.hp_atual) + "/" + string(_unidade_criada.hp_max));
+                show_debug_message("🚢 Velocidade: " + string(_unidade_criada.velocidade_movimento));
+                show_debug_message("🚢 Tem canhão: " + string(instance_exists(_unidade_criada.canhao_instancia)));
+            }
         } else {
             show_debug_message("❌ Falha ao criar unidade!");
         }

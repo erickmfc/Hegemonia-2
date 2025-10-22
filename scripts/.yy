@@ -1,4 +1,4 @@
-{
+﻿{
   "$GMScript":"v1",
   "%Name":"",
   "isCompatibility":false,
@@ -9,5 +9,4 @@
     "path":"menu de contrucao.yyp",
   },
   "resourceType":"GMScript",
-  "resourceVersion":"2.0",
-}
+  "resourceVersion":"2.0"}

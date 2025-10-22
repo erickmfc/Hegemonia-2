@@ -32,6 +32,9 @@ if (global.debug_enabled) {
     show_debug_message("Sistema de debug ULTRA otimizado inicializado. Modo: " + string(global.debug_enabled));
 }
 
+// Inicializar enums do jogo
+sc_game_init();
+
 // Inicializar enums navais globais
 scr_enums_navais();
 
@@ -44,7 +47,7 @@ scr_verificar_ui_sistema();
 // Estes são os 4 recursos base essenciais para o funcionamento da nação
 
 // Dinheiro: Usado para investimentos, construções e manutenção.
-global.dinheiro = 50000; // Aumentado para $50000 para permitir múltiplas pesquisas
+global.dinheiro = 50000000; // $50.000.000 Créditos Globais (CG)
 
 // Minério: Essencial para a produção industrial e militar.
 global.minerio = 1500;
@@ -54,6 +57,14 @@ global.petroleo = 1000;
 
 // População: Representa a força de trabalho e a base para o crescimento da nação.
 global.populacao = 2000;
+
+// === SISTEMA DE LIMITE POPULACIONAL ===
+// Limite inicial de população (sem casas)
+global.limite_populacional = 1000; // Limite base sem casas
+global.populacao_atual = 0; // População atual (será calculada dinamicamente)
+
+// Sistema de Alimento
+global.alimento = 0; // Inicia com 0, será produzido pelas fazendas
 
 // === RECURSOS ESTRATÉGICOS AVANÇADOS ===
 // Recursos obtidos através de pesquisa e exploração
@@ -81,6 +92,40 @@ global.aco = 400;       // Construção pesada e armamento
 
 global.energia = 1000;        // Capacidade energética da nação
 
+// === SISTEMA DE INFLATION ===
+// Inicializar variáveis de inflação
+global.taxa_inflacao = 0.0;        // Inflação atual (0% inicial)
+global.inflacao_maxima = 0.50;     // Máximo 50% de inflação
+global.inflacao_decay = 0.001;     // Redução automática por frame
+global.ultima_impressao = 0;       // Timer da última impressão
+
+// === SISTEMA DE CUSTOS COM INFLATION ===
+// Função para calcular custos com inflação
+global.calcular_custo_inflacionado = function(custo_base) {
+    return custo_base * (1 + global.taxa_inflacao);
+};
+
+// === SISTEMA DE ESTABILIDADE SOCIAL ===
+global.estabilidade_social = 100;   // 100% de estabilidade inicial
+global.instabilidade_por_inflacao = 0.8; // Perda de estabilidade por inflação
+
+// === SISTEMA DE IMPOSTOS (FUTURO) ===
+// TODO: Implementar sistema de arrecadação de impostos
+// global.taxa_impostos = 0.20; // Taxa de 20% de impostos sobre atividade econômica
+// global.base_economica_por_cidadao = 10; // Cada cidadão gera 10 CG de atividade econômica por mês
+// global.ultima_coleta_impostos = 0; // Timer da última coleta de impostos
+// global.ciclo_impostos = 1800; // Coleta de impostos a cada 30 segundos (1800 frames)
+
+// === SISTEMA FINANCEIRO - BANCO ===
+// Sistema de empréstimos e dívida
+global.divida_total = 0;                    // Dívida total da nação
+global.juros_mensais = 0;                   // Juros a pagar por mês
+global.taxa_juros = 0.05;                   // Taxa de juros (5% ao mês)
+global.emprestimo_disponivel = 20000000;    // Empréstimo disponível ($20M)
+global.banco_construido = false;            // Se o banco foi construído
+global.pagamento_automatico = true;         // Pagamento automático de juros
+global.ultimo_pagamento = 0;                // Timer do último pagamento
+
 // === SISTEMA DE COMANDOS AÉREOS ===
 // Variável global para controle de patrulha avançada
 // ✅ CORREÇÃO: Inicialização robusta com verificação de existência
@@ -97,10 +142,11 @@ global.renda_diaria = 1000;   // Renda diária base
 global.estoque_recursos = ds_map_create();
 
 // Adicionando recursos fundamentais
-ds_map_add(global.estoque_recursos, "Dinheiro", global.dinheiro); // Agora $50000
+ds_map_add(global.estoque_recursos, "Dinheiro", global.dinheiro); // Agora $50.000.000 CG
 ds_map_add(global.estoque_recursos, "Minério", global.minerio);
 ds_map_add(global.estoque_recursos, "Petróleo", global.petroleo);
 ds_map_add(global.estoque_recursos, "População", global.populacao);
+ds_map_add(global.estoque_recursos, "Alimento", global.alimento);
 
 // Adicionando metais preciosos
 ds_map_add(global.estoque_recursos, "Ouro", global.ouro);
@@ -122,6 +168,23 @@ ds_map_add(global.estoque_recursos, "Aço", global.aco);
 
 // Adicionando recursos complementares
 ds_map_add(global.estoque_recursos, "Energia", global.energia);
+
+// === SISTEMA DE INFLATION ===
+// Inicializar variáveis de inflação
+global.taxa_inflacao = 0.0;        // Inflação atual (0% inicial)
+global.inflacao_maxima = 0.50;     // Máximo 50% de inflação
+global.inflacao_decay = 0.001;     // Redução automática por frame
+global.ultima_impressao = 0;       // Timer da última impressão
+
+// === SISTEMA DE CUSTOS COM INFLATION ===
+// Função para calcular custos com inflação
+global.calcular_custo_inflacionado = function(custo_base) {
+    return custo_base * (1 + global.taxa_inflacao);
+};
+
+// === SISTEMA DE ESTABILIDADE SOCIAL ===
+global.estabilidade_social = 100;   // 100% de estabilidade inicial
+global.instabilidade_por_inflacao = 0.8; // Perda de estabilidade por inflação
 
 show_debug_message("Tesouro da Nação definido com sucesso.");
 show_debug_message("Total de recursos inicializados: " + string(ds_map_size(global.estoque_recursos)));
@@ -171,10 +234,11 @@ show_debug_message("Sistema de pesquisa inicializado com " + string(array_length
 // === RELATÓRIO INICIAL DO TESOURO ===
 show_debug_message("\n=== RELATÓRIO DO TESOURO DA NAÇÃO ===");
 show_debug_message("RECURSOS FUNDAMENTAIS:");
-show_debug_message("  Dinheiro: $" + string(global.dinheiro));
+show_debug_message("  Dinheiro: $" + string(global.dinheiro) + " Créditos Globais (CG)");
 show_debug_message("  Minério: " + string(global.minerio) + " toneladas");
 show_debug_message("  Petróleo: " + string(global.petroleo) + " barris");
 show_debug_message("  População: " + string(global.populacao) + " habitantes");
+show_debug_message("  Alimento: " + string(global.alimento) + " unidades");
 
 show_debug_message("\nMETAIS PRECIOSOS:");
 show_debug_message("  Ouro: " + string(global.ouro) + " kg");
@@ -257,11 +321,15 @@ show_debug_message("Criando grade de pathfinding para o mapa...");
 global.pathfinding_grid = mp_grid_create(0, 0, room_width / global.tile_size, room_height / global.tile_size, global.tile_size, global.tile_size);
 
 // Adiciona todas as instâncias de edifícios como obstáculos na grade
-// (Vamos criar um objeto 'pai' para facilitar)
-// Por enquanto, adicionamos um por um:
+// === EDIFÍCIOS DO MENU DE CONSTRUÇÃO ===
 mp_grid_add_instances(global.pathfinding_grid, obj_casa, true);
 mp_grid_add_instances(global.pathfinding_grid, obj_banco, true);
+mp_grid_add_instances(global.pathfinding_grid, obj_fazenda, true);
 mp_grid_add_instances(global.pathfinding_grid, obj_quartel, true);
+mp_grid_add_instances(global.pathfinding_grid, obj_quartel_marinha, true);
+mp_grid_add_instances(global.pathfinding_grid, obj_aeroporto_militar, true);
+
+// === EDIFÍCIOS DE PESQUISA E MINERAÇÃO ===
 mp_grid_add_instances(global.pathfinding_grid, obj_mina_ouro, true);
 mp_grid_add_instances(global.pathfinding_grid, obj_mina_aluminio, true);
 mp_grid_add_instances(global.pathfinding_grid, obj_mina_cobre, true);

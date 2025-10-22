@@ -12,6 +12,10 @@ meu_quartel_id = noone;
 navio_hover = -1; // Índice do navio com hover (-1 = nenhum)
 navio_selecionado = -1; // Índice do navio clicado
 
+// === PROTEÇÃO CONTRA CLIQUE AUTOMÁTICO ===
+menu_aberto_frames = 0; // Contador de frames desde que o menu abriu
+frames_minimos_antes_clique = 3; // Frames necessários antes de aceitar cliques (evita clique automático) - reduzido para 3
+
 // === ANIMAÇÕES ===
 animation_timer = 0;
 card_animations = [];

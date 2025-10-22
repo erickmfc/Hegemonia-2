@@ -15,4 +15,4 @@ part_sys = part_system_create();
 part_system_depth(part_sys, depth - 1);
 part_particles_create(part_sys, x, y, part_type, 40);
 
-alarm[0] = room_speed * 1; // 1 segundo
+alarm[0] = game_get_speed(gamespeed_fps) * 1; // 1 segundo

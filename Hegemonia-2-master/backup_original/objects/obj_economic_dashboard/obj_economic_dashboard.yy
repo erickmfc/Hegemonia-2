@@ -7,8 +7,7 @@
   "overriddenProperties":[],
   "parent":{
     "name":"Objetos",
-    "path":"folders/Objetos.yy",
-  },
+    "path":"folders/Objetos.yy"},
   "parentObjectId":null,
   "persistent":false,
   "physicsAngularDamping":0.1,
@@ -29,5 +28,4 @@
   "solid":false,
   "spriteId":null,
   "spriteMaskId":null,
-  "visible":false,
-}
+  "visible":false}

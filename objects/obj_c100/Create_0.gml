@@ -46,9 +46,9 @@ unidades_indo_embarcar = ds_list_create();
 raio_atracao = 150; // Raio para detectar unidades indo embarcar
 
 // Flares (cooldown reduzido para 2 segundos)
-flare_cooldown_max = 2 * room_speed;
+flare_cooldown_max = 2 * game_get_speed(gamespeed_fps);
 flare_cooldown = 0;
-flare_duracao = 4 * room_speed;
+flare_duracao = 4 * game_get_speed(gamespeed_fps);
 flare_timer_ativo = 0;
 
 show_debug_message("✈️ C-100 criado - Transporte pronto para carga e flares");

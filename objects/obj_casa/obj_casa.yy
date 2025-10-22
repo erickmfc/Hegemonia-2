@@ -2,19 +2,20 @@
   "$GMObject":"",
   "%Name":"obj_casa",
   "eventList":[
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-  ],
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0"},
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":{"name":"obj_infantaria","path":"objects/obj_infantaria/obj_infantaria.yy"},"eventNum":0,"eventType":4,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0"},
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":{"name":"obj_tanque","path":"objects/obj_tanque/obj_tanque.yy"},"eventNum":0,"eventType":4,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0"},
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":{"name":"obj_soldado_antiaereo","path":"objects/obj_soldado_antiaereo/obj_soldado_antiaereo.yy"},"eventNum":0,"eventType":4,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0"},
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":{"name":"obj_blindado_antiaereo","path":"objects/obj_blindado_antiaereo/obj_blindado_antiaereo.yy"},"eventNum":0,"eventType":4,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0"}],
   "managed":true,
   "name":"obj_casa",
   "overriddenProperties":[],
   "parent":{
     "name":"Objetos",
-    "path":"folders/Objetos.yy",
-  },
+    "path":"folders/Objetos.yy"},
   "parentObjectId":{
     "name":"obj_estrutura_producao",
-    "path":"objects/obj_estrutura_producao/obj_estrutura_producao.yy",
-  },
+    "path":"objects/obj_estrutura_producao/obj_estrutura_producao.yy"},
   "persistent":false,
   "physicsAngularDamping":0.1,
   "physicsDensity":0.5,
@@ -34,8 +35,6 @@
   "solid":true,
   "spriteId":{
     "name":"spr_casa",
-    "path":"sprites/spr_casa/spr_casa.yy",
-  },
+    "path":"sprites/spr_casa/spr_casa.yy"},
   "spriteMaskId":null,
-  "visible":true,
-}
+  "visible":true}

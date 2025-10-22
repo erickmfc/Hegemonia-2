@@ -2,15 +2,13 @@
   "$GMObject":"",
   "%Name":"obj_destroyer",
   "eventList":[
-    {"$GMEvent":"v1","%Name":"<undefined>","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"<undefined>","resourceType":"GMEvent","resourceVersion":"2.0",},
-  ],
+    {"$GMEvent":"v1","%Name":"<undefined>","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"<undefined>","resourceType":"GMEvent","resourceVersion":"2.0"}],
   "managed":true,
   "name":"obj_destroyer",
   "overriddenProperties":[],
   "parent":{
     "name":"menu de contrucao",
-    "path":"menu de contrucao.yyp",
-  },
+    "path":"menu de contrucao.yyp"},
   "parentObjectId":null,
   "persistent":false,
   "physicsAngularDamping":0.1,
@@ -31,5 +29,4 @@
   "solid":false,
   "spriteId":null,
   "spriteMaskId":null,
-  "visible":true,
-}
+  "visible":true}

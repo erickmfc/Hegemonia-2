@@ -209,7 +209,7 @@ if (ds_list_size(_unidades) > 2) {
     if (sprite_exists(spr_c100)) {
         var _icon_x = _card_x + 20;
         var _icon_y = _card_y + _card_h/2;
-        draw_sprite_ext(spr_c100, 0, _icon_x, _icon_y, 2.0, 2.0, 0, c_white, 1);
+        draw_sprite_ext(spr_c100, 0, _icon_x, _icon_y, 1.0, 1.0, 0, c_white, 1);
     }
     
     var _info_x = _card_x + 80;

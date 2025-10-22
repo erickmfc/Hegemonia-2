@@ -6,8 +6,6 @@
   "name":"scr_inicializar_sistema_padronizado",
   "parent":{
     "name":"Scripts",
-    "path":"folders/Scripts.yy",
-  },
+    "path":"folders/Scripts.yy"},
   "resourceType":"GMScript",
-  "resourceVersion":"2.0",
-}
+  "resourceVersion":"2.0"}

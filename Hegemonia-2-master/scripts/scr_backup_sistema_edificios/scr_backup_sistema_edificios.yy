@@ -6,5 +6,4 @@
   "isHidden":false,
   "name":"scr_backup_sistema_edificios",
   "resourceType":"GMScript",
-  "resourceVersion":"2.0",
-}
+  "resourceVersion":"2.0"}

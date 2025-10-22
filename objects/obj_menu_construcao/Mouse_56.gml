@@ -10,7 +10,7 @@ if (global.modo_construcao) {
     
     // === DIMENSÕES ATUALIZADAS PARA LISTA VERTICAL ===
     var _menu_width = 600;   // Mesmo tamanho do Draw
-    var _menu_height = 470;  // Mesmo tamanho do Draw
+    var _menu_height = 540;  // Mesmo tamanho do Draw
     var _menu_x = display_get_gui_width() / 2 - _menu_width / 2;
     var _menu_y = display_get_gui_height() / 2 - _menu_height / 2;
     
@@ -41,30 +41,40 @@ if (global.modo_construcao) {
         exit;
     }
     
-    // Botão 3: Quartel
+    // Botão 3: Fazenda
     if (point_in_rectangle(_mouse_gui_x, _mouse_gui_y, 
                           _btn_start_x, _btn_start_y + (_btn_spacing_y * 2), 
                           _btn_start_x + _btn_width, _btn_start_y + (_btn_spacing_y * 2) + _btn_height)) {
+        global.construindo_agora = asset_get_index("obj_fazenda");
+        global.modo_construcao = false;
+        show_debug_message("✅ SELECIONADO: Fazenda");
+        exit;
+    }
+    
+    // Botão 4: Quartel
+    if (point_in_rectangle(_mouse_gui_x, _mouse_gui_y, 
+                          _btn_start_x, _btn_start_y + (_btn_spacing_y * 3), 
+                          _btn_start_x + _btn_width, _btn_start_y + (_btn_spacing_y * 3) + _btn_height)) {
         global.construindo_agora = asset_get_index("obj_quartel");
         global.modo_construcao = false;
         show_debug_message("✅ SELECIONADO: Quartel");
         exit;
     }
     
-    // Botão 4: Quartel Marinha
+    // Botão 5: Quartel Marinha
     if (point_in_rectangle(_mouse_gui_x, _mouse_gui_y, 
-                          _btn_start_x, _btn_start_y + (_btn_spacing_y * 3), 
-                          _btn_start_x + _btn_width, _btn_start_y + (_btn_spacing_y * 3) + _btn_height)) {
+                          _btn_start_x, _btn_start_y + (_btn_spacing_y * 4), 
+                          _btn_start_x + _btn_width, _btn_start_y + (_btn_spacing_y * 4) + _btn_height)) {
         global.construindo_agora = asset_get_index("obj_quartel_marinha");
         global.modo_construcao = false;
         show_debug_message("✅ SELECIONADO: Quartel Marinha");
         exit;
     }
     
-    // Botão 5: Aeroporto Militar
+    // Botão 6: Aeroporto Militar
     if (point_in_rectangle(_mouse_gui_x, _mouse_gui_y, 
-                          _btn_start_x, _btn_start_y + (_btn_spacing_y * 4), 
-                          _btn_start_x + _btn_width, _btn_start_y + (_btn_spacing_y * 4) + _btn_height)) {
+                          _btn_start_x, _btn_start_y + (_btn_spacing_y * 5), 
+                          _btn_start_x + _btn_width, _btn_start_y + (_btn_spacing_y * 5) + _btn_height)) {
         global.construindo_agora = asset_get_index("obj_aeroporto_militar");
         global.modo_construcao = false;
         show_debug_message("✅ SELECIONADO: Aeroporto Militar");

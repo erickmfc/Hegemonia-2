@@ -2,15 +2,13 @@
   "$GMObject":"",
   "%Name":"obj_quartel_marinha",
   "eventList":[
-    {"$GMEvent":"","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0","resourceType":"GMEvent","resourceVersion":"2.0",},
-    {"$GMEvent":"","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":10,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0","resourceType":"GMEvent","resourceVersion":"2.0",},
-  ],
+    {"$GMEvent":"","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0","resourceType":"GMEvent","resourceVersion":"2.0"},
+    {"$GMEvent":"","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":10,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0","resourceType":"GMEvent","resourceVersion":"2.0"}],
   "maskSpriteId":null,
   "name":"obj_quartel_marinha",
   "parent":{
     "name":"Objects",
-    "path":"folders/Objects.yy",
-  },
+    "path":"folders/Objects.yy"},
   "parentObjectId":null,
   "persistent":false,
   "physicsAngularDamping":0.1,
@@ -32,8 +30,6 @@
   "solid":false,
   "spriteId":{
     "name":"Spr_quartel_marinha",
-    "path":"sprites/Spr_quartel_marinha/Spr_quartel_marinha.yy",
-  },
+    "path":"sprites/Spr_quartel_marinha/Spr_quartel_marinha.yy"},
   "spriteMaskId":null,
-  "visible":true,
-}
+  "visible":true}

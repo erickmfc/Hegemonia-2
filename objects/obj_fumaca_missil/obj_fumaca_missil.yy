@@ -2,17 +2,15 @@
   "$GMObject":"",
   "%Name":"obj_fumaca_missil",
   "eventList":[
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":2,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-  ],
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0"},
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0"},
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":2,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0"}],
   "managed":true,
   "name":"obj_fumaca_missil",
   "overriddenProperties":[],
   "parent":{
     "name":"efeitos",
-    "path":"folders/Sprites/efeitos.yy",
-  },
+    "path":"folders/Sprites/efeitos.yy"},
   "parentObjectId":null,
   "persistent":false,
   "physicsAngularDamping":0.1,
@@ -33,8 +31,6 @@
   "solid":false,
   "spriteId":{
     "name":"spr_fumaca",
-    "path":"sprites/spr_fumaca/spr_fumaca.yy",
-  },
+    "path":"sprites/spr_fumaca/spr_fumaca.yy"},
   "spriteMaskId":null,
-  "visible":true,
-}
+  "visible":true}

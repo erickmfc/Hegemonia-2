@@ -5,6 +5,7 @@
 // =========================================================================
 var _unidades_selecionaveis = [
     obj_Constellation,
+    obj_Independence,
     obj_c100,
     obj_lancha_patrulha,
     obj_infantaria,
@@ -61,6 +62,7 @@ if (mouse_check_button_pressed(mb_left)) {
         obj_aeroporto_militar,
         obj_casa,
         obj_banco,
+        obj_fazenda,
         obj_research_center
     ];
     
@@ -174,6 +176,18 @@ if (mouse_check_button_pressed(mb_left)) {
                 show_debug_message("🚢 Selecionado: " + string(_instancia_selecionada.selecionado));
             }
             
+            // Debug para verificar seleção da Independence
+            if (object_get_name(_instancia_selecionada.object_index) == "obj_Independence") {
+                show_debug_message("🚢 INDEPENDENCE SELECIONADA VIA CONTROLADOR!");
+                show_debug_message("🚢 ID da Independence: " + string(_instancia_selecionada));
+                show_debug_message("🚢 global.unidade_selecionada: " + string(global.unidade_selecionada));
+                show_debug_message("🚢 Estado: " + string(_instancia_selecionada.estado));
+                show_debug_message("🚢 Selecionado: " + string(_instancia_selecionada.selecionado));
+                show_debug_message("🚢 HP: " + string(_instancia_selecionada.hp_atual) + "/" + string(_instancia_selecionada.hp_max));
+                show_debug_message("🚢 Velocidade: " + string(_instancia_selecionada.velocidade_movimento));
+                show_debug_message("🚢 Tem canhão: " + string(instance_exists(_instancia_selecionada.canhao_instancia)));
+            }
+            
             // ======================================================================
             // FUNCIONALIDADE DE CENTRALIZAR CÂMERA DESATIVADA
             // ======================================================================
@@ -232,9 +246,11 @@ if (mouse_check_button_pressed(mb_left)) {
         
         // Adicionar ponto se a lista foi encontrada
         if (_lista_patrulha != noone && ds_exists(_lista_patrulha, ds_type_list)) {
-            ds_list_add(_lista_patrulha, [_mouse_world_x, _mouse_world_y]);
+            // Corrigindo erro GM1041 - usar ds_list_add com parâmetros separados
+            ds_list_add(_lista_patrulha, _mouse_world_x);
+            ds_list_add(_lista_patrulha, _mouse_world_y);
             show_debug_message("📍 Ponto de patrulha adicionado: (" + string(_mouse_world_x) + ", " + string(_mouse_world_y) + ")");
-            show_debug_message("📊 Total de pontos: " + string(ds_list_size(_lista_patrulha)));
+            show_debug_message("📊 Total de pontos: " + string(ds_list_size(_lista_patrulha) / 2));
         } else {
             show_debug_message("❌ ERRO: Lista de patrulha não encontrada para " + object_get_name(_unidade.object_index));
         }
@@ -380,12 +396,15 @@ if (instance_exists(global.unidade_selecionada)) {
             // Se estiver definindo patrulha, adiciona um ponto
             if (global.definindo_patrulha == _unidade && variable_instance_exists(_unidade, "pontos_patrulha")) {
                 var _coords = global.scr_mouse_to_world();
-                ds_list_add(_unidade.pontos_patrulha, [_coords[0], _coords[1]]);
+                // Corrigindo erro GM1041 - usar ds_list_add com parâmetros separados
+                ds_list_add(_unidade.pontos_patrulha, _coords[0]);
+                ds_list_add(_unidade.pontos_patrulha, _coords[1]);
                 show_debug_message("📍 Ponto de patrulha adicionado");
             } 
             // Senão, é uma ordem de movimento normal
             else {
-                var _coords = global.scr_mouse_to_world();
+                // Corrigindo aviso GM2044 - variável local já declarada
+                _coords = global.scr_mouse_to_world();
                 
                 // ✅ CORREÇÃO: Usar a função interna da unidade para dar a ordem de movimento.
                 // Isso garante que a própria unidade lide com seus estados e destinos.
@@ -395,6 +414,15 @@ if (instance_exists(global.unidade_selecionada)) {
                     var _ty = clamp(_coords[1], 8, room_height - 8);
                     _unidade.ordem_mover(_tx, _ty);
                     show_debug_message("🚢 Ordem de movimento enviada para " + object_get_name(_unidade.object_index) + " via função interna.");
+                    
+                    // Debug específico para Independence
+                    if (object_get_name(_unidade.object_index) == "obj_Independence") {
+                        show_debug_message("🚢 INDEPENDENCE: Ordem de movimento recebida!");
+                        show_debug_message("🚢 INDEPENDENCE: Destino: (" + string(_tx) + ", " + string(_ty) + ")");
+                        show_debug_message("🚢 INDEPENDENCE: Estado atual: " + string(_unidade.estado));
+                        show_debug_message("🚢 INDEPENDENCE: Velocidade: " + string(_unidade.velocidade_movimento));
+                        show_debug_message("🚢 INDEPENDENCE: Tem ordem_mover: " + string(variable_instance_exists(_unidade, "ordem_mover")));
+                    }
                 } 
                 // Fallback para unidades mais antigas que não têm a função 'ordem_mover'
                 else if (variable_instance_exists(_unidade, "ESTADO_HELICOPTERO")) {

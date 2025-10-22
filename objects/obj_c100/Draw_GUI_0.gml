@@ -75,7 +75,7 @@ draw_text(_x, _y + 180, "🚀 FLARES:");
 if (modo_evadindo) {
     draw_text(_x, _y + 200, "🟢 FLARES ATIVOS (" + string(flare_timer_ativo) + " frames)");
 } else if (flare_cooldown > 0) {
-    var _segundos = ceil(flare_cooldown / room_speed);
+    var _segundos = ceil(flare_cooldown / game_get_speed(gamespeed_fps));
     draw_text(_x, _y + 200, "🔴 Cooldown: " + string(_segundos) + "s");
 } else {
     draw_text(_x, _y + 200, "🟢 Flares prontos");

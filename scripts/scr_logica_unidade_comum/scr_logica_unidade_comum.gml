@@ -136,6 +136,39 @@ function scr_unidade_pode_mover_para(unidade_id, x, y) {
         return false;
     }
     
+    // === VERIFICAÇÃO DE COLISÃO COM EDIFÍCIOS ===
+    // Apenas unidades terrestres respeitam colisão com edifícios
+    if (scr_unidade_deve_respeitar_colisao_edificios(unidade_id)) {
+        // Lista de todos os edifícios que impedem movimento
+        var _edificios_obstaculos = [
+            obj_casa,
+            obj_banco,
+            obj_fazenda,
+            obj_quartel,
+            obj_quartel_marinha,
+            obj_aeroporto_militar,
+            obj_research_center
+        ];
+        
+        // Verificar colisão com cada edifício
+        for (var i = 0; i < array_length(_edificios_obstaculos); i++) {
+            var _edificio_obj = _edificios_obstaculos[i];
+            if (object_exists(_edificio_obj)) {
+                // Verificar se há colisão com o edifício
+                if (position_meeting(x, y, _edificio_obj)) {
+                    show_debug_message("🚫 Movimento terrestre bloqueado: Colisão com " + object_get_name(_edificio_obj));
+                    return false;
+                }
+            }
+        }
+    } else {
+        // Unidades aéreas e navais podem passar por edifícios
+        var _tipo = scr_identificar_tipo_unidade(unidade_id);
+        if (global.debug_enabled) {
+            show_debug_message("✈️ Unidade " + _tipo + " pode passar por edifícios");
+        }
+    }
+    
     // Verificar se unidade pode se mover na água
     if (!unidade_id.pode_mover_agua) {
         // Aqui você pode adicionar verificação de tile de água

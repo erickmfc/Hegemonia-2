@@ -194,6 +194,8 @@ if (_can_produce) {
         draw_sprite_ext(spr_lancha_patrulha, 0, _icon_x, _icon_y, 1.5, 1.5, 0, c_white, _anim.alpha);
     } else if (_navio.nome == "Constellation" && sprite_exists(spr_Constellation)) {
         draw_sprite_ext(spr_Constellation, 0, _icon_x, _icon_y, 1.5, 1.5, 0, c_white, _anim.alpha);
+    } else if (_navio.nome == "Independence" && sprite_exists(spr_Independence)) {
+        draw_sprite_ext(spr_Independence, 0, _icon_x, _icon_y, 1.5, 1.5, 0, c_white, _anim.alpha);
     }
     
     // Descrição

@@ -244,8 +244,9 @@ for (var i = 0; i < min(4, ds_list_size(_unidades)); i++) {
     var _card_scale = card.scale;
     var _scaled_width = card_width * _card_scale;
     var _scaled_height = card_height * _card_scale;
-    var _scale_offset_x = (card_width - _scaled_width) / 2;
-    var _scale_offset_y = (card_height - _scaled_height) / 2;
+    // Corrigindo aviso GM2044 - variável local já declarada
+    _scale_offset_x = (card_width - _scaled_width) / 2;
+    _scale_offset_y = (card_height - _scaled_height) / 2;
     
     _card_x += _scale_offset_x;
     _card_y += _scale_offset_y;
@@ -428,7 +429,8 @@ var _footer_y = _animated_my + _animated_mh - _footer_h;
 draw_set_alpha(footer_alpha * menu_alpha);
 
 // Fundo do rodapé com gradiente horizontal
-var _gradient_steps = 15;
+// Corrigindo aviso GM2044 - variável local já declarada
+_gradient_steps = 15;
 for (var i = 0; i < _gradient_steps; i++) {
     var _step_alpha = i / _gradient_steps;
     var _step_color = make_color_rgb(

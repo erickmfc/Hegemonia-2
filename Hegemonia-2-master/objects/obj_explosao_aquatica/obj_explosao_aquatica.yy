@@ -2,17 +2,15 @@
   "$GMObject":"",
   "%Name":"obj_explosao_aquatica",
   "eventList":[
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":8,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-  ],
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0"},
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0"},
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":8,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0"}],
   "managed":true,
   "name":"obj_explosao_aquatica",
   "overriddenProperties":[],
   "parent":{
     "name":"equipamentos",
-    "path":"folders/Sprites/naval/equipamentos.yy",
-  },
+    "path":"folders/Sprites/naval/equipamentos.yy"},
   "parentObjectId":null,
   "persistent":false,
   "physicsAngularDamping":0.1,
@@ -33,8 +31,6 @@
   "solid":false,
   "spriteId":{
     "name":"spr_explosao_aquatica",
-    "path":"sprites/spr_explosao_aquatica/spr_explosao_aquatica.yy",
-  },
+    "path":"sprites/spr_explosao_aquatica/spr_explosao_aquatica.yy"},
   "spriteMaskId":null,
-  "visible":true,
-}
+  "visible":true}

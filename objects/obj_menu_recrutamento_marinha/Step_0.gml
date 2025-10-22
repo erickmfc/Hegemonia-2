@@ -20,3 +20,6 @@ if (keyboard_check_pressed(vk_escape)) {
 
 // Incrementar timer de animação
 animation_timer++;
+
+// Incrementar contador de frames desde abertura do menu
+menu_aberto_frames++;

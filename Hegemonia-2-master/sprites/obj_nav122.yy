@@ -2,16 +2,14 @@
   "$GMObject":"",
   "%Name":"obj_nav122",
   "eventList":[
-    {"$GMEvent":"","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0","resourceType":"GMEvent","resourceVersion":"2.0",},
-    {"$GMEvent":"","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0","resourceType":"GMEvent","resourceVersion":"2.0",},
-    {"$GMEvent":"","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":10,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0","resourceType":"GMEvent","resourceVersion":"2.0",},
-  ],
+    {"$GMEvent":"","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0","resourceType":"GMEvent","resourceVersion":"2.0"},
+    {"$GMEvent":"","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0","resourceType":"GMEvent","resourceVersion":"2.0"},
+    {"$GMEvent":"","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":10,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0","resourceType":"GMEvent","resourceVersion":"2.0"}],
   "maskSpriteId":null,
   "name":"obj_nav122",
   "parent":{
     "name":"Objects",
-    "path":"folders/Objects.yy",
-  },
+    "path":"folders/Objects.yy"},
   "parentObjectId":null,
   "persistent":false,
   "physicsAngularDamping":0.1,
@@ -33,8 +31,6 @@
   "solid":false,
   "spriteId":{
     "name":"spr_nav122",
-    "path":"sprites/spr_nav122/spr_nav122.yy",
-  },
+    "path":"sprites/spr_nav122/spr_nav122.yy"},
   "spriteMaskId":null,
-  "visible":true,
-}
+  "visible":true}

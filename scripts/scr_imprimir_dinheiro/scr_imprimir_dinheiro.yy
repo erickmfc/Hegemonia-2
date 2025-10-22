@@ -1,0 +1,11 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_imprimir_dinheiro",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_imprimir_dinheiro",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy"},
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0"}

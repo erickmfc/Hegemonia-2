@@ -2,20 +2,17 @@
   "$GMObject":"",
   "%Name":"obj_serraria",
   "eventList":[
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":2,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-  ],
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0"},
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":2,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0"}],
   "managed":true,
   "name":"obj_serraria",
   "overriddenProperties":[],
   "parent":{
     "name":"construcao",
-    "path":"folders/Sprites/construcao.yy",
-  },
+    "path":"folders/Sprites/construcao.yy"},
   "parentObjectId":{
     "name":"obj_estrutura_producao",
-    "path":"objects/obj_estrutura_producao/obj_estrutura_producao.yy",
-  },
+    "path":"objects/obj_estrutura_producao/obj_estrutura_producao.yy"},
   "persistent":false,
   "physicsAngularDamping":0.1,
   "physicsDensity":0.5,
@@ -35,8 +32,6 @@
   "solid":false,
   "spriteId":{
     "name":"spr_serraria",
-    "path":"sprites/spr_serraria/spr_serraria.yy",
-  },
+    "path":"sprites/spr_serraria/spr_serraria.yy"},
   "spriteMaskId":null,
-  "visible":true,
-}
+  "visible":true}

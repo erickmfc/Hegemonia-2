@@ -2,18 +2,16 @@
   "$GMObject":"",
   "%Name":"obj_Ironclad_terra",
   "eventList":[
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":2,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":{"name":"obj_explosao_terra","path":"objects/obj_explosao_terra/obj_explosao_terra.yy",},"eventNum":0,"eventType":4,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-  ],
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0"},
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0"},
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":2,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0"},
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":{"name":"obj_explosao_terra","path":"objects/obj_explosao_terra/obj_explosao_terra.yy"},"eventNum":0,"eventType":4,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0"}],
   "managed":true,
   "name":"obj_Ironclad_terra",
   "overriddenProperties":[],
   "parent":{
     "name":"missil",
-    "path":"folders/Sprites/missil.yy",
-  },
+    "path":"folders/Sprites/missil.yy"},
   "parentObjectId":null,
   "persistent":false,
   "physicsAngularDamping":0.1,
@@ -34,8 +32,6 @@
   "solid":false,
   "spriteId":{
     "name":"Spr_SkyFury_ar",
-    "path":"sprites/Spr_SkyFury_ar/Spr_SkyFury_ar.yy",
-  },
+    "path":"sprites/Spr_SkyFury_ar/Spr_SkyFury_ar.yy"},
   "spriteMaskId":null,
-  "visible":true,
-}
+  "visible":true}

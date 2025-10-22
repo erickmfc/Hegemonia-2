@@ -166,8 +166,8 @@ for (var i = 0; i < array_length(research_names); i++) {
     
     // === ÍCONE DA PESQUISA (REPOSICIONADO) ===
     if (sprite_exists(research_sprite)) {
-        var icon_x = card_x + card_w/2 + (card_w * 0.10); // Mover 10% para direita
-        var icon_y = card_y + 25 + (card_h * 0.40); // Mover 40% para baixo
+        var icon_x = card_x + card_w/2 + (card_w * 0.05); // Movido 5% para a esquerda (era 10% direita, agora 5% direita)
+        var icon_y = card_y + 15 + (card_h * 0.40); // Subiu 10% (era 20, agora 15)
         var icon_scale = 1.5;
         
         // Background do ícone
@@ -224,13 +224,13 @@ for (var i = 0; i < array_length(research_names); i++) {
         default: cost_text = "$2.000"; time_text = "30s"; break;
     }
     
-    // Custo (reposicionado 20% para baixo)
+    // Custo (desce mais 10%)
     draw_set_color(make_color_rgb(255, 215, 0));
-    scr_desenhar_texto_ui(card_x + card_w/2, card_y + 70 + (card_h * 0.20) + (card_h * 0.20), cost_text, 0.75, 0.75);
+    scr_desenhar_texto_ui(card_x + card_w/2, card_y + 84 + (card_h * 0.20) + (card_h * 0.20), cost_text, 0.75, 0.75); // Desce mais 10% (77->84)
     
-    // Tempo (reposicionado 20% para baixo)
+    // Tempo (desce 13%)
     draw_set_color(make_color_rgb(180, 200, 220));
-    scr_desenhar_texto_ui(card_x + card_w/2, card_y + 85 + (card_h * 0.20) + (card_h * 0.20), time_text, 0.7, 0.7);
+    scr_desenhar_texto_ui(card_x + card_w/2, card_y + 107 + (card_h * 0.20) + (card_h * 0.20), time_text, 0.7, 0.7); // Desce 13% (95->107)
     
     // === STATUS INDICATOR ===
     var status_y = card_y + card_h - 25;
@@ -283,7 +283,7 @@ draw_roundrect_ext(container_x + 10, footer_y, container_x + container_w - 10, f
 
 // === BOTÃO DE SLOT EXTRA (REPOSICIONADO) ===
 if (global.slots_pesquisa_total == 3) {
-    var slot_btn_x = container_x + 30 + (container_w * 0.10); // Mover 10% para direita
+    var slot_btn_x = container_x + 30 + (container_w * 0.05); // Movido 15% para a esquerda (era 10% direita, agora 5% direita)
     var slot_btn_y = footer_y + 15;
     var slot_btn_w = 200 + (200 * 0.20); // Aumentar largura em 20%
     var slot_btn_h = 35;
@@ -313,8 +313,8 @@ if (global.slots_pesquisa_total == 3) {
 // === BOTÃO FECHAR ===
 var close_btn_x = container_x + container_w - 120;
 var close_btn_y = footer_y + 15;
-var close_btn_w = 80;
-var close_btn_h = 35;
+var close_btn_w = 88; // 10% maior (80 * 1.1 = 88)
+var close_btn_h = 38; // 10% maior (35 * 1.1 = 38)
 
 // Background do botão fechar (vermelho aumentado em 10%)
 draw_set_color(make_color_rgb(132, 66, 66)); // 120 + 10% = 132, 60 + 10% = 66

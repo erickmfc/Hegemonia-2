@@ -14,6 +14,7 @@ function scr_deteccao_edificios_otimizada(_mouse_world_x, _mouse_world_y) {
         obj_quartel,
         obj_casa,
         obj_banco,
+        obj_fazenda,
         obj_quartel_marinha,
         obj_aeroporto_militar,
         obj_research_center
@@ -76,6 +77,7 @@ function scr_cache_edificios() {
             obj_quartel,
             obj_casa,
             obj_banco,
+            obj_fazenda,
             obj_quartel_marinha,
             obj_aeroporto_militar,
             obj_research_center

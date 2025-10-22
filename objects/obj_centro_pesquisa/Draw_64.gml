@@ -86,34 +86,34 @@ if (global.menu_pesquisa_aberto) {
         draw_set_color(make_color_rgb(80,80,90));
         draw_roundrect_ext(card_x+2, card_y+2, card_x+_card_w-2, card_y+_card_h-2, 6, 6, true);
         
-        // Texto do recurso
+        // Texto do recurso - Movido 10% para cima e 5% para a esquerda
         draw_set_halign(fa_center);
         draw_set_valign(fa_middle);
         draw_set_color(text_color);
-        draw_text(card_x + _card_w/2, card_y + 20, recurso);
+        draw_text(card_x + _card_w/2 - (_card_w * 0.05), card_y + 18, recurso); // 10% para cima (20->18) e 5% para esquerda
         
-        // Informações de custo e tempo
+        // Informações de custo e tempo - Dinheiro desce 10%, tempo desce 12%
         draw_set_color(c_white);
-        draw_text(card_x + _card_w/2, card_y + 40, "$" + string(preco));
-        draw_text(card_x + _card_w/2, card_y + 55, string(tempo) + "s");
+        draw_text(card_x + _card_w/2, card_y + 44, "$" + string(preco)); // Dinheiro desce 10% (40->44)
+        draw_text(card_x + _card_w/2, card_y + 61, string(tempo) + "s"); // Tempo desce 12% (55->61)
         
-        // Status específico
+        // Status específico - Movido para baixo proporcionalmente
         if (sendo_pesquisado) {
             var tempo_restante = global.pesquisas_tempo_restante[? recurso];
             draw_set_color(c_yellow);
-            draw_text(card_x + _card_w/2, card_y + 75, string(ceil(tempo_restante)) + "s");
+            draw_text(card_x + _card_w/2, card_y + 81, string(ceil(tempo_restante)) + "s"); // Movido para baixo
         } else if (status == RESOURCE_STATUS.RESEARCHED) {
             draw_set_color(c_lime);
-            draw_text(card_x + _card_w/2, card_y + 75, "COMPLETO");
+            draw_text(card_x + _card_w/2, card_y + 81, "COMPLETO"); // Movido para baixo
         } else if (status == RESOURCE_STATUS.AVAILABLE && slots_disponiveis > 0 && global.estoque_recursos[? "Dinheiro"] >= preco) {
             draw_set_color(c_aqua);
-            draw_text(card_x + _card_w/2, card_y + 75, "CLIQUE");
+            draw_text(card_x + _card_w/2, card_y + 81, "CLIQUE"); // Movido para baixo
         }
     }
     
-    // Botão para comprar slot extra
+    // Botão para comprar slot extra - Movido 15% para a esquerda
     if (global.pode_comprar_slot_extra && !global.slot_extra_comprado) {
-        var btn_x = _menu_x + _menu_w * 0.05;
+        var btn_x = _menu_x + _menu_w * 0.035; // Movido 15% para a esquerda (0.05 -> 0.035)
         var btn_y = _menu_y + _menu_h * 0.83;
         var btn_w = _menu_w * 0.25;
         var btn_h = _menu_h * 0.06;
@@ -128,11 +128,11 @@ if (global.menu_pesquisa_aberto) {
         draw_text(btn_x + btn_w/2, btn_y + btn_h/2, "SLOT EXTRA ($" + string(global.custo_slot_extra) + ")");
     }
     
-    // Botão Fechar
+    // Botão Fechar - Parte vermelha 10% maior
     var close_x = _menu_x + _menu_w * 0.8;
     var close_y = _menu_y + _menu_h * 0.9;
-    var close_w = _menu_w * 0.15;
-    var close_h = _menu_h * 0.06;
+    var close_w = _menu_w * 0.165; // 10% maior (0.15 * 1.1 = 0.165)
+    var close_h = _menu_h * 0.066; // 10% maior (0.06 * 1.1 = 0.066)
     draw_set_color(c_red);
     draw_roundrect_ext(close_x, close_y, close_x+close_w, close_y+close_h, 8, 8, false);
     draw_set_color(c_white);

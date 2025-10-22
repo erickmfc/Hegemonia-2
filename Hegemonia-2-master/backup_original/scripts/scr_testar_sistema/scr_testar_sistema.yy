@@ -6,8 +6,6 @@
   "name":"scr_testar_sistema",
   "parent":{
     "name":"scripts",
-    "path":"folders/scripts.yy",
-  },
+    "path":"folders/scripts.yy"},
   "resourceType":"GMScript",
-  "resourceVersion":"1.0",
-}
+  "resourceVersion":"1.0"}

@@ -7,8 +7,6 @@
   "folderPath": "",
   "parent": {
     "name": "Scripts",
-    "path": "folders/Scripts.yy",
-  },
+    "path": "folders/Scripts.yy"},
   "parentPath": "folders/Scripts.yy",
-  "resourceId": "scripts/scr_lancar_misseis/scr_lancar_misseis.yy",
-}
+  "resourceId": "scripts/scr_lancar_misseis/scr_lancar_misseis.yy"}

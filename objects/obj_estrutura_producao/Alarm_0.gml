@@ -7,26 +7,44 @@
 // Isso torna o sistema expansível para futuros tipos de recursos.
 switch (tipo_recurso) {
     case "dinheiro":
-        global.dinheiro += producao_por_ciclo;
+        // Aplicar penalidade de inflação se existir
+        var _producao_final = producao_por_ciclo;
+        if (variable_global_exists("penalidade_producao")) {
+            _producao_final = floor(producao_por_ciclo * global.penalidade_producao);
+        }
+        
+        global.dinheiro += _producao_final;
         // Atualizar também o mapa consolidado
         if (ds_exists(global.estoque_recursos, ds_type_map)) {
-            global.estoque_recursos[? "Dinheiro"] += producao_por_ciclo;
+            global.estoque_recursos[? "Dinheiro"] += _producao_final;
         }
         break;
         
     case "minerio":
-        global.minerio += producao_por_ciclo;
+        // Aplicar penalidade de inflação se existir
+        var _producao_final = producao_por_ciclo;
+        if (variable_global_exists("penalidade_producao")) {
+            _producao_final = floor(producao_por_ciclo * global.penalidade_producao);
+        }
+        
+        global.minerio += _producao_final;
         // Atualizar também o mapa consolidado
         if (ds_exists(global.estoque_recursos, ds_type_map)) {
-            global.estoque_recursos[? "Minério"] += producao_por_ciclo;
+            global.estoque_recursos[? "Minério"] += _producao_final;
         }
         break;
     
     case "petroleo":
-        global.petroleo += producao_por_ciclo;
+        // Aplicar penalidade de inflação se existir
+        var _producao_final = producao_por_ciclo;
+        if (variable_global_exists("penalidade_producao")) {
+            _producao_final = floor(producao_por_ciclo * global.penalidade_producao);
+        }
+        
+        global.petroleo += _producao_final;
         // Atualizar também o mapa consolidado
         if (ds_exists(global.estoque_recursos, ds_type_map)) {
-            global.estoque_recursos[? "Petróleo"] += producao_por_ciclo;
+            global.estoque_recursos[? "Petróleo"] += _producao_final;
         }
         break;
         

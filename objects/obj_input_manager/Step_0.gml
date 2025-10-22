@@ -58,6 +58,8 @@ if (instance_exists(global.definindo_patrulha_unidade)) {
                 _unidade.estado = LanchaState.PARADO;
             } else if (object_get_name(_unidade.object_index) == "obj_Constellation") {
                 _unidade.estado = LanchaState.PARADO;
+            } else if (object_get_name(_unidade.object_index) == "obj_Independence") {
+                _unidade.estado = LanchaState.PARADO;
             }
             show_debug_message("❌ PATRULHA CANCELADA - mínimo de 2 pontos necessários");
         }
@@ -72,6 +74,7 @@ else {
         if (_unidade_aerea == noone) _unidade_aerea = instance_position(_mx, _my, obj_c100);
         var _unidade_naval = instance_position(_mx, _my, obj_lancha_patrulha);
         var _unidade_constellation = instance_position(_mx, _my, obj_Constellation);
+        var _unidade_independence = instance_position(_mx, _my, obj_Independence);
         
         // Desseleciona unidade anterior
         if (instance_exists(global.unidade_selecionada)) {
@@ -93,6 +96,11 @@ else {
             global.unidade_selecionada = _unidade_constellation;
             _unidade_constellation.selecionado = true;
             show_debug_message("🚢 Constellation selecionado");
+        } else if (instance_exists(_unidade_independence)) {
+            // Seleciona Independence
+            global.unidade_selecionada = _unidade_independence;
+            _unidade_independence.selecionado = true;
+            show_debug_message("🚢 Independence selecionada");
         } else {
             // Desseleciona se clicou em lugar vazio
             global.unidade_selecionada = noone;
@@ -109,6 +117,8 @@ else {
         } else if (object_get_name(_unidade.object_index) == "obj_lancha_patrulha") {
             _unidade.estado = LanchaState.MOVENDO;
         } else if (object_get_name(_unidade.object_index) == "obj_Constellation") {
+            _unidade.estado = LanchaState.MOVENDO;
+        } else if (object_get_name(_unidade.object_index) == "obj_Independence") {
             _unidade.estado = LanchaState.MOVENDO;
         } else if (object_get_name(_unidade.object_index) == "obj_c100") {
             _unidade.estado = "movendo";
@@ -136,6 +146,8 @@ else {
             show_debug_message("🎯 Ordem de movimento para Lancha Patrulha");
         } else if (object_get_name(_unidade.object_index) == "obj_Constellation") {
             show_debug_message("🎯 Ordem de movimento para Constellation");
+        } else if (object_get_name(_unidade.object_index) == "obj_Independence") {
+            show_debug_message("🎯 Ordem de movimento para Independence");
         } else if (object_get_name(_unidade.object_index) == "obj_c100") {
             show_debug_message("🎯 Ordem de movimento para C-100");
         }

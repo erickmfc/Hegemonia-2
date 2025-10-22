@@ -6,5 +6,4 @@
   "isHidden":false,
   "name":"scr_teste_quartel_marinha_aeroporto",
   "resourceType":"GMScript",
-  "resourceVersion":"2.0",
-}
+  "resourceVersion":"2.0"}

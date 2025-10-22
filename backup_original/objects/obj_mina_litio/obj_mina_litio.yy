@@ -2,16 +2,14 @@
   "$GMObject":"",
   "%Name":"obj_mina_litio",
   "eventList":[
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":2,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-  ],
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0"},
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":2,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0"}],
   "managed":true,
   "name":"obj_mina_litio",
   "overriddenProperties":[],
   "parent":{
     "name":"construcao",
-    "path":"folders/Sprites/construcao.yy",
-  },
+    "path":"folders/Sprites/construcao.yy"},
   "parentObjectId":null,
   "persistent":false,
   "physicsAngularDamping":0.1,
@@ -32,8 +30,6 @@
   "solid":false,
   "spriteId":{
     "name":"spr_mina_litio",
-    "path":"sprites/spr_mina_litio/spr_mina_litio.yy",
-  },
+    "path":"sprites/spr_mina_litio/spr_mina_litio.yy"},
   "spriteMaskId":null,
-  "visible":true,
-}
+  "visible":true}

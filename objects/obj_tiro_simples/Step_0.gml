@@ -56,5 +56,15 @@ if (point_distance(x, y, alvo.x, alvo.y) <= speed) {
 // === TIMER DE VIDA ===
 timer_vida--;
 if (timer_vida <= 0) {
+    // Explosão automática quando o projétil "expira"
+    if (object_exists(obj_explosao_aquatica)) {
+        var _explosao = instance_create_depth(x, y, 0, obj_explosao_aquatica);
+        if (instance_exists(_explosao)) {
+            _explosao.image_blend = make_color_rgb(255, 100, 100); // Vermelho para indicar que errou
+            _explosao.image_xscale = 1.5;
+            _explosao.image_yscale = 1.5;
+            _explosao.image_angle = random(360);
+        }
+    }
     instance_destroy();
 }
