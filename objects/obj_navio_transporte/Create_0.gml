@@ -1,0 +1,300 @@
+/// @description Inicialização do Navio Transporte com Sistema de Embarque/Desembarque
+
+// === HERANÇA DO PAI (OBRIGATÓRIO) ===
+event_inherited();
+
+// === ENUMS GLOBAIS ===
+// Os enums LanchaState e LanchaMode estão no script global scr_enums_navais
+
+// Atributos básicos
+hp_atual = 150;
+hp_max = 150;
+velocidade_movimento = 1.4;
+nacao_proprietaria = 1; // 1 = jogador
+
+// Estado e modo
+estado = LanchaState.PARADO;
+modo_combate = LanchaMode.PASSIVO;
+
+// Sensores e alcance
+radar_alcance = 1000;
+missil_alcance = 1000;
+missil_max_alcance = 1000;
+alcance_ataque = missil_alcance;
+
+// Alvo e movimento
+alvo_x = x;
+alvo_y = y;
+
+// Patrulha
+pontos_patrulha = ds_list_create();
+indice_patrulha_atual = 0;
+
+// Seleção e UI
+selecionado = false;
+
+// Controle de taxa de tiro
+reload_time = 60;
+reload_timer = 0;
+
+// Identificador
+nome_unidade = "Navio Transporte";
+
+// Variáveis auxiliares
+alvo_unidade = noone;
+alvo_pos_anterior_x = -1;
+alvo_pos_anterior_y = -1;
+
+// Estado anterior para retorno após ataque
+estado_anterior = LanchaState.PARADO;
+
+// Mapeamento de compatibilidade
+modo_ataque = (modo_combate == LanchaMode.ATAQUE);
+velocidade_atual = velocidade_movimento;
+timer_ataque = reload_timer;
+destino_x = alvo_x;
+destino_y = alvo_y;
+
+// === SISTEMA DE EMBARQUE/DESEMBARQUE (NOVO) ===
+estado_transporte = NavioTransporteEstado.PARADO;
+modo_embarque = false;
+menu_carga_aberto = false;
+desembarque_timer = 0;
+desembarque_intervalo = 120; // 2 segundos entre desembarques
+
+// === CAPACIDADES DO NAVIO ===
+avioes_max = 10;
+unidades_max = 10;
+soldados_max = 50;
+
+avioes_count = 0;
+unidades_count = 0;
+soldados_count = 0;
+
+avioes_embarcados = ds_list_create();
+unidades_embarcadas = ds_list_create();
+soldados_embarcados = ds_list_create();
+
+raio_embarque = 80; // Raio de detecção para embarque
+desembarque_offset_angulo = 0; // Ângulo para desembarque radial
+
+// === VARIÁVEIS DE COMANDOS ===
+ultimo_comando = "nenhum";
+comando_timer = 0;
+
+// === FUNÇÕES BÁSICAS ===
+ordem_mover = function(dest_x, dest_y) {
+    var _dx = clamp(dest_x, 8, room_width - 8);
+    var _dy = clamp(dest_y, 8, room_height - 8);
+    destino_x = _dx;
+    destino_y = _dy;
+    estado = LanchaState.MOVENDO;
+    alvo_unidade = noone;
+    show_debug_message("🚢 " + nome_unidade + " recebeu ordem de movimento para (" + string(destino_x) + ", " + string(destino_y) + "). Estado: MOVENDO");
+}
+
+func_ordem_mover = ordem_mover;
+
+func_adicionar_ponto = function(px, py) {
+    ds_list_add(pontos_patrulha, [px, py]);
+}
+
+func_iniciar_patrulha = function() {
+    if (ds_list_size(pontos_patrulha) > 0) {
+        indice_patrulha_atual = 0;
+        var p = pontos_patrulha[| indice_patrulha_atual];
+        destino_x = p[0];
+        destino_y = p[1];
+        estado = LanchaState.PATRULHANDO;
+    } else {
+        estado = LanchaState.PARADO;
+    }
+}
+
+func_proximo_ponto = function() {
+    if (ds_list_size(pontos_patrulha) == 0) {
+        estado = LanchaState.PARADO;
+        return;
+    }
+    indice_patrulha_atual = (indice_patrulha_atual + 1) mod ds_list_size(pontos_patrulha);
+    var p = pontos_patrulha[| indice_patrulha_atual];
+    destino_x = p[0];
+    destino_y = p[1];
+}
+
+func_procurar_inimigo = function() {
+    var melhor = noone;
+    var melhor_d = 999999;
+    with (obj_inimigo) {
+        if (nacao_proprietaria != other.nacao_proprietaria) {
+            var d = point_distance(other.x, other.y, x, y);
+            if (d < other.radar_alcance && d < melhor_d) {
+                melhor = id;
+                melhor_d = d;
+            }
+        }
+    }
+    return melhor;
+}
+
+// === 6. FUNÇÕES DE EMBARQUE/DESEMBARQUE ===
+
+// Função para embarcar soldado
+funcao_embarcar_unidade = function(unidade_id) {
+    if (soldados_count >= soldados_max) {
+        show_debug_message("❌ Capacidade de soldados esgotada!");
+        return;
+    }
+    
+    if (ds_list_find_index(soldados_embarcados, unidade_id) == -1) {
+        // IMPORTANTE: Esconder ANTES de adicionar à lista
+        if (instance_exists(unidade_id)) {
+            unidade_id.visible = false;
+            // Não desativar - mantemos ativo mas invisível
+        }
+        ds_list_add(soldados_embarcados, unidade_id);
+        soldados_count++;
+        show_debug_message("✅ " + object_get_name(unidade_id.object_index) + " embarcou! Soldados: " + string(soldados_count) + "/" + string(soldados_max));
+    }
+}
+
+// Função para embarcar aeronave
+funcao_embarcar_aeronave = function(aeronave_id) {
+    if (avioes_count >= avioes_max) {
+        show_debug_message("❌ Capacidade de aeronaves esgotada!");
+        return;
+    }
+    
+    if (ds_list_find_index(avioes_embarcados, aeronave_id) == -1) {
+        // IMPORTANTE: Esconder ANTES de adicionar à lista
+        if (instance_exists(aeronave_id)) {
+            aeronave_id.visible = false;
+            // Não desativar - mantemos ativo mas invisível
+        }
+        ds_list_add(avioes_embarcados, aeronave_id);
+        avioes_count++;
+        show_debug_message("✅ " + object_get_name(aeronave_id.object_index) + " embarcou! Aeronaves: " + string(avioes_count) + "/" + string(avioes_max));
+    }
+}
+
+// Função para embarcar veículo
+funcao_embarcar_veiculo = function(veiculo_id) {
+    if (unidades_count >= unidades_max) {
+        show_debug_message("❌ Capacidade de veículos esgotada!");
+        return;
+    }
+    
+    if (ds_list_find_index(unidades_embarcadas, veiculo_id) == -1) {
+        // IMPORTANTE: Esconder ANTES de adicionar à lista
+        if (instance_exists(veiculo_id)) {
+            veiculo_id.visible = false;
+            // Não desativar - mantemos ativo mas invisível
+        }
+        ds_list_add(unidades_embarcadas, veiculo_id);
+        unidades_count++;
+        show_debug_message("✅ " + object_get_name(veiculo_id.object_index) + " embarcou! Veículos: " + string(unidades_count) + "/" + string(unidades_max));
+    }
+}
+
+// Função para desembarcar soldado
+funcao_desembarcar_soldado = function() {
+    if (ds_list_size(soldados_embarcados) == 0) return;
+    
+    var unidade_id = soldados_embarcados[| 0];
+    ds_list_delete(soldados_embarcados, 0);
+    soldados_count--;
+    
+    var offset_x = lengthdir_x(30, desembarque_offset_angulo);
+    var offset_y = lengthdir_y(30, desembarque_offset_angulo);
+    desembarque_offset_angulo += 30;
+    
+    if (instance_exists(unidade_id)) {
+        var _offset_x_final = x + offset_x;
+        var _offset_y_final = y + offset_y;
+        
+        unidade_id.x = _offset_x_final;
+        unidade_id.y = _offset_y_final;
+        unidade_id.visible = true;  // Mostrar visualmente ANTES de parar a velocidade
+        
+        // Parar a unidade ao desembarcar
+        if (variable_instance_exists(unidade_id, "velocidade_atual")) {
+            unidade_id.velocidade_atual = 0;
+        }
+    }
+    
+    show_debug_message("✅ Soldado desembarcou! Restantes: " + string(soldados_count));
+}
+
+// Função para desembarcar aeronave
+funcao_desembarcar_aeronave = function() {
+    if (ds_list_size(avioes_embarcados) == 0) return;
+    
+    var aeronave_id = avioes_embarcados[| 0];
+    ds_list_delete(avioes_embarcados, 0);
+    avioes_count--;
+    
+    var offset_x = lengthdir_x(40, desembarque_offset_angulo);
+    var offset_y = lengthdir_y(40, desembarque_offset_angulo);
+    desembarque_offset_angulo += 45;
+    
+    if (instance_exists(aeronave_id)) {
+        var _offset_x_final = x + offset_x;
+        var _offset_y_final = y + offset_y;
+        
+        aeronave_id.x = _offset_x_final;
+        aeronave_id.y = _offset_y_final;
+        aeronave_id.visible = true;  // Mostrar visualmente ANTES de dar velocidade
+        
+        // Dar velocidade ao avião ao desembarcar
+        if (variable_instance_exists(aeronave_id, "velocidade_atual")) {
+            aeronave_id.velocidade_atual = 5;
+        }
+    }
+    
+    show_debug_message("✅ Aeronave desembarcou! Restantes: " + string(avioes_count));
+}
+
+// Função para desembarcar veículo
+funcao_desembarcar_veiculo = function() {
+    if (ds_list_size(unidades_embarcadas) == 0) return;
+    
+    var veiculo_id = unidades_embarcadas[| 0];
+    ds_list_delete(unidades_embarcadas, 0);
+    unidades_count--;
+    
+    var offset_x = lengthdir_x(35, desembarque_offset_angulo);
+    var offset_y = lengthdir_y(35, desembarque_offset_angulo);
+    desembarque_offset_angulo += 35;
+    
+    if (instance_exists(veiculo_id)) {
+        var _offset_x_final = x + offset_x;
+        var _offset_y_final = y + offset_y;
+        
+        veiculo_id.x = _offset_x_final;
+        veiculo_id.y = _offset_y_final;
+        veiculo_id.visible = true;  // Mostrar visualmente ANTES de parar a velocidade
+        
+        // Parar o veículo ao desembarcar
+        if (variable_instance_exists(veiculo_id, "velocidade_atual")) {
+            veiculo_id.velocidade_atual = 0;
+        }
+    }
+    
+    show_debug_message("✅ Veículo desembarcou! Restantes: " + string(unidades_count));
+}
+
+// Callbacks
+on_select = function() {
+    selecionado = true;
+};
+
+on_deselect = function() {
+    selecionado = false;
+};
+
+// Garantir existência de ds_list
+if (!ds_exists(pontos_patrulha, ds_type_list)) {
+    pontos_patrulha = ds_list_create();
+}
+
+show_debug_message("🚢 Navio Transporte criado - Sistema de embarque/desembarque ativo!");

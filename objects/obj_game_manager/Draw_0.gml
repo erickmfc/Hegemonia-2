@@ -42,6 +42,7 @@ if (global.barras_vida_ativas) {
     // === FUNÇÃO LOCAL PARA DESENHAR BARRA BÁSICA ===
     function desenhar_barra_basica(_obj, _offset_y) {
         if (!instance_exists(_obj)) return;
+        if (!_obj.visible) return;  // ✅ RE-ADICIONADO: Verificar visibilidade
         if (!variable_instance_exists(_obj, "hp_atual") || !variable_instance_exists(_obj, "hp_max")) return;
         if (_obj.hp_atual <= 0) return;
         
@@ -86,6 +87,7 @@ if (global.barras_vida_ativas) {
     // === FUNÇÃO LOCAL PARA DESENHAR BARRA AVANÇADA ===
     function desenhar_barra_avancada(_obj, _offset_y) {
         if (!instance_exists(_obj)) return;
+        if (!_obj.visible) return;  // ✅ RE-ADICIONADO: Verificar visibilidade
         if (!variable_instance_exists(_obj, "hp_atual") || !variable_instance_exists(_obj, "hp_max")) return;
         if (_obj.hp_atual <= 0) return;
         

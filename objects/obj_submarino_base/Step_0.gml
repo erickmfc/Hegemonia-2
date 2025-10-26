@@ -2,7 +2,7 @@
 
 // --- 1. PROCESSAR INPUTS DO JOGADOR (SE SELECIONADO) ---
 if (selecionado) {
-    // Comandos de Modo (P/O) - adaptados para lancha
+    // Comandos de Modo (P/O)
     if (keyboard_check_pressed(ord("P"))) { 
         modo_combate = LanchaMode.PASSIVO; 
         show_debug_message("🛡️ " + nome_unidade + " em Modo PASSIVO");
@@ -12,15 +12,39 @@ if (selecionado) {
         show_debug_message("⚔️ " + nome_unidade + " em Modo ATAQUE AGRESSIVO");
     }
 
-    // Comando de Parar (L) - adaptado para lancha
+    // Comando de Parar (L)
     if (keyboard_check_pressed(ord("L"))) {
         estado = LanchaState.PARADO;
         alvo_unidade = noone;
         show_debug_message("⏹️ " + nome_unidade + " recebeu ordem para PARAR");
     }
     
-    // Comandos K, clique esquerdo e clique direito agora são gerenciados pelo obj_input_manager
-    // para evitar conflitos e manter o modo de patrulha persistente
+    // Comando K removido - agora gerenciado pelo obj_input_manager
+}
+
+// --- 1.5. SISTEMA DE SUBMERSÃO/EMERSÃO ---
+// Cooldown de submersão
+if (cooldown_submersao > 0) {
+    cooldown_submersao--;
+}
+
+// Timer de submersão (limitado)
+if (submerso) {
+    tempo_submersao_atual++;
+    
+    // Forçar emergir se ficou muito tempo submerso
+    if (tempo_submersao_atual >= tempo_maximo_submersao) {
+        func_emergir();
+        show_debug_message("⚠️ " + nome_unidade + " forçado a emergir (tempo máximo excedido)");
+    }
+    
+    // Efeito visual: mais profundo = mais transparente
+    var _profundidade_percentual = min(tempo_submersao_atual / tempo_maximo_submersao, 1.0);
+    image_alpha = 0.5 - (_profundidade_percentual * 0.3); // 0.5 a 0.2 de alpha
+} else {
+    // Resetar timer quando emergir
+    tempo_submersao_atual = 0;
+    image_alpha = 1.0;
 }
 
 // ======================================================================
@@ -29,32 +53,13 @@ if (selecionado) {
 // Se o modo ataque está ativo E a lancha não está parada E não está já atacando alguém...
 if (modo_combate == LanchaMode.ATAQUE && estado != LanchaState.ATACANDO) {
     // Prioriza alvos navais (qualquer objeto filho de obj_navio_base), depois aéreos e terrestres
-    var _alvo_submarino = noone;
-    // Submarino desabilitado (obj_submarino não existe no projeto)
-    var _alvo_naval = noone;
-    if (object_exists(obj_navio_base)) {
-        _alvo_naval = instance_nearest(x, y, obj_navio_base);
-    }
-    var _alvo_f6 = noone;
-    if (object_exists(obj_f6)) {
-        _alvo_f6 = instance_nearest(x, y, obj_f6);
-    }
-    var _alvo_f5 = noone;
-    if (object_exists(obj_caca_f5)) {
-        _alvo_f5 = instance_nearest(x, y, obj_caca_f5);
-    }
-    var _alvo_helicoptero = noone;
-    if (object_exists(obj_helicoptero_militar)) {
-        _alvo_helicoptero = instance_nearest(x, y, obj_helicoptero_militar);
-    }
-    var _alvo_terrestre = noone;
-    if (object_exists(obj_inimigo)) {
-        _alvo_terrestre = instance_nearest(x, y, obj_inimigo);
-    }
-    var _alvo_infantaria = noone;
-    if (object_exists(obj_infantaria)) {
-        _alvo_infantaria = instance_nearest(x, y, obj_infantaria);
-    }
+    var _alvo_submarino = instance_nearest(x, y, obj_wwhendrick); // Usar obj_wwhendrick ao invés de obj_submarino
+    var _alvo_naval = instance_nearest(x, y, obj_navio_base);
+    var _alvo_f6 = instance_nearest(x, y, obj_f6);
+    var _alvo_f5 = instance_nearest(x, y, obj_caca_f5);
+    var _alvo_helicoptero = instance_nearest(x, y, obj_helicoptero_militar);
+    var _alvo_terrestre = instance_nearest(x, y, obj_inimigo);
+    var _alvo_infantaria = instance_nearest(x, y, obj_infantaria);
     
     var _alvo_encontrado = noone;
     var _tipo_alvo = "";
@@ -181,7 +186,7 @@ switch (estado) {
                        
                        // === PRIMEIRO: Verificar se é um submarino ===
                        var _nome_alvo = object_get_name(alvo_unidade.object_index);
-                       if (_nome_alvo == "obj_submarino") {
+                       if (_nome_alvo == "obj_wwhendrick" || _nome_alvo == "obj_submarino_base") {
                            // Alvo é submarino - usar Míssil Ice anti-submarino
                            _missil_obj = obj_missel_ice;
                            _missil_nome = "Míssil Ice (Anti-Submarino)";

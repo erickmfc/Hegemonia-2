@@ -1,23 +1,23 @@
-/// @description Inicialização da Lancha Patrulha
+// ===============================================
+// HEGEMONIA GLOBAL - SUBMARINO BASE
+// Sistema de Submarino com Submersão/Emergência
+// ===============================================
 
-// === ENUMS GLOBAIS ===
-// Os enums LanchaState e LanchaMode agora estão no script global scr_enums_navais
-
-// Atributos básicos (adaptados para o jogo)
-hp_atual = 150;  // HP da lancha conforme documentação
-hp_max = 150;
-velocidade_movimento = 1.4; // velocidade conforme documentação
-nacao_proprietaria = 1; // 1 = jogador (conforme obj_inimigo usa 2)
+// === ATRIBUTOS BÁSICOS ===
+hp_atual = 180;  // HP do submarino
+hp_max = 180;
+velocidade_movimento = 1.2; // Mais lento que navios de superfície
+nacao_proprietaria = 1; // 1 = jogador
 
 
-// Estado e modo - DEFINIR PRIMEIRO
+// Estado e modo
 estado = LanchaState.PARADO;
 modo_combate = LanchaMode.PASSIVO;
 
-// Sensores e alcance (PADRONIZADO COM TODOS OS NAVIOS)
-radar_alcance = 1000; // IGUAL aos outros navios
-missil_alcance = 1000; // IGUAL aos outros navios
-missil_max_alcance = 1000; // Alcance máximo de mísseis
+// Sensores e alcance
+radar_alcance = 800; // Menor que navios (mais furtivo)
+missil_alcance = 700; // Alcance de torpedos
+missil_max_alcance = 700;
 alcance_ataque = missil_alcance;
 
 // Alvo e movimento
@@ -35,8 +35,17 @@ selecionado = false;
 reload_time = 60; // steps entre tiros
 reload_timer = 0;
 
-// Identificador e nome
-nome_unidade = "Lancha Patrulha";
+// Nome padrão
+nome_unidade = "Submarino";
+
+// === SISTEMA DE SUBMERSÃO ===
+submerso = false; // Estado de submersão
+profundidade_atual = 0; // Profundidade atual (0 = superfície)
+profundidade_maxima = 50; // Profundidade máxima de submersão
+velocidade_submersao = 0.5; // Velocidade de submersão/emersão
+cooldown_submersao = 0; // Cooldown para mudança de profundidade
+tempo_submersao_atual = 0; // Tempo atual debaixo d'água
+tempo_maximo_submersao = 600; // 10 segundos máx submerso
 
 // Variáveis auxiliares
 alvo_unidade = noone; // id da instancia inimiga a atacar
@@ -149,4 +158,35 @@ if (!ds_exists(pontos_patrulha, ds_type_list)) {
     pontos_patrulha = ds_list_create();
 }
 
-show_debug_message("🚢 " + nome_unidade + " base criada!");
+// Função para submergir
+func_submergir = function() {
+    if (!submerso && cooldown_submersao <= 0) {
+        submerso = true;
+        tempo_submersao_atual = 0;
+        image_alpha = 0.5; // Fica semi-transparente submerso
+        show_debug_message("🌊 " + nome_unidade + " submergindo!");
+        cooldown_submersao = 180; // 3 segundos de cooldown
+    }
+};
+
+// Função para emergir
+func_emergir = function() {
+    if (submerso && cooldown_submersao <= 0) {
+        submerso = false;
+        profundidade_atual = 0;
+        image_alpha = 1.0; // Volta totalmente visível
+        show_debug_message("🌊 " + nome_unidade + " emergindo!");
+        cooldown_submersao = 180; // 3 segundos de cooldown
+    }
+};
+
+// Função para alternar submersão
+func_trocar_profundidade = function() {
+    if (submerso) {
+        func_emergir();
+    } else {
+        func_submergir();
+    }
+};
+
+show_debug_message("🌊 Submarino base criado e pronto para ação!");
