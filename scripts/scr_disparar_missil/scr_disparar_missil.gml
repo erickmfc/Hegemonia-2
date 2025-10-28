@@ -31,6 +31,7 @@ switch (tipo) {
 if (instance_exists(m)) {
     m.target = alvo;
     m.dono = dono;
+    
     show_debug_message("✅ Míssil " + string(tipo) + " criado com sucesso!");
 } else {
     show_debug_message("❌ Falha ao criar míssil " + string(tipo));

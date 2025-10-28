@@ -5,7 +5,10 @@
 // ===============================================
 
 // Chamar Draw do pai
-event_inherited();
+// GM2040: Verificar se há parent antes de chamar event_inherited
+if (object_get_parent(object_index) != -1) {
+    event_inherited();
+}
 
 // Porta-aviões só desenha indicadores se estiver selecionado
 if (variable_instance_exists(id, "selecionado") && selecionado) {
@@ -28,7 +31,7 @@ if (variable_instance_exists(id, "selecionado") && selecionado) {
     var _soldados = variable_instance_exists(id, "soldados_count") ? soldados_count : 0;
     var _soldados_max = variable_instance_exists(id, "soldados_max") ? soldados_max : 0;
     
-    draw_set_color(c_aqua);
+    draw_set_color(make_color_rgb(0, 255, 255)); // c_aqua
     draw_set_halign(fa_center);
     draw_text_transformed(x, y - 130, "✈️ Aviação: " + string(_avioes) + "/" + string(_avioes_max), 0.9, 0.9, 0);
     draw_text_transformed(x, y - 110, "🚗 Unidades: " + string(_unidades) + "/" + string(_unidades_max), 0.9, 0.9, 0);
@@ -55,7 +58,7 @@ if (variable_instance_exists(id, "selecionado") && selecionado) {
     if (variable_instance_exists(id, "desembarque_ativo") && desembarque_ativo) {
         draw_set_color(c_yellow);
         draw_text_transformed(x, y - 50, "DESEMBARCANDO...", 1.0, 1.0, 0);
-        draw_set_color(c_aqua);
+        draw_set_color(make_color_rgb(0, 255, 255)); // c_aqua
     }
     
     // HP Bar maior (navio com muita vida)

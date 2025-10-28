@@ -45,7 +45,7 @@ if (selecionado) {
     var _status_color = c_gray;
     if (estado == LanchaState.ATACANDO) _status_color = c_red;
     else if (estado == LanchaState.PATRULHANDO) _status_color = c_orange;
-    else if (estado == LanchaState.MOVENDO) _status_color = c_aqua;
+    else if (estado == LanchaState.MOVENDO) _status_color = make_color_rgb(0, 255, 255); // c_aqua
     else if (estado == LanchaState.DEFININDO_PATRULHA) _status_color = c_lime;
     
     // Desenha o status acima da lancha
@@ -54,8 +54,9 @@ if (selecionado) {
     
     // Desenha os controles disponíveis (adaptados para submarino)
     draw_set_color(c_white);
-    draw_text(x, _draw_y - 45, "[K] Subm/Emerge | [L] Parar");
-    draw_text(x, _draw_y - 30, "[P] Passivo | [O] Ataque Agressivo");
+    draw_text(x, _draw_y - 50, "[K] Patrulha");
+    draw_text(x, _draw_y - 35, "[I] Subm/Emerg | [L] Parar");
+    draw_text(x, _draw_y - 20, "[P] Passivo | [O] Ataque");
 
     draw_set_halign(fa_left);
 }

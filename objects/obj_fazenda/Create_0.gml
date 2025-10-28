@@ -11,6 +11,7 @@ producao_final = 0; // Produção final
 
 // === CICLO DE PRODUÇÃO ===
 // Ciclo de 1 mês (30 dias × 60 segundos = 1800 segundos = 30 minutos)
+// ✅ CORREÇÃO GM1024: Usar game_get_speed em vez de room_speed
 alarm[0] = game_get_speed(gamespeed_fps) * 1800; // 30 minutos
 
 // === TERRENO PERMITIDO ===
@@ -19,4 +20,4 @@ terreno_permitido = TERRAIN.CAMPO; // Fazendas só em terreno de campo
 // === DEBUG ===
 show_debug_message("🌾 Fazenda criada - Custo: $" + string(custo_fazenda) + " CG");
 show_debug_message("🌾 Produção base: " + string(producao_base) + " Alimento/ciclo");
-show_debug_message("🌾 Próximo ciclo em: " + string(alarm[0] / room_speed) + " segundos");
+show_debug_message("🌾 Próximo ciclo em: " + string(alarm[0] / game_get_speed(gamespeed_fps)) + " segundos");

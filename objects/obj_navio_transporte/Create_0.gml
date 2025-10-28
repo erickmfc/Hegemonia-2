@@ -139,61 +139,128 @@ func_procurar_inimigo = function() {
 
 // === 6. FUNÇÕES DE EMBARQUE/DESEMBARQUE ===
 
-// Função para embarcar soldado
+// ✅ Função para detectar tipo de unidade
+tipo_unidade = function(unidade) {
+    // Aeronaves
+    if (unidade.object_index == obj_caca_f5 ||
+        unidade.object_index == obj_f15 ||
+        unidade.object_index == obj_f6 ||
+        unidade.object_index == obj_helicoptero_militar ||
+        unidade.object_index == obj_c100) {
+        return "aereo";
+    }
+    
+    // Soldados (unidades de infantaria)
+    if (unidade.object_index == obj_infantaria ||
+        unidade.object_index == obj_soldado_antiaereo) {
+        return "soldado";
+    }
+    
+    // Veículos (tanques e blindados)
+    if (unidade.object_index == obj_tanque ||
+        unidade.object_index == obj_blindado_antiaereo) {
+        return "unidade";
+    }
+    
+    return "desconhecido";
+}
+
+// ✅ FUNÇÃO UNIFICADA DE EMBARQUE
 funcao_embarcar_unidade = function(unidade_id) {
-    if (soldados_count >= soldados_max) {
-        show_debug_message("❌ Capacidade de soldados esgotada!");
-        return;
+    if (!instance_exists(unidade_id)) {
+        show_debug_message("❌ EMBARQUE FALHOU: Unidade não existe!");
+        return false;
     }
     
-    if (ds_list_find_index(soldados_embarcados, unidade_id) == -1) {
-        // IMPORTANTE: Esconder ANTES de adicionar à lista
-        if (instance_exists(unidade_id)) {
-            unidade_id.visible = false;
-            // Não desativar - mantemos ativo mas invisível
-        }
-        ds_list_add(soldados_embarcados, unidade_id);
-        soldados_count++;
-        show_debug_message("✅ " + object_get_name(unidade_id.object_index) + " embarcou! Soldados: " + string(soldados_count) + "/" + string(soldados_max));
+    var _unidade = unidade_id;
+    var _tipo = tipo_unidade(_unidade);
+    var _pode_embarcar = false;
+    var _lista_usar;
+    
+    show_debug_message("🔍 Tentando embarcar: " + object_get_name(_unidade.object_index) + " | Tipo: " + _tipo);
+    
+    // Verificar se pode embarcar de acordo com o tipo
+    switch (_tipo) {
+        case "aereo":
+            if (avioes_count >= avioes_max) {
+                show_debug_message("❌ EMBARQUE FALHOU: Capacidade AÉREA esgotada! (" + string(avioes_count) + "/" + string(avioes_max) + ")");
+                return false;
+            }
+            _lista_usar = avioes_embarcados;
+            _pode_embarcar = true;
+            show_debug_message("✅ Capacidade AÉREA OK: " + string(avioes_count) + "/" + string(avioes_max));
+            break;
+        case "unidade":
+            if (unidades_count >= unidades_max) {
+                show_debug_message("❌ EMBARQUE FALHOU: Capacidade VEÍCULOS esgotada! (" + string(unidades_count) + "/" + string(unidades_max) + ")");
+                return false;
+            }
+            _lista_usar = unidades_embarcadas;
+            _pode_embarcar = true;
+            show_debug_message("✅ Capacidade VEÍCULOS OK: " + string(unidades_count) + "/" + string(unidades_max));
+            break;
+        case "soldado":
+            if (soldados_count >= soldados_max) {
+                show_debug_message("❌ EMBARQUE FALHOU: Capacidade SOLDADOS esgotada! (" + string(soldados_count) + "/" + string(soldados_max) + ")");
+                return false;
+            }
+            _lista_usar = soldados_embarcados;
+            _pode_embarcar = true;
+            show_debug_message("✅ Capacidade SOLDADOS OK: " + string(soldados_count) + "/" + string(soldados_max));
+            break;
+        default:
+            show_debug_message("❌ EMBARQUE FALHOU: Tipo desconhecido: " + _tipo);
+            return false;
     }
+    
+    if (!_pode_embarcar) {
+        show_debug_message("❌ EMBARQUE FALHOU: Flag _pode_embarcar é false (ERRO INESPERADO)");
+        return false;
+    }
+    
+    // Verificar se já está embarcado
+    if (ds_list_find_index(_lista_usar, unidade_id) != -1) {
+        show_debug_message("⚠️ EMBARQUE FALHOU: " + object_get_name(_unidade.object_index) + " já está na lista!");
+        return false;
+    }
+    
+    // --- SE CHEGAR ATÉ AQUI, DEVERIA FUNCIONAR ---
+    show_debug_message(">>> PASSO FINAL: Adicionando à lista e escondendo...");
+    
+    // Adicionar à lista correta baseado no tipo
+    ds_list_add(_lista_usar, unidade_id);
+    
+    // Atualizar contador CORRETO baseado no tipo
+    switch (_tipo) {
+        case "aereo":
+            avioes_count++;
+            break;
+        case "unidade":
+            unidades_count++;
+            break;
+        case "soldado":
+            soldados_count++;
+            break;
+    }
+    
+    // IMPORTANTE: Apenas esconder a unidade (NÃO desativar!)
+    _unidade.visible = false;
+    
+    show_debug_message("✅ " + object_get_name(_unidade.object_index) + " embarcou! (A:" + 
+                      string(avioes_count) + "/" + string(avioes_max) + " | " +
+                      "U:" + string(unidades_count) + "/" + string(unidades_max) + " | " +
+                      "S:" + string(soldados_count) + "/" + string(soldados_max) + ")");
+    
+    return true;
 }
 
-// Função para embarcar aeronave
+// ✅ ALIAS PARA COMPATIBILIDADE
 funcao_embarcar_aeronave = function(aeronave_id) {
-    if (avioes_count >= avioes_max) {
-        show_debug_message("❌ Capacidade de aeronaves esgotada!");
-        return;
-    }
-    
-    if (ds_list_find_index(avioes_embarcados, aeronave_id) == -1) {
-        // IMPORTANTE: Esconder ANTES de adicionar à lista
-        if (instance_exists(aeronave_id)) {
-            aeronave_id.visible = false;
-            // Não desativar - mantemos ativo mas invisível
-        }
-        ds_list_add(avioes_embarcados, aeronave_id);
-        avioes_count++;
-        show_debug_message("✅ " + object_get_name(aeronave_id.object_index) + " embarcou! Aeronaves: " + string(avioes_count) + "/" + string(avioes_max));
-    }
+    return funcao_embarcar_unidade(aeronave_id);
 }
 
-// Função para embarcar veículo
 funcao_embarcar_veiculo = function(veiculo_id) {
-    if (unidades_count >= unidades_max) {
-        show_debug_message("❌ Capacidade de veículos esgotada!");
-        return;
-    }
-    
-    if (ds_list_find_index(unidades_embarcadas, veiculo_id) == -1) {
-        // IMPORTANTE: Esconder ANTES de adicionar à lista
-        if (instance_exists(veiculo_id)) {
-            veiculo_id.visible = false;
-            // Não desativar - mantemos ativo mas invisível
-        }
-        ds_list_add(unidades_embarcadas, veiculo_id);
-        unidades_count++;
-        show_debug_message("✅ " + object_get_name(veiculo_id.object_index) + " embarcou! Veículos: " + string(unidades_count) + "/" + string(unidades_max));
-    }
+    return funcao_embarcar_unidade(veiculo_id);
 }
 
 // Função para desembarcar soldado

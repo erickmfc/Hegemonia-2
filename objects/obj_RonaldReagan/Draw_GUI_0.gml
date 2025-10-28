@@ -113,7 +113,7 @@ if (_total_unidades > 0) {
     draw_text(_menu_x + _menu_w/2, _btn_y + 15, "DESEMBARCAR");
     
     // Contador
-    draw_set_color(c_aqua);
+    draw_set_color(make_color_rgb(0, 255, 255)); // c_aqua
     draw_text(_menu_x + 20, _menu_y + 20, "Total: " + string(_total_unidades));
     
     draw_set_halign(fa_left);

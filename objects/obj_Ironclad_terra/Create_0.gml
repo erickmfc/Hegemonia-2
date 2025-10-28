@@ -14,8 +14,8 @@ image_angle = 0; // Ângulo inicial
 image_speed = 0.5; // Velocidade da animação
 
 // Parâmetros de guiamento/impacto (ajustáveis)
-turn_rate = 0.06; // quão rápido corrige a direção (alvo 90-99%)
-impact_radius = 18; // raio de acerto
+turn_rate = 0.20; // Taxa de curva melhorada para 100% parado / 99% em movimento
+impact_radius = 28; // Raio de acerto aumentado
 
 // Rastreamento do alvo para detectar se está parado (garantir 100% quando imóvel)
 last_tx = -1;

@@ -6,6 +6,10 @@
 // ====================
 // ATRIBUTOS DO SOLDADO ANTI-AÉREO
 // ====================
+
+// Nação proprietária (1 = jogador, 2 = IA inimiga)
+nacao_proprietaria = 1;
+
 vida = 100;
 vida_max = 100;
 dano = 35; // Mais dano contra alvos aéreos
@@ -46,3 +50,6 @@ image_yscale = 1.0;
 // Sistema de mísseis
 missil_em_voo = false;
 missil_criado = noone;
+
+// Contador para debug
+step_counter = 0;

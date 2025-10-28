@@ -2,20 +2,23 @@
   "$GMObject":"",
   "%Name":"obj_Constellation",
   "eventList":[
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0"},
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0"},
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":8,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0"},
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":6,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0"},
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":4,"eventType":6,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0"}],
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":8,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":6,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":4,"eventType":6,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
+  ],
   "managed":true,
   "name":"obj_Constellation",
   "overriddenProperties":[],
   "parent":{
     "name":"navios",
-    "path":"folders/Sprites/naval/navios.yy"},
+    "path":"folders/Sprites/naval/navios.yy",
+  },
   "parentObjectId":{
     "name":"obj_navio_base",
-    "path":"objects/obj_navio_base/obj_navio_base.yy"},
+    "path":"objects/obj_navio_base/obj_navio_base.yy",
+  },
   "persistent":false,
   "physicsAngularDamping":0.1,
   "physicsDensity":0.5,
@@ -35,8 +38,11 @@
   "solid":false,
   "spriteId":{
     "name":"spr_Constellation",
-    "path":"sprites/spr_Constellation/spr_Constellation.yy"},
+    "path":"sprites/spr_Constellation/spr_Constellation.yy",
+  },
   "spriteMaskId":{
     "name":"spr_Constellation",
-    "path":"sprites/spr_Constellation/spr_Constellation.yy"},
-  "visible":true}
+    "path":"sprites/spr_Constellation/spr_Constellation.yy",
+  },
+  "visible":true,
+}

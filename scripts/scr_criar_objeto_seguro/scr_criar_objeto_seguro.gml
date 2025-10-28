@@ -60,7 +60,7 @@ function scr_verificar_posicao_valida(objeto_tipo, pos_x, pos_y) {
         case obj_fragata:
         case obj_destroyer:
         case obj_submarino:
-        case obj_porta_avioes:
+        case obj_RonaldReagan:
             return scr_check_water_tile();
         default:
             return true;
@@ -118,7 +118,7 @@ function scr_configurar_objeto_criado(objeto_id, objeto_tipo) {
         case obj_submarino:
             scr_configurar_submarino(objeto);
             break;
-        case obj_porta_avioes:
+        case obj_RonaldReagan:
             scr_configurar_porta_avioes(objeto);
             break;
         case obj_soldado:

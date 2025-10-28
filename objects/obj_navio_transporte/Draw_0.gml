@@ -50,7 +50,7 @@ if (selecionado) {
         _transporte_cor = c_lime;
     } else if (estado_transporte == NavioTransporteEstado.NAVEGANDO) {
         _transporte_texto = "⚓ NAVEGANDO";
-        _transporte_cor = c_aqua;
+        _transporte_cor = make_color_rgb(0, 255, 255); // c_aqua
     } else {
         // Status normal de movimento
         if (estado == LanchaState.ATACANDO) _transporte_texto = "⚔️ ATACANDO";
@@ -61,7 +61,7 @@ if (selecionado) {
         
         if (estado == LanchaState.ATACANDO) _transporte_cor = c_red;
         else if (estado == LanchaState.PATRULHANDO) _transporte_cor = c_orange;
-        else if (estado == LanchaState.MOVENDO) _transporte_cor = c_aqua;
+        else if (estado == LanchaState.MOVENDO) _transporte_cor = make_color_rgb(0, 255, 255); // c_aqua
         else _transporte_cor = c_gray;
     }
     

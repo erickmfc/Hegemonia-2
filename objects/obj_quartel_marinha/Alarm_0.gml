@@ -7,13 +7,15 @@
 if (produzindo && !ds_queue_empty(fila_producao)) {
     show_debug_message("🚢 Produzindo unidade naval...");
     
-    // Criar unidade naval - ✅ POSIÇÃO INTELIGENTE COM MAIOR DISTÂNCIA
+    // Criar unidade naval - ✅ POSIÇÃO INTELIGENTE COM DISTRIBUIÇÃO ALEATÓRIA
     // Posição baseada no número de unidades já produzidas para evitar sobreposição
     var _offset_base = 150; // ✅ AUMENTADO de 100 para 150
-    var _offset_x = _offset_base + (unidades_produzidas * 30); // ✅ AUMENTADO de 20 para 30
-    var _offset_y = _offset_base + (unidades_produzidas * 25); // ✅ AUMENTADO de 15 para 25
-    var _spawn_x = x + _offset_x;
-    var _spawn_y = y + _offset_y;
+    var _offset_x = _offset_base + (unidades_produzidas * 50); // ✅ AUMENTADO para 50 para maior espaço
+    var _offset_y = _offset_base + (unidades_produzidas * 40); // ✅ AUMENTADO para 40 para maior espaço
+    var _variacao_x = random_range(-30, 30); // ✅ NOVO: Variação horizontal aleatória
+    var _variacao_y = random_range(-30, 30); // ✅ NOVO: Variação vertical aleatória
+    var _spawn_x = x + _offset_x + _variacao_x;
+    var _spawn_y = y + _offset_y + _variacao_y;
     
     // Obter dados da unidade da fila
     var _unidade_data = ds_queue_dequeue(fila_producao);

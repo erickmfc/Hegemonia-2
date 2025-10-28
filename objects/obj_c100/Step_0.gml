@@ -138,11 +138,19 @@ if (modo_receber_carga && altura_voo == 0 && estado == "pousado") {
     // Sistema simplificado: aceita qualquer unidade terrestre do jogador
     var _unidade_proxima = collision_circle(x, y, 30, all, false, true);
     
-    if (instance_exists(_unidade_proxima) && eh_unidade_embarcavel(_unidade_proxima)) {
-        var _peso = calcular_peso_unidade(_unidade_proxima);
-        if (embarcar_unidade(_unidade_proxima, _peso)) {
-            // Atualizar penalidades se necessário
-            atualizar_penalidade_carga();
+    if (instance_exists(_unidade_proxima)) {
+        var _nome_obj = object_get_name(_unidade_proxima.object_index);
+        show_debug_message("🔍 C-100: Detectou unidade próxima: " + _nome_obj);
+        
+        if (eh_unidade_embarcavel(_unidade_proxima)) {
+            show_debug_message("✅ C-100: Unidade é embarcável!");
+            var _peso = calcular_peso_unidade(_unidade_proxima);
+            if (embarcar_unidade(_unidade_proxima, _peso)) {
+                // Atualizar penalidades se necessário
+                atualizar_penalidade_carga();
+            }
+        } else {
+            show_debug_message("❌ C-100: Unidade NÃO é embarcável: " + _nome_obj);
         }
     }
     

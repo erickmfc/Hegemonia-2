@@ -2,8 +2,8 @@
 // https://help.yoyogames.com/hc/en-us/articles/360005277377 para obter mais informações
 
 /// @description Verificar se o C100 pode carregar uma unidade
-/// @param {instance} unidade Unidade a ser carregada
-/// @return {bool} True se pode carregar, false caso contrário
+/// @param {Id.Instance} unidade Unidade a ser carregada
+/// @return {Bool} True se pode carregar, false caso contrário
 function scr_c100_can_load(unidade) {
     // Verificar se a unidade existe
     if (!instance_exists(unidade)) {

@@ -1,5 +1,12 @@
 // Explosão no solo (poeira + chamas)
-audio_play_sound(som_anti, 1, false);
+// ✅ CORREÇÃO: Usar asset_get_index() em vez de audio_exists()
+var _sound_index = asset_get_index("som_anti");
+if (_sound_index != -1) {
+    audio_play_sound(som_anti, 1, false);
+    show_debug_message("🔊 Som de impacto terrestre: som_anti");
+} else {
+    show_debug_message("❌ Som som_anti não encontrado!");
+}
 
 // Poeira
 for (var i = 0; i < 12; i++) {

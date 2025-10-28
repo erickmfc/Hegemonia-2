@@ -14,6 +14,29 @@ var _mouse_world_x = _coords[0];
 var _mouse_world_y = _coords[1];
 show_debug_message("Mouse Mundo: (" + string(_mouse_world_x) + ", " + string(_mouse_world_y) + ")");
 
+// ✅ CORREÇÃO BUG: Verificar se há unidade SOBRE o edifício (apenas se não for o próprio quartel)
+// Primeiro verificar se há uma UNIDADE sobre o edifício (não o próprio edifício)
+var _tem_unidade_sobre = false;
+var _tipos_unidades = [
+    obj_infantaria, obj_tanque, obj_soldado_antiaereo, obj_blindado_antiaereo,
+    obj_caca_f5, obj_helicoptero_militar, obj_f15, obj_f6, obj_c100
+];
+
+for (var i = 0; i < array_length(_tipos_unidades); i++) {
+    var _inst = instance_position(_mouse_world_x, _mouse_world_y, _tipos_unidades[i]);
+    if (_inst != noone && instance_exists(_inst)) {
+        _tem_unidade_sobre = true;
+        show_debug_message("⚠️ Unidade detectada sobre o edifício - ignorando clique no quartel");
+        show_debug_message("   Unidade: " + object_get_name(_inst.object_index));
+        break;
+    }
+}
+
+// Se há unidade sobre o edifício, ignorar o clique no edifício
+if (_tem_unidade_sobre) {
+    exit; // Sair sem processar clique no edifício
+}
+
 // ✅ CORREÇÃO: Verificar se o clique está dentro do sprite do quartel
 var _click_detected = false;
 if (mouse_check_button_pressed(mb_left)) {

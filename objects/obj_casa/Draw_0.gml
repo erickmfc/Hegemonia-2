@@ -74,7 +74,7 @@ if (selecionado) {
     var _barra_h = 8;
     
     // Fundo da barra
-    draw_set_color(c_darkgray);
+    draw_set_color(make_color_rgb(64, 64, 64)); // c_darkgray
     draw_rectangle(_barra_x, _barra_y, _barra_x + _barra_w, _barra_y + _barra_h, false);
     
     // Preenchimento baseado na população atual
@@ -98,3 +98,4 @@ if (selecionado) {
     draw_set_color(c_white);
     draw_text(x, _barra_y + 10, "População: " + string(global.populacao) + "/" + string(global.limite_populacional) + " (" + string(round(_percentual * 100)) + "%)");
 }
+

@@ -51,11 +51,11 @@ if (selecionado) {
     
     // Status de Submersão
     if (submerso) {
-        draw_set_color(c_red);
-        draw_text(_text_x, _text_y, "SUBMERSO");
+        draw_set_color(make_color_rgb(0, 255, 255)); // Ciano
+        draw_text(_text_x, _text_y, "🌊 SUBMERSO");
     } else {
         draw_set_color(c_green);
-        draw_text(_text_x, _text_y, "SUPERFÍCIE");
+        draw_text(_text_x, _text_y, "⛴️ SUPERFÍCIE");
     }
     _text_y += 18;
     

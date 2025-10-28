@@ -5,8 +5,10 @@
 // Herda de obj_lancha_patrulha (que funciona!)
 // ===============================================
 
-// Chamar o Create do objeto pai PRIMEIRO
-event_inherited();
+// ✅ CORREÇÃO GM2040: Chamar o Create do objeto pai PRIMEIRO com verificação
+if (object_get_parent(object_index) != -1) {
+    event_inherited();
+}
 
 // === CONFIGURAÇÕES ESPECÍFICAS DO CONSTELLATION ===
 
@@ -14,8 +16,8 @@ event_inherited();
 hp_atual = 800;
 hp_max = 800;
 velocidade_movimento = 2.5;
-radar_alcance = 1000;
-missil_alcance = 800;
+radar_alcance = 1000; // IGUAL aos outros navios
+missil_alcance = 1000; // IGUAL aos outros navios
 alcance_ataque = missil_alcance;
 dano_ataque = 100;
 reload_time = 120;

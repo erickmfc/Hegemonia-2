@@ -62,7 +62,7 @@ function scr_atualizar_padronizar_variaveis(parametros) {
         obj_fragata,
         obj_destroyer,
         obj_submarino,
-        obj_porta_avioes
+        obj_RonaldReagan
     ];
     
     var objetos_terrestres = [

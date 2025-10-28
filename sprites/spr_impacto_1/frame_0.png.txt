@@ -1,3 +1,0 @@
-This is a placeholder for the impact sprite image.
-In a real implementation, this would be a PNG file with a simple explosion/impact effect.
-For now, we'll use a simple yellow circle effect.

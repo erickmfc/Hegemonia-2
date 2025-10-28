@@ -16,7 +16,9 @@ if (atq_cooldown > 0) atq_cooldown--;
 // =======================
 // Só procura novo alvo se não estiver atacando
 if (estado != "atacando" || alvo == noone || !instance_exists(alvo)) {
-    alvo = instance_nearest(x, y, obj_inimigo);
+    // Buscar inimigos considerando nacao_proprietaria
+    var _nacao = (variable_instance_exists(id, "nacao_proprietaria")) ? nacao_proprietaria : 1;
+    alvo = scr_buscar_inimigo(x, y, alcance_visao, _nacao);
     if (alvo != noone && point_distance(x, y, alvo.x, alvo.y) <= alcance_visao) {
         estado = "atacando";
     }
@@ -227,23 +229,25 @@ switch (estado) {
         if (ds_list_size(patrulha) > 0) {
             // Se estamos iniciando patrulha, garante começar do ponto mais próximo ao soldado
             if (patrulha_indice >= ds_list_size(patrulha)) patrulha_indice = 0;
-            var pt = patrulha[| patrulha_indice];
-            var px = pt[0];
-            var py = pt[1];
-            var dist_patrulha = point_distance(x, y, px, py);
-            if (dist_patrulha > velocidade) {
-                var dir_x = px - x;
-                var dir_y = py - y;
-                var dist_norm = point_distance(0, 0, dir_x, dir_y);
-                if (dist_norm > 0) {
-                    x += (dir_x / dist_norm) * velocidade;
-                    y += (dir_y / dist_norm) * velocidade;
-                    image_angle = point_direction(0, 0, dir_x, dir_y);
+            var pt = ds_list_find_value(patrulha, patrulha_indice);
+            if (is_array(pt) && array_length(pt) >= 2) {
+                var px = pt[0];
+                var py = pt[1];
+                var dist_patrulha = point_distance(x, y, px, py);
+                if (dist_patrulha > velocidade) {
+                    var dir_x = px - x;
+                    var dir_y = py - y;
+                    var dist_norm = point_distance(0, 0, dir_x, dir_y);
+                    if (dist_norm > 0) {
+                        x += (dir_x / dist_norm) * velocidade;
+                        y += (dir_y / dist_norm) * velocidade;
+                        image_angle = point_direction(0, 0, dir_x, dir_y);
+                    }
+                } else {
+                    x = px;
+                    y = py;
+                    patrulha_indice = (patrulha_indice + 1) mod ds_list_size(patrulha);
                 }
-            } else {
-                x = px;
-                y = py;
-                patrulha_indice = (patrulha_indice + 1) mod ds_list_size(patrulha);
             }
         }
     break;
@@ -254,6 +258,21 @@ switch (estado) {
             alvo = noone;
             estado = "patrulhando";
         } else if (alvo != noone && instance_exists(alvo)) {
+            // ✅ VERIFICAR SE O ALVO É AÉREO - SOLDADOS NÃO ATACAM AVIÕES
+            var _alvo_aereo = (alvo.object_index == obj_caca_f5 || 
+                              alvo.object_index == obj_f15 || 
+                              alvo.object_index == obj_f6 ||
+                              alvo.object_index == obj_helicoptero_militar ||
+                              alvo.object_index == obj_c100);
+            
+            if (_alvo_aereo) {
+                // É avião - soldados não podem atacar
+                show_debug_message("⚠️ Soldado não pode atacar unidade aérea!");
+                alvo = noone;
+                estado = "patrulhando";
+                break;
+            }
+            
             var dist_alvo = point_distance(x, y, alvo.x, alvo.y);
             
             // Verificar se o inimigo está se movendo
@@ -289,8 +308,8 @@ switch (estado) {
                         var dist_norm = point_distance(0, 0, dir_x, dir_y);
                         if (dist_norm > 0) {
                             var dist_ideal = alcance - 20;
-                            var target_x = x + (dir_x / dist_norm) * (dist - dist_ideal);
-                            var target_y = y + (dir_y / dist_norm) * (dist - dist_ideal);
+                            var target_x = x + (dir_x / dist_norm) * (dist_alvo - dist_ideal);
+                            var target_y = y + (dir_y / dist_norm) * (dist_alvo - dist_ideal);
                             mp_potential_step(target_x, target_y, velocidade, false);
                             image_angle = point_direction(0, 0, dir_x, dir_y);
                         }

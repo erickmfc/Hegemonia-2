@@ -6,6 +6,7 @@
 var _unidades_selecionaveis = [
     obj_Constellation,
     obj_Independence,
+    obj_RonaldReagan,
     obj_c100,
     obj_lancha_patrulha,
     obj_infantaria,
@@ -245,8 +246,9 @@ if (mouse_check_button_pressed(mb_left)) {
         }
         
         // Adicionar ponto se a lista foi encontrada
-        if (_lista_patrulha != noone && ds_exists(_lista_patrulha, ds_type_list)) {
-            // Corrigindo erro GM1041 - usar ds_list_add com parâmetros separados
+        // ✅ CORREÇÃO GM1041: Verificar que _lista_patrulha é uma ds_list válida antes de adicionar
+        if (_lista_patrulha != noone && is_real(_lista_patrulha) && ds_exists(_lista_patrulha, ds_type_list)) {
+            // Adicionar coordenadas separadamente à ds_list
             ds_list_add(_lista_patrulha, _mouse_world_x);
             ds_list_add(_lista_patrulha, _mouse_world_y);
             show_debug_message("📍 Ponto de patrulha adicionado: (" + string(_mouse_world_x) + ", " + string(_mouse_world_y) + ")");
@@ -324,6 +326,22 @@ if (mouse_check_button(mb_left)) {
 // ===============================================
 if (instance_exists(global.unidade_selecionada)) {
     var _unidade = global.unidade_selecionada;
+    
+    // ✅ CORREÇÃO BUG: Navios de transporte NÃO recebem ordens de movimento via controlador
+    // Eles têm seu próprio sistema de controle (Mouse_4 event)
+    var _eh_navio_transporte = (_unidade.object_index == obj_navio_transporte || 
+                                _unidade.object_index == obj_RonaldReagan ||
+                                _unidade.object_index == obj_lancha_patrulha ||
+                                _unidade.object_index == obj_Constellation ||
+                                _unidade.object_index == obj_Independence ||
+                                _unidade.object_index == obj_submarino_base);
+    
+    // Se é um navio, pular processamento de comandos (eles têm Mouse_4 próprio)
+    if (_eh_navio_transporte) {
+        show_debug_message("⚠️ Navio de transporte detectado - ignorando controle centralizado");
+        show_debug_message("   Navio usa Mouse_4 event próprio para movimento");
+        // Não fazer nada - o Mouse_4 do navio cuida disso
+    } else {
 
     // Comandos para F-5 (COMANDOS CENTRALIZADOS NO INPUT MANAGER)
     //if (_unidade.object_index == obj_caca_f5) { // Condição removida para generalizar
@@ -387,6 +405,43 @@ if (instance_exists(global.unidade_selecionada)) {
 
         // Comando de Movimento (Clique Direito) - UNIFICADO PARA TODAS AS UNIDADES
         if (mouse_check_button_pressed(mb_right)) {
+            // ✅ NOVO: Verificar se clicou no Porta-Aviões em modo embarque
+            var _coords = global.scr_mouse_to_world();
+            var _porta_avioes_proximo = instance_position(_coords[0], _coords[1], obj_RonaldReagan);
+            
+            if (instance_exists(_porta_avioes_proximo)) {
+                // Verificar se está em modo embarque
+                if (variable_instance_exists(_porta_avioes_proximo, "estado_embarque") &&
+                    _porta_avioes_proximo.estado_embarque == "embarcando" &&
+                    variable_instance_exists(_unidade, "destino_x")) {
+                    
+                    // Verificar se é embarcável
+                    if (variable_instance_exists(_porta_avioes_proximo, "eh_embarcavel")) {
+                        if (_porta_avioes_proximo.eh_embarcavel(_unidade.id)) {
+                            // Ordenar unidade para IR PARA O NAVIO
+                            _unidade.destino_x = _porta_avioes_proximo.x;
+                            _unidade.destino_y = _porta_avioes_proximo.y;
+                            
+                            // ✅ SETAR FLAG DE EMBARQUE
+                            _unidade.indo_embarcar = true;
+                            
+                            // Ativar movimento se for aéreo
+                            if (variable_instance_exists(_unidade, "velocidade_atual")) {
+                                _unidade.velocidade_atual = 5;
+                            }
+                            
+                            // Ativar estado de movimento
+                            if (variable_instance_exists(_unidade, "estado")) {
+                                _unidade.estado = "movendo";
+                            }
+                            
+                            show_debug_message("✅ " + object_get_name(_unidade.object_index) + " recebeu ordem de embarcar no Porta-Aviões!");
+                            return; // Não processar movimento normal
+                        }
+                    }
+                }
+            }
+            
             // ✅ CORREÇÃO: Bloquear movimento do C-100 quando em modo de embarque
             if (object_get_name(_unidade.object_index) == "obj_c100" && _unidade.modo_receber_carga) {
                 show_debug_message("🚁 C-100: Comando de movimento bloqueado - modo embarque ativo");
@@ -395,23 +450,23 @@ if (instance_exists(global.unidade_selecionada)) {
             
             // Se estiver definindo patrulha, adiciona um ponto
             if (global.definindo_patrulha == _unidade && variable_instance_exists(_unidade, "pontos_patrulha")) {
-                var _coords = global.scr_mouse_to_world();
+                var _coords_patrulha = global.scr_mouse_to_world();
                 // Corrigindo erro GM1041 - usar ds_list_add com parâmetros separados
-                ds_list_add(_unidade.pontos_patrulha, _coords[0]);
-                ds_list_add(_unidade.pontos_patrulha, _coords[1]);
+                ds_list_add(_unidade.pontos_patrulha, _coords_patrulha[0]);
+                ds_list_add(_unidade.pontos_patrulha, _coords_patrulha[1]);
                 show_debug_message("📍 Ponto de patrulha adicionado");
             } 
             // Senão, é uma ordem de movimento normal
             else {
-                // Corrigindo aviso GM2044 - variável local já declarada
-                _coords = global.scr_mouse_to_world();
+                // Usar variável já declarada no escopo superior
+                var _coords_mov = global.scr_mouse_to_world();
                 
                 // ✅ CORREÇÃO: Usar a função interna da unidade para dar a ordem de movimento.
                 // Isso garante que a própria unidade lide com seus estados e destinos.
                 if (variable_instance_exists(_unidade, "ordem_mover")) {
                     // Clamp destino para dentro da sala antes de delegar
-                    var _tx = clamp(_coords[0], 8, room_width - 8);
-                    var _ty = clamp(_coords[1], 8, room_height - 8);
+                    var _tx = clamp(_coords_mov[0], 8, room_width - 8);
+                    var _ty = clamp(_coords_mov[1], 8, room_height - 8);
                     _unidade.ordem_mover(_tx, _ty);
                     show_debug_message("🚢 Ordem de movimento enviada para " + object_get_name(_unidade.object_index) + " via função interna.");
                     
@@ -419,8 +474,11 @@ if (instance_exists(global.unidade_selecionada)) {
                     if (object_get_name(_unidade.object_index) == "obj_Independence") {
                         show_debug_message("🚢 INDEPENDENCE: Ordem de movimento recebida!");
                         show_debug_message("🚢 INDEPENDENCE: Destino: (" + string(_tx) + ", " + string(_ty) + ")");
-                        show_debug_message("🚢 INDEPENDENCE: Estado atual: " + string(_unidade.estado));
-                        show_debug_message("🚢 INDEPENDENCE: Velocidade: " + string(_unidade.velocidade_movimento));
+                        // ✅ CORREÇÃO GM2016: Usar variáveis locais para debug
+                        var _estado_unidade = variable_instance_exists(_unidade, "estado") ? _unidade.estado : "desconhecido";
+                        var _velocidade_unidade = variable_instance_exists(_unidade, "velocidade_movimento") ? _unidade.velocidade_movimento : 0;
+                        show_debug_message("🚢 INDEPENDENCE: Estado atual: " + string(_estado_unidade));
+                        show_debug_message("🚢 INDEPENDENCE: Velocidade: " + string(_velocidade_unidade));
                         show_debug_message("🚢 INDEPENDENCE: Tem ordem_mover: " + string(variable_instance_exists(_unidade, "ordem_mover")));
                     }
                 } 
@@ -431,25 +489,38 @@ if (instance_exists(global.unidade_selecionada)) {
                         show_debug_message("🎯 Ordem de movimento para helicóptero");
                 } else {
                     // ✅ CORREÇÃO CRÍTICA: Sistema legado com clamp para evitar movimento fora da sala
-                    var _tx = clamp(_coords[0], 8, room_width - 8);
-                    var _ty = clamp(_coords[1], 8, room_height - 8);
+                    var _tx_legacy = clamp(_coords_mov[0], 8, room_width - 8);
+                    var _ty_legacy = clamp(_coords_mov[1], 8, room_height - 8);
                     
                     // ✅ CORREÇÃO ADICIONAL: Verificar se o destino é muito diferente do atual
-                    var _distancia_atual = point_distance(_unidade.x, _unidade.y, _tx, _ty);
-                    var _distancia_anterior = point_distance(_unidade.x, _unidade.y, _unidade.destino_x, _unidade.destino_y);
+                    var _distancia_atual = point_distance(_unidade.x, _unidade.y, _tx_legacy, _ty_legacy);
+                    
+                    // ✅ CORREÇÃO GM2016: Verificar se as variáveis existem antes de usar
+                    var _distancia_anterior = 0;
+                    if (variable_instance_exists(_unidade, "destino_x") && variable_instance_exists(_unidade, "destino_y")) {
+                        _distancia_anterior = point_distance(_unidade.x, _unidade.y, _unidade.destino_x, _unidade.destino_y);
+                    }
                     
                     // Se o novo destino é muito diferente do anterior, pode ser um erro de zoom
                     if (_distancia_anterior > 0 && abs(_distancia_atual - _distancia_anterior) > 200) {
                         show_debug_message("⚠️ AVISO: Destino muito diferente detectado - pode ser erro de zoom");
                         show_debug_message("   Distância anterior: " + string(_distancia_anterior) + " | Nova: " + string(_distancia_atual));
-                        show_debug_message("   Destino anterior: (" + string(_unidade.destino_x) + ", " + string(_unidade.destino_y) + ")");
-                        show_debug_message("   Novo destino: (" + string(_tx) + ", " + string(_ty) + ")");
+                        if (variable_instance_exists(_unidade, "destino_x") && variable_instance_exists(_unidade, "destino_y")) {
+                            show_debug_message("   Destino anterior: (" + string(_unidade.destino_x) + ", " + string(_unidade.destino_y) + ")");
+                        }
+                        show_debug_message("   Novo destino: (" + string(_tx_legacy) + ", " + string(_ty_legacy) + ")");
                     }
                     
-                    _unidade.destino_x = _tx;
-                    _unidade.destino_y = _ty;
+                    // ✅ CORREÇÃO GM2016: Inicializar variáveis se não existirem
+                    if (!variable_instance_exists(_unidade, "alvo_unidade")) _unidade.alvo_unidade = noone;
+                    if (!variable_instance_exists(_unidade, "destino_x")) _unidade.destino_x = _unidade.x;
+                    if (!variable_instance_exists(_unidade, "destino_y")) _unidade.destino_y = _unidade.y;
+                    if (!variable_instance_exists(_unidade, "estado")) _unidade.estado = "parado";
+                    
+                    _unidade.destino_x = _tx_legacy;
+                    _unidade.destino_y = _ty_legacy;
                     _unidade.estado = "movendo";
-                    show_debug_message("🎯 Ordem de movimento (legado) para " + object_get_name(_unidade.object_index) + " - Destino: (" + string(_tx) + ", " + string(_ty) + ")");
+                    show_debug_message("🎯 Ordem de movimento (legado) para " + object_get_name(_unidade.object_index) + " - Destino: (" + string(_tx_legacy) + ", " + string(_ty_legacy) + ")");
                 }
                     
                 // Cancela outros modos se existirem
@@ -460,4 +531,5 @@ if (instance_exists(global.unidade_selecionada)) {
             }
         }
     //} // Fim do if que foi removido
+    } // ✅ FIM DO else para navios de transporte
 }

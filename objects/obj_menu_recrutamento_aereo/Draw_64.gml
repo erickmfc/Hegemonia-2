@@ -1,6 +1,6 @@
 // ===============================================
-// HEGEMONIA GLOBAL - MENU DE RECRUTAMENTO AÉREO
-// Interface Visual Completa Inspirada nos Outros Menus
+// HEGEMONIA GLOBAL - MENU AÉREO MODERNO
+// Interface Grid com Todas as Aeronaves
 // ===============================================
 
 // Verificar se o aeroporto ainda existe
@@ -9,277 +9,294 @@ if (id_do_aeroporto == noone || !instance_exists(id_do_aeroporto)) {
     exit;
 }
 
-// === CONFIGURAÇÃO DE FONTE ===
-if (font_exists(fnt_ui_main)) {
-    draw_set_font(fnt_ui_main);
-} else {
-    draw_set_font(-1);
-}
+// === DIMENSÕES E POSICIONAMENTO ===
+var _gui_w = display_get_gui_width();
+var _gui_h = display_get_gui_height();
 
-// === OVERLAY DE FUNDO ESCURO ===
-draw_set_alpha(0.85);
-draw_set_color(make_color_rgb(15, 20, 30));
-draw_rectangle(0, 0, display_get_gui_width(), display_get_gui_height(), false);
-draw_set_alpha(1);
+// Menu ocupa 90% da tela
+var _menu_w = _gui_w * 0.9;
+var _menu_h = _gui_h * 0.9;
+var _menu_x = (_gui_w - _menu_w) / 2;
+var _menu_y = (_gui_h - _menu_h) / 2;
 
-// === PAINEL PRINCIPAL CENTRALIZADO ===
-var _mw = display_get_gui_width() * 0.5;   // 50% da largura da tela
-var _mh = display_get_gui_height() * 0.6;   // 60% da altura da tela
-var _mx = (display_get_gui_width() - _mw) / 2;   // Centralizar horizontalmente
-var _my = (display_get_gui_height() - _mh) / 2;   // Centralizar verticalmente
+// === OVERLAY DE FUNDO ===
+draw_set_alpha(0.92);
+draw_set_color(make_color_rgb(10, 15, 25)); // Céu noturno
+draw_rectangle(0, 0, _gui_w, _gui_h, false);
+draw_set_alpha(1.0);
 
-// Sombra do painel
-draw_set_color(make_color_rgb(0, 0, 0));
-draw_set_alpha(0.3);
-draw_roundrect_ext(_mx + 4, _my + 4, _mx + _mw + 4, _my + _mh + 4, 12, 12, false);
-draw_set_alpha(1);
+// === FUNDO PRINCIPAL COM GRADIENTE AÉREO ===
+// Sombra
+draw_set_color(c_black);
+draw_set_alpha(0.6);
+draw_roundrect_ext(_menu_x + 10, _menu_y + 10, _menu_x + _menu_w + 10, _menu_y + _menu_h + 10, 25, 25, false);
 
-// Fundo do painel principal - azul escuro aéreo
-draw_set_color(make_color_rgb(25, 35, 55));
-draw_set_alpha(0.95);
-draw_roundrect_ext(_mx, _my, _mx + _mw, _my + _mh, 12, 12, false);
-draw_set_alpha(1);
+// Fundo principal
+draw_set_alpha(1.0);
+draw_set_color(make_color_rgb(20, 30, 50)); // Azul escuro aéreo
+draw_roundrect_ext(_menu_x, _menu_y, _menu_x + _menu_w, _menu_y + _menu_h, 25, 25, false);
 
-// Borda do painel
-draw_set_color(make_color_rgb(70, 90, 120));
-draw_roundrect_ext(_mx, _my, _mx + _mw, _my + _mh, 12, 12, true);
+// Gradiente superior (céu)
+draw_set_color(make_color_rgb(40, 60, 100)); // Azul céu escuro
+draw_set_alpha(0.4);
+draw_roundrect_ext(_menu_x, _menu_y, _menu_x + _menu_w, _menu_y + 100, 25, 25, false);
+draw_set_alpha(1.0);
 
-// === CABEÇALHO ===
+// Borda principal
+draw_set_color(make_color_rgb(100, 150, 220)); // Azul céu claro
+draw_set_alpha(0.8);
+draw_roundrect_ext(_menu_x, _menu_y, _menu_x + _menu_w, _menu_y + _menu_h, 25, 25, true);
+draw_set_alpha(1.0);
+
+// === HEADER ===
+var _header_h = 100;
 draw_set_halign(fa_center);
 draw_set_valign(fa_middle);
 
 // Título principal
-draw_set_color(make_color_rgb(220, 230, 250));
-scr_desenhar_texto_ui(_mx + _mw/2, _my + 40, "AEROPORTO MILITAR", 1.2, 1.2);
+draw_set_color(make_color_rgb(255, 255, 255));
+draw_text_transformed(_menu_x + _menu_w/2, _menu_y + 35, "AEROPORTO MILITAR", 2.07, 2.07, 0);
 
 // Subtítulo
-draw_set_color(make_color_rgb(180, 200, 220));
-scr_desenhar_texto_ui(_mx + _mw/2, _my + 70, "Recrutamento de Unidades Aéreas", 0.8, 0.8);
+draw_set_color(make_color_rgb(180, 210, 255)); // Azul céu claro
+draw_text_transformed(_menu_x + _menu_w/2, _menu_y + 70, "Central de Produção Aérea - Frota Disponível", 1.15, 1.15, 0);
 
-// Dinheiro no canto superior esquerdo
+// === PAINEL DE RECURSOS ===
+var _recursos_y = _menu_y + _header_h + 10;
+var _recursos_h = 60;
+
+draw_set_color(make_color_rgb(30, 45, 70)); // Azul escuro
+draw_set_alpha(0.9);
+draw_roundrect_ext(_menu_x + 20, _recursos_y, _menu_x + _menu_w - 20, _recursos_y + _recursos_h, 15, 15, false);
+draw_set_alpha(1.0);
+
+// Recursos
 draw_set_halign(fa_left);
 draw_set_color(make_color_rgb(255, 215, 0));
-scr_desenhar_texto_ui(_mx + 20, _my + 25, "Dinheiro: $" + string(global.dinheiro), 0.9, 0.9);
+draw_text_transformed(_menu_x + 40, _recursos_y + 20, "DINHEIRO: $" + string(global.dinheiro), 1.38, 1.38, 0);
 
-// === OBTER DADOS DAS UNIDADES DO AEROPORTO ===
-var _unidades = id_do_aeroporto.unidades_disponiveis;
-var _content_start_y = _my + 100;
+// Verificar se população existe, senão usar valor padrão
+var _populacao = 50;
+if (variable_global_exists("populacao")) {
+    _populacao = global.populacao;
+}
 
-// === UNIDADE 1: CAÇA F-5 ===
-if (ds_list_size(_unidades) > 0) {
-    var _unidade_f5 = ds_list_find_value(_unidades, 0);
+draw_set_color(make_color_rgb(180, 210, 255));
+draw_text_transformed(_menu_x + 40, _recursos_y + 45, "População Disponível: " + string(_populacao), 1.035, 1.035, 0);
+
+// Status do aeroporto
+draw_set_halign(fa_right);
+var _status_text = id_do_aeroporto.produzindo ? "PRODUZINDO" : "OCIOSO";
+var _status_color = id_do_aeroporto.produzindo ? make_color_rgb(255, 200, 50) : make_color_rgb(100, 255, 100);
+draw_set_color(_status_color);
+draw_text_transformed(_menu_x + _menu_w - 40, _recursos_y + 30, "STATUS: " + _status_text, 1.15, 1.15, 0);
+
+// === GRID DE AERONAVES (3 colunas x 2 linhas) ===
+var _grid_start_y = _recursos_y + _recursos_h + 20;
+var _grid_h = _menu_h - _header_h - _recursos_h - 180; // Espaço para footer
+
+var _cols = 3;
+var _rows = 2;
+var _card_spacing = 20;
+var _card_w = (_menu_w - 40 - (_cols - 1) * _card_spacing) / _cols;
+var _card_h = ((_grid_h - (_rows - 1) * _card_spacing) / _rows) * 0.8; // Encurtado em 20%
+
+// Obter lista de aeronaves
+var _aeronaves = id_do_aeroporto.unidades_disponiveis;
+var _total_aeronaves = ds_list_size(_aeronaves);
+
+// Mouse position para hover
+var _mouse_gui_x = device_mouse_x_to_gui(0);
+var _mouse_gui_y = device_mouse_y_to_gui(0);
+aeronave_hover = -1;
+
+// Desenhar cada aeronave
+for (var i = 0; i < min(_total_aeronaves, 6); i++) {
+    var _aeronave = _aeronaves[| i];
     
-    var _card_w = _mw - 40;
-    var _card_h = 100;
-    var _card_x = _mx + 20;
-    var _card_y = _content_start_y;
+    // Calcular posição do card
+    var _col = i mod _cols;
+    var _row = floor(i / _cols);
+    var _card_x = _menu_x + 20 + _col * (_card_w + _card_spacing);
+    var _card_y = _grid_start_y + _row * (_card_h + _card_spacing);
     
+    // Verificar hover
+    var _is_hover = (_mouse_gui_x >= _card_x && _mouse_gui_x <= _card_x + _card_w &&
+                     _mouse_gui_y >= _card_y && _mouse_gui_y <= _card_y + _card_h);
+    
+    if (_is_hover) aeronave_hover = i;
+    
+    // Animação do card
+    var _anim = card_animations[i];
+    _anim.alpha = lerp(_anim.alpha, 1, 0.1);
+    _anim.scale = lerp(_anim.scale, 1, 0.15);
+    _anim.hover_intensity = lerp(_anim.hover_intensity, _is_hover ? 1 : 0, 0.2);
+    _anim.pulse = (_anim.pulse + 0.05) mod (pi * 2);
+
     // Verificar se pode produzir
-    var _pode_produzir_f5 = (global.dinheiro >= _unidade_f5.custo_dinheiro);
-    var _card_color = _pode_produzir_f5 ? make_color_rgb(30, 45, 70) : make_color_rgb(45, 30, 30);
-    var _border_color = _pode_produzir_f5 ? make_color_rgb(70, 130, 200) : make_color_rgb(200, 80, 80);
+    var _can_produce = (global.dinheiro >= _aeronave.custo_dinheiro && 
+                        _populacao >= _aeronave.custo_populacao &&
+                        !id_do_aeroporto.produzindo);
+    
+    // Cores baseadas em estado
+    var _card_color = _can_produce ? make_color_rgb(35, 55, 85) : make_color_rgb(40, 40, 50);
+    var _border_color = _can_produce ? make_color_rgb(100, 150, 220) : make_color_rgb(80, 80, 90);
+    
+    if (_is_hover && _can_produce) {
+        _card_color = make_color_rgb(45, 75, 120);
+        _border_color = make_color_rgb(130, 190, 255);
+    }
+    
+    // Sombra do card
+    draw_set_color(c_black);
+    draw_set_alpha(0.4 + _anim.hover_intensity * 0.2);
+    draw_roundrect_ext(_card_x + 5, _card_y + 5, _card_x + _card_w + 5, _card_y + _card_h + 5, 12, 12, false);
     
     // Fundo do card
+    draw_set_alpha(_anim.alpha);
     draw_set_color(_card_color);
-    draw_set_alpha(0.9);
-    draw_roundrect_ext(_card_x, _card_y, _card_x + _card_w, _card_y + _card_h, 8, 8, false);
-    draw_set_alpha(1);
+    draw_roundrect_ext(_card_x, _card_y, _card_x + _card_w, _card_y + _card_h, 12, 12, false);
     
     // Borda do card
     draw_set_color(_border_color);
-    draw_roundrect_ext(_card_x, _card_y, _card_x + _card_w, _card_y + _card_h, 8, 8, true);
+    draw_set_alpha(0.7 + _anim.hover_intensity * 0.3);
+    draw_roundrect_ext(_card_x, _card_y, _card_x + _card_w, _card_y + _card_h, 12, 12, true);
     
-    // Ícone da unidade (se existir)
-    if (sprite_exists(spr_caca_f5)) {
-        var _icon_x = _card_x + 20;
-        var _icon_y = _card_y + _card_h/2;
-        draw_sprite_ext(spr_caca_f5, 0, _icon_x, _icon_y, 2.0, 2.0, 0, c_white, 1);
+    // Efeito de brilho no topo
+    if (_can_produce) {
+        draw_set_color(make_color_rgb(130, 190, 255));
+        draw_set_alpha(0.15 + sin(_anim.pulse) * 0.1);
+        draw_roundrect_ext(_card_x + 3, _card_y + 3, _card_x + _card_w - 3, _card_y + 30, 10, 10, false);
     }
     
-    // Informações da unidade
-    var _info_x = _card_x + 80;
-    var _info_y = _card_y + 20;
+    draw_set_alpha(1.0);
     
+    // === CONTEÚDO DO CARD ===
+    var _content_x = _card_x + 15;
+    var _content_y = _card_y + 15;
+    
+    // Nome da aeronave
     draw_set_halign(fa_left);
-    draw_set_color(c_white);
-    scr_desenhar_texto_ui(_info_x, _info_y, _unidade_f5.nome, 1.0, 1.0);
+    draw_set_valign(fa_top);
+    draw_set_color(_can_produce ? make_color_rgb(255, 255, 255) : make_color_rgb(150, 150, 150));
+    draw_text_transformed(_content_x, _content_y, string_upper(_aeronave.nome), 1.265, 1.265, 0);
     
-    _info_y += 25;
-    draw_set_color(make_color_rgb(180, 200, 220));
-    scr_desenhar_texto_ui(_info_x, _info_y, _unidade_f5.descricao, 0.8, 0.8);
+    // Ícone/Sprite da aeronave (placeholder) - Movido 15% para baixo
+    var _icon_y = _content_y + 50;
+    var _icon_x = _content_x + (_card_w * 0.6); // 60% da largura do card
+    draw_set_color(_can_produce ? make_color_rgb(100, 160, 240) : make_color_rgb(100, 100, 100));
+    draw_set_alpha(0.3);
+    draw_circle(_icon_x, _icon_y, 25, false);
+    draw_set_alpha(1.0);
     
-    _info_y += 20;
-    draw_set_color(make_color_rgb(255, 215, 0));
-    scr_desenhar_texto_ui(_info_x, _info_y, "Custo: $" + string(_unidade_f5.custo_dinheiro), 0.9, 0.9);
+    // Tentar desenhar sprite se existir
+    if (_aeronave.nome == "Caça F-5" && sprite_exists(spr_caca_f5)) {
+        draw_sprite_ext(spr_caca_f5, 0, _icon_x, _icon_y, 1.5, 1.5, 0, c_white, _anim.alpha);
+    } else if (_aeronave.nome == "F-15 Eagle" && sprite_exists(spr_f15)) {
+        draw_sprite_ext(spr_f15, 0, _icon_x, _icon_y, 1.5, 1.5, 0, c_white, _anim.alpha);
+    } else if (_aeronave.nome == "Helicóptero Militar" && sprite_exists(spr_helicoptero_militar)) {
+        draw_sprite_ext(spr_helicoptero_militar, 0, _icon_x, _icon_y, 1.5, 1.5, 0, c_white, _anim.alpha);
+    } else if (_aeronave.nome == "C-100 Transporte" && sprite_exists(spr_c100)) {
+        draw_sprite_ext(spr_c100, 0, _icon_x, _icon_y, 1.5, 1.5, 0, c_white, _anim.alpha);
+    }
     
-    _info_y += 20;
-    draw_set_color(make_color_rgb(150, 150, 150));
-    scr_desenhar_texto_ui(_info_x, _info_y, "População: " + string(_unidade_f5.custo_populacao), 0.8, 0.8);
+    // Descrição
+    var _desc_y = _icon_y + 40;
+    draw_set_color(_can_produce ? make_color_rgb(200, 220, 240) : make_color_rgb(120, 120, 120));
+    draw_text_ext_transformed(_content_x, _desc_y, _aeronave.descricao, 18, _card_w - 30, 0.8625, 0.8625, 0);
     
-    // Botão de produção
-    var _btn_w = 120;
-    var _btn_h = 35;
-    var _btn_x = _card_x + _card_w - _btn_w - 15;
-    var _btn_y = _card_y + (_card_h - _btn_h) / 2;
+    // Informações - Movido 15% para cima
+    var _info_y = _card_y + _card_h - 65;
     
-    scr_desenhar_botao_ui(_btn_x, _btn_y, _btn_w, _btn_h, "PRODUZIR", _pode_produzir_f5, 0.9);
-}
-
-// === UNIDADE 2: HELICÓPTERO MILITAR ===
-if (ds_list_size(_unidades) > 1) {
-    var _unidade_heli = ds_list_find_value(_unidades, 1);
+    // Custo - Aumentado em 10%
+    draw_set_color(_can_produce ? make_color_rgb(255, 215, 0) : make_color_rgb(150, 150, 100));
+    draw_text_transformed(_content_x, _info_y, "$ " + string(_aeronave.custo_dinheiro), 1.1385, 1.1385, 0);
     
-    var _card_w = _mw - 40;
-    var _card_h = 100;
-    var _card_x = _mx + 20;
-    var _card_y = _content_start_y + 120;
+    // População
+    draw_set_color(_can_produce ? make_color_rgb(180, 210, 255) : make_color_rgb(120, 120, 120));
+    draw_text_transformed(_content_x, _info_y + 20, "Pop: " + string(_aeronave.custo_populacao), 0.92, 0.92, 0);
     
-    // Verificar se pode produzir
-    var _pode_produzir_heli = (global.dinheiro >= _unidade_heli.custo_dinheiro);
-    var _card_color = _pode_produzir_heli ? make_color_rgb(30, 45, 70) : make_color_rgb(45, 30, 30);
-    var _border_color = _pode_produzir_heli ? make_color_rgb(70, 130, 200) : make_color_rgb(200, 80, 80);
+    // Tempo
+    var _tempo_seg = _aeronave.tempo_treino / 60;
+    draw_text_transformed(_content_x, _info_y + 35, "Tempo: " + string(_tempo_seg) + "s", 0.92, 0.92, 0);
     
-    // Fundo do card
-    draw_set_color(_card_color);
+    // Botão PRODUZIR
+    var _btn_y = _card_y + _card_h - 35;
+    var _btn_h = 30;
+    var _btn_w = _card_w - 30;
+    var _btn_x = _card_x + 15;
+    
+    var _btn_color = _can_produce ? make_color_rgb(60, 140, 60) : make_color_rgb(80, 80, 80);
+    if (_is_hover && _can_produce) _btn_color = make_color_rgb(80, 180, 80);
+    
+    draw_set_color(_btn_color);
+    draw_roundrect_ext(_btn_x, _btn_y, _btn_x + _btn_w, _btn_y + _btn_h, 8, 8, false);
+    
+    draw_set_color(make_color_rgb(255, 255, 255));
     draw_set_alpha(0.9);
-    draw_roundrect_ext(_card_x, _card_y, _card_x + _card_w, _card_y + _card_h, 8, 8, false);
-    draw_set_alpha(1);
+    draw_roundrect_ext(_btn_x, _btn_y, _btn_x + _btn_w, _btn_y + _btn_h, 8, 8, true);
+    draw_set_alpha(1.0);
     
-    // Borda do card
-    draw_set_color(_border_color);
-    draw_roundrect_ext(_card_x, _card_y, _card_x + _card_w, _card_y + _card_h, 8, 8, true);
-    
-    // Ícone da unidade (se existir)
-    if (sprite_exists(spr_helicoptero_militar)) {
-        var _icon_x = _card_x + 20;
-        var _icon_y = _card_y + _card_h/2;
-        draw_sprite_ext(spr_helicoptero_militar, 0, _icon_x, _icon_y, 2.0, 2.0, 0, c_white, 1);
-    }
-    
-    // Informações da unidade
-    var _info_x = _card_x + 80;
-    var _info_y = _card_y + 20;
-    
-    draw_set_halign(fa_left);
-    draw_set_color(c_white);
-    scr_desenhar_texto_ui(_info_x, _info_y, _unidade_heli.nome, 1.0, 1.0);
-    
-    _info_y += 25;
-    draw_set_color(make_color_rgb(180, 200, 220));
-    scr_desenhar_texto_ui(_info_x, _info_y, _unidade_heli.descricao, 0.8, 0.8);
-    
-    _info_y += 20;
-    draw_set_color(make_color_rgb(255, 215, 0));
-    scr_desenhar_texto_ui(_info_x, _info_y, "Custo: $" + string(_unidade_heli.custo_dinheiro), 0.9, 0.9);
-    
-    _info_y += 20;
-    draw_set_color(make_color_rgb(150, 150, 150));
-    scr_desenhar_texto_ui(_info_x, _info_y, "População: " + string(_unidade_heli.custo_populacao), 0.8, 0.8);
-    
-    // Botão de produção
-    var _btn_w = 120;
-    var _btn_h = 35;
-    var _btn_x = _card_x + _card_w - _btn_w - 15;
-    var _btn_y = _card_y + (_card_h - _btn_h) / 2;
-    
-    scr_desenhar_botao_ui(_btn_x, _btn_y, _btn_w, _btn_h, "PRODUZIR", _pode_produzir_heli, 0.9);
-}
-
-// === UNIDADE 3: C-100 TRANSPORTE ===
-if (ds_list_size(_unidades) > 2) {
-    var _unidade_c100 = ds_list_find_value(_unidades, 2);
-    
-    var _card_w = _mw - 40;
-    var _card_h = 100;
-    var _card_x = _mx + 20;
-    var _card_y = _content_start_y + 240;
-    
-    var _pode_produzir_c100 = (global.dinheiro >= _unidade_c100.custo_dinheiro);
-    var _card_color = _pode_produzir_c100 ? make_color_rgb(30, 45, 70) : make_color_rgb(45, 30, 30);
-    var _border_color = _pode_produzir_c100 ? make_color_rgb(70, 130, 200) : make_color_rgb(200, 80, 80);
-    
-    draw_set_color(_card_color);
-    draw_set_alpha(0.9);
-    draw_roundrect_ext(_card_x, _card_y, _card_x + _card_w, _card_y + _card_h, 8, 8, false);
-    draw_set_alpha(1);
-    
-    draw_set_color(_border_color);
-    draw_roundrect_ext(_card_x, _card_y, _card_x + _card_w, _card_y + _card_h, 8, 8, true);
-    
-    if (sprite_exists(spr_c100)) {
-        var _icon_x = _card_x + 20;
-        var _icon_y = _card_y + _card_h/2;
-        draw_sprite_ext(spr_c100, 0, _icon_x, _icon_y, 1.0, 1.0, 0, c_white, 1);
-    }
-    
-    var _info_x = _card_x + 80;
-    var _info_y = _card_y + 20;
-    draw_set_halign(fa_left);
-    draw_set_color(c_white);
-    scr_desenhar_texto_ui(_info_x, _info_y, _unidade_c100.nome, 1.0, 1.0);
-    _info_y += 25;
-    draw_set_color(make_color_rgb(180, 200, 220));
-    scr_desenhar_texto_ui(_info_x, _info_y, _unidade_c100.descricao, 0.8, 0.8);
-    _info_y += 20;
-    draw_set_color(make_color_rgb(255, 215, 0));
-    scr_desenhar_texto_ui(_info_x, _info_y, "Custo: $" + string(_unidade_c100.custo_dinheiro), 0.9, 0.9);
-    _info_y += 20;
-    draw_set_color(make_color_rgb(150, 150, 150));
-    scr_desenhar_texto_ui(_info_x, _info_y, "População: " + string(_unidade_c100.custo_populacao), 0.8, 0.8);
-    
-    var _btn_w = 120;
-    var _btn_h = 35;
-    var _btn_x = _card_x + _card_w - _btn_w - 15;
-    var _btn_y = _card_y + (_card_h - _btn_h) / 2;
-    
-    scr_desenhar_botao_ui(_btn_x, _btn_y, _btn_w, _btn_h, "PRODUZIR", _pode_produzir_c100, 0.9);
-}
-
-// === STATUS DE PRODUÇÃO ===
-if (id_do_aeroporto.produzindo) {
-    var _status_y = _my + _mh - 60;
     draw_set_halign(fa_center);
-    draw_set_color(make_color_rgb(255, 180, 0));
-    scr_desenhar_texto_ui(_mx + _mw/2, _status_y, "⚠️ PRODUZINDO UNIDADE...", 1.0, 1.0);
-    
-    // Barra de progresso
-    var _bar_w = _mw - 80;
-    var _bar_h = 15;
-    var _bar_x = _mx + 40;
-    var _bar_y = _status_y + 25;
-    
-    // Fundo da barra
-    draw_set_color(make_color_rgb(50, 50, 50));
-    draw_rectangle(_bar_x, _bar_y, _bar_x + _bar_w, _bar_y + _bar_h, false);
-    
-    // Progresso
-    if (!ds_queue_empty(id_do_aeroporto.fila_producao)) {
-        var _unidade_atual = ds_queue_head(id_do_aeroporto.fila_producao);
-        var _progresso = id_do_aeroporto.timer_producao / _unidade_atual.tempo_treino;
-        var _progresso_w = _bar_w * _progresso;
-        
-        draw_set_color(make_color_rgb(100, 200, 100));
-        draw_rectangle(_bar_x, _bar_y, _bar_x + _progresso_w, _bar_y + _bar_h, false);
-    }
-    
-    // Borda da barra
-    draw_set_color(make_color_rgb(200, 200, 200));
-    draw_rectangle(_bar_x, _bar_y, _bar_x + _bar_w, _bar_y + _bar_h, true);
+    draw_set_color(_can_produce ? make_color_rgb(255, 255, 255) : make_color_rgb(150, 150, 150));
+    draw_text_transformed(_btn_x + _btn_w/2, _btn_y + _btn_h/2 - 8, _can_produce ? "PRODUZIR" : "BLOQUEADO", 0.9775, 0.9775, 0);
 }
+
+// === FILA DE PRODUÇÃO ===
+var _fila_y = _menu_y + _menu_h - 130;
+var _fila_h = 80;
+
+draw_set_color(make_color_rgb(30, 45, 70));
+draw_set_alpha(0.9);
+draw_roundrect_ext(_menu_x + 20, _fila_y, _menu_x + _menu_w - 20, _fila_y + _fila_h, 15, 15, false);
+draw_set_alpha(1.0);
+
+draw_set_halign(fa_left);
+draw_set_valign(fa_middle);
+draw_set_color(make_color_rgb(220, 230, 255));
+draw_text_transformed(_menu_x + 40, _fila_y + 20, "FILA DE PRODUÇÃO", 1.15, 1.15, 0);
+
+var _fila_size = ds_queue_size(id_do_aeroporto.fila_producao);
+draw_set_color(make_color_rgb(255, 255, 255));
+draw_text_transformed(_menu_x + 40, _fila_y + 45, "Unidades na fila: " + string(_fila_size), 1.035, 1.035, 0);
+
+draw_set_halign(fa_right);
+draw_set_color(make_color_rgb(180, 210, 255));
+draw_text_transformed(_menu_x + _menu_w - 40, _fila_y + 45, "Total produzido: " + string(id_do_aeroporto.unidades_produzidas), 1.035, 1.035, 0);
 
 // === BOTÃO FECHAR ===
-var _fechar_w = 80;
-var _fechar_h = 30;
-var _fechar_x = _mx + _mw - _fechar_w - 20;
-var _fechar_y = _my + _mh - _fechar_h - 20;
+var _close_w = 140;
+var _close_h = 45;
+var _close_x = _menu_x + _menu_w - _close_w - 20;
+var _close_y = _menu_y + _menu_h - 60;
 
-scr_desenhar_botao_ui(_fechar_x, _fechar_y, _fechar_w, _fechar_h, "FECHAR", true, 0.8);
+draw_set_color(make_color_rgb(180, 60, 60));
+draw_roundrect_ext(_close_x, _close_y, _close_x + _close_w, _close_y + _close_h, 10, 10, false);
 
-// === INSTRUÇÕES ===
+draw_set_color(make_color_rgb(255, 255, 255));
+draw_set_alpha(0.9);
+draw_roundrect_ext(_close_x, _close_y, _close_x + _close_w, _close_y + _close_h, 10, 10, true);
+
 draw_set_halign(fa_center);
-draw_set_color(make_color_rgb(150, 150, 150));
-scr_desenhar_texto_ui(_mx + _mw/2, _my + _mh - 15, "Clique nos botões para produzir unidades aéreas", 0.7, 0.7);
+draw_set_valign(fa_middle);
+draw_set_color(make_color_rgb(255, 255, 255));
+draw_text_transformed(_close_x + _close_w/2, _close_y + _close_h/2, "FECHAR", 1.15, 1.15, 0);
+draw_set_alpha(1.0);
 
-// Reset alinhamento
+// === CONTROLES DE QUANTIDADE ===
+var _controls_y = _close_y - 80;
+var _controls_x = _menu_x + 20;
+
+draw_set_halign(fa_left);
+draw_set_valign(fa_top);
+draw_set_color(make_color_rgb(120, 170, 220));
+draw_text_transformed(_controls_x, _controls_y, "CONTROLES DE QUANTIDADE:", 0.92, 0.92, 0);
+
+draw_set_color(make_color_rgb(255, 255, 255));
+draw_text_transformed(_controls_x, _controls_y + 20, "• Clique normal: 1 unidade", 0.805, 0.805, 0);
+draw_text_transformed(_controls_x, _controls_y + 35, "• Shift + Clique: 5 unidades", 0.805, 0.805, 0);
+draw_text_transformed(_controls_x, _controls_y + 50, "• Ctrl + Clique: 10 unidades", 0.805, 0.805, 0);
+
+// Reset
 draw_set_halign(fa_left);
 draw_set_valign(fa_top);

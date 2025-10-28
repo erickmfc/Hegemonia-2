@@ -54,12 +54,18 @@ function scr_verificar_sistemas_existentes() {
         var _obj_nome = _objetos_principais[i];
         var _obj_index = asset_get_index(_obj_nome);
         
-        if (_obj_index != -1) {
-            var _count = instance_number(_obj_index);
-            if (_count > 0) {
-                show_debug_message("✅ " + _obj_nome + ": " + string(_count) + " instâncias ativas");
+        // ✅ CORREÇÃO GM1044 e GM1041: Verificar se é um objeto válido
+        if (_obj_index != -1 && is_real(_obj_index)) {
+            var _asset_type = asset_get_type(_obj_index);
+            if (_asset_type == asset_object) {
+                var _count = instance_number(_obj_index);
+                if (_count > 0) {
+                    show_debug_message("✅ " + _obj_nome + ": " + string(_count) + " instâncias ativas");
+                } else {
+                    show_debug_message("⚠️ " + _obj_nome + ": Definido mas não instanciado");
+                }
             } else {
-                show_debug_message("⚠️ " + _obj_nome + ": Definido mas não instanciado");
+                show_debug_message("❌ " + _obj_nome + ": Não é um objeto válido");
             }
         } else {
             show_debug_message("❌ " + _obj_nome + ": Não encontrado");
@@ -79,9 +85,15 @@ function scr_verificar_sistemas_existentes() {
         var _unidade_nome = _unidades[i];
         var _unidade_index = asset_get_index(_unidade_nome);
         
-        if (_unidade_index != -1) {
-            var _count = instance_number(_unidade_index);
-            show_debug_message("✅ " + _unidade_nome + ": " + string(_count) + " instâncias");
+        // ✅ CORREÇÃO GM1044 e GM1041: Verificar se é um objeto válido
+        if (_unidade_index != -1 && is_real(_unidade_index)) {
+            var _asset_type = asset_get_type(_unidade_index);
+            if (_asset_type == asset_object) {
+                var _count = instance_number(_unidade_index);
+                show_debug_message("✅ " + _unidade_nome + ": " + string(_count) + " instâncias");
+            } else {
+                show_debug_message("❌ " + _unidade_nome + ": Não é um objeto válido");
+            }
         } else {
             show_debug_message("❌ " + _unidade_nome + ": Não encontrado");
         }

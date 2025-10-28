@@ -3,7 +3,20 @@
 // Sistema de Produção Aérea - STEP EVENT
 // ===============================================
 
-// === SISTEMA DE PRODUÇÃO AÉREA ===
+// === SISTEMA DE VIDA ===
+// Verificar se HP chegou a 0 e destruir
+if (destrutivel && hp_atual <= 0) {
+    show_debug_message("💥 Aeroporto destruído - HP: " + string(hp_atual) + "/" + string(hp_max));
+    instance_destroy();
+    exit;
+}
+
+// === SISTEMA DE PRODUÇÃO AÉREA COM FILA ===
+
+// ✅ CORREÇÃO CRÍTICA: NÃO iniciar produção automaticamente
+// O aeroporto só deve produzir quando o jogador explicitamente adicionar unidades via menu
+// NÃO iniciar automaticamente mesmo que haja unidades na fila - aguardar ação do jogador
+
 if (produzindo && !ds_queue_empty(fila_producao)) {
     
     // Incrementar timer
@@ -15,18 +28,19 @@ if (produzindo && !ds_queue_empty(fila_producao)) {
     
     // Debug a cada segundo
     if (timer_producao % 60 == 0) {
-        show_debug_message("⏱️ Produção Aérea: " + string(timer_producao) + "/" + string(_tempo_necessario) + " frames");
+        var _fila_size = ds_queue_size(fila_producao);
+        show_debug_message("⏱️ Produção: " + string(timer_producao) + "/" + string(_tempo_necessario) + " frames | Fila: " + string(_fila_size));
     }
     
     // Verificar se produção concluída
     if (timer_producao >= _tempo_necessario) {
         
         // Posição de spawn (mais à direita do aeroporto - área de estacionamento)
-        // Ajustada para spawn à direita do aeroporto
-        var _variacao_x = random_range(-15, 15);  // Variação horizontal menor
-        var _variacao_y = random_range(-20, 20);  // Variação vertical
+        // ✅ MELHORADO: Variação aleatória maior para distribuição
+        var _variacao_x = random_range(-40, 40);  // Variação horizontal maior
+        var _variacao_y = random_range(-30, 30);  // Variação vertical maior
         
-        var _spawn_x = x + 200 + _variacao_x; // Muito mais à direita (150 -> 200)
+        var _spawn_x = x + 220 + _variacao_x; // Mais à direita com maior espaçamento
         var _spawn_y = y + _variacao_y;       // Mesma altura do aeroporto (não abaixo)
         
         // Remover unidade da fila
@@ -42,6 +56,8 @@ if (produzindo && !ds_queue_empty(fila_producao)) {
         
         if (_unidade_data_final.objeto == obj_caca_f5) {
             _unidade_criada = instance_create_layer(_spawn_x, _spawn_y, "Instances", obj_caca_f5);
+        } else if (_unidade_data_final.objeto == obj_f15) {
+            _unidade_criada = instance_create_layer(_spawn_x, _spawn_y, "Instances", obj_f15);
         } else if (_unidade_data_final.objeto == obj_helicoptero_militar) {
             _unidade_criada = instance_create_layer(_spawn_x, _spawn_y, "Instances", obj_helicoptero_militar);
         } else if (_unidade_data_final.objeto == obj_c100) {

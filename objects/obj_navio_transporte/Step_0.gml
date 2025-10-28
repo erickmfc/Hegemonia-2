@@ -5,6 +5,17 @@ event_inherited();
 
 // === 1. PROCESSAR COMANDOS DO JOGADOR (SE SELECIONADO) ===
 if (variable_instance_exists(id, "selecionado") && selecionado) {
+    
+    // === COMANDO J - MENU DE CARGA ===
+    if (keyboard_check_pressed(ord("J"))) {
+        menu_carga_aberto = !menu_carga_aberto;
+        if (menu_carga_aberto) {
+            show_debug_message("📋 MENU DE CARGA ABERTO");
+        } else {
+            show_debug_message("✅ MENU DE CARGA FECHADO");
+        }
+    }
+    
     // COMANDO P - TOGGLE EMBARQUE/DESEMBARQUE
     if (keyboard_check_pressed(ord("P"))) { 
         var _total_embarcado = soldados_count + unidades_count + avioes_count;
@@ -50,22 +61,13 @@ if (variable_instance_exists(id, "selecionado") && selecionado) {
             if (modo_combate == LanchaMode.PASSIVO) {
                 modo_combate = LanchaMode.ATAQUE;
                 show_debug_message("⚔️ Modo ATAQUE ativado");
-            } else {
+        } else {
                 modo_combate = LanchaMode.PASSIVO;
                 show_debug_message("🛡️ Modo PASSIVO ativado");
             }
         }
     }
     
-    // COMANDO J - MENU DE CARGA
-    if (keyboard_check_pressed(ord("J"))) {
-        menu_carga_aberto = !menu_carga_aberto;
-        if (menu_carga_aberto) {
-            show_debug_message("📋 Menu de Carga aberto");
-        } else {
-            show_debug_message("✅ Menu de Carga fechado");
-        }
-    }
     
 }
 
@@ -78,42 +80,140 @@ if (estado_transporte == NavioTransporteEstado.EMBARQUE_ATIVO && modo_embarque) 
         modo_embarque = false;
         estado_transporte = NavioTransporteEstado.EMBARQUE_OFF;
         show_debug_message("✅ Navio CHEIO - Embarque desativado");
-    } else {
-        // Detectar infantaria
+                   } else {
+        // ✅ SISTEMA UNIFICADO: Detectar TODAS as unidades e embarcar automaticamente
+        var _unidades_detectadas = ds_list_create();
+        
+        // Coletar TODAS as unidades próximas (qualquer tipo que funciona com o navio)
         with (obj_infantaria) {
-            if (nacao_proprietaria == other.nacao_proprietaria && 
+            if (variable_instance_exists(id, "nacao_proprietaria") && 
+                nacao_proprietaria == other.nacao_proprietaria && 
                 point_distance(other.x, other.y, x, y) < other.raio_embarque &&
                 visible) {
-                other.funcao_embarcar_unidade(id);
+                ds_list_add(_unidades_detectadas, id);
             }
         }
         
-        // Detectar aeronaves F-5
-        with (obj_caca_f5) {
-            if (nacao_proprietaria == other.nacao_proprietaria && 
+        with (obj_soldado_antiaereo) {
+            if (variable_instance_exists(id, "nacao_proprietaria") && 
+                nacao_proprietaria == other.nacao_proprietaria && 
                 point_distance(other.x, other.y, x, y) < other.raio_embarque &&
                 visible) {
-                other.funcao_embarcar_aeronave(id);
+                ds_list_add(_unidades_detectadas, id);
             }
         }
         
-        // Detectar helicópteros
-        with (obj_helicoptero_militar) {
-            if (nacao_proprietaria == other.nacao_proprietaria && 
-                point_distance(other.x, other.y, x, y) < other.raio_embarque &&
-                visible) {
-                other.funcao_embarcar_aeronave(id);
-            }
-        }
-        
-        // Detectar tanques
         with (obj_tanque) {
-            if (nacao_proprietaria == other.nacao_proprietaria && 
+            show_debug_message("--- [NAVIO] Verificando Tanque ID: " + string(id) + " ---");
+            
+            var cond1_nacao_existe = variable_instance_exists(id, "nacao_proprietaria");
+            var cond2_nacao_ok = false;
+            var tanque_nacao_str = "N/A"; // Valor padrão caso a variável não exista
+            
+            // ✅ CORREÇÃO: Só lê 'nacao_proprietaria' DEPOIS de confirmar que existe
+            if (cond1_nacao_existe) {
+                cond2_nacao_ok = (nacao_proprietaria == other.nacao_proprietaria);
+                tanque_nacao_str = string(nacao_proprietaria); // Lê o valor de forma segura aqui
+            }
+            
+            var dist = point_distance(other.x, other.y, x, y);
+            var raio = other.raio_embarque;
+            var cond3_distancia_ok = (dist < raio);
+            var cond4_visivel_ok = visible;
+            
+            // <<< DEBUG: Mostrar o status de cada condição >>>
+            show_debug_message("  Condição 1 (Nação Existe): " + string(cond1_nacao_existe));
+            show_debug_message("  Condição 2 (Nação OK): " + string(cond2_nacao_ok) + " (Tanque: " + tanque_nacao_str + " | Navio: " + string(other.nacao_proprietaria) + ")");
+            show_debug_message("  Condição 3 (Distância OK): " + string(cond3_distancia_ok) + " (Dist: " + string(dist) + " < Raio: " + string(raio) + ")");
+            show_debug_message("  Condição 4 (Visível OK): " + string(cond4_visivel_ok));
+            
+            // Bloco original, mas agora sabemos por que falha se não entrar
+            if (cond1_nacao_existe && cond2_nacao_ok && cond3_distancia_ok && cond4_visivel_ok) {
+                ds_list_add(_unidades_detectadas, id);
+                show_debug_message("  >>> SUCESSO: Tanque adicionado à lista!");
+            } else {
+                show_debug_message("  >>> FALHA: Tanque não atende a todas as condições.");
+            }
+            show_debug_message("------------------------------------");
+        }
+        
+        with (obj_blindado_antiaereo) {
+            show_debug_message("--- [NAVIO] Verificando Blindado ID: " + string(id) + " ---");
+            
+            var cond1_nacao_existe = variable_instance_exists(id, "nacao_proprietaria");
+            var cond2_nacao_ok = false;
+            var blindado_nacao_str = "N/A"; // Valor padrão caso a variável não exista
+            
+            // ✅ CORREÇÃO: Só lê 'nacao_proprietaria' DEPOIS de confirmar que existe
+            if (cond1_nacao_existe) {
+                cond2_nacao_ok = (nacao_proprietaria == other.nacao_proprietaria);
+                blindado_nacao_str = string(nacao_proprietaria); // Lê o valor de forma segura aqui
+            }
+            
+            var dist = point_distance(other.x, other.y, x, y);
+            var raio = other.raio_embarque;
+            var cond3_distancia_ok = (dist < raio);
+            var cond4_visivel_ok = visible;
+            
+            // <<< DEBUG: Mostrar o status de cada condição >>>
+            show_debug_message("  Condição 1 (Nação Existe): " + string(cond1_nacao_existe));
+            show_debug_message("  Condição 2 (Nação OK): " + string(cond2_nacao_ok) + " (Blindado: " + blindado_nacao_str + " | Navio: " + string(other.nacao_proprietaria) + ")");
+            show_debug_message("  Condição 3 (Distância OK): " + string(cond3_distancia_ok) + " (Dist: " + string(dist) + " < Raio: " + string(raio) + ")");
+            show_debug_message("  Condição 4 (Visível OK): " + string(cond4_visivel_ok));
+            
+            // Bloco original, mas agora sabemos por que falha se não entrar
+            if (cond1_nacao_existe && cond2_nacao_ok && cond3_distancia_ok && cond4_visivel_ok) {
+                ds_list_add(_unidades_detectadas, id);
+                show_debug_message("  >>> SUCESSO: Blindado adicionado à lista!");
+            } else {
+                show_debug_message("  >>> FALHA: Blindado não atende a todas as condições.");
+            }
+            show_debug_message("------------------------------------");
+        }
+        
+        with (obj_caca_f5) {
+            if (variable_instance_exists(id, "nacao_proprietaria") && 
+                nacao_proprietaria == other.nacao_proprietaria && 
                 point_distance(other.x, other.y, x, y) < other.raio_embarque &&
                 visible) {
-                other.funcao_embarcar_veiculo(id);
+                ds_list_add(_unidades_detectadas, id);
             }
         }
+        
+        with (obj_f15) {
+            if (variable_instance_exists(id, "nacao_proprietaria") && 
+                nacao_proprietaria == other.nacao_proprietaria && 
+                point_distance(other.x, other.y, x, y) < other.raio_embarque &&
+                visible) {
+                ds_list_add(_unidades_detectadas, id);
+            }
+        }
+        
+        with (obj_helicoptero_militar) {
+            if (variable_instance_exists(id, "nacao_proprietaria") && 
+                nacao_proprietaria == other.nacao_proprietaria && 
+                point_distance(other.x, other.y, x, y) < other.raio_embarque &&
+                visible) {
+                ds_list_add(_unidades_detectadas, id);
+            }
+        }
+        
+        with (obj_c100) {
+            if (variable_instance_exists(id, "nacao_proprietaria") && 
+                nacao_proprietaria == other.nacao_proprietaria && 
+                point_distance(other.x, other.y, x, y) < other.raio_embarque &&
+                visible) {
+                ds_list_add(_unidades_detectadas, id);
+            }
+        }
+        
+        // Embarcar todas as unidades detectadas usando a função unificada
+        for (var i = 0; i < ds_list_size(_unidades_detectadas); i++) {
+            var _unidade = _unidades_detectadas[| i];
+            funcao_embarcar_unidade(_unidade);
+        }
+        
+        ds_list_destroy(_unidades_detectadas);
     }
 }
 

@@ -12,14 +12,10 @@ if (selecionado && mouse_check_button_pressed(mb_right)) {
     // Usar função herdada do obj_navio_base
     func_ordem_mover(_world_x, _world_y);
     
-    // Feedback visual - ✅ CORREÇÃO GM2016: Verificar existência das variáveis
-    if (!variable_instance_exists(id, "ultima_acao")) { ultima_acao = ""; }
-    if (!variable_instance_exists(id, "cor_feedback")) { cor_feedback = c_green; }
-    if (!variable_instance_exists(id, "feedback_timer")) { feedback_timer = 0; }
-    
-    ultima_acao = "Movendo para (" + string(round(_world_x)) + ", " + string(round(_world_y)) + ")";
-    cor_feedback = c_green;
-    feedback_timer = 90;
+    // Feedback visual - ✅ CORREÇÃO GM2016: Usar 'var' para declarar variáveis de instância fora do Create
+    var ultima_acao = "Movendo para (" + string(round(_world_x)) + ", " + string(round(_world_y)) + ")";
+    var cor_feedback = c_green;
+    var feedback_timer = 90;
     
     show_debug_message("🚢 Constellation movendo para: (" + string(round(_world_x)) + ", " + string(round(_world_y)) + ")");
 }

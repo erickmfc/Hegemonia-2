@@ -95,7 +95,7 @@ function scr_obter_alcance(unidade) {
         case obj_fragata:
         case obj_destroyer:
         case obj_submarino:
-        case obj_porta_avioes:
+        case obj_RonaldReagan:
             return 400; // Alcance naval
         case obj_soldado:
         case obj_soldado_antiaereo:
@@ -136,7 +136,7 @@ function scr_ataque_projetil(atacante, alvo) {
         case obj_fragata:
         case obj_destroyer:
         case obj_submarino:
-        case obj_porta_avioes:
+        case obj_RonaldReagan:
             tipo_projetil = obj_projetil_naval;
             break;
         case obj_soldado:

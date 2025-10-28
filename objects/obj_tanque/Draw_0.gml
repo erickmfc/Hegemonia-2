@@ -28,13 +28,17 @@ if (selecionado) {
         var mxw = camera_get_view_x(view_camera[0]) + mouse_x;
         var myw = camera_get_view_y(view_camera[0]) + mouse_y;
         for (var i = 0; i < ds_list_size(patrulha)-1; i++) {
-            var p1 = patrulha[| i];
-            var p2 = patrulha[| i+1];
-            draw_line(p1[0], p1[1], p2[0], p2[1]);
+            var p1 = ds_list_find_value(patrulha, i);
+            var p2 = ds_list_find_value(patrulha, i+1);
+            if (is_array(p1) && is_array(p2) && array_length(p1) >= 2 && array_length(p2) >= 2) {
+                draw_line(p1[0], p1[1], p2[0], p2[1]);
+            }
         }
         if (modo_patrulha) {
-            var plast = patrulha[| ds_list_size(patrulha)-1];
-            draw_line(plast[0], plast[1], mxw, myw);
+            var plast = ds_list_find_value(patrulha, ds_list_size(patrulha)-1);
+            if (is_array(plast) && array_length(plast) >= 2) {
+                draw_line(plast[0], plast[1], mxw, myw);
+            }
         }
     }
 

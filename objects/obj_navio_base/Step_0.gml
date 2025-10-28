@@ -217,9 +217,15 @@ switch (estado) {
                                _missil.speed = 8;
                            } else if (_missil_obj == obj_missel_ice) {
                                // Míssil Ice anti-submarino
+                               _missil.target = alvo_unidade;
                                _missil.alvo = alvo_unidade;
                                // Dano já configurado no Create (75 base + bônus)
                                show_debug_message("❄️ Míssil Ice configurado contra submarino!");
+                           } else if (_missil_obj == obj_SkyFury_ar || _missil_obj == obj_Ironclad_terra) {
+                               // Mísseis especiais do Constellation/Independence
+                               _missil.target = alvo_unidade;
+                               _missil.alvo = alvo_unidade;
+                               show_debug_message("🎯 Míssil especial configurado: " + _missil_nome);
                            }
                            
                            reload_timer = reload_time; // Reseta o timer

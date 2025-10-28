@@ -34,7 +34,7 @@ if (instance_exists(global.definindo_patrulha_unidade)) {
     if (mouse_check_button_pressed(mb_right)) {
         if (variable_instance_exists(_unidade, "pontos_patrulha") && ds_exists(_unidade.pontos_patrulha, ds_type_list) && ds_list_size(_unidade.pontos_patrulha) >= 2) {
             // ✅ CORREÇÃO: Usar estados corretos baseados no tipo de unidade
-            if (object_get_name(_unidade.object_index) == "obj_caca_f5") {
+            if (object_get_name(_unidade.object_index) == "obj_caca_f5" || object_get_name(_unidade.object_index) == "obj_f15") {
                 _unidade.estado = "patrulhando";
             } else if (object_get_name(_unidade.object_index) == "obj_lancha_patrulha") {
                 _unidade.estado = LanchaState.PATRULHANDO;
@@ -65,6 +65,7 @@ else {
     // Seleção com clique esquerdo
     if (mouse_check_button_pressed(mb_left)) {
         var _unidade_aerea = instance_position(_mx, _my, obj_caca_f5);
+        if (_unidade_aerea == noone) _unidade_aerea = instance_position(_mx, _my, obj_f15);
         if (_unidade_aerea == noone) _unidade_aerea = instance_position(_mx, _my, obj_c100);
         var _unidade_naval = instance_position(_mx, _my, obj_lancha_patrulha);
         var _unidade_transporte = instance_position(_mx, _my, obj_navio_transporte);
@@ -72,19 +73,33 @@ else {
         var _unidade_constellation = instance_position(_mx, _my, obj_Constellation);
         var _unidade_independence = instance_position(_mx, _my, obj_Independence);
         var _unidade_wwhendrick = instance_position(_mx, _my, obj_wwhendrick);
+        var _unidade_submarino = instance_position(_mx, _my, obj_submarino_base);
         
-        // Desseleciona unidade anterior ANTES de selecionar nova
-        if (instance_exists(global.unidade_selecionada)) {
-            var _nome_anterior = object_get_name(global.unidade_selecionada.object_index);
-            global.unidade_selecionada.selecionado = false;
-            show_debug_message("🔄 Desselecionando: " + _nome_anterior);
-        }
+        // Desseleciona TODAS as unidades ANTES de selecionar nova
+        // IMPORTANTE: Desselecionar TUDO para garantir que não fica nada marcado
+        with (obj_caca_f5) { selecionado = false; }
+        with (obj_f15) { selecionado = false; }
+        with (obj_c100) { selecionado = false; }
+        with (obj_lancha_patrulha) { selecionado = false; }
+        with (obj_navio_transporte) { selecionado = false; }
+        with (obj_RonaldReagan) { selecionado = false; }
+        with (obj_Constellation) { selecionado = false; }
+        with (obj_Independence) { selecionado = false; }
+        with (obj_wwhendrick) { selecionado = false; }
+        with (obj_submarino_base) { selecionado = false; }
+        with (obj_tanque) { selecionado = false; }
+        with (obj_infantaria) { selecionado = false; }
         
         if (instance_exists(_unidade_aerea)) {
             // Seleciona nova unidade aérea
             global.unidade_selecionada = _unidade_aerea;
             _unidade_aerea.selecionado = true;
             show_debug_message("✈️ Unidade aérea selecionada: " + object_get_name(_unidade_aerea.object_index));
+        } else if (instance_exists(_unidade_submarino)) {
+            // Seleciona Submarino
+            global.unidade_selecionada = _unidade_submarino;
+            _unidade_submarino.selecionado = true;
+            show_debug_message("🌊 Submarino selecionado!");
         } else if (instance_exists(_unidade_wwhendrick)) {
             // Seleciona Ww-Hendrick
             global.unidade_selecionada = _unidade_wwhendrick;
@@ -132,7 +147,7 @@ else {
         var _unidade = global.unidade_selecionada;
         
         // ✅ CORREÇÃO: Usar estados corretos baseados no tipo de unidade
-        if (object_get_name(_unidade.object_index) == "obj_caca_f5") {
+        if (object_get_name(_unidade.object_index) == "obj_caca_f5" || object_get_name(_unidade.object_index) == "obj_f15") {
             _unidade.estado = "movendo";
         } else if (object_get_name(_unidade.object_index) == "obj_navio_transporte") {
             _unidade.estado = LanchaState.MOVENDO;
@@ -168,6 +183,8 @@ else {
         // Mensagem adaptada ao tipo de unidade
         if (object_get_name(_unidade.object_index) == "obj_caca_f5") {
             show_debug_message("🎯 Ordem de movimento para F-5");
+        } else if (object_get_name(_unidade.object_index) == "obj_f15") {
+            show_debug_message("🎯 Ordem de movimento para F-15");
         } else if (object_get_name(_unidade.object_index) == "obj_lancha_patrulha") {
             show_debug_message("🎯 Ordem de movimento para Lancha Patrulha");
         } else if (object_get_name(_unidade.object_index) == "obj_Constellation") {
@@ -187,20 +204,28 @@ if (keyboard_check_pressed(ord("T"))) {
 }
 
 // --- LÓGICA DE INPUT DO TECLADO ---
-if (keyboard_check_pressed(ord("K")) && instance_exists(global.unidade_selecionada)) {
+
+// COMANDO I - EMERGIR/SUBMERGIR (APENAS SUBMARINOS)
+if (keyboard_check_pressed(ord("I")) && instance_exists(global.unidade_selecionada)) {
     var _nome_obj = object_get_name(global.unidade_selecionada.object_index);
     
-    // Se for submarino - usar K para submergir/emergir
+    // Se for submarino - usar I para submergir/emergir
     if (_nome_obj == "obj_wwhendrick" || _nome_obj == "obj_submarino_base") {
         if (global.unidade_selecionada.submerso) {
             global.unidade_selecionada.func_emergir();
         } else {
             global.unidade_selecionada.func_submergir();
         }
+        show_debug_message("🌊 Submergir/Emergir (I)");
     }
-    // Se NÃO for submarino - usar K para patrulha
-    else {
-        // Tecla K só funciona para a unidade selecionada e que NÃO está em modo de definição
+}
+
+// COMANDO K - PATRULHA
+if (keyboard_check_pressed(ord("K")) && instance_exists(global.unidade_selecionada)) {
+    var _nome_obj = object_get_name(global.unidade_selecionada.object_index);
+    
+    // K é SEMPRE para patrulha
+    {
         // ✅ CORREÇÃO: Verificação direta e segura da variável global
         var _definindo_patrulha = noone;
         if (variable_global_exists("definindo_patrulha_unidade")) {
@@ -216,7 +241,7 @@ if (keyboard_check_pressed(ord("K")) && instance_exists(global.unidade_seleciona
                 // ✅ CORREÇÃO: Usando função auxiliar segura para definir a variável
                 global.definindo_patrulha_unidade = global.unidade_selecionada;
                 ds_list_clear(global.definindo_patrulha_unidade.pontos_patrulha);
-                show_debug_message("🎯 Modo PATRULHA ATIVADO para: " + string(object_get_name(global.unidade_selecionada.object_index)));
+                show_debug_message("🎯 Modo PATRULHA ATIVADO (K) para: " + string(object_get_name(global.unidade_selecionada.object_index)));
                 show_debug_message("💡 INSTRUÇÕES: Clique esquerdo para adicionar pontos, direito para iniciar");
             } else {
                 show_debug_message("❌ Esta unidade não suporta patrulha");

@@ -11,8 +11,9 @@ if (!instance_exists(navio_pai)) {
 }
 
 // === ATUALIZAR POSIÇÃO ===
-x = navio_pai.x + offset_x;
-y = navio_pai.y + offset_y;
+// Usar lengthdir para acompanhar rotação do navio
+x = navio_pai.x + lengthdir_x(offset_x, navio_pai.image_angle);
+y = navio_pai.y + lengthdir_y(offset_y, navio_pai.image_angle);
 
 // === ROTAÇÃO DO CANHÃO ===
 // Se o navio tem alvo, rotacionar canhão para o alvo

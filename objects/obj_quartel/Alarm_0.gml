@@ -18,21 +18,26 @@ show_debug_message("==== UNIDADE " + string(unidades_criadas) + "/" + string(uni
 show_debug_message("Unidade pronta para o combate!");
 show_debug_message("Quartel ID: " + string(id));
 
-// Calcular posição da unidade (espalhar as unidades em formação)
-var _offset_x = ((unidades_criadas - 1) mod 3) * 40; // 3 unidades por linha
-var _offset_y = floor((unidades_criadas - 1) / 3) * 40; // Novas linhas a cada 3 unidades
-var _spawn_x = x + sprite_width + _offset_x;
-var _spawn_y = y + sprite_height + _offset_y;
+// Calcular posição da unidade (espalhar as unidades em formação com variação aleatória)
+var _offset_x = ((unidades_criadas - 1) mod 3) * 60; // 3 unidades por linha com mais espaço
+var _offset_y = floor((unidades_criadas - 1) / 3) * 60; // Novas linhas a cada 3 unidades
+var _variacao_x = random_range(-20, 20); // Variação horizontal aleatória
+var _variacao_y = random_range(-20, 20); // Variação vertical aleatória
+var _spawn_x = x + sprite_width + _offset_x + _variacao_x;
+var _spawn_y = y + sprite_height + _offset_y + _variacao_y;
 
 // Criar unidade conforme tipo selecionado (SISTEMA NOVO)
-var _unidade_data = ds_list_find_value(unidades_disponiveis, unidade_selecionada);
 var _obj_unidade = obj_infantaria; // Padrão
-
-if (_unidade_data != undefined) {
-    _obj_unidade = _unidade_data.objeto;
-    show_debug_message("Criando unidade: " + _unidade_data.nome + " (Objeto: " + string(_obj_unidade) + ")");
+if (variable_instance_exists(id, "unidade_selecionada") && unidade_selecionada >= 0 && unidade_selecionada < ds_list_size(unidades_disponiveis)) {
+    var _unidade_data = ds_list_find_value(unidades_disponiveis, unidade_selecionada);
+    if (_unidade_data != undefined && is_struct(_unidade_data)) {
+        _obj_unidade = _unidade_data.objeto;
+        show_debug_message("Criando unidade: " + _unidade_data.nome + " (Objeto: " + string(_obj_unidade) + ")");
+    } else {
+        show_debug_message("AVISO: Dados da unidade não encontrados, usando infantaria como padrão");
+    }
 } else {
-    show_debug_message("AVISO: Dados da unidade não encontrados, usando infantaria como padrão");
+    show_debug_message("AVISO: unidade_selecionada inválido, usando infantaria como padrão");
 }
 
 var _unidade_criada = instance_create_layer(_spawn_x, _spawn_y, "Instances", _obj_unidade);

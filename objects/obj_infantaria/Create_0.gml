@@ -9,6 +9,9 @@ vida_max = hp_max;
 dano = 20;
 velocidade = 2;
 
+// Nação proprietária (1 = jogador, 2 = IA inimiga)
+nacao_proprietaria = 1;
+
 // Estado inicial
 selecionado = false;
 estado = "parado";

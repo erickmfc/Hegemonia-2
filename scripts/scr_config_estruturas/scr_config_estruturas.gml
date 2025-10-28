@@ -151,7 +151,7 @@ function scr_config_quartel_marinha(parametros) {
             },
             {
                 nome: "Porta-aviões",
-                objeto: obj_porta_avioes,
+                objeto: obj_RonaldReagan,
                 custo_dinheiro: 2000,
                 custo_populacao: 8,
                 tempo_treino: 1200, // 20 segundos

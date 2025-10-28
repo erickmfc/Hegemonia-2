@@ -1,5 +1,6 @@
+/// @description Clique Esquerdo - Adicionar Ponto de Patrulha
 // ===============================================
-// HEGEMONIA GLOBAL - CONSTELLATION
+// HEGEMONIA GLOBAL - INDEPENDENCE
 // Clique Esquerdo - Adicionar Ponto de Patrulha (APENAS SE SELECIONADO)
 // ===============================================
 
@@ -17,5 +18,5 @@ if (selecionado && mouse_check_button_pressed(mb_left)) {
     cor_feedback = c_blue;
     feedback_timer = 90;
     
-    show_debug_message("🚢 Constellation adicionou ponto de patrulha: (" + string(round(_world_x)) + ", " + string(round(_world_y)) + ")");
+    show_debug_message("🚢 Independence adicionou ponto de patrulha: (" + string(round(_world_x)) + ", " + string(round(_world_y)) + ")");
 }

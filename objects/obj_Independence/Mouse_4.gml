@@ -1,5 +1,6 @@
+/// @description Clique Direito - Mover para Posição
 // ===============================================
-// HEGEMONIA GLOBAL - CONSTELLATION
+// HEGEMONIA GLOBAL - INDEPENDENCE
 // Clique Direito - Mover para Posição (APENAS SE SELECIONADO)
 // ===============================================
 
@@ -17,5 +18,5 @@ if (selecionado && mouse_check_button_pressed(mb_right)) {
     cor_feedback = c_green;
     feedback_timer = 90;
     
-    show_debug_message("🚢 Constellation movendo para: (" + string(round(_world_x)) + ", " + string(round(_world_y)) + ")");
+    show_debug_message("🚢 Independence movendo para: (" + string(round(_world_x)) + ", " + string(round(_world_y)) + ")");
 }

@@ -19,7 +19,8 @@ if (atq_cooldown > 0) atq_cooldown--;
 // =======================
 // Só procura novo alvo se não estiver atacando
 if (estado != "atacando" || alvo_inimigo == noone || !instance_exists(alvo_inimigo)) {
-    alvo_inimigo = instance_nearest(x, y, obj_inimigo);
+    // Buscar inimigos considerando nacao_proprietaria
+    alvo_inimigo = scr_buscar_inimigo(x, y, raio_de_visao, nacao_proprietaria);
     if (alvo_inimigo != noone && point_distance(x, y, alvo_inimigo.x, alvo_inimigo.y) <= raio_de_visao) {
         estado = "atacando";
     }

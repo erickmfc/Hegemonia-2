@@ -1,3 +1,6 @@
+// Nação proprietária (1 = jogador, 2 = IA inimiga)
+nacao_proprietaria = 1;
+
 // Seleção
 selecionado = false;
 estado = "parado";
@@ -17,7 +20,7 @@ seguir_alvo = noone;
 alcance_visao = 600;  // bem maior
 alcance_tiro  = 540;  // ~3x infantaria (180 * 3)
 atq_cooldown = 0;
-atq_rate = 90; // demora mais pra disparar
+atq_rate = 180; // 3 segundos (60 FPS * 3 = 180 frames)
 
 // Alvo inimigo
 alvo = noone;

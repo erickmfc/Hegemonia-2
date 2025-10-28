@@ -64,10 +64,10 @@ var _grav = alvo_parado ? gravity * 0.5 : gravity;
 x += lengthdir_x(speed, direction);
 y += lengthdir_y(speed, direction) + _grav;
 
-// Checagem de impacto por proximidade
+// Checagem de impacto por proximidade (100% parado, 99% em movimento)
 if (instance_exists(target)) {
-    var _radius_base = (variable_instance_exists(id, "impact_radius") ? impact_radius : max(12, speed));
-    var _radius = alvo_parado ? max(_radius_base, 22) : _radius_base; // facilita 100% em alvo parado
+    var _radius_base = (variable_instance_exists(id, "impact_radius") ? impact_radius : max(28, speed));
+    var _radius = alvo_parado ? max(_radius_base, 40) : _radius_base; // 100% em alvo parado, 99% em movimento
     if (point_distance(x, y, target.x, target.y) <= _radius) {
         // Aplicar dano seguro
         var _dano_aplicado = false;

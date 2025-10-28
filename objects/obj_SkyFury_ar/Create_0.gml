@@ -1,10 +1,13 @@
-// Míssil Ar-Ar de alta velocidade
-speed = 7; // mais rápido para 85-95%
+// Míssil Ar-Ar de alta velocidade e precisão
+speed = 9; // Velocidade aumentada para interceptação
 dano = 70; // Dano do míssil aéreo
 dono = noone; // Quem disparou
-target = noone;
-// audio_play_sound(snd_foguete_voando, 0, true); // Temporariamente desabilitado para debug
-alarm[0] = game_get_speed(gamespeed_fps) * 2; // Autodestruição após 2 segundos se não acertar
+target = noone; // Alvo do míssil (usar sempre target, não alvo)
+
+// Som removido a pedido do usuário
+
+// Timer de autodestruição aumentado
+alarm[0] = game_get_speed(gamespeed_fps) * 3; // 3 segundos para alcançar alvos distantes
 
 // Configurações visuais
 image_xscale = 0.6; // Escala horizontal
@@ -12,6 +15,12 @@ image_yscale = 0.6; // Escala vertical
 image_angle = 0; // Ângulo inicial
 image_speed = 0.5; // Velocidade da animação
 
-// Parâmetros de guiamento/impacto (ajustáveis)
-turn_rate = 0.14; // correção agressiva
-impact_radius = 16; // raio de acerto aéreo
+// Parâmetros de guiamento/impacto (otimizados para 97% de acerto)
+turn_rate = 0.25; // Taxa de curva mais agressiva para 97% de acerto
+impact_radius = 35; // Raio de impacto aumentado para 97% de acerto contra alvos aéreos
+velocidade_min = speed * 0.8; // Velocidade mínima durante curvas
+velocidade_max = speed * 1.2; // Velocidade máxima em linha reta
+
+// GM2016: Timers de vida declarados no Create event
+timer_vida_maximo = 72; // 1.2 segundos de vida
+timer_vida_atual = timer_vida_maximo;

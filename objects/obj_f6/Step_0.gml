@@ -134,7 +134,7 @@ if (estado == "patrulhando" || estado == "movendo") {
     
     // Buscar helicópteros militares inimigos
     with (obj_helicoptero_militar) {
-        if (nacao_proprietaria == 1) { // Apenas helicópteros do jogador
+        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) { // Apenas helicópteros do jogador
             var _dist = point_distance(other.x, other.y, x, y);
             if (_dist <= other.radar_alcance && _dist < _dist_aereo) {
                 _inimigo_aereo = id;
@@ -145,7 +145,7 @@ if (estado == "patrulhando" || estado == "movendo") {
     
     // Buscar caças F-5 inimigos
     with (obj_caca_f5) {
-        if (nacao_proprietaria == 1) { // Apenas aviões do jogador
+        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) { // Apenas aviões do jogador
             var _dist = point_distance(other.x, other.y, x, y);
             if (_dist <= other.radar_alcance && _dist < _dist_aereo) {
                 _inimigo_aereo = id;
@@ -157,7 +157,7 @@ if (estado == "patrulhando" || estado == "movendo") {
     // Buscar inimigos terrestres se não há alvos aéreos
     if (!instance_exists(_inimigo_aereo)) {
         with (obj_infantaria) {
-            if (nacao_proprietaria == 1) {
+            if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) {
                 var _dist = point_distance(other.x, other.y, x, y);
                 if (_dist <= other.alcance_missil_ar_terra && _dist < _dist_terrestre) {
                     _inimigo_terrestre = id;
@@ -167,7 +167,7 @@ if (estado == "patrulhando" || estado == "movendo") {
         }
         
         with (obj_tanque) {
-            if (nacao_proprietaria == 1) {
+            if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) {
                 var _dist = point_distance(other.x, other.y, x, y);
                 if (_dist <= other.alcance_missil_ar_terra && _dist < _dist_terrestre) {
                     _inimigo_terrestre = id;
@@ -177,7 +177,7 @@ if (estado == "patrulhando" || estado == "movendo") {
         }
         
         with (obj_blindado_antiaereo) {
-            if (nacao_proprietaria == 1) {
+            if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) {
                 var _dist = point_distance(other.x, other.y, x, y);
                 if (_dist <= other.alcance_missil_ar_terra && _dist < _dist_terrestre) {
                     _inimigo_terrestre = id;

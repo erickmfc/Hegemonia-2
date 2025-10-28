@@ -1,503 +1,358 @@
 // ===============================================
-// HEGEMONIA GLOBAL - MENU RECRUTAMENTO REORGANIZADO
-// Layout Limpo e Organizado - Cada Elemento em Seu Lugar
+// HEGEMONIA GLOBAL - MENU MILITAR MODERNO
+// Interface Grid com Todas as Unidades Terrestres
+// Design Verde Militar
 // ===============================================
 
-// Configurar fonte e definir cor básica
-draw_set_font(fnt_ui_main);
-draw_set_color(c_white);
-
-// === OVERLAY DE FUNDO ANIMADO - 100% OPACO PARA LEGIBILIDADE ===
-draw_set_alpha(1.0); // 100% opaco para eliminar vazamento do fundo
-draw_set_color(make_color_rgb(0, 0, 0)); // Preto sólido para melhor contraste
-draw_rectangle(0, 0, display_get_gui_width(), display_get_gui_height(), false);
-draw_set_alpha(1);
-
-// === PAINEL PRINCIPAL COM SCALE E ALPHA ANIMADOS ===
-var _mw = 1430;
-var _mh = 786;
-var _mx = (display_get_gui_width() - _mw) / 2;
-var _my = (display_get_gui_height() - _mh) / 2;
-
-// Aplicar transformações de animação
-var _scale_offset_x = (_mw * (1 - menu_scale)) / 2;
-var _scale_offset_y = (_mh * (1 - menu_scale)) / 2;
-var _animated_mx = _mx + _scale_offset_x;
-var _animated_my = _my + _scale_offset_y;
-var _animated_mw = _mw * menu_scale;
-var _animated_mh = _mh * menu_scale;
-
-// Sombra do painel principal
-draw_set_color(make_color_rgb(0, 0, 0));
-draw_set_alpha(0.4 * menu_alpha);
-draw_roundrect_ext(_animated_mx + 12, _animated_my + 12, _animated_mx + _animated_mw + 12, _animated_my + _animated_mh + 12, 24, 24, false);
-draw_set_alpha(1);
-
-// Fundo do painel principal - 95% OPACIDADE PARA ISOLAR DO MAPA
-draw_set_alpha(0.95); // 95% opacidade para isolar o menu
-draw_set_color(make_color_rgb(15, 20, 30)); // Azul escuro sólido
-draw_roundrect_ext(_animated_mx, _animated_my, _animated_mx + _animated_mw, _animated_my + _animated_mh, 24, 24, false);
-
-// Gradiente interno mais contrastante
-draw_set_color(make_color_rgb(25, 35, 50)); // Mais claro para melhor legibilidade
-draw_roundrect_ext(_animated_mx + 2, _animated_my + 2, _animated_mx + _animated_mw - 2, _animated_my + _animated_mh - 2, 22, 22, false);
-
-// Borda principal com efeito de brilho animado
-draw_set_color(make_color_rgb(45 + 15 * header_glow_intensity, 70 + 20 * header_glow_intensity, 105 + 25 * header_glow_intensity));
-draw_roundrect_ext(_animated_mx, _animated_my, _animated_mx + _animated_mw, _animated_my + _animated_mh, 24, 24, true);
-draw_set_alpha(1);
-
-// === SEÇÃO 1: CABEÇALHO LIMPO ===
-var _header_h = 70;
-draw_set_alpha(menu_alpha);
-
-// Gradiente vertical no cabeçalho
-var _gradient_steps = 15;
-for (var i = 0; i < _gradient_steps; i++) {
-    var _step_alpha = i / _gradient_steps;
-    var _step_color = make_color_rgb(
-        20 + 15 * _step_alpha,
-        30 + 20 * _step_alpha,
-        45 + 15 * _step_alpha
-    );
-    var _step_y = _animated_my + (i * _header_h / _gradient_steps);
-    var _step_height = _header_h / _gradient_steps;
-    
-    draw_set_color(_step_color);
-    draw_rectangle(_animated_mx, _step_y, _animated_mx + _animated_mw, _step_y + _step_height, false);
+// Verificar se o quartel ainda existe
+if (id_do_quartel == noone || !instance_exists(id_do_quartel)) {
+    instance_destroy();
+    exit;
 }
 
-// Linha divisória animada - ESPESSURA AUMENTADA 50% E COR MELHORADA
-draw_set_color(make_color_rgb(100, 150, 200)); // Azul claro para melhor contraste
-draw_set_alpha(header_line_alpha * menu_alpha);
-draw_rectangle(_animated_mx + 20, _animated_my + _header_h - 4, _animated_mx + _animated_mw - 20, _animated_my + _header_h + 1, false); // Espessura aumentada 50%
-draw_set_alpha(1);
+// Incrementar timer de animação
+animation_timer++;
 
-// Título principal centralizado - FONTE AUMENTADA 20% E COR BRANCA
+// === DIMENSÕES E POSICIONAMENTO ===
+var _gui_w = display_get_gui_width();
+var _gui_h = display_get_gui_height();
+
+// Menu ocupa 90% da tela
+var _menu_w = _gui_w * 0.9;
+var _menu_h = _gui_h * 0.9;
+var _menu_x = (_gui_w - _menu_w) / 2;
+var _menu_y = (_gui_h - _menu_h) / 2;
+
+// === OVERLAY DE FUNDO ===
+draw_set_alpha(0.92);
+draw_set_color(make_color_rgb(5, 10, 20));
+draw_rectangle(0, 0, _gui_w, _gui_h, false);
+draw_set_alpha(1.0);
+
+// === FUNDO PRINCIPAL COM GRADIENTE VERDE MILITAR ===
+// Sombra
+draw_set_color(c_black);
+draw_set_alpha(0.6);
+draw_roundrect_ext(_menu_x + 10, _menu_y + 10, _menu_x + _menu_w + 10, _menu_y + _menu_h + 10, 25, 25, false);
+
+// Fundo principal (verde militar em vez de azul naval)
+draw_set_alpha(1.0);
+draw_set_color(make_color_rgb(15, 40, 25));
+draw_roundrect_ext(_menu_x, _menu_y, _menu_x + _menu_w, _menu_y + _menu_h, 25, 25, false);
+
+// Gradiente superior
+draw_set_color(make_color_rgb(30, 80, 50));
+draw_set_alpha(0.4);
+draw_roundrect_ext(_menu_x, _menu_y, _menu_x + _menu_w, _menu_y + 100, 25, 25, false);
+draw_set_alpha(1.0);
+
+// Borda principal (verde claro militar)
+draw_set_color(make_color_rgb(60, 200, 120));
+draw_set_alpha(0.8);
+draw_roundrect_ext(_menu_x, _menu_y, _menu_x + _menu_w, _menu_y + _menu_h, 25, 25, true);
+draw_set_alpha(1.0);
+
+// === HEADER ===
+var _header_h = 100;
 draw_set_halign(fa_center);
 draw_set_valign(fa_middle);
-draw_set_color(make_color_rgb(255, 255, 255)); // Branco puro para contraste máximo
-draw_text_transformed(_animated_mx + _animated_mw/2, _animated_my + 25, "QUARTEL MILITAR", 1.2, 1.2, 0); // Fonte aumentada 20%
 
-// Subtítulo separado - COR CINZA CLARO
-draw_set_color(make_color_rgb(180, 180, 180)); // Cinza claro
-draw_set_alpha(menu_alpha * header_line_alpha);
-draw_text_transformed(_animated_mx + _animated_mw/2, _animated_my + 50, "Recrutamento de Unidades Terrestres", 0.8, 0.8, 0);
-draw_set_alpha(1);
-
-// === SEÇÃO 2: PAINEL DE STATUS (ESQUERDA SUPERIOR) - ALTURA AUMENTADA 10% ===
-var _status_w = 280;
-var _status_h = 132; // Altura aumentada 10%
-var _status_x = _animated_mx + 20;
-var _status_y = _animated_my + 80;
-
-draw_set_alpha(menu_alpha);
-
-// Fundo do painel de status
-draw_set_color(make_color_rgb(25, 35, 45));
-draw_roundrect_ext(_status_x, _status_y, _status_x + _status_w, _status_y + _status_h, 12, 12, false);
-
-// Borda do painel
-draw_set_color(make_color_rgb(60, 100, 150));
-draw_roundrect_ext(_status_x, _status_y, _status_x + _status_w, _status_y + _status_h, 12, 12, true);
-
-// Título do painel - COR BRANCA
-draw_set_halign(fa_center);
-draw_set_color(make_color_rgb(255, 255, 255)); // Branco
-draw_text(_status_x + _status_w/2, _status_y + 15, "STATUS DO QUARTEL");
-
-// Linha divisória
-draw_set_color(make_color_rgb(60, 100, 150));
-draw_set_alpha(0.6 * menu_alpha);
-draw_rectangle(_status_x + 15, _status_y + 35, _status_x + _status_w - 15, _status_y + 37, false);
-draw_set_alpha(1);
-
-// Conteúdo organizado em linhas separadas
-draw_set_halign(fa_left);
-var _line_y = _status_y + 50;
-var _line_spacing = 20;
-
-// Status do quartel - POSICIONAMENTO CORRETO E COR VERDE BRILHANTE
-draw_set_color(make_color_rgb(255, 255, 255)); // Branco para o texto
-draw_text(_status_x + 15, _line_y, "Status:");
-if (instance_exists(id_do_quartel) && id_do_quartel.esta_treinando) {
-    draw_set_color(make_color_rgb(255, 165, 0));
-    draw_text(_status_x + 50, _line_y, "Treinando"); // Posicionamento ajustado
-    
-    // Tempo restante
-    var _tempo_restante = max(0, id_do_quartel.alarm[0]);
-    draw_set_color(make_color_rgb(255, 255, 255)); // Branco
-    draw_text(_status_x + 15, _line_y + _line_spacing, "Tempo:");
+// Título principal - AUMENTADO 20% (1.8 * 1.2 = 2.16)
     draw_set_color(make_color_rgb(255, 255, 255));
-    draw_text(_status_x + 50, _line_y + _line_spacing, string(_tempo_restante / 60) + "s");
-} else {
-    draw_set_color(make_color_rgb(0, 255, 0)); // Verde brilhante para indicar estado positivo
-    draw_text(_status_x + 50, _line_y, "Disponível"); // Posicionamento ajustado
-    
-    // Mostrar fila de recrutamento se existir
-    if (instance_exists(id_do_quartel) && ds_queue_size(id_do_quartel.fila_recrutamento) > 0) {
-        draw_set_color(make_color_rgb(255, 255, 255)); // Branco
-        draw_text(_status_x + 15, _line_y + _line_spacing, "Fila:");
-        draw_set_color(make_color_rgb(255, 255, 255)); // Branco
-        draw_text(_status_x + 50, _line_y + _line_spacing, string(ds_queue_size(id_do_quartel.fila_recrutamento)) + " unidades");
-    }
-}
+draw_text_transformed(_menu_x + _menu_w/2, _menu_y + 35, "QUARTEL MILITAR", 2.16, 2.16, 0);
 
-// === SEÇÃO 3: PAINEL DE RECURSOS (DIREITA SUPERIOR) ===
-var _recursos_w = 280;
-var _recursos_h = 120;
-var _recursos_x = _animated_mx + _animated_mw - _recursos_w - 20;
-var _recursos_y = _animated_my + 80;
+// Subtítulo - AUMENTADO 20% (1.0 * 1.2 = 1.2)
+draw_set_color(make_color_rgb(150, 255, 200));
+draw_text_transformed(_menu_x + _menu_w/2, _menu_y + 75, "Central de Produção Terrestre - Exército Disponível", 1.2, 1.2, 0);
 
-// Fundo do painel de recursos
-draw_set_color(make_color_rgb(25, 35, 45));
-draw_roundrect_ext(_recursos_x, _recursos_y, _recursos_x + _recursos_w, _recursos_y + _recursos_h, 12, 12, false);
+// === PAINEL DE RECURSOS - ALTURA AUMENTADA 20% ===
+var _recursos_y = _menu_y + _header_h + 15; // +20% de espaçamento (12 + 3)
+var _recursos_h = 72; // Aumentado 20% (60 * 1.2 = 72)
 
-// Borda do painel
-draw_set_color(make_color_rgb(60, 100, 150));
-draw_roundrect_ext(_recursos_x, _recursos_y, _recursos_x + _recursos_w, _recursos_y + _recursos_h, 12, 12, true);
+draw_set_color(make_color_rgb(25, 60, 40));
+draw_set_alpha(0.9);
+draw_roundrect_ext(_menu_x + 20, _recursos_y, _menu_x + _menu_w - 20, _recursos_y + _recursos_h, 15, 15, false);
+draw_set_alpha(1.0);
 
-// Título do painel - COR BRANCA
-draw_set_halign(fa_center);
-draw_set_color(make_color_rgb(255, 255, 255)); // Branco
-draw_text(_recursos_x + _recursos_w/2, _recursos_y + 15, "RECURSOS");
-
-// Linha divisória
-draw_set_color(make_color_rgb(60, 100, 150));
-draw_set_alpha(0.6 * menu_alpha);
-draw_rectangle(_recursos_x + 15, _recursos_y + 35, _recursos_x + _recursos_w - 15, _recursos_y + 37, false);
-draw_set_alpha(1);
-
-// Recursos organizados
+// Recursos - AUMENTADO 20% (1.2 * 1.2 = 1.44)
 draw_set_halign(fa_left);
-var _res_y = _recursos_y + 50;
+draw_set_color(make_color_rgb(255, 215, 0));
+draw_text_transformed(_menu_x + 40, _recursos_y + 20, "DINHEIRO: $" + string(global.dinheiro), 1.44, 1.44, 0);
 
-// Dinheiro - FONTE AUMENTADA 10% E ALINHAMENTO CORRETO
-draw_set_color(make_color_rgb(255, 255, 255)); // Branco para o texto
-draw_text_transformed(_recursos_x + 15, _res_y, "Dinheiro:", 1.1, 1.1, 0); // Fonte aumentada 10%
-draw_set_color(make_color_rgb(255, 215, 0)); // Amarelo/dourado para o valor
-// Posicionamento ajustado para 80% da largura
-var _dinheiro_x = _recursos_x + (_recursos_w * 0.8); // 80% da largura
-draw_text(_dinheiro_x, _res_y, "$" + string(global.dinheiro));
-
-// População - FONTE AUMENTADA 10% E ALINHAMENTO CORRETO
-draw_set_color(make_color_rgb(255, 255, 255)); // Branco para o título
-draw_text_transformed(_recursos_x + 15, _res_y + 25, "População:", 1.1, 1.1, 0); // Fonte aumentada 10%
-draw_set_color(make_color_rgb(100, 255, 100)); // Verde claro brilhante para o valor
-// Posicionamento ajustado para 80% da largura
-var _populacao_x = _recursos_x + (_recursos_w * 0.8); // 80% da largura
-draw_text(_populacao_x, _res_y + 25, string(global.populacao) + "/20");
-
-// Feedback de confirmação
-if (recruitment_confirmation && confirmation_timer > 0) {
-    var _confirmation_alpha = confirmation_timer / 30.0;
-    var _confirmation_y = _res_y + 50;
-    
-    draw_set_color(make_color_rgb(50, 205, 50));
-    draw_set_alpha(_confirmation_alpha * menu_alpha);
-    draw_text(_recursos_x + 15, _confirmation_y, "✓ " + confirmation_text);
-    draw_set_alpha(1);
+// Verificar se população existe, senão usar valor padrão
+var _populacao = 50;
+if (variable_global_exists("populacao")) {
+    _populacao = global.populacao;
 }
 
-draw_set_alpha(1);
+draw_set_color(make_color_rgb(150, 255, 200));
+draw_text_transformed(_menu_x + 40, _recursos_y + 50, "População Disponível: " + string(_populacao), 1.08, 1.08, 0); // 0.9 * 1.2
 
-// === SEÇÃO 4: GRID DE UNIDADES (CENTRO) ===
-var _grid_x = _animated_mx + 20;
-var _grid_y = _animated_my + 220; // Bem separado dos painéis superiores
-var _grid_w = _animated_mw - 40;
-var _grid_h = 400;
+// Status do quartel - AUMENTADO 20% (1.0 * 1.2 = 1.2)
+draw_set_halign(fa_right);
+var _status_text = id_do_quartel.esta_treinando ? "TREINANDO" : "OCIOSO";
+var _status_color = id_do_quartel.esta_treinando ? make_color_rgb(255, 200, 50) : make_color_rgb(100, 255, 100);
+draw_set_color(_status_color);
+draw_text_transformed(_menu_x + _menu_w - 40, _recursos_y + 30, "STATUS: " + _status_text, 1.2, 1.2, 0);
 
-// Título da seção de unidades - FONTE AUMENTADA 15% E COR BRANCA
-draw_set_halign(fa_center);
-draw_set_color(make_color_rgb(255, 255, 255)); // Branco puro para contraste máximo
-draw_text_transformed(_grid_x + _grid_w/2, _grid_y - 30 - 30, "UNIDADES DISPONÍVEIS", 1.15, 1.15, 0); // Fonte aumentada 15%
+// === GRID DE UNIDADES (3 colunas x 2 linhas) ===
+var _grid_start_y = _recursos_y + _recursos_h + 25; // AUMENTADO 20% de espaçamento (20 + 5)
+var _grid_h = _menu_h - _header_h - _recursos_h - 220; // AUMENTADO 20% de espaço para footer (180 * 1.2 = 216, ajustado para 220)
 
-// Obter unidades disponíveis
-var _unidades = [];
-if (instance_exists(id_do_quartel)) {
+var _cols = 3;
+var _rows = 2;
+var _card_spacing = 24; // AUMENTADO 20% (20 * 1.2 = 24)
+var _card_w = (_menu_w - 40 - (_cols - 1) * _card_spacing) / _cols;
+var _card_h = ((_grid_h - (_rows - 1) * _card_spacing) / _rows); // REMOVIDO o fator de 0.8 para dar mais altura
+
+// Obter lista de unidades
+var _unidades;
+if (instance_exists(id_do_quartel) && !is_struct(id_do_quartel.unidades_disponiveis)) {
     _unidades = id_do_quartel.unidades_disponiveis;
+} else {
+    _unidades = ds_list_create();
 }
+var _total_unidades = ds_list_size(_unidades);
 
-// Cards das unidades com espaçamento adequado - ALTURA AUMENTADA 10%
-var card_width = 300;
-var card_height = 200 * 1.1; // Aumentar 10% para baixo
-var card_spacing_x = 40;
-var card_spacing_y = 30;
+// Mouse position para hover
+var _mouse_gui_x = device_mouse_x_to_gui(0);
+var _mouse_gui_y = device_mouse_y_to_gui(0);
+unidade_hover = -1;
 
-// Desenhar cards organizados em grid 2x2
-for (var i = 0; i < min(4, ds_list_size(_unidades)); i++) {
+// Desenhar cada unidade
+for (var i = 0; i < min(_total_unidades, 6); i++) {
     var _unidade = ds_list_find_value(_unidades, i);
-    var _row = i div 2;
-    var _col = i mod 2;
     
-    var _card_x = _grid_x + _col * (card_width + card_spacing_x);
-    var _card_y = _grid_y + _row * (card_height + card_spacing_y);
+    // Calcular posição do card
+    var _col = i mod _cols;
+    var _row = floor(i / _cols);
+    var _card_x = _menu_x + 20 + _col * (_card_w + _card_spacing);
+    var _card_y = _grid_start_y + _row * (_card_h + _card_spacing);
     
-    // Aplicar animações do card
-    var card = card_animations[i];
-    var hover = card_hover_effects[i];
+    // Verificar hover
+    var _is_hover = (_mouse_gui_x >= _card_x && _mouse_gui_x <= _card_x + _card_w &&
+                     _mouse_gui_y >= _card_y && _mouse_gui_y <= _card_y + _card_h);
     
-    // Aplicar offsets de animação
-    _card_y += card.offset_y;
+    if (_is_hover) unidade_hover = i;
     
-    // Aplicar scale de animação
-    var _card_scale = card.scale;
-    var _scaled_width = card_width * _card_scale;
-    var _scaled_height = card_height * _card_scale;
-    // Corrigindo aviso GM2044 - variável local já declarada
-    _scale_offset_x = (card_width - _scaled_width) / 2;
-    _scale_offset_y = (card_height - _scaled_height) / 2;
+    // Animação do card
+    var _anim = card_animations[i];
+    _anim.alpha = lerp(_anim.alpha, 1, 0.1);
+    _anim.scale = lerp(_anim.scale, 1, 0.15);
+    _anim.hover_intensity = lerp(_anim.hover_intensity, _is_hover ? 1 : 0, 0.2);
+    _anim.pulse = (_anim.pulse + 0.05) mod (pi * 2);
+
+    // Verificar se pode produzir
+    var _can_produce = (global.dinheiro >= _unidade.custo_dinheiro && 
+                        _populacao >= _unidade.custo_populacao &&
+                        !id_do_quartel.esta_treinando);
     
-    _card_x += _scale_offset_x;
-    _card_y += _scale_offset_y;
+    // Cores baseadas em estado (verde militar em vez de azul)
+    var _card_color = _can_produce ? make_color_rgb(30, 75, 50) : make_color_rgb(40, 50, 40);
+    var _border_color = _can_produce ? make_color_rgb(60, 200, 120) : make_color_rgb(80, 90, 80);
     
-    // === CARD DA UNIDADE ORGANIZADO ===
-    
-    // Verificar disponibilidade
-    var _can_afford = (global.dinheiro >= _unidade.custo_dinheiro && global.populacao >= _unidade.custo_populacao);
-    var _quartel_livre = (!instance_exists(id_do_quartel) || !id_do_quartel.esta_treinando);
-    var _disponivel = _can_afford && _quartel_livre;
-    
-    // Alpha do card baseado na animação
-    var _card_alpha = card.alpha * menu_alpha;
-    
-    // Cores baseadas na disponibilidade
-    var _card_color = c_white;
-    var _border_color = c_white;
-    
-    if (_disponivel) {
-        _card_color = make_color_rgb(40 + 20 * hover.hover_alpha, 65 + 15 * hover.hover_alpha, 55 + 10 * hover.hover_alpha);
-        _border_color = make_color_rgb(70 + 25 * hover.hover_alpha, 95 + 20 * hover.hover_alpha, 85 + 15 * hover.hover_alpha);
-    } else if (!_can_afford) {
-        _card_color = make_color_rgb(170 + 20 * hover.hover_alpha, 70 + 15 * hover.hover_alpha, 70 + 10 * hover.hover_alpha);
-        _border_color = make_color_rgb(190 + 25 * hover.hover_alpha, 100 + 20 * hover.hover_alpha, 100 + 15 * hover.hover_alpha);
-    } else {
-        _card_color = make_color_rgb(180 + 20 * hover.hover_alpha, 155 + 15 * hover.hover_alpha, 85 + 10 * hover.hover_alpha);
-        _border_color = make_color_rgb(200 + 25 * hover.hover_alpha, 175 + 20 * hover.hover_alpha, 105 + 15 * hover.hover_alpha);
+    if (_is_hover && _can_produce) {
+        _card_color = make_color_rgb(40, 110, 70);
+        _border_color = make_color_rgb(100, 255, 180);
     }
     
     // Sombra do card
-    draw_set_color(make_color_rgb(0, 0, 0));
-    draw_set_alpha(0.3 * _card_alpha);
-    draw_roundrect_ext(_card_x + 3, _card_y + 3, _card_x + _scaled_width + 3, _card_y + _scaled_height + 3, 12, 12, false);
+    draw_set_color(c_black);
+    draw_set_alpha(0.4 + _anim.hover_intensity * 0.2);
+    draw_roundrect_ext(_card_x + 5, _card_y + 5, _card_x + _card_w + 5, _card_y + _card_h + 5, 12, 12, false);
     
     // Fundo do card
+    draw_set_alpha(_anim.alpha);
     draw_set_color(_card_color);
-    draw_set_alpha(0.95 * _card_alpha);
-    draw_roundrect_ext(_card_x, _card_y, _card_x + _scaled_width, _card_y + _scaled_height, 12, 12, false);
+    draw_roundrect_ext(_card_x, _card_y, _card_x + _card_w, _card_y + _card_h, 12, 12, false);
     
     // Borda do card
     draw_set_color(_border_color);
-    draw_set_alpha(_card_alpha);
-    draw_roundrect_ext(_card_x, _card_y, _card_x + _scaled_width, _card_y + _scaled_height, 12, 12, true);
+    draw_set_alpha(0.7 + _anim.hover_intensity * 0.3);
+    draw_roundrect_ext(_card_x, _card_y, _card_x + _card_w, _card_y + _card_h, 12, 12, true);
     
-    // Efeito de glow quando disponível
-    if (_disponivel && hover.glow_intensity > 0) {
-        draw_set_color(make_color_rgb(100, 200, 100));
-        draw_set_alpha(hover.glow_intensity * _card_alpha);
-        draw_roundrect_ext(_card_x - 3, _card_y - 3, _card_x + _scaled_width + 3, _card_y + _scaled_height + 3, 15, 15, true);
+    // Efeito de brilho no topo
+    if (_can_produce) {
+        draw_set_color(make_color_rgb(120, 255, 180));
+        draw_set_alpha(0.15 + sin(_anim.pulse) * 0.1);
+        draw_roundrect_ext(_card_x + 3, _card_y + 3, _card_x + _card_w - 3, _card_y + 30, 10, 10, false);
     }
     
-    draw_set_alpha(1);
+    draw_set_alpha(1.0);
     
-    // === ÁREA DO ÍCONE (TOP) ===
-    var _icon_area_h = 60;
-    draw_set_halign(fa_center);
+    // === CONTEÚDO DO CARD ===
+    var _content_x = _card_x + 15;
+    var _content_y = _card_y + 15;
     
-    // Ícone da unidade - AUMENTADO 30%
-    if (sprite_exists(_unidade.sprite)) {
-        draw_sprite_ext(_unidade.sprite, 0, _card_x + _scaled_width/2, _card_y + _icon_area_h/2, 1.56 * _card_scale, 1.56 * _card_scale, 0, c_white, _card_alpha); // Aumentado 30%
-    }
-    
-    // === ÁREA DO NOME (CENTRO) - COR AMARELA DOURADA E FONTE AUMENTADA 20% ===
-    var _name_y = _card_y + _icon_area_h + 10;
-    draw_set_color(make_color_rgb(255, 215, 0)); // Amarelo dourado
-    draw_set_alpha(_card_alpha);
-    draw_text_transformed(_card_x + _scaled_width/2, _name_y, _unidade.nome, 1.2, 1.2, 0); // Fonte aumentada 20%
-    
-    // Linha divisória
-    draw_set_color(make_color_rgb(60, 100, 150));
-    draw_set_alpha(0.6 * _card_alpha);
-    draw_rectangle(_card_x + 20, _name_y + 20, _card_x + _scaled_width - 20, _name_y + 22, false);
-    draw_set_alpha(1);
-    
-    // === ÁREA DE INFORMAÇÕES (CENTRO-BAIXO) ===
-    var _info_y = _name_y + 35;
-    var _info_spacing = 18;
-    
+    // Nome da unidade - AUMENTADO 20% (1.1 * 1.2 = 1.32)
     draw_set_halign(fa_left);
-    draw_set_alpha(_card_alpha);
+    draw_set_valign(fa_top);
+    draw_set_color(_can_produce ? make_color_rgb(255, 255, 255) : make_color_rgb(150, 150, 150));
+    draw_text_transformed(_content_x, _content_y, string_upper(_unidade.nome), 1.32, 1.32, 0);
     
-    // Custo em dinheiro - COR AMARELA E POSICIONAMENTO CORRETO
-    draw_set_color(make_color_rgb(255, 215, 0)); // Amarelo/dourado
-    draw_text(_card_x + (_scaled_width * 0.1), _info_y + (_scaled_height * 0.5), "$" + string(_unidade.custo_dinheiro)); // 10% da largura, 50% da altura
+    // Ícone/Sprite da unidade - POSIÇÃO AJUSTADA
+    var _icon_y = _content_y + 42; // AUMENTADO 20% (35 * 1.2 = 42)
+    var _icon_x = _content_x + (_card_w * 0.6);
+    draw_set_color(_can_produce ? make_color_rgb(80, 220, 140) : make_color_rgb(100, 100, 100));
+    draw_set_alpha(0.3);
+    draw_circle(_icon_x, _icon_y, 25, false);
+    draw_set_alpha(1.0);
     
-    // Custo em população - COR VERDE CLARO E ESPAÇAMENTO AUMENTADO 50%
-    draw_set_color(make_color_rgb(100, 255, 100)); // Verde claro
-    draw_text(_card_x + (_scaled_width * 0.1), _info_y + (_scaled_height * 0.5) + (_info_spacing * 1.5), string(_unidade.custo_populacao) + " POP"); // Espaçamento aumentado 50%
-    
-    // Tempo de treino - COR BRANCA E ESPAÇAMENTO AUMENTADO 50%
-    draw_set_color(make_color_rgb(255, 255, 255)); // Branco
-    draw_text(_card_x + (_scaled_width * 0.1), _info_y + (_scaled_height * 0.5) + (_info_spacing * 3.0), string(_unidade.tempo_treino / 60) + "s"); // Espaçamento aumentado 50%
-    
-    draw_set_alpha(1);
-    
-    // === ÁREA DO BOTÃO (BAIXO) - REDUZIDO 10% ===
-    var _btn_w = (_scaled_width - 40) * 0.9; // Reduzir 10%
-    var _btn_h = 35 * 0.9; // Reduzir 10%
-    var _btn_x = _card_x + 20;
-    var _btn_y = _card_y + _scaled_height - _btn_h - 15;
-    
-    // Verificar hover no botão
-    var _mouse_gui_x = device_mouse_x_to_gui(0);
-    var _mouse_gui_y = device_mouse_y_to_gui(0);
-    var _mouse_over_btn = (_mouse_gui_x >= _btn_x && _mouse_gui_x <= _btn_x + _btn_w && 
-                          _mouse_gui_y >= _btn_y && _mouse_gui_y <= _btn_y + _btn_h);
-    
-    // Cor do botão baseada na disponibilidade
-    var _btn_color = c_white;
-    var _text_color = c_white;
-    
-    if (_disponivel) {
-        if (_mouse_over_btn) {
-            _btn_color = make_color_rgb(80, 140, 210);
-        } else {
-            _btn_color = make_color_rgb(60, 120, 190);
-        }
-        _text_color = c_white;
-    } else if (!_can_afford) {
-        _btn_color = make_color_rgb(190, 90, 90);
-        _text_color = c_white;
-    } else {
-        _btn_color = make_color_rgb(110, 110, 110);
-        _text_color = make_color_rgb(190, 190, 190);
+    // Desenhar sprite se existir
+    var _sprite_desenhado = false;
+    if (_unidade.nome == "Infantaria" && sprite_exists(spr_infantaria)) {
+        draw_sprite_ext(spr_infantaria, 0, _icon_x, _icon_y, 1.5, 1.5, 0, c_white, _anim.alpha);
+        _sprite_desenhado = true;
+    } else if (_unidade.nome == "Soldado Anti-Aéreo" && sprite_exists(spr_soldado_antiaereo)) {
+        draw_sprite_ext(spr_soldado_antiaereo, 0, _icon_x, _icon_y, 1.5, 1.5, 0, c_white, _anim.alpha);
+        _sprite_desenhado = true;
+    } else if (_unidade.nome == "Tanque" && sprite_exists(spr_tanque)) {
+        draw_sprite_ext(spr_tanque, 0, _icon_x, _icon_y, 1.5, 1.5, 0, c_white, _anim.alpha);
+        _sprite_desenhado = true;
+    } else if (_unidade.nome == "Blindado Anti-Aéreo" && sprite_exists(spr_blindado_antiaereo)) {
+        draw_sprite_ext(spr_blindado_antiaereo, 0, _icon_x, _icon_y, 1.5, 1.5, 0, c_white, _anim.alpha);
+        _sprite_desenhado = true;
     }
     
-    // Sombra do botão
-    draw_set_color(make_color_rgb(0, 0, 0));
-    draw_set_alpha(0.3 * _card_alpha);
-    draw_roundrect_ext(_btn_x + 2, _btn_y + 2, _btn_x + _btn_w + 2, _btn_y + _btn_h + 2, 8, 8, false);
+    // Descrição - AUMENTADO 20% (0.75 * 1.2 = 0.9)
+    var _desc_y = _icon_y + 48; // AUMENTADO 20% (40 * 1.2 = 48)
+    draw_set_color(_can_produce ? make_color_rgb(180, 230, 200) : make_color_rgb(120, 120, 120));
+    draw_text_ext_transformed(_content_x, _desc_y, _unidade.descricao, 18, _card_w - 30, 0.9, 0.9, 0);
     
-    // Fundo do botão
+    // Informações - POSIÇÃO AJUSTADA
+    var _info_y = _card_y + _card_h - 75; // AUMENTADO de 65 para 75
+    
+    // Custo - AUMENTADO 20% (0.99 * 1.2 = 1.188)
+    draw_set_color(_can_produce ? make_color_rgb(255, 215, 0) : make_color_rgb(150, 150, 100));
+    draw_text_transformed(_content_x, _info_y, "$ " + string(_unidade.custo_dinheiro), 1.188, 1.188, 0);
+    
+    // População - AUMENTADO 20% (0.8 * 1.2 = 0.96) E ESPAÇAMENTO AJUSTADO
+    draw_set_color(_can_produce ? make_color_rgb(150, 255, 200) : make_color_rgb(120, 120, 120));
+    draw_text_transformed(_content_x, _info_y + 24, "Pop: " + string(_unidade.custo_populacao), 0.96, 0.96, 0); // 20 * 1.2 = 24
+    
+    // Tempo - AUMENTADO 20% (0.8 * 1.2 = 0.96) E ESPAÇAMENTO AJUSTADO
+    var _tempo_seg = _unidade.tempo_treino / 60;
+    draw_text_transformed(_content_x, _info_y + 48, "Tempo: " + string(_tempo_seg) + "s", 0.96, 0.96, 0); // 35 * 1.37 ≈ 48
+    
+    // === BOTÕES DE QUANTIDADE (1, 5, 10) ===
+    var _btn_quant_y = _card_y + _card_h - 85;
+    var _btn_quant_h = 28;
+    var _btn_quant_w = (_card_w - 30) / 3 - 2;
+    var _btn_quant_spacing = 2;
+    
+    var _quantidades = [1, 5, 10];
+    var _btn_textos = ["1", "5", "10"];
+    
+    for (var _q = 0; _q < 3; _q++) {
+        var _quant = _quantidades[_q];
+        var _btn_q_x = _card_x + 15 + _q * (_btn_quant_w + _btn_quant_spacing);
+        var _btn_q_y = _btn_quant_y;
+        
+        // Verificar hover
+        var _mouse_over_qbtn = (_mouse_gui_x >= _btn_q_x && _mouse_gui_x <= _btn_q_x + _btn_quant_w &&
+                               _mouse_gui_y >= _btn_q_y && _mouse_gui_y <= _btn_q_y + _btn_quant_h);
+        
+        // Calcular custo para esta quantidade
+        var _custo_q_dinheiro = _unidade.custo_dinheiro * _quant;
+        var _custo_q_populacao = _unidade.custo_populacao * _quant;
+        var _can_afford_quant = (global.dinheiro >= _custo_q_dinheiro && 
+                                _populacao >= _custo_q_populacao &&
+                                !id_do_quartel.esta_treinando);
+        
+        // Cor do botão
+        var _qbtn_color = _can_afford_quant ? make_color_rgb(60, 140, 60) : make_color_rgb(80, 80, 80);
+        if (_mouse_over_qbtn && _can_afford_quant) _qbtn_color = make_color_rgb(80, 180, 80);
+        
+        draw_set_color(_qbtn_color);
+        draw_roundrect_ext(_btn_q_x, _btn_q_y, _btn_q_x + _btn_quant_w, _btn_q_y + _btn_quant_h, 6, 6, false);
+        
+        draw_set_color(make_color_rgb(255, 255, 255));
+        draw_set_alpha(0.9);
+        draw_roundrect_ext(_btn_q_x, _btn_q_y, _btn_q_x + _btn_quant_w, _btn_q_y + _btn_quant_h, 6, 6, true);
+        draw_set_alpha(1.0);
+        
+        draw_set_halign(fa_center);
+        draw_set_color(_can_afford_quant ? make_color_rgb(255, 255, 255) : make_color_rgb(150, 150, 150));
+        draw_text_transformed(_btn_q_x + _btn_quant_w/2, _btn_q_y + _btn_quant_h/2 - 2, _btn_textos[_q], 0.9, 0.9, 0);
+    }
+    
+    // Botão TREINAR - POSIÇÃO AJUSTADA (mais acima)
+    var _btn_y = _card_y + _card_h - 50;
+    var _btn_h = 36;
+    var _btn_w = _card_w - 30;
+    var _btn_x = _card_x + 15;
+    
+    var _btn_color = _can_produce ? make_color_rgb(60, 140, 60) : make_color_rgb(80, 80, 80);
+    if (_is_hover && _can_produce) _btn_color = make_color_rgb(80, 180, 80);
+    
     draw_set_color(_btn_color);
-    draw_set_alpha(_card_alpha);
     draw_roundrect_ext(_btn_x, _btn_y, _btn_x + _btn_w, _btn_y + _btn_h, 8, 8, false);
     
-    // Texto do botão - FONTE REDUZIDA 10%
-    draw_set_halign(fa_center);
-    draw_set_valign(fa_middle);
-    draw_set_color(_text_color);
-    var _btn_text = _disponivel ? "RECRUTAR" : (!_can_afford ? "SEM RECURSOS" : "QUARTEL OCUPADO");
-    
-    // Aplicar escala de fonte reduzida
-    draw_set_font(fnt_ui_main);
-    var _font_scale = 0.9; // Reduzir 10%
-    draw_text_transformed(_btn_x + _btn_w/2, _btn_y + _btn_h/2, _btn_text, _font_scale, _font_scale, 0);
-    
-    // Efeito de brilho no hover
-    if (_mouse_over_btn && _disponivel) {
-        draw_set_color(make_color_rgb(255, 255, 255));
-        draw_set_alpha(0.2 * _card_alpha);
-        draw_roundrect_ext(_btn_x, _btn_y, _btn_x + _btn_w, _btn_y + _btn_h, 8, 8, false);
-    }
-    
-    draw_set_alpha(1);
-    
-    // Dica visual quando mouse está sobre card disponível
-    var _mouse_over_card = (_mouse_gui_x >= _card_x && _mouse_gui_x <= _card_x + _scaled_width && 
-                           _mouse_gui_y >= _card_y && _mouse_gui_y <= _card_y + _scaled_height);
-    
-    if (_disponivel && _mouse_over_card) {
-        // Borda pulsante
-        draw_set_color(make_color_rgb(100, 200, 100));
-        draw_set_alpha(0.6 * _card_alpha);
-        draw_roundrect_ext(_card_x - 2, _card_y - 2, _card_x + _scaled_width + 2, _card_y + _scaled_height + 2, 14, 14, true);
+    draw_set_color(make_color_rgb(255, 255, 255));
+    draw_set_alpha(0.9);
+    draw_roundrect_ext(_btn_x, _btn_y, _btn_x + _btn_w, _btn_y + _btn_h, 8, 8, true);
+    draw_set_alpha(1.0);
         
-        // Texto de dica
-        draw_set_halign(fa_center);
-        draw_set_color(make_color_rgb(255, 255, 255));
-        draw_set_alpha(_card_alpha);
-        draw_text(_card_x + _scaled_width/2, _card_y - 15, "Clique para recrutar");
-        draw_set_alpha(1);
-    }
+    draw_set_halign(fa_center);
+    draw_set_color(_can_produce ? make_color_rgb(255, 255, 255) : make_color_rgb(150, 150, 150));
+    draw_text_transformed(_btn_x + _btn_w/2, _btn_y + _btn_h/2 - 4, _can_produce ? "TREINAR" : "BLOQUEADO", 1.02, 1.02, 0);
 }
 
-// === SEÇÃO 5: RODAPÉ LIMPO ===
-var _footer_h = 50;
-var _footer_y = _animated_my + _animated_mh - _footer_h;
+// === FILA DE PRODUÇÃO ===
+var _fila_y = _menu_y + _menu_h - 156; // AUMENTADO (130 * 1.2 = 156)
+var _fila_h = 96; // AUMENTADO 20% (80 * 1.2 = 96)
 
-draw_set_alpha(footer_alpha * menu_alpha);
+draw_set_color(make_color_rgb(25, 60, 40));
+draw_set_alpha(0.9);
+draw_roundrect_ext(_menu_x + 20, _fila_y, _menu_x + _menu_w - 20, _fila_y + _fila_h, 15, 15, false);
+draw_set_alpha(1.0);
 
-// Fundo do rodapé com gradiente horizontal
-// Corrigindo aviso GM2044 - variável local já declarada
-_gradient_steps = 15;
-for (var i = 0; i < _gradient_steps; i++) {
-    var _step_alpha = i / _gradient_steps;
-    var _step_color = make_color_rgb(
-        20 + 10 * _step_alpha,
-        30 + 15 * _step_alpha,
-        45 + 10 * _step_alpha
-    );
-    var _step_x = _animated_mx + (i * _animated_mw / _gradient_steps);
-    var _step_width = _animated_mw / _gradient_steps;
-    
-    draw_set_color(_step_color);
-    draw_rectangle(_step_x, _footer_y, _step_x + _step_width, _animated_my + _animated_mh, false);
-}
-
-// Instrução clara - FONTE AUMENTADA 20% E COR BRANCA, POSICIONAMENTO 5%
 draw_set_halign(fa_left);
-draw_set_color(make_color_rgb(255, 255, 255)); // Branco para chamado à ação claro
-draw_text_transformed(_animated_mx + (_animated_mw * 0.05), _footer_y + 15, "Clique em uma unidade para recrutar", 1.2, 1.2, 0); // Fonte aumentada 20%, posição 5%
+draw_set_valign(fa_middle);
+draw_set_color(make_color_rgb(200, 255, 220));
+draw_text_transformed(_menu_x + 40, _fila_y + 20, "FILA DE RECRUTAMENTO", 1.2, 1.2, 0); // AUMENTADO 20%
 
-// Dicas de atalho em linha separada com fonte menor e posição ajustada
-draw_set_color(make_color_rgb(160, 160, 160)); // Cinza claro
-draw_text_transformed(_animated_mx + (_animated_mw * 0.05), _footer_y + 40, "Shift+Clique = 5 unidades | Ctrl+Clique = 10 unidades", 0.85, 0.85, 0); // Fonte diminuída 15%, posição 5%
-
-// Botão fechar separado
-var _close_w = 100;
-var _close_h = 30;
-var _close_x = _animated_mx + _animated_mw - _close_w - 20;
-var _close_y = _footer_y + 10;
-
-// Verificar hover no botão fechar
-var _mouse_gui_x = device_mouse_x_to_gui(0);
-var _mouse_gui_y = device_mouse_y_to_gui(0);
-var _mouse_over_close = (_mouse_gui_x >= _close_x && _mouse_gui_x <= _close_x + _close_w && 
-                        _mouse_gui_y >= _close_y && _mouse_gui_y <= _close_y + _close_h);
-
-// Cores do botão fechar
-var _close_color = _mouse_over_close ? make_color_rgb(220, 80, 80) : make_color_rgb(184, 76, 76);
-
-// Sombra do botão fechar
-draw_set_color(make_color_rgb(0, 0, 0));
-draw_set_alpha(0.3 * footer_alpha * menu_alpha);
-draw_roundrect_ext(_close_x + 2, _close_y + 2, _close_x + _close_w + 2, _close_y + _close_h + 2, 8, 8, false);
-
-// Fundo do botão fechar
-draw_set_color(_close_color);
-draw_roundrect_ext(_close_x, _close_y, _close_x + _close_w, _close_y + _close_h, 8, 8, false);
-
-// Borda branca de 2 pixels para definir o botão
+var _fila_size = ds_queue_size(id_do_quartel.fila_recrutamento);
 draw_set_color(make_color_rgb(255, 255, 255));
-draw_roundrect_ext(_close_x, _close_y, _close_x + _close_w, _close_y + _close_h, 8, 8, true);
+draw_text_transformed(_menu_x + 40, _fila_y + 54, "Unidades na fila: " + string(_fila_size), 1.08, 1.08, 0); // 0.9 * 1.2 e posição ajustada
 
-// Texto do botão fechar - FONTE AUMENTADA 10%
+draw_set_halign(fa_right);
+draw_set_color(make_color_rgb(150, 255, 200));
+draw_text_transformed(_menu_x + _menu_w - 40, _fila_y + 54, "Total treinado: " + string(id_do_quartel.unidades_criadas), 1.08, 1.08, 0);
+
+// === BOTÃO FECHAR - AUMENTADO 20% ===
+var _close_w = 168; // AUMENTADO 20% (140 * 1.2 = 168)
+var _close_h = 54; // AUMENTADO 20% (45 * 1.2 = 54)
+var _close_x = _menu_x + _menu_w - _close_w - 20;
+var _close_y = _menu_y + _menu_h - 72; // AUMENTADO (60 * 1.2 = 72)
+
+draw_set_color(make_color_rgb(180, 60, 60));
+draw_roundrect_ext(_close_x, _close_y, _close_x + _close_w, _close_y + _close_h, 10, 10, false);
+
+draw_set_color(make_color_rgb(255, 255, 255));
+draw_set_alpha(0.9);
+draw_roundrect_ext(_close_x, _close_y, _close_x + _close_w, _close_y + _close_h, 10, 10, true);
+
 draw_set_halign(fa_center);
 draw_set_valign(fa_middle);
-draw_set_color(c_white);
-draw_text_transformed(_close_x + _close_w/2, _close_y + _close_h/2, "FECHAR", 1.1, 1.1, 0); // Fonte aumentada 10%
+draw_set_color(make_color_rgb(255, 255, 255));
+draw_text_transformed(_close_x + _close_w/2, _close_y + _close_h/2, "FECHAR", 1.2, 1.2, 0); // AUMENTADO 20%
+draw_set_alpha(1.0);
 
-// Brilho adicional no hover
-if (_mouse_over_close) {
-    draw_set_color(make_color_rgb(255, 255, 255));
-    draw_set_alpha(0.15 * footer_alpha * menu_alpha);
-    draw_roundrect_ext(_close_x, _close_y, _close_x + _close_w, _close_y + _close_h, 8, 8, false);
-}
+// === CONTROLES DE QUANTIDADE ===
+var _controls_y = _close_y - 96; // AUMENTADO (80 * 1.2 = 96)
+var _controls_x = _menu_x + 20;
 
-draw_set_alpha(1);
-
-// === RESETAR CONFIGURAÇÕES ===
 draw_set_halign(fa_left);
 draw_set_valign(fa_top);
-draw_set_color(c_white);
+draw_set_color(make_color_rgb(100, 200, 150));
+draw_text_transformed(_controls_x, _controls_y, "CONTROLES DE QUANTIDADE:", 0.96, 0.96, 0); // 0.8 * 1.2
+
+draw_set_color(make_color_rgb(255, 255, 255));
+draw_text_transformed(_controls_x, _controls_y + 24, "• Clique normal: 1 unidade", 0.84, 0.84, 0); // 0.7 * 1.2
+draw_text_transformed(_controls_x, _controls_y + 42, "• Shift + Clique: 5 unidades", 0.84, 0.84, 0); // 0.7 * 1.2
+draw_text_transformed(_controls_x, _controls_y + 60, "• Ctrl + Clique: 10 unidades", 0.84, 0.84, 0); // 0.7 * 1.2
+
+// Reset
+draw_set_halign(fa_left);
+draw_set_valign(fa_top);

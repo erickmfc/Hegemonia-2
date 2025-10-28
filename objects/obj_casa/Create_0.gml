@@ -10,6 +10,11 @@ event_inherited();
 custo_dinheiro = 150;
 custo_minerio = 25;
 
+// === SISTEMA DE VIDA ===
+hp_max = 200;
+hp_atual = 200;
+destrutivel = true; // ✅ Casa pode ser destruída
+
 // === SISTEMA DE NÍVEIS DE CASA ===
 nivel_casa = 1;                    // Nível atual da casa (1, 2, 3)
 capacidade_por_nivel = [10, 20, 30]; // Capacidade por nível
@@ -39,3 +44,4 @@ global.limite_populacional += capacidade_atual;
 
 show_debug_message("🏠 Casa Nível " + string(nivel_casa) + " construída - Capacidade: " + string(capacidade_atual) + " pessoas");
 show_debug_message("📊 Limite populacional total: " + string(global.limite_populacional) + " pessoas");
+

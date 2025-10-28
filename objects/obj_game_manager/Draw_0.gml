@@ -1,31 +1,87 @@
-// Evento Draw de obj_game_manager
+// Evento Draw de obj_game_manager - ✅ OTIMIZADO COM CULLING
+
+// === VERIFICAÇÕES DE SEGURANÇA ===
+if (!variable_global_exists("map_width") || !variable_global_exists("map_height")) {
+    exit; // Variáveis não inicializadas
+}
+if (!variable_global_exists("map_grid") || !is_array(global.map_grid)) {
+    exit; // Grid não criado
+}
+
+// === CALCULAR ÁREA VISÍVEL ===
+var cam = view_camera[0];
+var tile_start_x = 0, tile_start_y = 0, tile_end_x = 0, tile_end_y = 0;
+
+if (cam != noone) {
+    var cam_x = camera_get_view_x(cam);
+    var cam_y = camera_get_view_y(cam);
+    var cam_w = camera_get_view_width(cam);
+    var cam_h = camera_get_view_height(cam);
+    
+    // Verifica se os valores são válidos
+    if (is_real(cam_x) && is_real(cam_y) && is_real(cam_w) && is_real(cam_h) && cam_w > 0 && cam_h > 0) {
+        // Margem extra para evitar pop-in
+        var margin = 256;
+        
+        // Calcula quais tiles desenhar
+        tile_start_x = floor((cam_x - margin) / global.tile_size);
+        tile_start_y = floor((cam_y - margin) / global.tile_size);
+        tile_end_x = ceil((cam_x + cam_w + margin) / global.tile_size);
+        tile_end_y = ceil((cam_y + cam_h + margin) / global.tile_size);
+        
+        // Garante limites do mapa
+        tile_start_x = clamp(tile_start_x, 0, max(0, global.map_width - 1));
+        tile_start_y = clamp(tile_start_y, 0, max(0, global.map_height - 1));
+        tile_end_x = clamp(tile_end_x, 0, max(0, global.map_width - 1));
+        tile_end_y = clamp(tile_end_y, 0, max(0, global.map_height - 1));
+    } else {
+        // Fallback: toda a room se valores inválidos
+        tile_start_x = 0;
+        tile_start_y = 0;
+        tile_end_x = max(0, global.map_width - 1);
+        tile_end_y = max(0, global.map_height - 1);
+    }
+} else {
+    // Fallback: toda a room (mapas pequenos)
+    tile_start_x = 0;
+    tile_start_y = 0;
+    tile_end_x = max(0, global.map_width - 1);
+    tile_end_y = max(0, global.map_height - 1);
+}
 
 draw_set_color(c_black);
 draw_set_alpha(0.8);
 
-for (var i = 0; i < global.map_width; i++) {
-    for (var j = 0; j < global.map_height; j++) {
+// ✅ OTIMIZAÇÃO: Desenhar apenas tiles visíveis
+for (var i = tile_start_x; i <= tile_end_x; i++) {
+    for (var j = tile_start_y; j <= tile_end_y; j++) {
+        
+        // Verificações de segurança MÁXIMAS
+        if (i < 0 || i >= global.map_width || j < 0 || j >= global.map_height) continue;
+        if (i >= array_length(global.map_grid)) continue;
+        if (j >= array_length(global.map_grid[i])) continue;
+        if (is_undefined(global.map_grid[i][j])) continue;  // ✅ NOVO!
         
         var minha_nacao = global.map_grid[i][j].nacao;
-        if (minha_nacao == NATIONS.NEUTRA) continue;
+        if (is_undefined(minha_nacao) || minha_nacao == NATIONS.NEUTRA) continue;  // ✅ MELHORADO
 
         var xx = i * global.tile_size;
         var yy = j * global.tile_size;
 
         // Cima
-        if (j > 0 && global.map_grid[i][j-1].nacao != minha_nacao) {
+        if (j > 0 && j < array_length(global.map_grid[i]) && !is_undefined(global.map_grid[i][j-1]) && global.map_grid[i][j-1].nacao != minha_nacao) {
             draw_line(xx, yy, xx + global.tile_size, yy);
         }
         // Baixo
-        if (j < global.map_height - 1 && global.map_grid[i][j+1].nacao != minha_nacao) {
+        if (j < global.map_height - 1 && !is_undefined(global.map_grid[i][j+1]) && global.map_grid[i][j+1].nacao != minha_nacao) {
             draw_line(xx, yy + global.tile_size, xx + global.tile_size, yy + global.tile_size);
         }
         // Esquerda
-        if (i > 0 && global.map_grid[i-1][j].nacao != minha_nacao) {
+        if (i > 0 && i < array_length(global.map_grid) && !is_undefined(global.map_grid[i-1][j]) && global.map_grid[i-1][j].nacao != minha_nacao) {
             draw_line(xx, yy, xx, yy + global.tile_size);
         }
         // Direita
-        if (i < global.map_width - 1 && global.map_grid[i+1][j].nacao != minha_nacao) {
+        if (i < global.map_width - 1 && !is_undefined(global.map_grid[i+1][j]) && global.map_grid[i+1][j].nacao != minha_nacao) {
             draw_line(xx + global.tile_size, yy, xx + global.tile_size, yy + global.tile_size);
         }
     }
@@ -153,14 +209,14 @@ if (global.barras_vida_ativas) {
     
     // F-5 CAÇA
     with (obj_caca_f5) {
-        if (nacao_proprietaria == 1) {
+        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) {
             desenhar_barra_avancada(id, -30);
         }
     }
 
     // HELICÓPTERO MILITAR
     with (obj_helicoptero_militar) {
-        if (nacao_proprietaria == 1) {
+        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) {
             desenhar_barra_avancada(id, -25);
         }
     }
@@ -172,25 +228,25 @@ if (global.barras_vida_ativas) {
 
     // UNIDADES TERRESTRES - NÃO MOSTRAR STATUS SE ESTIVEREM DENTRO DO AVIÃO
     with (obj_infantaria) {
-        if (nacao_proprietaria == 1 && visible) { // Só mostrar se estiver visível (não embarcada)
+        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1 && visible) { // Só mostrar se estiver visível (não embarcada)
             desenhar_barra_basica(id, -20);
         }
     }
 
     with (obj_tanque) {
-        if (nacao_proprietaria == 1 && visible) { // Só mostrar se estiver visível (não embarcada)
+        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1 && visible) { // Só mostrar se estiver visível (não embarcada)
             desenhar_barra_basica(id, -25);
         }
     }
 
     with (obj_blindado_antiaereo) {
-        if (nacao_proprietaria == 1 && visible) { // Só mostrar se estiver visível (não embarcada)
+        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1 && visible) { // Só mostrar se estiver visível (não embarcada)
             desenhar_barra_basica(id, -25);
         }
     }
 
     with (obj_soldado_antiaereo) {
-        if (nacao_proprietaria == 1 && visible) { // Só mostrar se estiver visível (não embarcada)
+        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1 && visible) { // Só mostrar se estiver visível (não embarcada)
             desenhar_barra_basica(id, -20);
         }
     }
@@ -199,4 +255,18 @@ if (global.barras_vida_ativas) {
     with (obj_inimigo) {
         desenhar_barra_basica(id, -20);
     }
+}
+
+// === DEBUG DE CULLING (Tecla F3) ===
+if (keyboard_check_pressed(vk_f3)) {
+    var tiles_visiveis = (tile_end_x - tile_start_x + 1) * (tile_end_y - tile_start_y + 1);
+    var tiles_totais = global.map_width * global.map_height;
+    var porcentagem = (tiles_visiveis / tiles_totais) * 100;
+    
+    show_debug_message("=== CULLING STATS (F3) ===");
+    show_debug_message("Tiles visíveis: " + string(tiles_visiveis));
+    show_debug_message("Tiles totais: " + string(tiles_totais));
+    show_debug_message("Economia: " + string(round(porcentagem * 10) / 10) + "%");
+    show_debug_message("Área: (" + string(tile_start_x) + "," + string(tile_start_y) + ") a (" + string(tile_end_x) + "," + string(tile_end_y) + ")");
+    show_debug_message("Room: " + string(room_width) + "x" + string(room_height));
 }

@@ -16,6 +16,7 @@ show_debug_message("🚀 INICIANDO TESTE DO SISTEMA DE MÍSSEIS");
 show_debug_message("📡 Teste 1: Disparando mísseis...");
 
 // Teste míssil ar-ar
+// ✅ CORREÇÃO GM2039: Usar sintaxe de função moderna
 var _missil_ar = scr_disparar_missil(noone, "ar", _x_pos, _y_pos, self);
 if (instance_exists(_missil_ar)) {
     show_debug_message("✅ Míssil ar-ar criado com sucesso!");
@@ -24,6 +25,7 @@ if (instance_exists(_missil_ar)) {
 }
 
 // Teste míssil terra-terra
+// ✅ CORREÇÃO GM2039: Usar sintaxe de função moderna
 var _missil_terra = scr_disparar_missil(noone, "terra", _x_pos + 50, _y_pos, self);
 if (instance_exists(_missil_terra)) {
     show_debug_message("✅ Míssil terra-terra criado com sucesso!");

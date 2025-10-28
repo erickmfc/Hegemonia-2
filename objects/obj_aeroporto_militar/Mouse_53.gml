@@ -36,6 +36,29 @@ show_debug_message("Sprite H: " + string(sprite_get_height(sprite_index)));
 show_debug_message("Origem X: " + string(sprite_get_xoffset(sprite_index)));
 show_debug_message("Origem Y: " + string(sprite_get_yoffset(sprite_index)));
 
+// ✅ CORREÇÃO BUG: Verificar se há unidade SOBRE o edifício (apenas se não for o próprio aeroporto)
+// Primeiro verificar se há uma UNIDADE sobre o edifício (não o próprio edifício)
+var _tem_unidade_sobre = false;
+var _tipos_unidades = [
+    obj_infantaria, obj_tanque, obj_soldado_antiaereo, obj_blindado_antiaereo,
+    obj_caca_f5, obj_helicoptero_militar, obj_f15, obj_f6, obj_c100
+];
+
+for (var i = 0; i < array_length(_tipos_unidades); i++) {
+    var _inst = instance_position(_world_mouse_x, _world_mouse_y, _tipos_unidades[i]);
+    if (_inst != noone && instance_exists(_inst)) {
+        _tem_unidade_sobre = true;
+        show_debug_message("⚠️ Unidade detectada sobre o edifício - ignorando clique no aeroporto");
+        show_debug_message("   Unidade: " + object_get_name(_inst.object_index));
+        break;
+    }
+}
+
+// Se há unidade sobre o edifício, ignorar o clique no edifício
+if (_tem_unidade_sobre) {
+    exit; // Sair sem processar clique no edifício
+}
+
 // Verificar se o clique foi realmente no sprite do aeroporto
 // Usar múltiplos métodos para detecção mais robusta
 var _clique_detectado = false;

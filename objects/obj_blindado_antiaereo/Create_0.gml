@@ -3,6 +3,9 @@
 // Veículo Militar Especializado em Defesa Aérea
 // ================================================
 
+// === NAÇÃO PROPRIETÁRIA ===
+nacao_proprietaria = 1; // 1 = jogador, 2 = IA inimiga
+
 // === ATRIBUTOS BÁSICOS ===
 selecionado = false;
 estado = "parado";
@@ -22,7 +25,7 @@ seguir_alvo = noone;
 alcance_visao = 700;  // Alcance de detecção amplo
 alcance_tiro  = 600;  // Alcance de tiro longo para defesa aérea
 atq_cooldown = 0;
-atq_rate = 60; // Cadência de tiro rápida para defesa aérea
+atq_rate = 180; // 3 segundos (60 FPS * 3 = 180 frames)
 
 // === ALVO E VIDA ===
 alvo = noone;

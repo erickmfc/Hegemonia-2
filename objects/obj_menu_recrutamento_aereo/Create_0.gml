@@ -1,29 +1,37 @@
 // ===============================================
-// HEGEMONIA GLOBAL - MENU DE RECRUTAMENTO AÉREO
-// Interface para recrutar unidades aéreas
+// HEGEMONIA GLOBAL - MENU AÉREO MODERNO
+// Sistema Grid com Todas as Aeronaves Visíveis
 // ===============================================
 
-// === CONFIGURAÇÕES DO MENU ===
+show_debug_message("🚀 MENU AÉREO MODERNO - CREATE EVENT");
+
+// === VARIÁVEIS DE CONEXÃO ===
 id_do_aeroporto = noone;
-posicao_x = 100;
-posicao_y = 100;
-largura_menu = 400;
-altura_menu = 300;
 
-// === CONFIGURAÇÕES DOS BOTÕES ===
-botao_f5_x = posicao_x + 20;
-botao_f5_y = posicao_y + 80;
-botao_f5_largura = 150;
-botao_f5_altura = 40;
+// === VARIÁVEIS DE SELEÇÃO ===
+aeronave_hover = -1; // Índice da aeronave com hover (-1 = nenhum)
+aeronave_selecionada = -1; // Índice da aeronave clicada
 
-botao_helicoptero_x = posicao_x + 20;
-botao_helicoptero_y = posicao_y + 140;
-botao_helicoptero_largura = 150;
-botao_helicoptero_altura = 40;
+// === PROTEÇÃO CONTRA CLIQUE AUTOMÁTICO ===
+menu_aberto_frames = 0; // Contador de frames desde que o menu abriu
+frames_minimos_antes_clique = 10; // ✅ AUMENTADO para 10 frames (≈0.17s a 60fps) para evitar cliques acidentais
 
-botao_fechar_x = posicao_x + largura_menu - 80;
-botao_fechar_y = posicao_y + altura_menu - 40;
-botao_fechar_largura = 60;
-botao_fechar_altura = 30;
+// === ANIMAÇÕES ===
+animation_timer = 0;
+card_animations = [];
 
-show_debug_message("📱 Menu de recrutamento aéreo criado");
+// Inicializar animação para 6 aeronaves (ou quantas tiver)
+for (var i = 0; i < 6; i++) {
+    card_animations[i] = {
+        alpha: 0,
+        scale: 0.8,
+        hover_intensity: 0,
+        pulse: 0
+    };
+}
+
+// === CONFIGURAÇÕES VISUAIS ===
+scroll_offset = 0;
+scroll_max = 0;
+
+show_debug_message("✅ Menu Aéreo Moderno criado!");

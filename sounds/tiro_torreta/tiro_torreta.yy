@@ -1,0 +1,25 @@
+{
+  "$GMSound":"",
+  "%Name":"tiro_torreta",
+  "audioGroupId":{
+    "name":"audiogroup_default",
+    "path":"audiogroups/audiogroup_default",
+  },
+  "bitDepth":1,
+  "bitRate":128,
+  "compression":0,
+  "conversionMode":0,
+  "duration":1.6950567,
+  "name":"tiro_torreta",
+  "parent":{
+    "name":"efeitos",
+    "path":"folders/Sprites/efeitos.yy",
+  },
+  "preload":false,
+  "resourceType":"GMSound",
+  "resourceVersion":"2.0",
+  "sampleRate":44100,
+  "soundFile":"tiro_torreta.ogg",
+  "type":0,
+  "volume":1.0,
+}

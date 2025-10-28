@@ -24,6 +24,10 @@ alcance_ataque = missil_alcance;
 alvo_x = x;
 alvo_y = y;
 
+// Destino para movimento
+destino_x = x;
+destino_y = y;
+
 // Patrulha
 pontos_patrulha = ds_list_create();
 indice_patrulha_atual = 0;
@@ -43,9 +47,8 @@ submerso = false; // Estado de submersão
 profundidade_atual = 0; // Profundidade atual (0 = superfície)
 profundidade_maxima = 50; // Profundidade máxima de submersão
 velocidade_submersao = 0.5; // Velocidade de submersão/emersão
-cooldown_submersao = 0; // Cooldown para mudança de profundidade
-tempo_submersao_atual = 0; // Tempo atual debaixo d'água
-tempo_maximo_submersao = 600; // 10 segundos máx submerso
+cooldown_submersao = 0; // Cooldown para mudança de profundidade (3 segundos)
+tempo_submersao_atual = 0; // Timer de tempo submerso
 
 // Variáveis auxiliares
 alvo_unidade = noone; // id da instancia inimiga a atacar

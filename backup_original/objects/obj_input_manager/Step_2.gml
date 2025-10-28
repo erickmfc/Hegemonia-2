@@ -181,47 +181,26 @@ if (instance_exists(global.construindo_edificio)) {
             var _build_x = floor(_world_mouse_x / global.tile_size) * global.tile_size;
             var _build_y = floor(_world_mouse_y / global.tile_size) * global.tile_size;
             
-            var _building_cost = 0;
-            var _building_name = "";
-            
-            // Determinar custo baseado no objeto selecionado
-            if (global.construindo_agora == asset_get_index("obj_casa")) {
-                _building_cost = 1000;
-                _building_name = "Casa";
-            } else if (global.construindo_agora == asset_get_index("obj_banco")) {
-                _building_cost = 2500;
-                _building_name = "Banco";
-            } else if (global.construindo_agora == asset_get_index("obj_quartel")) {
-                _building_cost = 800;
-                _building_name = "Quartel";
-            } else if (global.construindo_agora == asset_get_index("obj_quartel_marinha")) {
-                _building_cost = 1200; // Custo de exemplo
-                _building_name = "Quartel Marinha";
-            }
+            // --- LÓGICA REATORADA USANDO DS_MAP ---
+            var _building_data = global.building_definitions[? global.construindo_agora];
             
             // Verificar se tem dinheiro e construir
-            if (global.dinheiro >= _building_cost) {
+            if (_building_data != undefined && global.dinheiro >= _building_data.cost) {
                 // Descontar dinheiro
-                global.dinheiro -= _building_cost;
+                global.dinheiro -= _building_data.cost;
                 
-                // Criar edifício - CORREÇÃO GM1041
-                var _new_building = noone;
-                
-                // Determinar qual objeto criar baseado no tipo
-                if (global.construindo_agora == asset_get_index("obj_casa")) {
-                    _new_building = instance_create_layer(_build_x, _build_y, "Instances", asset_get_index("obj_casa"));
-                } else if (global.construindo_agora == asset_get_index("obj_banco")) {
-                    _new_building = instance_create_layer(_build_x, _build_y, "Instances", asset_get_index("obj_banco"));
-                } else if (global.construindo_agora == asset_get_index("obj_quartel")) {
-                    _new_building = instance_create_layer(_build_x, _build_y, "Instances", asset_get_index("obj_quartel"));
-                } else if (global.construindo_agora == asset_get_index("obj_quartel_marinha")) {
-                    _new_building = instance_create_layer(_build_x, _build_y, "Instances", asset_get_index("obj_quartel_marinha"));
-                }
+                // Criar o edifício usando os dados da struct
+                var _new_building = instance_create_layer(
+                    _build_x, 
+                    _build_y, 
+                    "Instances", 
+                    _building_data.object
+                );
                 
                 if (instance_exists(_new_building)) {
                     show_debug_message("=== EDIFÍCIO CONSTRUÍDO (ZOOM: " + string(zoom_level) + ") ===");
-                    show_debug_message("Tipo: " + _building_name);
-                    show_debug_message("Custo: $" + string(_building_cost));
+                    show_debug_message("Tipo: " + _building_data.name);
+                    show_debug_message("Custo: $" + string(_building_data.cost));
                     show_debug_message("Mouse: (" + string(mouse_x) + ", " + string(mouse_y) + ")");
                     show_debug_message("Mundo: (" + string(_world_mouse_x) + ", " + string(_world_mouse_y) + ")");
                     show_debug_message("Posição: (" + string(_build_x) + ", " + string(_build_y) + ")");
@@ -231,12 +210,12 @@ if (instance_exists(global.construindo_edificio)) {
                     global.construindo_agora = noone;
                 } else {
                     // Reembolsar se falhou
-                    global.dinheiro += _building_cost;
+                    global.dinheiro += _building_data.cost;
                     show_debug_message("ERRO: Falha ao construir edifício!");
                 }
             } else {
                 show_debug_message("DINHEIRO INSUFICIENTE!");
-                show_debug_message("Precisa: $" + string(_building_cost) + ", Tem: $" + string(global.dinheiro));
+                show_debug_message("Precisa: $" + string(_building_data.cost) + ", Tem: $" + string(global.dinheiro));
             }
         }
     }

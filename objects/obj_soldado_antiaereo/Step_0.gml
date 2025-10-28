@@ -1,6 +1,9 @@
 /// STEP EVENT - Lógica do Soldado Anti-Aéreo
 /// Sistema idêntico à infantaria, mas especializado em alvos aéreos
 
+// Incrementar contador
+step_counter++;
+
 // Verificação de vida
 if (vida <= 0) {
     instance_destroy();
@@ -13,24 +16,95 @@ if (vida <= 0) {
 if (atq_cooldown > 0) atq_cooldown--;
 
 // =======================
-// DETECÇÃO DE ALVOS (AÉREOS E TERRESTRES)
+// DETECÇÃO DE ALVOS (APENAS AÉREOS)
 // =======================
 // Só procura novo alvo se não estiver atacando
 if (estado != "atacando" || alvo == noone || !instance_exists(alvo)) {
-    // Buscar inimigos terrestres primeiro (obj_inimigo)
-    alvo = instance_nearest(x, y, obj_inimigo);
+    // Buscar APENAS unidades aéreas inimigas
+    alvo = noone;
+    var menor_dist = 999999;
     
-    // Se não encontrou inimigo terrestre, buscar outros alvos terrestres
-    if (alvo == noone) {
-        // Buscar outros tipos de inimigos terrestres se existirem
-        // Nota: obj_aviao e obj_drone foram removidos do projeto
-        // Sistema focado apenas em alvos terrestres por enquanto
+    // Debug: Nação do soldado anti-aéreo
+    if (step_counter mod 180 == 0) {
+        show_debug_message("🔍 Soldado Anti-Aéreo (ID: " + string(id) + ") | Nação: " + string(nacao_proprietaria) + " | Alcance: " + string(alcance_visao));
     }
     
-    // Se encontrou qualquer alvo dentro do alcance
-    if (alvo != noone && point_distance(x, y, alvo.x, alvo.y) <= alcance_visao) {
+    // Verificar objetos aéreos inimigos
+    with (obj_caca_f5) {
+        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria != other.nacao_proprietaria) {
+            var dist = point_distance(other.x, other.y, x, y);
+            if (dist < menor_dist && dist <= other.alcance_visao) {
+                alvo = id;
+                menor_dist = dist;
+            }
+        }
+    }
+    
+    with (obj_f15) {
+        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria != other.nacao_proprietaria) {
+            var dist = point_distance(other.x, other.y, x, y);
+            if (dist < menor_dist && dist <= other.alcance_visao) {
+                alvo = id;
+                menor_dist = dist;
+            }
+        }
+    }
+    
+    with (obj_helicoptero_militar) {
+        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria != other.nacao_proprietaria) {
+            var dist = point_distance(other.x, other.y, x, y);
+            if (dist < menor_dist && dist <= other.alcance_visao) {
+                alvo = id;
+                menor_dist = dist;
+            }
+        }
+    }
+    
+    with (obj_c100) {
+        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria != other.nacao_proprietaria) {
+            var dist = point_distance(other.x, other.y, x, y);
+            if (dist < menor_dist && dist <= other.alcance_visao) {
+                alvo = id;
+                menor_dist = dist;
+            }
+        }
+    }
+    
+    with (obj_f6) {
+        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria != other.nacao_proprietaria) {
+            var dist = point_distance(other.x, other.y, x, y);
+            if (dist < menor_dist && dist <= other.alcance_visao) {
+                alvo = id;
+                menor_dist = dist;
+            }
+        }
+    }
+    
+    // Se encontrou alvo aéreo dentro do alcance
+    if (alvo != noone) {
         estado = "atacando";
-        global.debug_log("Soldado Anti-Aéreo detectou alvo!");
+        show_debug_message("🎯 Soldado Anti-Aéreo detectou alvo AÉREO! ID: " + string(alvo) + " | Distância: " + string(menor_dist) + " | Alcance: " + string(alcance_visao));
+    } else {
+        // Debug: verificar se há unidades aéreas por perto
+        var unidades_aereas_proximas = 0;
+        with (obj_caca_f5) {
+            if (nacao_proprietaria != other.nacao_proprietaria) unidades_aereas_proximas++;
+        }
+        with (obj_f15) {
+            if (nacao_proprietaria != other.nacao_proprietaria) unidades_aereas_proximas++;
+        }
+        with (obj_helicoptero_militar) {
+            if (nacao_proprietaria != other.nacao_proprietaria) unidades_aereas_proximas++;
+        }
+        with (obj_c100) {
+            if (nacao_proprietaria != other.nacao_proprietaria) unidades_aereas_proximas++;
+        }
+        with (obj_f6) {
+            if (nacao_proprietaria != other.nacao_proprietaria) unidades_aereas_proximas++;
+        }
+        if (unidades_aereas_proximas > 0 && step_counter mod 180 == 0) { // Debug a cada 3 segundos
+            show_debug_message("⚠️ Soldado Anti-Aéreo vê " + string(unidades_aereas_proximas) + " unidades aéreas inimigas, mas nenhuma no alcance");
+        }
     }
 }
 
@@ -307,10 +381,10 @@ switch (estado) {
             }
             
             if (dist_alvo <= alcance_tiro) {
-                // Lança míssil se estiver no alcance
+                // Lança míssil Sky se estiver no alcance
                 if (atq_cooldown <= 0 && !missil_em_voo) {
-                    // Criar míssil aéreo especializado
-                    var m = instance_create_layer(x, y, layer, obj_missil_aereo);
+                    // Criar míssil Sky (obj_sky) APENAS contra unidades aéreas
+                    var m = instance_create_layer(x, y, layer, obj_sky);
                     m.direction = point_direction(x, y, alvo.x, alvo.y);
                     m.speed = 6; // Velocidade do míssil
                     m.dano = dano;

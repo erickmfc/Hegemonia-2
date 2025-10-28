@@ -6,15 +6,20 @@
 // === CONFIGURAÇÕES BÁSICAS ===
 custo_dinheiro = 1000;
 custo_minerio = 500;
-hp_max = 300;
-hp_atual = 300;
+hp_max = 800;
+hp_atual = 800;
+destrutivel = true; // ✅ Aeroporto pode ser destruído
 nacao_proprietaria = 1;
 
 // === SISTEMA DE PRODUÇÃO AÉREA ===
 fila_producao = ds_queue_create();
 timer_producao = 0;
-produzindo = false;
+produzindo = false; // ✅ GARANTIR QUE NÃO ESTÁ PRODUZINDO
 unidades_produzidas = 0;
+
+// ✅ LIMPAR FILA PARA EVITAR PRODUÇÃO AUTOMÁTICA
+ds_queue_clear(fila_producao);
+show_debug_message("🧹 Fila de produção limpa - aguardando comando do jogador");
 
 // === CONFIGURAÇÕES DE UNIDADES AÉREAS ===
 unidades_disponiveis = ds_list_create();
@@ -25,7 +30,7 @@ ds_list_add(unidades_disponiveis, {
     objeto: obj_caca_f5,
     custo_dinheiro: 800,
     custo_populacao: 3,
-    tempo_treino: 300, // 5 segundos
+    tempo_treino: 180, // 3 segundos
     descricao: "Caça-bombardeiro de alta velocidade"
 });
 
@@ -35,7 +40,7 @@ ds_list_add(unidades_disponiveis, {
     objeto: obj_helicoptero_militar,
     custo_dinheiro: 600,
     custo_populacao: 2,
-    tempo_treino: 240, // 4 segundos
+    tempo_treino: 180, // 3 segundos
     descricao: "Helicóptero de ataque e transporte"
 });
 
@@ -45,8 +50,18 @@ ds_list_add(unidades_disponiveis, {
     objeto: obj_c100,
     custo_dinheiro: 1200,
     custo_populacao: 4,
-    tempo_treino: 360, // 6 segundos
+    tempo_treino: 180, // 3 segundos
     descricao: "Avião de transporte com embarque de tropas e flares defensivos"
+});
+
+// Caça F-15 Eagle
+ds_list_add(unidades_disponiveis, {
+    nome: "F-15 Eagle",
+    objeto: obj_f15,
+    custo_dinheiro: 1500,
+    custo_populacao: 5,
+    tempo_treino: 180, // 3 segundos
+    descricao: "Caça superior com HP 800 e sistema de mísseis avançado"
 });
 
 // === SISTEMA DE SELEÇÃO ===

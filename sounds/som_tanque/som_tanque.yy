@@ -3,7 +3,8 @@
   "%Name":"som_tanque",
   "audioGroupId":{
     "name":"audiogroup_default",
-    "path":"audiogroups/audiogroup_default"},
+    "path":"audiogroups/audiogroup_default",
+  },
   "bitDepth":1,
   "bitRate":128,
   "compression":0,
@@ -12,11 +13,13 @@
   "name":"som_tanque",
   "parent":{
     "name":"Sons",
-    "path":"folders/Sons.yy"},
+    "path":"folders/Sons.yy",
+  },
   "preload":false,
   "resourceType":"GMSound",
   "resourceVersion":"2.0",
   "sampleRate":44100,
   "soundFile":"som_tanque.ogg",
   "type":0,
-  "volume":0.76}
+  "volume":0.76,
+}

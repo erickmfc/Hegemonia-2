@@ -12,9 +12,9 @@ if (mouse_check_button_pressed(mb_right)) {
     show_debug_message("Posição do mouse: (" + string(mouse_x) + ", " + string(mouse_y) + ")");
     
     // ✅ CORREÇÃO: Usar função global para coordenadas (mais estável)
-    var _coords = global.scr_mouse_to_world();
-    var world_x = _coords[0];
-    var world_y = _coords[1];
+    var _coords_world = global.scr_mouse_to_world();
+    var world_x = _coords_world[0];
+    var world_y = _coords_world[1];
     
     show_debug_message("🎯 COORDENADAS COM ZOOM - Mouse: (" + string(mouse_x) + ", " + string(mouse_y) + ") | Mundo: (" + string(world_x) + ", " + string(world_y) + ")");
     
@@ -50,9 +50,9 @@ if (mouse_check_button_pressed(mb_right)) {
                 estado = "movendo";
                 
                 // ✅ CORREÇÃO CRÍTICA: Usar função global para coordenadas consistentes
-                var _coords = global.scr_mouse_to_world();
-                var world_x_local = _coords[0];
-                var world_y_local = _coords[1];
+                var _coords_local = global.scr_mouse_to_world();
+                var world_x_local = _coords_local[0];
+                var world_y_local = _coords_local[1];
                 
                 // Clamp para dentro da sala
                 var _tx = clamp(world_x_local, 8, room_width - 8);

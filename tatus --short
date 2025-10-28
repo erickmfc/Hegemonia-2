@@ -1,0 +1,79 @@
+[33mcommit 1f1837d824a26f2be830155b9e938dbc564e1dd0[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: erickmfc <matheuserick197@gmail.com>
+Date:   Sun Oct 26 20:14:57 2025 -0300
+
+    feat: Sistema de Navio Transporte com Embarque/Desembarque
+    
+    - Criado obj_navio_transporte com sistema de transporte completo
+    - Implementado Ronald Reagan (porta-aviões) herdando do transporte
+    - Sistema de míssil ice anti-submarino (obj_missel_ice)
+    - Subsódio base (obj_submarino_base) e WW Hendrick implementados
+    - Correção de visibilidade em obj_game_manager (barras de vida para unidades embarcadas)
+    - Comandos: P=embarque, L=parar, K=patrulha, O=toggle ataque, J=menu carga, U=desembarque
+    - Sistema de embarque automático por proximidade (raio 80px)
+    - Capacidades: 10 aviões, 10 veículos, 50 soldados
+    - Desembarque sequencial a cada 2 segundos
+
+ objects/obj_RonaldReagan/Alarm_0.gml               |   2 [32m+[m
+ objects/obj_RonaldReagan/CleanUp_0.gml             |   7 [32m+[m
+ objects/obj_RonaldReagan/Clean_Up_0.gml            |  10 [32m+[m
+ objects/obj_RonaldReagan/Create_0.gml              | 299 [32m+++++++++++++++[m
+ objects/obj_RonaldReagan/Destroy_0.gml             |   5 [32m+[m
+ objects/obj_RonaldReagan/Draw_0.gml                | 100 [32m++++++[m
+ objects/obj_RonaldReagan/Draw_64.gml               | 170 [32m+++++++++[m
+ objects/obj_RonaldReagan/Draw_GUI_0.gml            | 127 [32m+++++++[m
+ objects/obj_RonaldReagan/Mouse_0.gml               |  28 [32m++[m
+ objects/obj_RonaldReagan/Mouse_4.gml               | 195 [32m++++++++++[m
+ objects/obj_RonaldReagan/Mouse_5.gml               |   2 [32m+[m
+ objects/obj_RonaldReagan/Mouse_53.gml              |   2 [32m+[m
+ objects/obj_RonaldReagan/Mouse_54.gml              |   2 [32m+[m
+ objects/obj_RonaldReagan/Mouse_56.gml              |   2 [32m+[m
+ objects/obj_RonaldReagan/Step_0.gml                | 120 [32m+++++++[m
+ objects/obj_RonaldReagan/Step_1.gml                | 400 [32m+++++++++++++++++++++[m
+ objects/obj_RonaldReagan/obj_RonaldReagan.yy       |  50 [32m+++[m
+ objects/obj_game_manager/Draw_0.gml                |   2 [32m+[m
+ objects/obj_input_manager/Step_0.gml               | 113 [32m++++[m[31m--[m
+ objects/obj_missel_ice/Create_0.gml                |  58 [32m+++[m
+ objects/obj_missel_ice/Draw_0.gml                  |   2 [32m+[m
+ objects/obj_missel_ice/Step_0.gml                  |  96 [32m+++++[m
+ objects/obj_missel_ice/obj_missel_ice.yy           |  40 [32m+++[m
+ objects/obj_navio_base/Create_0.gml                |   7 [32m+[m[31m-[m
+ objects/obj_navio_base/Step_0.gml                  | 106 [32m++++[m[31m--[m
+ objects/obj_navio_transporte/Alarm_0.gml           | 116 [32m++++++[m
+ objects/obj_navio_transporte/CleanUp_0.gml         |   7 [32m+[m
+ objects/obj_navio_transporte/Clean_Up_0.gml        |  10 [32m+[m
+ objects/obj_navio_transporte/Create_0.gml          | 300 [32m++++++++++++++++[m
+ objects/obj_navio_transporte/Destroy_0.gml         |   5 [32m+[m
+ objects/obj_navio_transporte/Draw_0.gml            | 157 [32m++++++++[m
+ objects/obj_navio_transporte/Draw_64.gml           | 177 [32m+++++++++[m
+ objects/obj_navio_transporte/Draw_GUI_0.gml        |  62 [32m++++[m
+ objects/obj_navio_transporte/Mouse_0.gml           |  15 [32m+[m
+ objects/obj_navio_transporte/Mouse_4.gml           |  17 [32m+[m
+ objects/obj_navio_transporte/Mouse_5.gml           |   2 [32m+[m
+ objects/obj_navio_transporte/Mouse_53.gml          |   4 [32m+[m
+ objects/obj_navio_transporte/Mouse_54.gml          |   4 [32m+[m
+ objects/obj_navio_transporte/Mouse_56.gml          |  17 [32m+[m
+ objects/obj_navio_transporte/Step_0.gml            | 151 [32m++++++++[m
+ .../obj_navio_transporte/obj_navio_transporte.yy   |  46 [32m+++[m
+ objects/obj_submarino_base/Alarm_0.gml             |   2 [32m+[m
+ objects/obj_submarino_base/CleanUp_0.gml           |   7 [32m+[m
+ objects/obj_submarino_base/Create_0.gml            | 192 [32m++++++++++[m
+ objects/obj_submarino_base/Destroy_0.gml           |   5 [32m+[m
+ objects/obj_submarino_base/Draw_0.gml              | 122 [32m+++++++[m
+ objects/obj_submarino_base/Draw_64.gml             |  93 [32m+++++[m
+ objects/obj_submarino_base/Draw_GUI_0.gml          |  62 [32m++++[m
+ objects/obj_submarino_base/Mouse_0.gml             |  24 [32m++[m
+ objects/obj_submarino_base/Mouse_4.gml             |  17 [32m+[m
+ objects/obj_submarino_base/Mouse_5.gml             |   2 [32m+[m
+ objects/obj_submarino_base/Mouse_53.gml            |   4 [32m+[m
+ objects/obj_submarino_base/Mouse_54.gml            |   4 [32m+[m
+ objects/obj_submarino_base/Mouse_56.gml            |  17 [32m+[m
+ objects/obj_submarino_base/Step_0.gml              | 266 [32m++++++++++++++[m
+ objects/obj_submarino_base/obj_submarino_base.yy   |  49 [32m+++[m
+ objects/obj_wwhendrick/Create_0.gml                |  29 [32m++[m
+ objects/obj_wwhendrick/Draw_0.gml                  |  31 [32m++[m
+ objects/obj_wwhendrick/Mouse_4.gml                 |  25 [32m++[m
+ objects/obj_wwhendrick/Step_0.gml                  |  10 [32m+[m
+ objects/obj_wwhendrick/obj_wwhendrick.yy           |  48 [32m+++[m
+ scripts/scr_enums_navais/scr_enums_navais.gml      |  11 [32m+[m
+ 62 files changed, 3987 insertions(+), 68 deletions(-)

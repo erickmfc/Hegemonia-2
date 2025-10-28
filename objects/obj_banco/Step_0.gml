@@ -3,6 +3,14 @@
 // Sistema Financeiro - Empréstimos e Gestão de Dívida
 // ================================================
 
+// === SISTEMA DE VIDA ===
+// Verificar se HP chegou a 0 e destruir
+if (destrutivel && hp_atual <= 0) {
+    show_debug_message("💥 Banco destruído - HP: " + string(hp_atual) + "/" + string(hp_max));
+    instance_destroy();
+    exit;
+}
+
 // === SISTEMA DE SELEÇÃO ===
 // Verifica se o mouse está sobre o banco
 var _mouse_sobre = position_meeting(mouse_x, mouse_y, id);

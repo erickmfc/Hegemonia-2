@@ -83,8 +83,8 @@ function scr_inicializar_temas_padrao() {
             botao_hover: c_gray,
             botao_pressionado: c_black,
             borda: c_gray,
-            selecao: c_cyan,
-            sucesso: c_lime,
+            selecao: make_color_rgb(0, 255, 255), // c_cyan
+            sucesso: make_color_rgb(0, 255, 0), // c_lime
             erro: c_red,
             aviso: c_yellow
         },
@@ -137,12 +137,12 @@ function scr_inicializar_temas_padrao() {
         cores: {
             fundo_principal: c_black,
             fundo_secundario: c_olive,
-            texto_principal: c_lime,
+            texto_principal: make_color_rgb(0, 255, 0), // c_lime
             texto_secundario: c_yellow,
             botao_normal: c_olive,
             botao_hover: c_yellow,
             botao_pressionado: c_green,
-            borda: c_lime,
+            borda: make_color_rgb(0, 255, 0), // c_lime
             selecao: c_yellow,
             sucesso: c_green,
             erro: c_red,

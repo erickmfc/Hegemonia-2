@@ -70,6 +70,13 @@ calcular_peso_unidade = function(unidade) {
     }
 }
 
+// ✅ Verificar se pode embarcar tanque
+pode_embarcar_tanque = function(tanque) {
+    if (!instance_exists(tanque)) return false;
+    var _peso_tanque = calcular_peso_unidade(tanque);
+    return (carga_usada + _peso_tanque <= capacidade_total);
+}
+
 // ✅ Verificar se unidade é embarcável
 eh_unidade_embarcavel = function(unidade) {
     if (!instance_exists(unidade)) return false;
@@ -87,6 +94,13 @@ eh_unidade_embarcavel = function(unidade) {
     // Verificar se não está em outro transporte
     if (variable_instance_exists(unidade, "visible")) {
         if (!unidade.visible) return false;
+    }
+    
+    // ✅ CORREÇÃO: Verificar se há espaço para a unidade
+    var _peso = calcular_peso_unidade(unidade);
+    if (carga_usada + _peso > capacidade_total) {
+        show_debug_message("⚠️ C-100: Sem espaço! Capacidade: " + string(carga_usada) + "/" + string(capacidade_total) + " | Peso necessário: " + string(_peso));
+        return false;
     }
     
     return true;

@@ -50,7 +50,6 @@ if (global.construindo_agora == asset_get_index("obj_casa")) {
 } else if (global.construindo_agora == asset_get_index("obj_casa_da_moeda")) {
     _custo_d = 50000000; // $50.000.000 CG
     _custo_m = 10000;    // 10.000 minério
-    _custo_p = 5000;     // 5.000 petróleo
     _nome_edificio = "Casa da Moeda";
 }
 
@@ -89,11 +88,103 @@ if (_custo_p_inflacionado > 0) {
 if (global.dinheiro >= _custo_d_inflacionado && global.minerio >= _custo_m_inflacionado && _tem_petroleo) {
     
     // TEMOS RECURSOS! Vamos para o próximo passo.
-    show_debug_message("Recursos verificados. Construindo " + _nome_edificio + "...");
+    show_debug_message("Recursos verificados. Verificando espaço para construir " + _nome_edificio + "...");
 
-    // --- PASSO 2: VERIFICAR POSIÇÃO (Lógica Simplificada) ---
-    // Futuramente, aqui verificaremos o grid de dados para ver se o tile está ocupado.
-    // Por enquanto, vamos assumir que a posição é sempre válida.
+    // --- PASSO 2: VERIFICAR SE HÁ ESPAÇO LIVRE ---
+    
+    // Obtém o objeto que será construído
+    var _objeto_construir = global.construindo_agora;
+    var _largura = 64;
+    var _altura = 64;
+    
+    // Determinar dimensões baseado no tipo de edifício
+    if (global.construindo_agora == asset_get_index("obj_casa")) {
+        _largura = 64;
+        _altura = 64;
+    } else if (global.construindo_agora == asset_get_index("obj_banco")) {
+        _largura = 64;
+        _altura = 64;
+    } else if (global.construindo_agora == asset_get_index("obj_quartel")) {
+        _largura = 64;
+        _altura = 64;
+    } else if (global.construindo_agora == asset_get_index("obj_quartel_marinha")) {
+        _largura = 96;
+        _altura = 96;
+    } else if (global.construindo_agora == asset_get_index("obj_fazenda")) {
+        _largura = 64;
+        _altura = 64;
+    } else if (global.construindo_agora == asset_get_index("obj_aeroporto_militar")) {
+        _largura = 96;
+        _altura = 96;
+    } else if (global.construindo_agora == asset_get_index("obj_casa_da_moeda")) {
+        _largura = 128;
+        _altura = 128;
+    }
+    
+    // Verifica se há espaço livre para construir (função inline)
+    var _espaco_livre = true;
+    
+    // Lista de todos os edifícios que bloqueiam construção
+    // ✅ CORREÇÃO: Verificar existência de cada objeto sem causar erro
+    var _edificios = [];
+    
+    // Edifícios principais (sempre adicionar)
+    array_push(_edificios, obj_casa);
+    array_push(_edificios, obj_banco);
+    array_push(_edificios, obj_fazenda);
+    array_push(_edificios, obj_quartel);
+    array_push(_edificios, obj_quartel_marinha);
+    array_push(_edificios, obj_aeroporto_militar);
+    
+    // Research center (se existir)
+    var _research_index = asset_get_index("obj_research_center");
+    if (_research_index != -1) {
+        array_push(_edificios, obj_research_center);
+    }
+    
+    // Casa da Moeda (se existir)
+    var _casa_moeda_index = asset_get_index("obj_casa_da_moeda");
+    if (_casa_moeda_index != -1) {
+        array_push(_edificios, obj_casa_da_moeda);
+    }
+    
+    // Verifica se há algum edifício ocupando a área
+    for (var i = 0; i < array_length(_edificios); i++) {
+        var _edificio_obj = _edificios[i];
+        if (!object_exists(_edificio_obj)) continue;
+        
+        // Verifica múltiplos pontos para garantir que não há overlap
+        var _check_points = [
+            [grid_x, grid_y],  // Centro
+            [grid_x - _largura/2 + 10, grid_y - _altura/2 + 10],  // Canto superior esquerdo
+            [grid_x + _largura/2 - 10, grid_y - _altura/2 + 10],  // Canto superior direito
+            [grid_x - _largura/2 + 10, grid_y + _altura/2 - 10],  // Canto inferior esquerdo
+            [grid_x + _largura/2 - 10, grid_y + _altura/2 - 10]   // Canto inferior direito
+        ];
+        
+        // Verifica todos os pontos
+        for (var j = 0; j < array_length(_check_points); j++) {
+            var _x = _check_points[j][0];
+            var _y = _check_points[j][1];
+            
+            // Verifica se há alguma instância do edifício nesta posição
+            if (instance_position(_x, _y, _edificio_obj) != noone) {
+                _espaco_livre = false;
+                show_debug_message("🚫 Espaço ocupado por edifício na posição (" + string(_x) + ", " + string(_y) + ")");
+                break;
+            }
+        }
+        
+        if (!_espaco_livre) break;
+    }
+    
+    if (!_espaco_livre) {
+        show_debug_message("❌ ESPAÇO OCUPADO! Não é possível construir em cima de outro edifício.");
+        global.construindo_agora = noone;
+        exit;
+    }
+    
+    show_debug_message("✅ Espaço livre verificado. Construindo " + _nome_edificio + "...");
     
     // --- PASSO 3: EXECUTAR A CONSTRUÇÃO ---
     

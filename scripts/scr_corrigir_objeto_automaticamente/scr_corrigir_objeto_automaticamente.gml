@@ -101,7 +101,7 @@ function scr_corrigir_variaveis_objeto(objeto) {
         case obj_fragata:
         case obj_destroyer:
         case obj_submarino:
-        case obj_porta_avioes:
+        case obj_RonaldReagan:
             variaveis_essenciais = [
                 "hp_atual", "hp_max", "velocidade", "dano", "alcance",
                 "estado", "nacao_proprietaria", "experiencia", "nivel",
@@ -182,7 +182,7 @@ function scr_corrigir_propriedades_objeto(objeto) {
         case obj_fragata:
         case obj_destroyer:
         case obj_submarino:
-        case obj_porta_avioes:
+        case obj_RonaldReagan:
             // Verificar se está em água
             if (!scr_check_water_tile()) {
                 var pos_agua = scr_find_nearest_water();
@@ -253,7 +253,7 @@ function scr_obter_valor_padrao_variavel(nome_variavel, tipo_objeto) {
                 case obj_fragata: return 200;
                 case obj_destroyer: return 300;
                 case obj_submarino: return 180;
-                case obj_porta_avioes: return 500;
+                case obj_RonaldReagan: return 500;
                 case obj_soldado: return 100;
                 case obj_soldado_antiaereo: return 120;
                 case obj_blindado: return 200;
@@ -266,7 +266,7 @@ function scr_obter_valor_padrao_variavel(nome_variavel, tipo_objeto) {
                 case obj_fragata: return 1.8;
                 case obj_destroyer: return 1.5;
                 case obj_submarino: return 1.2;
-                case obj_porta_avioes: return 1.0;
+                case obj_RonaldReagan: return 1.0;
                 case obj_soldado: return 1.5;
                 case obj_soldado_antiaereo: return 1.3;
                 case obj_blindado: return 1.2;
@@ -279,7 +279,7 @@ function scr_obter_valor_padrao_variavel(nome_variavel, tipo_objeto) {
                 case obj_fragata: return 35;
                 case obj_destroyer: return 50;
                 case obj_submarino: return 60;
-                case obj_porta_avioes: return 40;
+                case obj_RonaldReagan: return 40;
                 case obj_soldado: return 20;
                 case obj_soldado_antiaereo: return 25;
                 case obj_blindado: return 40;
@@ -292,7 +292,7 @@ function scr_obter_valor_padrao_variavel(nome_variavel, tipo_objeto) {
                 case obj_fragata: return 450;
                 case obj_destroyer: return 500;
                 case obj_submarino: return 500;
-                case obj_porta_avioes: return 600;
+                case obj_RonaldReagan: return 600;
                 case obj_soldado: return 300;
                 case obj_soldado_antiaereo: return 400;
                 case obj_blindado: return 350;
@@ -315,7 +315,7 @@ function scr_obter_valor_padrao_variavel(nome_variavel, tipo_objeto) {
                 case obj_fragata: return 75;
                 case obj_destroyer: return 90;
                 case obj_submarino: return 120;
-                case obj_porta_avioes: return 150;
+                case obj_RonaldReagan: return 150;
                 case obj_soldado: return 45;
                 case obj_soldado_antiaereo: return 60;
                 case obj_blindado: return 75;
@@ -328,7 +328,7 @@ function scr_obter_valor_padrao_variavel(nome_variavel, tipo_objeto) {
                 case obj_fragata: return 550;
                 case obj_destroyer: return 600;
                 case obj_submarino: return 400;
-                case obj_porta_avioes: return 700;
+                case obj_RonaldReagan: return 700;
                 case obj_soldado: return 400;
                 case obj_soldado_antiaereo: return 500;
                 case obj_blindado: return 450;

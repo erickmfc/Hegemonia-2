@@ -183,7 +183,7 @@ function scr_config_naval(parametros) {
             descricao: "Unidade submarina furtiva"
         },
         {
-            objeto: obj_porta_avioes,
+            objeto: obj_RonaldReagan,
             nome: "Porta-aviões",
             hp: 500,
             velocidade: 1.0,

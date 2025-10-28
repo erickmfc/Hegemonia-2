@@ -25,8 +25,10 @@ missil_timer = 0;
 missil_cooldown = 120; // 2 segundos entre mísseis
 
 // === HERANÇA DO PAI (OBRIGATÓRIO) ===
-// HERDAR DEPOIS de configurar hp e velocidade
-event_inherited();
+// GM2040: Verificar se há parent antes de chamar event_inherited
+if (object_get_parent(object_index) != -1) {
+    event_inherited();
+}
 
 // === VARIÁVEIS DE MOVIMENTO (DEFINIR DEPOIS DA HERANÇA) ===
 destino_x = x;
@@ -66,6 +68,7 @@ desembarque_offset_y = 0;
 
 // === SISTEMA DE ESTADO DE EMBARQUE (PADRONIZADO) ===
 estado_transporte = NavioTransporteEstado.PARADO;
+estado_embarque = "navegando";             // GM2016: Declarado no Create event
 modo_embarque = false;
 menu_carga_aberto = false;
 raio_embarque = 80;                         // Raio de detecção aumentado
@@ -98,6 +101,7 @@ eh_embarcavel = function(unidade) {
     
     // Verificar se é aéreo
     if (object_is_ancestor(unidade.object_index, obj_caca_f5) || 
+        object_is_ancestor(unidade.object_index, obj_f15) ||
         object_is_ancestor(unidade.object_index, obj_f6) ||
         object_is_ancestor(unidade.object_index, obj_helicoptero_militar)) return true;
     
@@ -112,44 +116,75 @@ eh_embarcavel = function(unidade) {
 }
 
 tipo_unidade = function(unidade) {
-    if (object_is_ancestor(unidade.object_index, obj_caca_f5) || 
-        object_is_ancestor(unidade.object_index, obj_f6) ||
-        object_is_ancestor(unidade.object_index, obj_helicoptero_militar)) {
+    // Aeronaves
+    if (unidade.object_index == obj_caca_f5 ||
+        unidade.object_index == obj_f15 ||
+        unidade.object_index == obj_f6 ||
+        unidade.object_index == obj_helicoptero_militar ||
+        unidade.object_index == obj_c100) {
         return "aereo";
-    } else if (object_is_ancestor(unidade.object_index, obj_infantaria) ||
-               object_is_ancestor(unidade.object_index, obj_soldado_antiaereo)) {
+    }
+    
+    // Soldados
+    if (unidade.object_index == obj_infantaria ||
+        unidade.object_index == obj_soldado_antiaereo) {
         return "soldado";
-    } else {
+    }
+    
+    // Veículos
+    if (unidade.object_index == obj_tanque ||
+        unidade.object_index == obj_blindado_antiaereo) {
         return "unidade";
     }
+    
+    return "desconhecido";
 }
 
 embarcar_unidade = function(unidade) {
     var _tipo = tipo_unidade(unidade);
     var _pode_embarcar = false;
     
+    show_debug_message("🔍 [RONALD] Tentando embarcar: " + object_get_name(unidade.object_index) + " | Tipo: " + _tipo);
+    
     // Verificar capacidade
     switch (_tipo) {
         case "aereo":
-            if (avioes_count >= avioes_max) return false;
+            if (avioes_count >= avioes_max) {
+                show_debug_message("❌ [RONALD] EMBARQUE FALHOU: Capacidade AÉREA esgotada! (" + string(avioes_count) + "/" + string(avioes_max) + ")");
+                return false;
+            }
             _pode_embarcar = true;
+            show_debug_message("✅ [RONALD] Capacidade AÉREA OK: " + string(avioes_count) + "/" + string(avioes_max));
             break;
         case "unidade":
-            if (unidades_count >= unidades_max) return false;
+            if (unidades_count >= unidades_max) {
+                show_debug_message("❌ [RONALD] EMBARQUE FALHOU: Capacidade VEÍCULOS esgotada! (" + string(unidades_count) + "/" + string(unidades_max) + ")");
+                return false;
+            }
             _pode_embarcar = true;
+            show_debug_message("✅ [RONALD] Capacidade VEÍCULOS OK: " + string(unidades_count) + "/" + string(unidades_max));
             break;
         case "soldado":
-            if (soldados_count >= soldados_max) return false;
+            if (soldados_count >= soldados_max) {
+                show_debug_message("❌ [RONALD] EMBARQUE FALHOU: Capacidade SOLDADOS esgotada! (" + string(soldados_count) + "/" + string(soldados_max) + ")");
+                return false;
+            }
             _pode_embarcar = true;
+            show_debug_message("✅ [RONALD] Capacidade SOLDADOS OK: " + string(soldados_count) + "/" + string(soldados_max));
             break;
     }
     
-    if (!_pode_embarcar) return false;
+    if (!_pode_embarcar) {
+        show_debug_message("❌ [RONALD] EMBARQUE FALHOU: Flag _pode_embarcar é false (ERRO INESPERADO)");
+        return false;
+    }
     
     // Escolher qual lista usar
     var _lista_usar = avioes_embarcados;
     if (_tipo == "unidade") _lista_usar = unidades_embarcadas;
     else if (_tipo == "soldado") _lista_usar = soldados_embarcados;
+    
+    show_debug_message(">>> [RONALD] PASSO FINAL: Adicionando à lista e escondendo...");
     
     // Adicionar à lista
     ds_list_add(_lista_usar, unidade.id);
@@ -162,10 +197,7 @@ embarcar_unidade = function(unidade) {
     // IMPORTANTE: Apenas esconder a unidade (NÃO desativar!)
     unidade.visible = false;
     
-    // NÃO usar instance_deactivate_object() porque desativa TODAS as instâncias!
-    // Apenas deixar visible = false é suficiente
-    
-    show_debug_message("✅ " + object_get_name(unidade.object_index) + " embarcou! (A:" + 
+    show_debug_message("✅ [RONALD] " + object_get_name(unidade.object_index) + " embarcou! (A:" + 
                       string(avioes_count) + "/" + string(avioes_max) + " | " +
                       "U:" + string(unidades_count) + "/" + string(unidades_max) + " | " +
                       "S:" + string(soldados_count) + "/" + string(soldados_max) + ")");

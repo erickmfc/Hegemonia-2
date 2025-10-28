@@ -24,7 +24,7 @@ depth = -1000;                     // PROFUNDIDADE PARA FICAR NA FRENTE
 
 // === PROPRIEDADES ESPECÍFICAS AR-AR ===
 alcance_maximo = 600;              // Alcance máximo do míssil
-precisao = 0.95;                   // Precisão do míssil (95%)
+precisao = 0.97;                   // Precisão do míssil (97% para alvos aéreos)
 altura_voo = 0;                    // Altura de voo do míssil
 
 show_debug_message("🚀 Míssil AR-CURTO criado - Sistema Ar-Ar!");

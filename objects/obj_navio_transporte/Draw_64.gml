@@ -96,7 +96,7 @@ if (variable_instance_exists(id, "menu_carga_aberto") && menu_carga_aberto) {
     // Título
     draw_set_halign(fa_left);
     draw_set_color(c_yellow);
-    draw_set_valign(fa_top);
+    draw_set_valign(fa_center);
     draw_text(_menu_x + 15, _menu_y + 15, "📦 CARGA DO NAVIO");
 
     var _line_y = _menu_y + 45;

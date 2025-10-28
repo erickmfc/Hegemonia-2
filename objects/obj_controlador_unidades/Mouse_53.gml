@@ -2,9 +2,10 @@
 // Sistema básico de mouse
 
 // CORREÇÃO: Verificar se clicou em edifício primeiro
-var _coords = scr_mouse_to_world();
-var _mouse_world_x = _coords[0];
-var _mouse_world_y = _coords[1];
+// ✅ CORREÇÃO GM2044: Usar nome único para evitar conflito
+var _coords_mouse = scr_mouse_to_world();
+var _mouse_world_x = _coords_mouse[0];
+var _mouse_world_y = _coords_mouse[1];
 
 // Verificar se clicou em algum edifício
 // CORREÇÃO: Usar instance_position para detecção mais precisa

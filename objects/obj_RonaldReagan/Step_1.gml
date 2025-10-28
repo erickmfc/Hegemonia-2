@@ -16,11 +16,6 @@ if (variable_instance_exists(id, "estado_embarque") && estado_embarque == "embar
 } else if ((variable_instance_exists(id, "modo_combate") && modo_combate == LanchaMode.ATAQUE) || 
            (variable_instance_exists(id, "estado") && estado == LanchaState.ATACANDO)) {
     
-    // Inicializar arrays de inimigos (NÃO usar var - precisa ser variável de instância)
-    if (!variable_instance_exists(id, "_inimigos_navais")) var _inimigos_navais = [];
-    if (!variable_instance_exists(id, "_inimigos_aereos")) var _inimigos_aereos = [];
-    if (!variable_instance_exists(id, "_inimigos_terrestres")) var _inimigos_terrestres = [];
-    
     // Limpar arrays a cada step (usar variáveis locais)
     var _inimigos_navais = [];
     var _inimigos_aereos = [];
@@ -214,23 +209,20 @@ if (missil_timer > 0) {
 // === SISTEMA DE ESTADOS DE EMBARQUE (TECLA P) ===
 if (variable_instance_exists(id, "selecionado") && selecionado) {
     if (keyboard_check_pressed(ord("P"))) {
-        var _estado_atual = variable_instance_exists(id, "estado_embarque") ? estado_embarque : "navegando";
+        var _estado_atual = estado_embarque;
         
         if (_estado_atual == "navegando") {
             // NAVEGANDO → EMBARCANDO
-            if (!variable_instance_exists(id, "estado_embarque")) { estado_embarque = "navegando"; }
             estado_embarque = "embarcando";
             // ✅ NAVIO CONTINUA NAVEGANDO normalmente (sem forçar parar)
             show_debug_message("🟢 Porta-Aviões: PORTAS ABERTAS - Aceitando embarque (Pressione P novamente para fechar)");
         } else if (_estado_atual == "embarcando") {
             // EMBARCANDO → EMBARCADO
-            if (!variable_instance_exists(id, "estado_embarque")) { estado_embarque = "navegando"; }
             estado_embarque = "embarcado";
             show_debug_message("🔴 Porta-Aviões: PORTAS FECHADAS - Navegando");
         } else if (_estado_atual == "embarcado") {
             // EMBARCADO → NAVEGANDO (se sem unidades) ou EMBARCANDO
             var _total = avioes_count + unidades_count + soldados_count;
-            if (!variable_instance_exists(id, "estado_embarque")) { estado_embarque = "navegando"; }
             
             if (_total > 0) {
                 estado_embarque = "embarcando";
@@ -286,7 +278,7 @@ if (_embarcando_ativo) {
                     
                     // ✅ EMBARCAR IMEDIATAMENTE
                     // ✅ CORREÇÃO GM1041: Verificar se é um objeto válido antes de usar object_get_name
-                    var _nome_obj = noone;
+                    var _nome_obj = "";
                     if (instance_exists(id)) {
                         _nome_obj = object_get_name(id.object_index);
                     }
@@ -396,5 +388,7 @@ if (debug_timer >= 120) { // A cada 2 segundos
 // Chamar Step do pai (herda lógica de movimento, ataque, etc)
 // ✅ CORREÇÃO GM2040: Verificar se o objeto tem parent antes de chamar event_inherited
 if (variable_instance_exists(id, "parent") || object_index != -1) {
-    event_inherited();
+    if (object_get_parent(object_index) != -1) {
+        event_inherited();
+    }
 }

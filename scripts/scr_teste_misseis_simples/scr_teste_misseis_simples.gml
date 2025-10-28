@@ -46,6 +46,7 @@ if (instance_exists(_missil_terra)) {
 // Teste 4: Usar o script
 show_debug_message("🚀 Teste 4: Usando scr_disparar_missil...");
 
+// ✅ CORREÇÃO GM2039: Usar sintaxe de função moderna
 var _missil_script_ar = scr_disparar_missil(noone, "ar", argument0 + 100, argument1, self);
 if (instance_exists(_missil_script_ar)) {
     show_debug_message("✅ Script criou míssil ar-ar!");
@@ -53,6 +54,7 @@ if (instance_exists(_missil_script_ar)) {
     show_debug_message("❌ Script falhou ao criar míssil ar-ar");
 }
 
+// ✅ CORREÇÃO GM2039: Usar sintaxe de função moderna
 var _missil_script_terra = scr_disparar_missil(noone, "terra", argument0 + 150, argument1, self);
 if (instance_exists(_missil_script_terra)) {
     show_debug_message("✅ Script criou míssil terra-terra!");

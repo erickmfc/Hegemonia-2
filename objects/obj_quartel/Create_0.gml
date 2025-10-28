@@ -8,7 +8,12 @@ event_inherited();
 
 // === CUSTOS DE CONSTRUÇÃO ===
 custo_dinheiro = 400;
-custo_minerio = 250; 
+custo_minerio = 250;
+
+// === SISTEMA DE VIDA ===
+hp_max = 300;
+hp_atual = 300;
+destrutivel = true; // ✅ Quartel pode ser destruído 
 
 // === CONFIGURAÇÕES DE PRODUÇÃO ===
 producao_por_ciclo = 0; // Não produz recursos automáticos
@@ -46,7 +51,7 @@ ds_list_add(unidades_disponiveis, {
     objeto: obj_infantaria,
     custo_dinheiro: 100,
     custo_populacao: 1,
-    tempo_treino: 300,
+    tempo_treino: 180, // 3 segundos (180 frames)
     descricao: "Unidade de combate básica com rifle",
     sprite: spr_infantaria
 });
@@ -56,7 +61,7 @@ ds_list_add(unidades_disponiveis, {
     objeto: obj_soldado_antiaereo,
     custo_dinheiro: 200,
     custo_populacao: 1,
-    tempo_treino: 450,
+    tempo_treino: 300, // 5 segundos
     descricao: "Especialista com mísseis de longo alcance",
     sprite: spr_soldado_antiaereo,
     categoria: "terrestre"
@@ -67,7 +72,7 @@ ds_list_add(unidades_disponiveis, {
     objeto: obj_tanque,
     custo_dinheiro: 500,
     custo_populacao: 3,
-    tempo_treino: 300,
+    tempo_treino: 300, // 5 segundos
     descricao: "Unidade blindada pesada com canhão",
     sprite: spr_tanque
 });
@@ -77,7 +82,7 @@ ds_list_add(unidades_disponiveis, {
     objeto: obj_blindado_antiaereo,
     custo_dinheiro: 800,
     custo_populacao: 4,
-    tempo_treino: 300,
+    tempo_treino: 300, // 5 segundos
     descricao: "Veículo especializado em defesa aérea",
     sprite: spr_blindado_antiaereo,
     categoria: "terrestre"
@@ -94,6 +99,9 @@ quantidade_recrutar = 1;
 unidades_para_criar = 1;
 unidades_criadas = 0;
 recrutar_tanque = false;
+
+// Contador para debug do Step
+step_counter = 0;
 
 show_debug_message("Um quartel foi construído e está pronto para recrutar unidades.");
 show_debug_message("Custo de construção: $" + string(custo_dinheiro) + " dinheiro, " + string(custo_minerio) + " minério");

@@ -4,9 +4,19 @@
 // =============================================
 
 // === COLISÃO COM INFANTARIA ===
-// Apenas unidades terrestres respeitam colisão com edifícios
-if (instance_exists(other) && scr_unidade_deve_respeitar_colisao_edificios(other)) {
-    show_debug_message("🚫 Colisão detectada: Infantaria vs Casa");
+// Verificar se função existe antes de usar
+if (instance_exists(other)) {
+    var _deve_respeitar = true;
+    
+    // Chamar função se existir, senão usar padrão
+    try {
+        _deve_respeitar = scr_unidade_deve_respeitar_colisao_edificios(other);
+    } catch (e) {
+        _deve_respeitar = true; // Padrão: sempre respeitar
+    }
+    
+    if (_deve_respeitar) {
+        show_debug_message("🚫 Colisão detectada: Infantaria vs Casa");
     
     // Calcular direção oposta para empurrar a unidade
     var _angulo = point_direction(other.x, other.y, x, y);
@@ -24,4 +34,8 @@ if (instance_exists(other) && scr_unidade_deve_respeitar_colisao_edificios(other
             show_debug_message("📍 Infantaria empurrada para: (" + string(_novo_x) + ", " + string(_novo_y) + ")");
         }
     }
+    }
 }
+
+
+

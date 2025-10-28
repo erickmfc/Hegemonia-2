@@ -49,7 +49,7 @@ function scr_obter_objeto_por_tipo(tipo_unidade) {
         case "submarino":
             return obj_submarino;
         case "porta_avioes":
-            return obj_porta_avioes;
+            return obj_RonaldReagan;
         
         // Unidades Terrestres
         case "soldado":

@@ -66,7 +66,7 @@ function scr_corrigir_step_event_completa(objeto) {
         case obj_fragata:
         case obj_destroyer:
         case obj_submarino:
-        case obj_porta_avioes:
+        case obj_RonaldReagan:
             resultado = scr_corrigir_step_navios(objeto, resultado);
             break;
         case obj_soldado:

@@ -3,8 +3,10 @@
 // Herda de obj_submarino_base
 // ===============================================
 
-// Chamar o Create do objeto pai PRIMEIRO
-event_inherited();
+// ✅ CORREÇÃO GM2040: Chamar o Create do objeto pai PRIMEIRO com verificação
+if (object_get_parent(object_index) != -1) {
+    event_inherited();
+}
 
 // === CONFIGURAÇÕES ESPECÍFICAS DO WW-HENDRICK ===
 
@@ -24,6 +26,6 @@ nome_unidade = "Ww-Hendrick"; // Primeiro submarino
 
 // === MELHORIAS DE SUBMERSÃO ===
 profundidade_maxima = 60; // Pode ir mais fundo
-tempo_maximo_submersao = 720; // 12 segundos submerso (mais que o padrão)
+// Tempo máximo removido - pode ficar submerso indefinidamente
 
 show_debug_message("🌊 Ww-Hendrick configurado - HP: " + string(hp_atual) + ", Dano: " + string(dano_ataque));

@@ -28,23 +28,11 @@ if (cooldown_submersao > 0) {
     cooldown_submersao--;
 }
 
-// Timer de submersão (limitado)
+// Efeito visual de transparência
 if (submerso) {
-    tempo_submersao_atual++;
-    
-    // Forçar emergir se ficou muito tempo submerso
-    if (tempo_submersao_atual >= tempo_maximo_submersao) {
-        func_emergir();
-        show_debug_message("⚠️ " + nome_unidade + " forçado a emergir (tempo máximo excedido)");
-    }
-    
-    // Efeito visual: mais profundo = mais transparente
-    var _profundidade_percentual = min(tempo_submersao_atual / tempo_maximo_submersao, 1.0);
-    image_alpha = 0.5 - (_profundidade_percentual * 0.3); // 0.5 a 0.2 de alpha
+    image_alpha = 0.5; // Semi-transparente submerso
 } else {
-    // Resetar timer quando emergir
-    tempo_submersao_atual = 0;
-    image_alpha = 1.0;
+    image_alpha = 1.0; // Totalmente visível na superfície
 }
 
 // ======================================================================

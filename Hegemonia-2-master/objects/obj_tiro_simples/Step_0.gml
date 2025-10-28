@@ -10,9 +10,15 @@ if (!instance_exists(alvo)) {
 }
 
 // === MOVIMENTO E ROTAÇÃO ===
-var _dir = point_direction(x, y, alvo.x, alvo.y);
-image_angle = _dir;
-direction = _dir;
+if (instance_exists(alvo)) {
+    var _dir = point_direction(x, y, alvo.x, alvo.y);
+    direction = _dir;
+    image_angle = _dir;
+    
+    // Mantém a velocidade constante
+    x += lengthdir_x(speed, direction);
+    y += lengthdir_y(speed, direction);
+}
 
 // === COLISÃO E DANO ===
 if (point_distance(x, y, alvo.x, alvo.y) <= speed) {

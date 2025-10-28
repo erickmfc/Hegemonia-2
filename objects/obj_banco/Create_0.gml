@@ -10,6 +10,11 @@ event_inherited();
 custo_dinheiro = 500;
 custo_minerio = 100;
 
+// === SISTEMA DE VIDA ===
+hp_max = 500;
+hp_atual = 500;
+destrutivel = true; // ✅ Banco pode ser destruído
+
 // === SISTEMA FINANCEIRO ===
 // O banco não produz dinheiro automaticamente
 // Ele oferece serviços financeiros

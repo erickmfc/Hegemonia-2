@@ -3,6 +3,14 @@
 // Sistema de Evolução e Gestão de Habitação
 // ================================================
 
+// === SISTEMA DE VIDA ===
+// Verificar se HP chegou a 0 e destruir
+if (destrutivel && hp_atual <= 0) {
+    show_debug_message("💥 Casa destruída - HP: " + string(hp_atual) + "/" + string(hp_max));
+    instance_destroy();
+    exit;
+}
+
 // === SISTEMA DE SELEÇÃO ===
 // Verifica se o mouse está sobre a casa
 var _mouse_sobre = position_meeting(mouse_x, mouse_y, id);
@@ -62,3 +70,4 @@ if (selecionado && _mouse_sobre && mouse_check_button_pressed(mb_right)) {
         show_debug_message("🏠 Casa já está no nível máximo (3)!");
     }
 }
+

@@ -10,9 +10,16 @@ if (atq_cooldown > 0) atq_cooldown--;
 if (estado != "movendo") {
     // Se não está atacando ou perdeu o alvo, procurar novo alvo
     if (estado != "atacando" || alvo == noone || !instance_exists(alvo)) {
-        alvo = instance_nearest(x, y, obj_inimigo);
-        if (alvo != noone && point_distance(x, y, alvo.x, alvo.y) <= alcance_visao) {
+        // ✅ CORREÇÃO: Usar scr_buscar_inimigo() para considerar nacao_proprietaria
+        var _nacao = (variable_instance_exists(id, "nacao_proprietaria")) ? nacao_proprietaria : 1;
+        var _alvo_temp = scr_buscar_inimigo(x, y, alcance_visao, _nacao);
+        if (_alvo_temp != noone && _alvo_temp != undefined && instance_exists(_alvo_temp)) {
+            alvo = _alvo_temp;
+        }
+        
+        if (alvo != noone && instance_exists(alvo) && point_distance(x, y, alvo.x, alvo.y) <= alcance_visao) {
             estado = "atacando";
+            show_debug_message("🎯 Tanque encontrou inimigo - atacando!");
         } else {
             // Se não há alvo próximo, volta para patrulha se tiver pontos
             if (ds_list_size(patrulha) > 0) {
@@ -170,24 +177,30 @@ switch (estado) {
     break;
     
     case "patrulhando":
-        // Verificar se há inimigo próximo durante a patrulha
-        var inimigo_proximo = instance_nearest(x, y, obj_inimigo);
-        if (inimigo_proximo != noone && point_distance(x, y, inimigo_proximo.x, inimigo_proximo.y) <= alcance_visao) {
+        // ✅ CORREÇÃO: Verificar se há inimigo próximo durante a patrulha usando scr_buscar_inimigo
+        var _nacao_patrulha = (variable_instance_exists(id, "nacao_proprietaria")) ? nacao_proprietaria : 1;
+        var _inimigo_temp = scr_buscar_inimigo(x, y, alcance_visao, _nacao_patrulha);
+        var inimigo_proximo = (_inimigo_temp != undefined && _inimigo_temp != noone && instance_exists(_inimigo_temp)) ? _inimigo_temp : noone;
+        
+        if (inimigo_proximo != noone && instance_exists(inimigo_proximo) && point_distance(x, y, inimigo_proximo.x, inimigo_proximo.y) <= alcance_visao) {
             // Inimigo detectado! Parar patrulha e atacar
             alvo = inimigo_proximo;
             estado = "atacando";
+            show_debug_message("🎯 Tanque detectou inimigo durante patrulha!");
         } else if (ds_list_size(patrulha) > 0) {
             // Continuar patrulha normalmente
-            var pt = patrulha[| patrulha_indice];
-            var px = pt[0];
-            var py = pt[1];
-            if (point_distance(x, y, px, py) > 6) {
-                var dirp = point_direction(x, y, px, py);
-                x += lengthdir_x(velocidade, dirp);
-                y += lengthdir_y(velocidade, dirp);
-                image_angle = dirp;
-            } else {
-                patrulha_indice = (patrulha_indice + 1) mod ds_list_size(patrulha);
+            var pt = ds_list_find_value(patrulha, patrulha_indice);
+            if (is_array(pt) && array_length(pt) >= 2) {
+                var px = pt[0];
+                var py = pt[1];
+                if (point_distance(x, y, px, py) > 6) {
+                    var dirp = point_direction(x, y, px, py);
+                    x += lengthdir_x(velocidade, dirp);
+                    y += lengthdir_y(velocidade, dirp);
+                    image_angle = dirp;
+                } else {
+                    patrulha_indice = (patrulha_indice + 1) mod ds_list_size(patrulha);
+                }
             }
         }
     break;
@@ -202,6 +215,25 @@ switch (estado) {
                 estado = "parado";
             }
         } else if (alvo != noone && instance_exists(alvo)) {
+            // ✅ VERIFICAR SE O ALVO É AÉREO - TANQUES NÃO ATACAM AVIÕES
+            var _alvo_aereo = (alvo.object_index == obj_caca_f5 || 
+                              alvo.object_index == obj_f15 || 
+                              alvo.object_index == obj_f6 ||
+                              alvo.object_index == obj_helicoptero_militar ||
+                              alvo.object_index == obj_c100);
+            
+            if (_alvo_aereo) {
+                // É avião - tanques não podem atacar
+                show_debug_message("⚠️ Tanque não pode atacar unidade aérea!");
+                alvo = noone;
+                if (ds_list_size(patrulha) > 0) {
+                    estado = "patrulhando";
+                } else {
+                    estado = "parado";
+                }
+                break;
+            }
+            
             var dist = point_distance(x, y, alvo.x, alvo.y);
             
             if (dist <= alcance_tiro) {
@@ -210,10 +242,21 @@ switch (estado) {
                     var b = instance_create_layer(x, y, layer, obj_tiro_infantaria);
                     b.direction = point_direction(x, y, alvo.x, alvo.y);
                     b.speed = 12;      // mais rápido que infantaria
-                    b.dano = 35;       // muito mais forte
+                    b.dano = 70;       // DOBRO DO DANO (era 35, agora 70)
+                    b.dano_area = 40;  // Dano de área para explosão
+                    b.raio_area = 80;  // Raio de explosão (80 pixels)
+                    b.eh_tiro_tanque = true; // Flag para identificar tiro de tanque
                     b.alvo = alvo;     // manter alvo
                     b.image_blend = c_yellow; // cor amarela para diferenciar
                     atq_cooldown = atq_rate;
+                    
+                    // Tocar som do tanque
+                    if (variable_global_exists("som_tanque")) {
+                        var _sound_index = asset_get_index("som_tanque");
+                        if (_sound_index != -1) {
+                            audio_play_sound(som_tanque, 5, false);
+                        }
+                    }
                 }
                 image_angle = point_direction(x, y, alvo.x, alvo.y);
                 

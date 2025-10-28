@@ -343,3 +343,13 @@ global.unidade_selecionada = noone;
 global.mostrar_painel_comandos = false;
 
 show_debug_message("CONTROLES GLOBAIS: Inicialização completa!");
+
+// === RECURSOS DA IA (PRESIDENTE 1) ===
+// Sistema de recursos separados para a IA inimiga
+global.ia_dinheiro = 50000; // Aumentado para permitir construções
+global.ia_minerio = 1000;
+global.ia_petroleo = 500;
+global.ia_populacao = 100;
+global.ia_alimento = 0;
+
+show_debug_message("✅ Recursos da IA inicializados");

@@ -77,7 +77,7 @@ function scr_obter_objeto_navio(tipo_navio) {
         case "submarino":
             return obj_submarino;
         case "porta_avioes":
-            return obj_porta_avioes;
+            return obj_RonaldReagan;
         default:
             return -1;
     }

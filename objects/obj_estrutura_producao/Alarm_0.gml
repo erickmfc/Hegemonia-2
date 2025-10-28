@@ -5,14 +5,14 @@
 
 // Usamos uma estrutura 'switch' para adicionar o recurso ao estoque global correto.
 // Isso torna o sistema expansível para futuros tipos de recursos.
+// Calcular produção final uma vez no início
+var _producao_final = producao_por_ciclo;
+if (variable_global_exists("penalidade_producao")) {
+    _producao_final = floor(producao_por_ciclo * global.penalidade_producao);
+}
+
 switch (tipo_recurso) {
     case "dinheiro":
-        // Aplicar penalidade de inflação se existir
-        var _producao_final = producao_por_ciclo;
-        if (variable_global_exists("penalidade_producao")) {
-            _producao_final = floor(producao_por_ciclo * global.penalidade_producao);
-        }
-        
         global.dinheiro += _producao_final;
         // Atualizar também o mapa consolidado
         if (ds_exists(global.estoque_recursos, ds_type_map)) {
@@ -21,12 +21,6 @@ switch (tipo_recurso) {
         break;
         
     case "minerio":
-        // Aplicar penalidade de inflação se existir
-        var _producao_final = producao_por_ciclo;
-        if (variable_global_exists("penalidade_producao")) {
-            _producao_final = floor(producao_por_ciclo * global.penalidade_producao);
-        }
-        
         global.minerio += _producao_final;
         // Atualizar também o mapa consolidado
         if (ds_exists(global.estoque_recursos, ds_type_map)) {
@@ -35,12 +29,6 @@ switch (tipo_recurso) {
         break;
     
     case "petroleo":
-        // Aplicar penalidade de inflação se existir
-        var _producao_final = producao_por_ciclo;
-        if (variable_global_exists("penalidade_producao")) {
-            _producao_final = floor(producao_por_ciclo * global.penalidade_producao);
-        }
-        
         global.petroleo += _producao_final;
         // Atualizar também o mapa consolidado
         if (ds_exists(global.estoque_recursos, ds_type_map)) {

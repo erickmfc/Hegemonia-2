@@ -190,12 +190,30 @@ if (_can_produce) {
     draw_set_alpha(1.0);
     
     // Tentar desenhar sprite se existir
+    var _sprite_desenhado = false;
     if (_navio.nome == "Lancha Patrulha" && sprite_exists(spr_lancha_patrulha)) {
         draw_sprite_ext(spr_lancha_patrulha, 0, _icon_x, _icon_y, 1.5, 1.5, 0, c_white, _anim.alpha);
+        _sprite_desenhado = true;
     } else if (_navio.nome == "Constellation" && sprite_exists(spr_Constellation)) {
         draw_sprite_ext(spr_Constellation, 0, _icon_x, _icon_y, 1.5, 1.5, 0, c_white, _anim.alpha);
+        _sprite_desenhado = true;
     } else if (_navio.nome == "Independence" && sprite_exists(spr_Independence)) {
         draw_sprite_ext(spr_Independence, 0, _icon_x, _icon_y, 1.5, 1.5, 0, c_white, _anim.alpha);
+        _sprite_desenhado = true;
+    } else if (_navio.nome == "Ww-Hendrick" && sprite_exists(spr_wwhendrick)) {
+        draw_sprite_ext(spr_wwhendrick, 0, _icon_x, _icon_y, 2.0, 2.0, 0, c_white, _anim.alpha); // Escala maior (2x)
+        _sprite_desenhado = true;
+        if (i == 0 || (animation_timer % 180 == 0)) { // Debug a cada 3 segundos
+            show_debug_message("🌊 Sprite Ww-Hendrick desenhado! Pos: (" + string(_icon_x) + ", " + string(_icon_y) + ")");
+        }
+    } else if (_navio.nome == "Ronald Reagan" && sprite_exists(spr_RonaldReagan)) {
+        draw_sprite_ext(spr_RonaldReagan, 0, _icon_x, _icon_y, 1.5, 1.5, 0, c_white, _anim.alpha);
+        _sprite_desenhado = true;
+    }
+    
+    // DEBUG: Se não desenhou sprite, mostrar mensagem
+    if (!_sprite_desenhado && i == 4 && animation_timer % 180 == 0) {
+        show_debug_message("⚠️ Navio: " + _navio.nome + " - Sprite não encontrado ou nome incorreto");
     }
     
     // Descrição
