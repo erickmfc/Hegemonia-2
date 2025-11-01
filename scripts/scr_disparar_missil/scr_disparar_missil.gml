@@ -16,11 +16,11 @@ show_debug_message("🔍 scr_disparar_missil: Chamado com tipo='" + string(tipo)
 switch (tipo) {
     case "ar":
         show_debug_message("🚀 Criando míssil ar-ar (SkyFury)");
-        m = instance_create_layer(xx, yy, "Projeteis", obj_SkyFury_ar);
+        m = scr_get_projectile_from_pool(obj_SkyFury_ar, xx, yy, "Projeteis");
         break;
     case "terra":
         show_debug_message("🚀 Criando míssil terra-terra (Ironclad)");
-        m = instance_create_layer(xx, yy, "Projeteis", obj_Ironclad_terra);
+        m = scr_get_projectile_from_pool(obj_Ironclad_terra, xx, yy, "Projeteis");
         break;
     default:
         show_debug_message("❌ scr_disparar_missil: Tipo inválido '" + string(tipo) + "'. Use 'ar' ou 'terra'.");

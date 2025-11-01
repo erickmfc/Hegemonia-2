@@ -2,6 +2,18 @@
 // HEGEMONIA GLOBAL - CAÇA F-5 (Draw Refatorado)
 // ===============================================
 
+// =============================================
+// DRAW - Otimizado com verificação de visibilidade
+// =============================================
+
+// ✅ OTIMIZAÇÃO: Verificar se deve desenhar
+if (!scr_should_draw(id)) {
+    if (instance_exists(obj_draw_optimizer)) {
+        obj_draw_optimizer.objects_skipped++;
+    }
+    exit;
+}
+
 // Efeito de altitude com sombra
 draw_sprite_ext(sprite_index, image_index, x, y, image_xscale, image_yscale, image_angle, c_black, 0.4);
 draw_sprite_ext(sprite_index, image_index, x, y - altura_voo, image_xscale, image_yscale, image_angle, image_blend, image_alpha);

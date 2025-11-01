@@ -1,2 +1,2 @@
-/// @description Inserir descrição aqui
-// Você pode escrever seu código neste editor
+/// @description Create - Botão Sair
+// Botão não precisa de inicialização

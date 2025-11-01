@@ -327,5 +327,13 @@ funcao_desembarcar_veiculo = function() {
     return true;
 }
 
+// =============================================
+// SISTEMA DE FRAME SKIP COM LOD
+// =============================================
+lod_level = 2;
+force_always_active = false;
+lod_process_index = irandom(99);
+skip_frames_enabled = true;
+
 show_debug_message("🚢 RONALD REAGAN (Porta-Aviões) CRIADO - Sistema de Embarque/Desembarque Ativo!");
 show_debug_message("📦 Capacidade: 35 aviões + 20 veículos + 100 soldados");

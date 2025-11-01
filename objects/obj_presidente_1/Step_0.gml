@@ -14,65 +14,59 @@ if (timer_decisao <= 0) {
     // 2. EXECUTAR DECISÃO
     switch (_decisao) {
         case "construir_economia":
-            // Construir fazenda próxima à base
-            var _pos_x = base_x + irandom(200) - 100;
-            var _pos_y = base_y + irandom(200) - 100;
-            var _sucesso = scr_ia_construir(id, obj_fazenda, _pos_x, _pos_y);
+            // ✅ NOVO: Usar posicionamento estratégico (não grudado)
+            var _pos_estrategica = scr_ia_encontrar_posicao_estrategica(id, "economia", 300);
+            var _sucesso = scr_ia_construir(id, obj_fazenda, _pos_estrategica.x, _pos_estrategica.y);
             if (!_sucesso) {
                 show_debug_message("⚠️ IA não pode construir fazenda");
             }
             break;
             
         case "construir_mina":
-            // Construir mina próxima à base
-            _pos_x = base_x + irandom(200) - 100;
-            _pos_y = base_y + irandom(200) - 100;
-            _sucesso = scr_ia_construir(id, obj_mina, _pos_x, _pos_y);
+            // ✅ NOVO: Posicionamento estratégico
+            _pos_estrategica = scr_ia_encontrar_posicao_estrategica(id, "economia", 280);
+            _sucesso = scr_ia_construir(id, obj_mina, _pos_estrategica.x, _pos_estrategica.y);
             if (!_sucesso) {
                 show_debug_message("⚠️ IA não pode construir mina");
             }
             break;
             
         case "construir_militar":
-            // Construir quartel terrestre
-            _pos_x = base_x + irandom(150) - 75;
-            _pos_y = base_y + irandom(150) - 75;
-            _sucesso = scr_ia_construir(id, obj_quartel, _pos_x, _pos_y);
+            // ✅ NOVO: Quartel em posição estratégica (bem espaçado)
+            _pos_estrategica = scr_ia_encontrar_posicao_estrategica(id, "militar", 350);
+            _sucesso = scr_ia_construir(id, obj_quartel, _pos_estrategica.x, _pos_estrategica.y);
             if (!_sucesso) {
                 show_debug_message("⚠️ IA não pode construir quartel");
             }
             break;
             
         case "construir_naval":
-            // Construir quartel naval (requer água)
-            _pos_x = base_x + irandom(400) - 200;
-            _pos_y = base_y + irandom(400) - 200;
-            _sucesso = scr_ia_construir(id, obj_quartel_marinha, _pos_x, _pos_y);
+            // ✅ NOVO: Quartel naval estrategicamente posicionado
+            _pos_estrategica = scr_ia_encontrar_posicao_estrategica(id, "naval", 400);
+            _sucesso = scr_ia_construir(id, obj_quartel_marinha, _pos_estrategica.x, _pos_estrategica.y);
             if (!_sucesso) {
                 show_debug_message("⚠️ IA não pode construir quartel naval");
             }
             break;
             
         case "construir_aereo":
-            // Construir aeroporto militar
-            _pos_x = base_x + irandom(300) - 150;
-            _pos_y = base_y + irandom(300) - 150;
-            _sucesso = scr_ia_construir(id, obj_aeroporto_militar, _pos_x, _pos_y);
+            // ✅ NOVO: Aeroporto em posição estratégica (bem espaçado)
+            _pos_estrategica = scr_ia_encontrar_posicao_estrategica(id, "aereo", 450);
+            _sucesso = scr_ia_construir(id, obj_aeroporto_militar, _pos_estrategica.x, _pos_estrategica.y);
             if (!_sucesso) {
                 show_debug_message("⚠️ IA não pode construir aeroporto");
             }
             break;
             
         case "expandir_economia":
-            // Continuar construindo fazendas
-            _pos_x = base_x + irandom(300) - 150;
-            _pos_y = base_y + irandom(300) - 150;
-            _sucesso = scr_ia_construir(id, obj_fazenda, _pos_x, _pos_y);
+            // ✅ NOVO: Expandir com posicionamento estratégico
+            _pos_estrategica = scr_ia_encontrar_posicao_estrategica(id, "economia", 320);
+            _sucesso = scr_ia_construir(id, obj_fazenda, _pos_estrategica.x, _pos_estrategica.y);
             break;
             
         case "recrutar_unidades":
-            // Recrutar unidades usando o sistema automático
-            _sucesso = scr_ia_recrutar_unidade(id, obj_infantaria, 5);
+            // Recrutar unidades usando o sistema automático - PRODUZIR MAIS
+            _sucesso = scr_ia_recrutar_unidade(id, obj_infantaria, 8); // AUMENTADO de 5 para 8
             if (!_sucesso) {
                 show_debug_message("⚠️ IA não pode recrutar unidades (sem recursos ou quartel ocupado)");
             }
@@ -92,6 +86,14 @@ if (timer_decisao <= 0) {
                 // Esquadrão já formado, apenas atacar
                 show_debug_message("⚔️ IA atacando com esquadrão existente...");
                 scr_ia_atacar(id);
+            }
+            break;
+            
+        case "defender":
+            // ✅ NOVO: Defesa já foi executada em scr_ia_decisao_economia
+            // Apenas confirmar
+            if (variable_global_exists("debug_enabled") && global.debug_enabled) {
+                show_debug_message("✅ IA em modo defesa - contra-ataque em curso");
             }
             break;
             

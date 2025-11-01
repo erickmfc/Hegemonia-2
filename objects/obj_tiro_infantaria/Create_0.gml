@@ -13,5 +13,6 @@ timer_vida = 120;                  // Tempo de vida (2 segundos a 60 FPS)
 // === SPRITE E VISUAL ===
 image_speed = 0.5;                 // Velocidade da animação
 image_alpha = 0.9;                 // Transparência
-/// @description Inserir descrição aqui
-// Você pode escrever seu código neste editor
+
+// === SISTEMA DE POOLING ===
+pooled = false; // false = disponível no pool, true = em uso

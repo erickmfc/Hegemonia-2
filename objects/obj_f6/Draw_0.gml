@@ -3,6 +3,18 @@
 // Draw Event - Visual diferenciado para identificação
 // ===============================================
 
+// =============================================
+// DRAW - Otimizado com verificação de visibilidade
+// =============================================
+
+// ✅ OTIMIZAÇÃO: Verificar se deve desenhar
+if (!scr_should_draw(id)) {
+    if (instance_exists(obj_draw_optimizer)) {
+        obj_draw_optimizer.objects_skipped++;
+    }
+    exit;
+}
+
 // Efeito de altitude com sombra
 draw_sprite_ext(sprite_index, image_index, x, y, image_xscale, image_yscale, image_angle, c_black, 0.4);
 draw_sprite_ext(sprite_index, image_index, x, y - altura_voo, image_xscale, image_yscale, image_angle, image_blend, image_alpha);
@@ -69,61 +81,9 @@ if (selecionado) {
 }
 
 // ======================================================================
-// ✅ SISTEMA DE EXIBIÇÃO DE VIDA
+// ✅ CORREÇÃO: Barra de vida removida - agora é desenhada pelo obj_game_manager centralizadamente
+// Isso evita conflito e piscar das barras
 // ======================================================================
-// Desenhar barra de vida do F-6
-if (hp_atual > 0) {
-    var _barra_w = 60;  // Largura da barra
-    var _barra_h = 8;   // Altura da barra
-    var _barra_x = x - _barra_w/2;  // Centralizada no avião
-    var _barra_y = y - 25;  // Acima do avião
-    
-    // Fundo da barra (vermelho)
-    draw_set_color(c_red);
-    draw_set_alpha(0.7);
-    draw_rectangle(_barra_x, _barra_y, _barra_x + _barra_w, _barra_y + _barra_h, false);
-    
-    // Barra de vida atual (verde)
-    var _vida_percentual = hp_atual / hp_max;
-    var _vida_w = _barra_w * _vida_percentual;
-    
-    draw_set_color(c_green);
-    draw_set_alpha(0.8);
-    draw_rectangle(_barra_x, _barra_y, _barra_x + _vida_w, _barra_y + _barra_h, false);
-    
-    // Borda da barra (branco)
-    draw_set_color(c_white);
-    draw_set_alpha(1.0);
-    draw_rectangle(_barra_x, _barra_y, _barra_x + _barra_w, _barra_y + _barra_h, true);
-    
-    // Texto com HP atual/máximo
-    draw_set_halign(fa_center);
-    draw_set_valign(fa_middle);
-    draw_set_color(c_white);
-    draw_text(_barra_x + _barra_w/2, _barra_y - 12, string(hp_atual) + "/" + string(hp_max));
-    
-    // Indicador de estado
-    var _estado_texto = "";
-    var _cor_estado = c_white;
-    
-    switch (estado) {
-        case "pousado": _estado_texto = "POUSADO"; _cor_estado = c_gray; break;
-        case "decolando": _estado_texto = "DECOLANDO"; _cor_estado = c_yellow; break;
-        case "patrulhando": _estado_texto = "PATRULHANDO"; _cor_estado = c_blue; break;
-        case "caçando": _estado_texto = "CAÇANDO!"; _cor_estado = c_red; break;
-        case "movendo": _estado_texto = "MOVENDO"; _cor_estado = c_lime; break;
-        case "pousando": _estado_texto = "POUSANDO"; _cor_estado = c_orange; break;
-        default: _estado_texto = estado; _cor_estado = c_white; break;
-    }
-    
-    draw_set_color(_cor_estado);
-    draw_text(_barra_x + _barra_w/2, _barra_y - 25, _estado_texto);
-    
-    // Resetar configurações
-    draw_set_halign(fa_left);
-    draw_set_valign(fa_top);
-    draw_set_alpha(1.0);
-}
 
 // ======================================================================
 // ✅ DESENHAR A ROTA DE PATRULHA (SEMPRE VISÍVEL PARA TESTE)

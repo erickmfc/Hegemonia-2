@@ -21,8 +21,11 @@ tipo_recurso = "militar"; // Tipo especial para identificar como estrutura milit
 
 // === CORREÇÃO CRÍTICA: DESATIVAR ALARME DE PRODUÇÃO ===
 // O quartel não deve produzir recursos automaticamente como outras estruturas
-// Ele usa o Alarm_0 apenas para recrutamento de unidades
+// Ele usa o sistema de FILA no Step_0, não o Alarm_0
+// ✅ GARANTIR QUE ALARME ESTÁ DESATIVADO (o pai pode ter ativado)
 alarm[0] = -1; // Desativa o alarme de produção automática
+// ✅ VERIFICAR E DESATIVAR NOVAMENTE APÓS VARIÁVEIS
+if (alarm[0] > 0) alarm[0] = -1; // Forçar desativação se ainda estiver ativo
 
 // === CONFIGURAÇÕES DE RECRUTAMENTO ===
 menu_recrutamento_ativo = false;
@@ -91,6 +94,11 @@ ds_list_add(unidades_disponiveis, {
 // === FILA DE RECRUTAMENTO SIMPLES ===
 fila_recrutamento = ds_queue_create();
 
+// ✅ GARANTIR QUE FILA ESTÁ VAZIA AO CRIAR
+ds_queue_clear(fila_recrutamento);
+esta_treinando = false; // ✅ GARANTIR QUE NÃO ESTÁ TREINANDO
+tempo_treinamento_restante = 0; // ✅ RESETAR TIMER
+
 // === VARIÁVEIS PARA COMPATIBILIDADE ===
 ultimo_recrutamento_tanque = false;
 
@@ -103,5 +111,12 @@ recrutar_tanque = false;
 // Contador para debug do Step
 step_counter = 0;
 
+// === PROTEÇÃO CONTRA DESATIVAÇÃO ===
+// ✅ CORREÇÃO: Garantir que quartel sempre esteja visível e ativo
+visible = true;
+force_always_active = true; // Nunca desativar estruturas importantes
+instance_activate_object(id); // Garantir que está ativo
+
 show_debug_message("Um quartel foi construído e está pronto para recrutar unidades.");
 show_debug_message("Custo de construção: $" + string(custo_dinheiro) + " dinheiro, " + string(custo_minerio) + " minério");
+show_debug_message("✅ Quartel protegido contra desativação - ID: " + string(id));

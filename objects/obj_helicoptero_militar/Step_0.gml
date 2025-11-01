@@ -2,11 +2,46 @@
 // HEGEMONIA GLOBAL - HELICÓPTERO (Step Simplificado)
 // ===============================================
 
+// =============================================
+// SISTEMA DE FRAME SKIP COM LOD (OTIMIZADO)
+// =============================================
+
+// ✅ SEMPRE processar se selecionado ou em combate crítico
+var should_always_process = (selecionado || 
+                              (variable_instance_exists(id, "force_always_active") && force_always_active) ||
+                              estado == "atacando" || voando);
+
+// ✅ Se não for sempre processar, verificar frame skip
+if (!should_always_process && skip_frames_enabled) {
+    // Obter LOD atual (com fallback se script não existir)
+    var current_lod = 2; // Default: detalhe normal
+    var current_zoom = 1.0;
+    if (instance_exists(obj_input_manager)) {
+        current_zoom = obj_input_manager.zoom_level;
+    }
+    if (current_zoom >= 2.0) current_lod = 3;
+    else if (current_zoom >= 0.8) current_lod = 2;
+    else if (current_zoom >= 0.4) current_lod = 1;
+    else current_lod = 0;
+    var should_process = scr_calculate_frame_skip(current_lod, lod_process_index);
+    
+    if (!should_process) {
+        // Frame skip: movimento básico apenas
+        if (voando && velocidade_atual > 0) {
+            var speed_mult = scr_get_speed_multiplier(current_lod, lod_process_index);
+            x += lengthdir_x(velocidade_atual * speed_mult, image_angle);
+            y += lengthdir_y(velocidade_atual * speed_mult, image_angle);
+        }
+        exit;
+    }
+    lod_level = current_lod;
+}
+
 // --- 1. CONTROLE DO JOGADOR ---
 if (selecionado) {
     // Comando de Movimento (Clique Direito)
     if (mouse_check_button_pressed(mb_right)) {
-        var _coords = global.scr_mouse_to_world();
+        var _coords = scr_mouse_to_world();
         destino_x = _coords[0];
         destino_y = _coords[1];
         
@@ -86,11 +121,14 @@ if (modo_ataque && voando && velocidade_atual > 0) {
     } else {
         var _alvo = instance_nearest(x, y, obj_inimigo);
         if (instance_exists(_alvo) && point_distance(x, y, _alvo.x, _alvo.y) <= radar_alcance) {
-            var _missil = instance_create_layer(x, y, "Instances", obj_tiro_simples);
+            var _missil = scr_get_projectile_from_pool(obj_tiro_simples, x, y, "Instances");
             if (instance_exists(_missil)) {
                 _missil.alvo = _alvo;
                 _missil.dono = id;
                 _missil.dano = 30;
+                if (variable_instance_exists(_missil, "timer_vida")) {
+                    _missil.timer_vida = 300;
+                }
                 timer_ataque = intervalo_ataque;
                 show_debug_message("🚀 Helicóptero atirou em " + string(_alvo));
             }

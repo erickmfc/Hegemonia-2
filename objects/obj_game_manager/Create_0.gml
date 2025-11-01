@@ -7,19 +7,29 @@
 
 // === SISTEMA DE DEBUG GLOBAL ULTRA OTIMIZADO ===
 // Sistema configurável para reduzir debug messages de 973 para ~10 por frame (99% de redução)
-global.debug_enabled = true; // ✅ ATIVADO TEMPORARIAMENTE PARA TESTAR CONTROLES
+// ✅ OTIMIZAÇÃO: Desabilitar debug por padrão para melhor performance
+if (!variable_global_exists("debug_enabled")) {
+    global.debug_enabled = false; // ✅ Desabilitado por padrão
+}
 global.debug_timer_global = 0; // Timer global para debug
 global.debug_frame_count = 0; // Contador de frames para debug
-global.debug_max_per_frame = 3; // Máximo de debug messages por frame
-global.debug_current_frame = 0; // Debug messages no frame atual
 
-// Função global para debug otimizado
-global.debug_log = function(message) {
-    if (global.debug_enabled && global.debug_current_frame < global.debug_max_per_frame) {
-        show_debug_message(message);
-        global.debug_current_frame++;
-    }
-};
+// ✅ CORREÇÃO: Inicializar global.game_frame para uso em frame skipping
+if (!variable_global_exists("game_frame")) {
+    global.game_frame = 0;
+}
+
+// ✅ OTIMIZAÇÃO: Função wrapper para debug condicional (melhor performance)
+if (!variable_global_exists("debug_log")) {
+    global.debug_log = function(msg) {
+        if (global.debug_enabled) {
+            show_debug_message(msg);
+        }
+    };
+}
+
+// ✅ OTIMIZAÇÃO: Timer para barras de vida
+global.barras_vida_frame = 0; // Timer para desenho de barras (evita desenhar todo frame)
 
 // Resetar contador a cada frame
 global.debug_reset_frame = function() {
@@ -35,13 +45,18 @@ if (global.debug_enabled) {
 // Inicializar enums do jogo
 sc_game_init();
 
-// Inicializar enums navais globais
-scr_enums_navais();
+// ✅ CORREÇÃO GM2039: scr_enums_navais contém apenas enums que são globais automaticamente
+// Não precisa chamar - os enums já estão disponíveis quando o script é incluído no projeto
 
 // === SISTEMA GLOBAL DE UI ===
 // Configurar sistema de interface global para resolver problemas de fonte
 scr_config_ui_global();
 scr_verificar_ui_sistema();
+
+// === CONFIGURAÇÃO DA GUI PARA DETECÇÃO CORRETA DE CLIQUES ===
+// Define que a GUI deve manter proporção 1:1 sempre, garantindo que device_mouse_x_to_gui funcione corretamente
+display_set_gui_maximise(1, 1, 0, 0);
+show_debug_message("✅ GUI configurado com display_set_gui_maximise para detecção correta de cliques");
 
 // === RECURSOS FUNDAMENTAIS ===
 // Estes são os 4 recursos base essenciais para o funcionamento da nação
@@ -266,17 +281,72 @@ show_debug_message("===================================\n");
 /// ================= CRIAÇÃO DOS MINISTÉRIOS =================
 instance_create_layer(0, 0, "Instances", obj_resource_manager);
 instance_create_layer(0, 0, "Instances", obj_ui_manager);
-instance_create_layer(0, 0, "Instances", obj_input_manager);
+
+// ✅ CORREÇÃO: obj_input_manager é PERSISTENTE, só criar se não existir
+if (!instance_exists(obj_input_manager)) {
+    instance_create_layer(0, 0, "Instances", obj_input_manager);
+    show_debug_message("✅ Input Manager criado pelo game_manager");
+} else {
+    show_debug_message("✅ Input Manager já existe (persistente) - usando instância existente");
+}
+
 instance_create_layer(0, 0, "Instances", obj_build_manager);
 instance_create_layer(0, 0, "Instances", obj_controlador_unidades); // Controlador de unidades
 // Sistema de barras de vida integrado ao game_manager
 global.barras_vida_ativas = true;
+
+// =============================================
+// SISTEMA DE PROJECTILE POOL MANAGER
+// =============================================
+if (!instance_exists(obj_projectile_pool_manager)) {
+    instance_create_layer(0, 0, "Instances", obj_projectile_pool_manager);
+    show_debug_message("✅ Projectile Pool Manager criado");
+} else {
+    show_debug_message("✅ Projectile Pool Manager já existe");
+}
+
+// =============================================
+// SISTEMA DE CACHE DE BUSCA DE INIMIGOS
+// =============================================
+if (!instance_exists(obj_enemy_search_cache_manager)) {
+    instance_create_layer(0, 0, "Instances", obj_enemy_search_cache_manager);
+    if (variable_global_exists("debug_enabled") && global.debug_enabled) {
+        show_debug_message("✅ Enemy Search Cache Manager criado");
+    }
+}
+
+// =============================================
+// SISTEMA DE OTIMIZAÇÃO DE DRAW CALLS
+// =============================================
+if (!instance_exists(obj_draw_optimizer)) {
+    instance_create_layer(0, 0, "Instances", obj_draw_optimizer);
+    if (variable_global_exists("debug_enabled") && global.debug_enabled) {
+        show_debug_message("✅ Draw Optimizer criado");
+    }
+}
+
+// =============================================
+// SISTEMA DE STANDBY PARA UNIDADES INIMIGAS
+// ✅ DESABILITADO: Estava impedindo IA de atacar
+// =============================================
+/*
+if (!instance_exists(obj_enemy_standby_manager)) {
+    instance_create_layer(0, 0, "Instances", obj_enemy_standby_manager);
+    if (variable_global_exists("debug_enabled") && global.debug_enabled) {
+        show_debug_message("✅ Enemy Standby Manager criado");
+    }
+}
+*/
 
 
 /// ================= CONFIGURAÇÕES DO MAPA =================
 global.tile_size = 32;
 global.map_width = room_width / global.tile_size;
 global.map_height = room_height / global.tile_size;
+
+/// ================= SISTEMA SPATIAL GRID (OPCIONAL) =================
+// ✅ OTIMIZAÇÃO: Inicializar spatial grid para busca otimizada de unidades
+scr_init_spatial_grid();
 
 
 /// ================= DEFINIÇÃO DAS CAMADAS DE TERRENO =================
@@ -346,10 +416,34 @@ show_debug_message("CONTROLES GLOBAIS: Inicialização completa!");
 
 // === RECURSOS DA IA (PRESIDENTE 1) ===
 // Sistema de recursos separados para a IA inimiga
-global.ia_dinheiro = 50000; // Aumentado para permitir construções
+global.ia_dinheiro = 1000000; // 1 MILHÃO de dinheiro para a IA
 global.ia_minerio = 1000;
 global.ia_petroleo = 500;
 global.ia_populacao = 100;
 global.ia_alimento = 0;
 
 show_debug_message("✅ Recursos da IA inicializados");
+
+// === SISTEMA DE DEACTIVATION MANAGER ===
+// ✅ DESABILITADO: Estava fazendo unidades sumirem ao mudar de local
+// Criar objeto gerenciador de deactivation para estatísticas e debug
+/*
+if (object_exists(obj_deactivation_manager)) {
+    var _deact_mgr = instance_create_layer(0, 0, "Instances", obj_deactivation_manager);
+    if (variable_global_exists("debug_enabled") && global.debug_enabled && instance_exists(_deact_mgr)) {
+        show_debug_message("✅ Sistema de Deactivation Manager criado");
+    }
+} else {
+    if (variable_global_exists("debug_enabled") && global.debug_enabled) {
+        show_debug_message("⚠️ obj_deactivation_manager não encontrado - usando scr_manage_instance_lod()");
+    }
+}
+*/
+
+// === SISTEMA DE PROJECTILE POOLING ===
+if (object_exists(obj_projectile_pool_manager)) {
+    var _pool_mgr = instance_create_layer(0, 0, "Instances", obj_projectile_pool_manager);
+    if (variable_global_exists("debug_enabled") && global.debug_enabled && instance_exists(_pool_mgr)) {
+        show_debug_message("✅ Projectile Pool Manager criado");
+    }
+}

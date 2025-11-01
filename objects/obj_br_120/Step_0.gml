@@ -16,12 +16,17 @@ if (atira) {
     var alvo = instance_nearest(x, y, obj_inimigo);
     if (instance_exists(alvo) && point_distance(x, y, alvo.x, alvo.y) <= alcance_ataque) {
         if (_cd <= 0) {
-            var b = instance_create_layer(x, y, layer, obj_tiro_infantaria);
-            b.direction = point_direction(x, y, alvo.x, alvo.y);
-            b.speed = 10;
-            b.dano = dano_ataque;
-            b.image_blend = c_aqua;
-            _cd = atq_rate;
+            var b = scr_get_projectile_from_pool(obj_tiro_infantaria, x, y, layer);
+            if (instance_exists(b)) {
+                b.direction = point_direction(x, y, alvo.x, alvo.y);
+                b.speed = 10;
+                b.dano = dano_ataque;
+                b.image_blend = c_aqua;
+                if (variable_instance_exists(b, "timer_vida")) {
+                    b.timer_vida = 120;
+                }
+                _cd = atq_rate;
+            }
         }
     }
 }

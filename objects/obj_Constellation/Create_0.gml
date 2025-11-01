@@ -30,4 +30,12 @@ ultima_acao = "nenhuma";
 cor_feedback = c_white;
 feedback_timer = 0;
 
+// =============================================
+// SISTEMA DE FRAME SKIP COM LOD
+// =============================================
+lod_level = 2;
+force_always_active = false;
+lod_process_index = irandom(99);
+skip_frames_enabled = true;
+
 show_debug_message("🚢 Constellation configurado - HP: " + string(hp_atual) + ", Dano: " + string(dano_ataque));

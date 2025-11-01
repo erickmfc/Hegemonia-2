@@ -1,14 +1,20 @@
 // === Step Event - SkyFury (guiamento ar-ar) ===
 
-// Efeito de fumaça (aleatório)
-if (irandom(2) == 0) {
+// ✅ CORREÇÃO: Efeito de fumaça REDUZIDO (só a cada 10 frames)
+// Reduzido para evitar "rastro" excessivo quando usado por soldado anti-aéreo
+if (!variable_instance_exists(id, "contador_fumaca")) contador_fumaca = 0;
+contador_fumaca++;
+if (contador_fumaca >= 10 && irandom(3) == 0) { // Apenas 1 em 3 vezes, a cada 10 frames
+    contador_fumaca = 0; // Resetar contador
+    
     var _fumaca = instance_create_layer(x - lengthdir_x(8, direction), y - lengthdir_y(8, direction), "Efeitos", obj_fumaca_missil);
     if (instance_exists(_fumaca)) {
         _fumaca.image_angle = direction;
+        _fumaca.image_alpha = 0.4; // ✅ Mais transparente para reduzir visibilidade do rastro
     }
 }
 
-// Se o alvo não existe mais, explodir e sair
+// Se o alvo não existe mais, explodir e retornar ao pool
 if (!instance_exists(target)) {
     if (object_exists(obj_explosao_ar)) {
         var _expl = instance_create_layer(x, y, "Efeitos", obj_explosao_ar);
@@ -18,7 +24,7 @@ if (!instance_exists(target)) {
             _expl.image_yscale = 1.2;
         }
     }
-    instance_destroy();
+    scr_return_projectile_to_pool(id);
     exit;
 }
 
@@ -87,7 +93,7 @@ if (instance_exists(target)) {
 
         if (_hit) {
             if (object_exists(obj_explosao_ar)) instance_create_layer(x, y, "Efeitos", obj_explosao_ar);
-            instance_destroy();
+            scr_return_projectile_to_pool(id);
             exit;
         }
     }
@@ -97,5 +103,5 @@ if (instance_exists(target)) {
 timer_vida_atual--;
 if (timer_vida_atual <= 0) {
     if (object_exists(obj_explosao_ar)) instance_create_layer(x, y, "Efeitos", obj_explosao_ar);
-    instance_destroy();
+    scr_return_projectile_to_pool(id);
 }

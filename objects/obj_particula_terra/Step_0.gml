@@ -1,7 +1,15 @@
 // ===============================================
 // HEGEMONIA GLOBAL - STEP EVENT: PARTÍCULA DE TERRA
-// Animação da Partícula de Terra
+// Animação da Partícula de Terra (OTIMIZADO)
 // ===============================================
+
+// ✅ OTIMIZAÇÃO: Destruir partículas em zoom muito afastado
+var _lod_level = scr_get_lod_level();
+if (_lod_level == 0) {
+    // Zoom muito afastado - destruir partículas pequenas imediatamente
+    instance_destroy();
+    exit;
+}
 
 tempo_vida++;
 

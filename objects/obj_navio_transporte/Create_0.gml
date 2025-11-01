@@ -364,4 +364,12 @@ if (!ds_exists(pontos_patrulha, ds_type_list)) {
     pontos_patrulha = ds_list_create();
 }
 
+// =============================================
+// SISTEMA DE FRAME SKIP COM LOD
+// =============================================
+lod_level = 2;
+force_always_active = false;
+lod_process_index = irandom(99);
+skip_frames_enabled = true;
+
 show_debug_message("🚢 Navio Transporte criado - Sistema de embarque/desembarque ativo!");

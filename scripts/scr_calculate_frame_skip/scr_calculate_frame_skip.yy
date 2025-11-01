@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_calculate_frame_skip",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_calculate_frame_skip",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

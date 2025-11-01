@@ -229,12 +229,17 @@ switch (estado) {
             if (dist <= alcance_em_pixels) {
                 // Atira se estiver no alcance
                 if (atq_cooldown <= 0) {
-                    var b = instance_create_layer(x, y, layer, obj_tiro_infantaria);
-                    b.direction = point_direction(x, y, alvo_inimigo.x, alvo_inimigo.y);
-                    b.speed = 8;
-                    b.dano = ataque;
-                    b.alvo = alvo_inimigo;
-                    atq_cooldown = velocidade_de_ataque;
+                    var b = scr_get_projectile_from_pool(obj_tiro_infantaria, x, y, layer);
+                    if (instance_exists(b)) {
+                        b.direction = point_direction(x, y, alvo_inimigo.x, alvo_inimigo.y);
+                        b.speed = 8;
+                        b.dano = ataque;
+                        b.alvo = alvo_inimigo;
+                        if (variable_instance_exists(b, "timer_vida")) {
+                            b.timer_vida = 120;
+                        }
+                        atq_cooldown = velocidade_de_ataque;
+                    }
                 }
                 
                 // Se o inimigo está parado, o soldado também para

@@ -140,7 +140,7 @@ if (variable_instance_exists(id, "estado_embarque") && estado_embarque == "embar
                         var _alvo_aereo = _inimigos_aereos[i];
                         
                         if (instance_exists(_alvo_aereo)) {
-                            var _missil = instance_create_layer(x, y, "Instances", obj_SkyFury_ar);
+                            var _missil = scr_get_projectile_from_pool(obj_SkyFury_ar, x, y, "Instances");
                             if (instance_exists(_missil)) {
                                 _missil.target = _alvo_aereo;
                                 _missil.dono = id;
@@ -175,7 +175,7 @@ if (variable_instance_exists(id, "estado_embarque") && estado_embarque == "embar
                         var _alvo = _todos_terrestres_navais[i];
                         
                         if (instance_exists(_alvo)) {
-                            var _missil = instance_create_layer(x, y, "Instances", obj_Ironclad_terra);
+                            var _missil = scr_get_projectile_from_pool(obj_Ironclad_terra, x, y, "Instances");
                             if (instance_exists(_missil)) {
                                 _missil.target = _alvo;
                                 _missil.dono = id;
@@ -387,8 +387,6 @@ if (debug_timer >= 120) { // A cada 2 segundos
 
 // Chamar Step do pai (herda lógica de movimento, ataque, etc)
 // ✅ CORREÇÃO GM2040: Verificar se o objeto tem parent antes de chamar event_inherited
-if (variable_instance_exists(id, "parent") || object_index != -1) {
-    if (object_get_parent(object_index) != -1) {
-        event_inherited();
-    }
+if (object_get_parent(object_index) != -1) {
+    event_inherited();
 }

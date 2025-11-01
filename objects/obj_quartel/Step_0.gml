@@ -3,6 +3,14 @@
 // Sistema de Produção Terrestre com Fila
 // ===============================================
 
+// === PROTEÇÃO CONTRA DESATIVAÇÃO ===
+// ✅ CORREÇÃO: Garantir que quartel sempre esteja visível e ativo
+visible = true;
+if (!variable_instance_exists(id, "force_always_active") || !force_always_active) {
+    force_always_active = true;
+}
+instance_activate_object(id); // Garantir que está ativo
+
 // === SISTEMA DE VIDA ===
 // Verificar se HP chegou a 0 e destruir
 if (variable_instance_exists(id, "destrutivel") && variable_instance_exists(id, "hp_atual") && hp_atual <= 0) {
@@ -18,37 +26,73 @@ if (!variable_instance_exists(id, "step_counter")) {
 }
 step_counter++;
 
-// Mostrar debug a cada segundo (60 frames)
-if (step_counter % 60 == 0) {
-    show_debug_message("⚙️ Step executado - esta_treinando: " + string(esta_treinando) + " | Fila: " + string(ds_queue_size(fila_recrutamento)));
+// ✅ DEBUG: Informações importantes sempre
+var _fila_size = 0;
+if (ds_exists(fila_recrutamento, ds_type_queue)) {
+    _fila_size = ds_queue_size(fila_recrutamento);
+}
+
+// ✅ DEBUG MELHORADO: Informações a cada 3 segundos (180 frames) se tiver algo na fila ou estiver treinando
+if ((_fila_size > 0 || esta_treinando) && step_counter % 180 == 0) {
+    show_debug_message("⚙️ Quartel Step - Treinando: " + string(esta_treinando) + " | Fila: " + string(_fila_size) + " | Timer: " + string(tempo_treinamento_restante));
+}
+
+// ✅ DEBUG REDUZIDO: Apenas a cada 10 segundos se debug_enabled e não há atividade
+if (variable_global_exists("debug_enabled") && global.debug_enabled && _fila_size == 0 && !esta_treinando && step_counter % 600 == 0) {
+    show_debug_message("⚙️ Quartel Step - Ocioso - ID: " + string(id));
 }
 
 // === SISTEMA DE PRODUÇÃO COM FILA ===
 
 // ✅ CORREÇÃO: Iniciar produção se tiver unidades na fila mas não estiver treinando
-if (!esta_treinando && !ds_queue_empty(fila_recrutamento)) {
-    esta_treinando = true;
-    tempo_treinamento_restante = 0;
-    
-    // Obter próxima unidade da fila
-    var _indice_unidade = ds_queue_head(fila_recrutamento);
-    unidade_selecionada = _indice_unidade;
-    
-    var _unidade_data = ds_list_find_value(unidades_disponiveis, _indice_unidade);
-    if (_unidade_data != undefined) {
-        show_debug_message("🚀 Quartel iniciando treinamento de: " + _unidade_data.nome);
-        show_debug_message("📊 Unidades na fila: " + string(ds_queue_size(fila_recrutamento)));
+// Verificar se fila existe antes de usar
+if (ds_exists(fila_recrutamento, ds_type_queue)) {
+    if (!esta_treinando && !ds_queue_empty(fila_recrutamento)) {
+        esta_treinando = true;
+        tempo_treinamento_restante = 0;
+        
+        // Obter próxima unidade da fila
+        var _indice_unidade = ds_queue_head(fila_recrutamento);
+        unidade_selecionada = _indice_unidade;
+        
+        var _unidade_data = ds_list_find_value(unidades_disponiveis, _indice_unidade);
+        if (_unidade_data != undefined) {
+            show_debug_message("🚀 Quartel iniciando treinamento de: " + _unidade_data.nome);
+            show_debug_message("📊 Unidades na fila: " + string(ds_queue_size(fila_recrutamento)));
+        }
     }
+} else {
+    // Se fila não existe, recriar (proteção)
+    fila_recrutamento = ds_queue_create();
+    show_debug_message("⚠️ Fila de recrutamento recriada");
 }
 
 // Processar treinamento
-if (esta_treinando && !ds_queue_empty(fila_recrutamento)) {
+// ✅ CORREÇÃO: Verificar se fila existe antes de usar
+if (esta_treinando && ds_exists(fila_recrutamento, ds_type_queue) && !ds_queue_empty(fila_recrutamento)) {
     tempo_treinamento_restante++;
     
     var _indice_unidade = ds_queue_head(fila_recrutamento);
     var _unidade_data = ds_list_find_value(unidades_disponiveis, _indice_unidade);
     
-    if (_unidade_data != undefined) {
+    // ✅ CORREÇÃO CRÍTICA: Verificar se dados da unidade são válidos
+    if (_unidade_data == undefined) {
+        show_debug_message("❌ ERRO: Dados da unidade inválidos para índice " + string(_indice_unidade));
+        show_debug_message("❌ Removendo entrada inválida da fila");
+        ds_queue_dequeue(fila_recrutamento); // Remover entrada inválida
+        
+        // Verificar se há mais unidades na fila
+        if (!ds_queue_empty(fila_recrutamento)) {
+            tempo_treinamento_restante = 0; // Reset para próxima unidade
+            var _novo_indice = ds_queue_head(fila_recrutamento);
+            unidade_selecionada = _novo_indice;
+            show_debug_message("🔄 Tentando próxima unidade na fila...");
+        } else {
+            esta_treinando = false;
+            tempo_treinamento_restante = 0;
+            show_debug_message("🏁 Fila esvaziada após erro - Quartel ocioso");
+        }
+    } else {
         var _tempo_necessario = _unidade_data.tempo_treino;
         
         // Debug a cada segundo
@@ -65,16 +109,26 @@ if (esta_treinando && !ds_queue_empty(fila_recrutamento)) {
             var _spawn_x = x + sprite_width + _offset_x;
             var _spawn_y = y + sprite_height + _offset_y;
             
-            // ✅ REMOVER DA FILA APENAS UMA VEZ
-            ds_queue_dequeue(fila_recrutamento);
-            
             show_debug_message("✚ Criando: " + _unidade_data.nome);
             show_debug_message("📍 Posição: (" + string(_spawn_x) + ", " + string(_spawn_y) + ")");
             
             // Verificar se objeto existe antes de criar
             if (!object_exists(_unidade_data.objeto)) {
                 show_debug_message("❌ ERRO: Objeto '" + string(_unidade_data.objeto) + "' não existe!");
-                esta_treinando = false;
+                // ✅ CORREÇÃO: Remover da fila mesmo se falhar
+                ds_queue_dequeue(fila_recrutamento);
+                
+                // Verificar se há mais unidades na fila
+                if (!ds_queue_empty(fila_recrutamento)) {
+                    tempo_treinamento_restante = 0;
+                    var _novo_indice = ds_queue_head(fila_recrutamento);
+                    unidade_selecionada = _novo_indice;
+                    show_debug_message("🔄 Tentando próxima unidade na fila...");
+                } else {
+                    esta_treinando = false;
+                    tempo_treinamento_restante = 0;
+                    show_debug_message("🏁 Fila esvaziada após erro - Quartel ocioso");
+                }
             } else {
                 show_debug_message("📦 Criando instância do objeto: " + string(_unidade_data.objeto));
                 
@@ -107,8 +161,12 @@ if (esta_treinando && !ds_queue_empty(fila_recrutamento)) {
                     show_debug_message("🎯 Usando instance_create() direto → " + string(_unidade_criada));
                 }
                 
+                // ✅ CORREÇÃO CRÍTICA: Só remover da fila se criação foi bem-sucedida
                 if (instance_exists(_unidade_criada)) {
                     unidades_criadas++;
+                    
+                    // Remover da fila apenas após sucesso
+                    ds_queue_dequeue(fila_recrutamento);
                     
                     // Atribuir nação
                     if (variable_instance_exists(_unidade_criada, "nacao_proprietaria")) {
@@ -124,29 +182,67 @@ if (esta_treinando && !ds_queue_empty(fila_recrutamento)) {
                         _unidade_criada.selecionado = false;
                     }
                     
+                    // ✅ CORREÇÃO: Garantir que soldado anti-aéreo tenha variáveis de movimento
+                    if (_unidade_criada.object_index == obj_soldado_antiaereo) {
+                        if (!variable_instance_exists(_unidade_criada, "destino_x")) {
+                            _unidade_criada.destino_x = _unidade_criada.x;
+                        }
+                        if (!variable_instance_exists(_unidade_criada, "destino_y")) {
+                            _unidade_criada.destino_y = _unidade_criada.y;
+                        }
+                        if (!variable_instance_exists(_unidade_criada, "velocidade")) {
+                            _unidade_criada.velocidade = 2; // Velocidade padrão
+                        }
+                        if (!variable_instance_exists(_unidade_criada, "patrulha")) {
+                            _unidade_criada.patrulha = ds_list_create();
+                            _unidade_criada.patrulha_indice = 0;
+                            _unidade_criada.modo_patrulha = false;
+                        }
+                        show_debug_message("✅ Soldado Anti-Aéreo configurado com variáveis de movimento");
+                    }
+                    
                     show_debug_message("✅ " + _unidade_data.nome + " criada com sucesso! ID: " + string(_unidade_criada));
                     show_debug_message("📍 Posição final: (" + string(_unidade_criada.x) + ", " + string(_unidade_criada.y) + ")");
                     
                     if (variable_instance_exists(_unidade_criada, "nacao_proprietaria")) {
                         show_debug_message("🏴 Nação: " + string(_unidade_criada.nacao_proprietaria));
                     }
+                    
+                    // Próxima unidade ou parar produção
+                    if (!ds_queue_empty(fila_recrutamento)) {
+                        tempo_treinamento_restante = 0; // Reset para próxima unidade
+                        _indice_unidade = ds_queue_head(fila_recrutamento);
+                        unidade_selecionada = _indice_unidade;
+                        show_debug_message("🔄 Iniciando próximo treinamento...");
+                    } else {
+                        esta_treinando = false;
+                        tempo_treinamento_restante = 0;
+                        show_debug_message("🏁 Treinamento completo - Quartel ocioso");
+                    }
                 } else {
                     show_debug_message("❌ ERRO: Falha ao criar unidade! Objeto: " + string(_unidade_data.objeto));
                     show_debug_message("❌ Spawn pos: (" + string(_spawn_x) + ", " + string(_spawn_y) + ")");
+                    // ✅ CORREÇÃO: Remover da fila mesmo se falhar para não travar
+                    ds_queue_dequeue(fila_recrutamento);
+                    
+                    // Verificar se há mais unidades na fila
+                    if (!ds_queue_empty(fila_recrutamento)) {
+                        tempo_treinamento_restante = 0;
+                        var _novo_indice = ds_queue_head(fila_recrutamento);
+                        unidade_selecionada = _novo_indice;
+                        show_debug_message("🔄 Tentando próxima unidade na fila...");
+                    } else {
+                        esta_treinando = false;
+                        tempo_treinamento_restante = 0;
+                        show_debug_message("🏁 Fila esvaziada após erro - Quartel ocioso");
+                    }
                 }
-            }
-            
-            // Próxima unidade ou parar produção
-            if (!ds_queue_empty(fila_recrutamento)) {
-                tempo_treinamento_restante = 0; // Reset para próxima unidade
-                _indice_unidade = ds_queue_head(fila_recrutamento);
-                unidade_selecionada = _indice_unidade;
-                show_debug_message("🔄 Iniciando próximo treinamento...");
-            } else {
-                esta_treinando = false;
-                tempo_treinamento_restante = 0;
-                show_debug_message("🏁 Treinamento completo - Quartel ocioso");
             }
         }
     }
+} else if (esta_treinando && (ds_queue_empty(fila_recrutamento) || !ds_exists(fila_recrutamento, ds_type_queue))) {
+    // ✅ CORREÇÃO: Resetar estado se fila estiver vazia ou não existir
+    show_debug_message("⚠️ Quartel estava treinando mas fila está vazia ou não existe - resetando estado");
+    esta_treinando = false;
+    tempo_treinamento_restante = 0;
 }

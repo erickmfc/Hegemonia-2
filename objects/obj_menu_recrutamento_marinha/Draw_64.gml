@@ -195,19 +195,19 @@ if (_can_produce) {
         draw_sprite_ext(spr_lancha_patrulha, 0, _icon_x, _icon_y, 1.5, 1.5, 0, c_white, _anim.alpha);
         _sprite_desenhado = true;
     } else if (_navio.nome == "Constellation" && sprite_exists(spr_Constellation)) {
-        draw_sprite_ext(spr_Constellation, 0, _icon_x, _icon_y, 1.5, 1.5, 0, c_white, _anim.alpha);
+        draw_sprite_ext(spr_Constellation, 0, _icon_x, _icon_y, 0.975, 0.975, 0, c_white, _anim.alpha); // ✅ Reduzido 35% (de 1.5 para 0.975)
         _sprite_desenhado = true;
     } else if (_navio.nome == "Independence" && sprite_exists(spr_Independence)) {
-        draw_sprite_ext(spr_Independence, 0, _icon_x, _icon_y, 1.5, 1.5, 0, c_white, _anim.alpha);
+        draw_sprite_ext(spr_Independence, 0, _icon_x, _icon_y, 0.975, 0.975, 0, c_white, _anim.alpha); // ✅ Reduzido 35% (de 1.5 para 0.975)
         _sprite_desenhado = true;
     } else if (_navio.nome == "Ww-Hendrick" && sprite_exists(spr_wwhendrick)) {
-        draw_sprite_ext(spr_wwhendrick, 0, _icon_x, _icon_y, 2.0, 2.0, 0, c_white, _anim.alpha); // Escala maior (2x)
+        draw_sprite_ext(spr_wwhendrick, 0, _icon_x, _icon_y, 1.3, 1.3, 0, c_white, _anim.alpha); // ✅ Reduzido 35% (de 2.0 para 1.3)
         _sprite_desenhado = true;
         if (i == 0 || (animation_timer % 180 == 0)) { // Debug a cada 3 segundos
             show_debug_message("🌊 Sprite Ww-Hendrick desenhado! Pos: (" + string(_icon_x) + ", " + string(_icon_y) + ")");
         }
     } else if (_navio.nome == "Ronald Reagan" && sprite_exists(spr_RonaldReagan)) {
-        draw_sprite_ext(spr_RonaldReagan, 0, _icon_x, _icon_y, 1.5, 1.5, 0, c_white, _anim.alpha);
+        draw_sprite_ext(spr_RonaldReagan, 0, _icon_x, _icon_y, 0.975, 0.975, 0, c_white, _anim.alpha); // ✅ Reduzido 35% (de 1.5 para 0.975)
         _sprite_desenhado = true;
     }
     

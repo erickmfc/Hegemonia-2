@@ -17,8 +17,8 @@ function scr_inicializar_sistema() {
     global.construindo_agora = noone;
     global.unidade_selecionada = noone;
     
-    // Inicializar enums navais globais
-    scr_enums_navais();
+    // ✅ CORREÇÃO GM2039: scr_enums_navais contém apenas enums que são globais automaticamente
+    // Não precisa chamar - os enums já estão disponíveis quando o script é incluído no projeto
     
     // Inicializar sistema de recursos
     scr_inicializar_recursos();

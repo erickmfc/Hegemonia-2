@@ -41,14 +41,13 @@ function scr_ia_recrutar_unidade(_ia_id, _tipo_unidade, _quantidade) {
         return false;
     }
     
-    // 3. Procurar quartel disponível da IA
+    // 3. Procurar quartel da IA (pode estar treinando - fila aceita sempre)
     var _quartel_da_ia = noone;
     with (obj_quartel) {
         if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _ia.nacao_proprietaria) {
-            if (!variable_instance_exists(id, "esta_treinando") || !esta_treinando) {
-                _quartel_da_ia = id;
-                break;
-            }
+            // ✅ CORREÇÃO: Pode usar quartel mesmo se estiver treinando (fila aceita)
+            _quartel_da_ia = id;
+            break;
         }
     }
     
@@ -57,47 +56,49 @@ function scr_ia_recrutar_unidade(_ia_id, _tipo_unidade, _quantidade) {
         return false;
     }
     
-    // 4. Iniciar recrutamento no quartel
+    // ✅ CORREÇÃO: 4. Adicionar unidades à FILA do quartel (não usar alarm!)
     with (_quartel_da_ia) {
-        // Configurar variáveis de treinamento
-        if (!variable_instance_exists(id, "esta_treinando")) {
-            esta_treinando = false;
+        // Verificar se fila existe
+        if (!ds_exists(fila_recrutamento, ds_type_queue)) {
+            fila_recrutamento = ds_queue_create();
+            show_debug_message("⚠️ Fila de recrutamento criada");
         }
-        esta_treinando = true;
-        
-        // Definir quantidade
-        if (!variable_instance_exists(id, "unidades_para_criar")) {
-            unidades_para_criar = 1;
-        }
-        unidades_para_criar = _quantidade;
-        unidades_criadas = 0;
         
         // Encontrar índice da unidade nas unidades_disponiveis
+        var _idx_unidade = -1;
         if (variable_instance_exists(id, "unidades_disponiveis")) {
-            var _idx_encontrado = -1;
             for (var i = 0; i < ds_list_size(unidades_disponiveis); i++) {
                 var _data = ds_list_find_value(unidades_disponiveis, i);
                 if (is_struct(_data)) {
                     if (variable_struct_exists(_data, "objeto") && _data.objeto == _tipo_unidade) {
-                        _idx_encontrado = i;
+                        _idx_unidade = i;
                         break;
                     }
                 }
             }
-            
-            if (_idx_encontrado != -1) {
-                unidade_selecionada = _idx_encontrado;
-                show_debug_message("✅ IA definiu tipo de unidade: " + _nome_unidade + " (índice " + string(_idx_encontrado) + ")");
-            } else {
-                show_debug_message("⚠️ IA: Tipo não encontrado, usando infantaria como padrão");
-                unidade_selecionada = 0; // Fallback para infantaria
-            }
         }
         
-        // Configurar alarm (5 segundos para completar)
-        alarm[0] = 300; // 300 frames = 5 segundos
+        if (_idx_unidade == -1) {
+            show_debug_message("⚠️ IA: Tipo não encontrado, usando infantaria como padrão");
+            _idx_unidade = 0; // Fallback para infantaria
+        }
         
-        show_debug_message("✅ IA iniciou recrutamento de " + string(_quantidade) + " " + _nome_unidade);
+        // ✅ ADICIONAR MÚLTIPLAS UNIDADES À FILA
+        for (var j = 0; j < _quantidade; j++) {
+            ds_queue_enqueue(fila_recrutamento, _idx_unidade);
+        }
+        
+        show_debug_message("✅ IA adicionou " + string(_quantidade) + "x " + _nome_unidade + " à fila (índice " + string(_idx_unidade) + ")");
+        show_debug_message("📊 Tamanho da fila: " + string(ds_queue_size(fila_recrutamento)));
+        
+        // ✅ FORÇAR INÍCIO DE PRODUÇÃO SE ESTIVER OCIOSO
+        if (!variable_instance_exists(id, "esta_treinando") || !esta_treinando) {
+            show_debug_message("🚀 Quartel da IA está ocioso - iniciando produção imediatamente!");
+            esta_treinando = true;
+            tempo_treinamento_restante = 0;
+        } else {
+            show_debug_message("⏸️ Quartel da IA já está treinando - unidade adicionada à fila");
+        }
     }
     
     // 5. DEDUZIR recursos da IA

@@ -161,13 +161,13 @@ function scr_inicializar_ia() {
     
     // Configurar sistema de IA
     global.ia_ativa = true;
-    global.dificuldade_ia = "normal";
-    global.ia_agressividade = 0.5;
+    global.dificuldade_ia = "extremo"; // AUMENTADO de "normal" para "extremo"
+    global.ia_agressividade = 0.9; // AUMENTADO de 0.5 para 0.9
     
     // Inicializar comportamentos de IA
     global.ia_comportamentos = ds_map_create();
-    global.ia_comportamentos[? "defensivo"] = 0.3;
-    global.ia_comportamentos[? "agressivo"] = 0.7;
+    global.ia_comportamentos[? "defensivo"] = 0.1; // REDUZIDO de 0.3 para 0.1
+    global.ia_comportamentos[? "agressivo"] = 0.9; // AUMENTADO de 0.7 para 0.9
     
     show_debug_message("✅ Sistema de IA inicializado");
 }

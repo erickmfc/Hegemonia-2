@@ -2,6 +2,34 @@
 // HEGEMONIA GLOBAL - C-100 Transporte (Step)
 // ===============================================
 
+// =============================================
+// SISTEMA DE FRAME SKIP COM LOD (OTIMIZADO)
+// =============================================
+
+var should_always_process = (selecionado || 
+                              (variable_instance_exists(id, "force_always_active") && force_always_active) ||
+                              estado == "atacando" || estado == "embarcando" || estado == "desembarcando" ||
+                              modo_transporte == "embarcando" || modo_transporte == "desembarcando");
+
+if (!should_always_process && skip_frames_enabled) {
+    var current_lod = scr_get_lod_level();
+    var should_process = scr_calculate_frame_skip(current_lod, lod_process_index);
+    
+    if (!should_process) {
+        // Movimento simplificado para aviões
+        if (estado == "patrulhando" || estado == "movendo") {
+            var speed_mult = scr_get_speed_multiplier(current_lod, lod_process_index);
+            // Movimento básico mantendo direção
+            if (variable_instance_exists(id, "velocidade_atual")) {
+                x += lengthdir_x(velocidade_atual * speed_mult, image_angle);
+                y += lengthdir_y(velocidade_atual * speed_mult, image_angle);
+            }
+        }
+        exit;
+    }
+    lod_level = current_lod;
+}
+
 // --- 1. PROCESSAR INPUTS DO JOGADOR (SE SELECIONADO) ---
 if (selecionado) {
     // ✅ CORREÇÃO: Bloquear comandos de movimento quando em modo de embarque

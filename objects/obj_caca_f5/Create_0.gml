@@ -38,4 +38,12 @@ selecionado = false;
 estado_anterior = "pousado"; // Guarda o que o avião estava fazendo antes de atacar
 alvo_em_mira = noone;         // Guarda a ID do inimigo que está sendo caçado
 
+// =============================================
+// SISTEMA DE FRAME SKIP COM LOD
+// =============================================
+lod_level = 2;
+force_always_active = false;
+lod_process_index = irandom(99);
+skip_frames_enabled = true;
+
 show_debug_message("✈️ Caça F-5 criado - Sistema refatorado com comandos avançados e ataque agressivo");

@@ -2,19 +2,16 @@
 // HEGEMONIA GLOBAL - INPUT MANAGER (Step Corrigido com Patrulha Persistente)
 // ===============================================
 
-// --- LÓGICA DE INPUT DO MOUSE ---
-// Conversão de coordenadas do mouse para o mundo (com zoom)
-var _mouse_gui_x = device_mouse_x_to_gui(0);
-var _mouse_gui_y = device_mouse_y_to_gui(0);
-var _cam = view_camera[0];
-var _cam_x = camera_get_view_x(_cam);
-var _cam_y = camera_get_view_y(_cam);
-var _cam_w = camera_get_view_width(_cam);
-var _cam_h = camera_get_view_height(_cam);
-var _zoom_level_x = _cam_w / display_get_gui_width();
-var _zoom_level_y = _cam_h / display_get_gui_height();
-var _mx = _cam_x + (_mouse_gui_x * _zoom_level_x);
-var _my = _cam_y + (_mouse_gui_y * _zoom_level_y);
+// === DEBUG: VERIFICAR SE STEP_0 ESTÁ EXECUTANDO ===
+if (current_time mod 3000 < 17 && global.debug_enabled) {
+    show_debug_message("✅ obj_input_manager Step_0 executando | Room: " + room_get_name(room));
+}
+
+// --- LÓGICA DE INPUT DO MOUSE (OTIMIZADA) ---
+// ✅ CORREÇÃO: Usar função scr_mouse_to_world() diretamente
+var _coords = scr_mouse_to_world();
+var _mx = _coords[0];
+var _my = _coords[1];
 
 // --- MODO DE DEFINIÇÃO DE PATRULHA ---
 if (instance_exists(global.definindo_patrulha_unidade)) {
@@ -252,10 +249,60 @@ if (keyboard_check_pressed(ord("K")) && instance_exists(global.unidade_seleciona
     }
 }
 
+// --- CONTROLES DE TECLADO GLOBAIS: TECLAS C E B ---
+// ✅ CORREÇÃO: Adicionar no Step_0 para garantir funcionamento em todas as rooms
+
+// Inicializar variáveis se não existirem
+if (!variable_global_exists("modo_construcao")) {
+    global.modo_construcao = false;
+    show_debug_message("⚠️ global.modo_construcao inicializado no Step_0");
+}
+
+if (!variable_global_exists("menu_pesquisa_aberto")) {
+    global.menu_pesquisa_aberto = false;
+    show_debug_message("⚠️ global.menu_pesquisa_aberto inicializado no Step_0");
+}
+
+// === TECLA C: MODO DE CONSTRUÇÃO ===
+if (keyboard_check_pressed(ord("C"))) {
+    show_debug_message("🔨 TECLA C PRESSIONADA! Room: " + room_get_name(room));
+    global.modo_construcao = !global.modo_construcao;
+    show_debug_message("🔨 Modo construção agora: " + string(global.modo_construcao));
+    
+    // Debug: Verificar se o menu de construção existe
+    var _menu_instance = instance_find(obj_menu_construcao, 0);
+    if (instance_exists(_menu_instance)) {
+        show_debug_message("✅ Menu encontrado - ID: " + string(_menu_instance) + " | visible será atualizado pelo Step_0 do menu");
+    } else {
+        show_debug_message("⚠️ Menu não encontrado");
+    }
+    
+    if (!global.modo_construcao) {
+        global.construcao_selecionada = "";
+        global.construindo_agora = noone;
+    }
+}
+
+// === TECLA B: MENU DE PESQUISA ===
+if (keyboard_check_pressed(ord("B"))) {
+    show_debug_message("🔬 TECLA B PRESSIONADA! Room: " + room_get_name(room));
+    global.menu_pesquisa_aberto = !global.menu_pesquisa_aberto;
+    show_debug_message("🔬 Menu pesquisa agora: " + string(global.menu_pesquisa_aberto));
+    
+    // Debug: Verificar se o centro de pesquisa existe
+    var _research_instance = instance_find(obj_research_center, 0);
+    if (_research_instance == noone) {
+        _research_instance = instance_find(obj_centro_pesquisa, 0);
+    }
+    if (instance_exists(_research_instance)) {
+        show_debug_message("✅ Centro encontrado - ID: " + string(_research_instance));
+    } else {
+        show_debug_message("⚠️ Centro não encontrado");
+    }
+}
+
 // --- CONTROLES DE CÂMERA ---
 mouse_x_previous = window_mouse_get_x();
 mouse_y_previous = window_mouse_get_y();
-
-
 
 

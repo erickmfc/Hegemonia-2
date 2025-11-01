@@ -20,8 +20,25 @@ if (cam != noone) {
     
     // Verifica se os valores são válidos
     if (is_real(cam_x) && is_real(cam_y) && is_real(cam_w) && is_real(cam_h) && cam_w > 0 && cam_h > 0) {
-        // Margem extra para evitar pop-in
-        var margin = 256;
+        // ✅ OTIMIZADO: Margem dinâmica baseada em LOD para mapas grandes
+        // Calcular LOD diretamente para evitar dependência de script
+        var zoom = 0.95; // Default
+        if (instance_exists(obj_input_manager)) {
+            zoom = obj_input_manager.zoom_level;
+        }
+        var lod = 2; // Default: detalhe normal
+        if (zoom >= 2.0) lod = 3;
+        else if (zoom >= 0.8) lod = 2;
+        else if (zoom >= 0.4) lod = 1;
+        else lod = 0;
+        
+        var margin = 32; // Base
+        
+        if (lod == 0) {
+            margin = 8; // Zoom muito afastado - culling agressivo
+        } else if (lod == 1) {
+            margin = 16; // Zoom médio-afastado
+        }
         
         // Calcula quais tiles desenhar
         tile_start_x = floor((cam_x - margin) / global.tile_size);
@@ -52,9 +69,22 @@ if (cam != noone) {
 draw_set_color(c_black);
 draw_set_alpha(0.8);
 
-// ✅ OTIMIZAÇÃO: Desenhar apenas tiles visíveis
-for (var i = tile_start_x; i <= tile_end_x; i++) {
-    for (var j = tile_start_y; j <= tile_end_y; j++) {
+// ✅ OTIMIZAÇÃO: Sistema de LOD para tiles - pular tiles em zoom out
+// Calcular LOD diretamente para evitar dependência de script
+var zoom_tiles = 0.95; // Default
+if (instance_exists(obj_input_manager)) {
+    zoom_tiles = obj_input_manager.zoom_level;
+}
+var lod_tiles = 2; // Default: detalhe normal
+if (zoom_tiles >= 2.0) lod_tiles = 3;
+else if (zoom_tiles >= 0.8) lod_tiles = 2;
+else if (zoom_tiles >= 0.4) lod_tiles = 1;
+else lod_tiles = 0;
+var tile_skip = (lod_tiles == 0) ? 4 : ((lod_tiles == 1) ? 2 : 1); // Pular tiles em zoom out
+
+// ✅ OTIMIZAÇÃO: Desenhar apenas tiles visíveis com skip baseado em LOD
+for (var i = tile_start_x; i <= tile_end_x; i += tile_skip) {
+    for (var j = tile_start_y; j <= tile_end_y; j += tile_skip) {
         
         // Verificações de segurança MÁXIMAS
         if (i < 0 || i >= global.map_width || j < 0 || j >= global.map_height) continue;
@@ -68,8 +98,12 @@ for (var i = tile_start_x; i <= tile_end_x; i++) {
         var xx = i * global.tile_size;
         var yy = j * global.tile_size;
 
+        // ✅ OTIMIZADO: Reduzir verificações redundantes
+        var _j_check = j > 0 && j < array_length(global.map_grid[i]);
+        var _i_check = i > 0 && i < array_length(global.map_grid);
+        
         // Cima
-        if (j > 0 && j < array_length(global.map_grid[i]) && !is_undefined(global.map_grid[i][j-1]) && global.map_grid[i][j-1].nacao != minha_nacao) {
+        if (_j_check && !is_undefined(global.map_grid[i][j-1]) && global.map_grid[i][j-1].nacao != minha_nacao) {
             draw_line(xx, yy, xx + global.tile_size, yy);
         }
         // Baixo
@@ -77,7 +111,7 @@ for (var i = tile_start_x; i <= tile_end_x; i++) {
             draw_line(xx, yy + global.tile_size, xx + global.tile_size, yy + global.tile_size);
         }
         // Esquerda
-        if (i > 0 && i < array_length(global.map_grid) && !is_undefined(global.map_grid[i-1][j]) && global.map_grid[i-1][j].nacao != minha_nacao) {
+        if (_i_check && !is_undefined(global.map_grid[i-1][j]) && global.map_grid[i-1][j].nacao != minha_nacao) {
             draw_line(xx, yy, xx, yy + global.tile_size);
         }
         // Direita
@@ -91,16 +125,32 @@ draw_set_alpha(1);
 draw_set_color(c_white);
 
 // ===============================================
-// SISTEMA DE BARRAS DE VIDA INTEGRADO
+// SISTEMA DE BARRAS DE VIDA INTEGRADO (OTIMIZADO)
 // ===============================================
+// ✅ OTIMIZAÇÃO: Desenhar barras TODOS os frames (removido frame skip que causava piscar)
+// ✅ CORREÇÃO: Desenhar sempre para evitar piscar - performance já está otimizada com culling
 if (global.barras_vida_ativas) {
     
     // === FUNÇÃO LOCAL PARA DESENHAR BARRA BÁSICA ===
     function desenhar_barra_basica(_obj, _offset_y) {
         if (!instance_exists(_obj)) return;
         if (!_obj.visible) return;  // ✅ RE-ADICIONADO: Verificar visibilidade
-        if (!variable_instance_exists(_obj, "hp_atual") || !variable_instance_exists(_obj, "hp_max")) return;
-        if (_obj.hp_atual <= 0) return;
+        
+        // ✅ CORREÇÃO: Aceitar tanto hp_atual/hp_max quanto vida/vida_max
+        var _hp_atual = 0;
+        var _hp_max = 1;
+        
+        if (variable_instance_exists(_obj, "hp_atual") && variable_instance_exists(_obj, "hp_max")) {
+            _hp_atual = _obj.hp_atual;
+            _hp_max = _obj.hp_max;
+        } else if (variable_instance_exists(_obj, "vida") && variable_instance_exists(_obj, "vida_max")) {
+            _hp_atual = _obj.vida;
+            _hp_max = _obj.vida_max;
+        } else {
+            return; // Não tem variáveis de vida
+        }
+        
+        if (_hp_atual <= 0) return;
         
         var _barra_w = 50;
         var _barra_h = 6;
@@ -113,7 +163,7 @@ if (global.barras_vida_ativas) {
         draw_rectangle(_barra_x, _barra_y, _barra_x + _barra_w, _barra_y + _barra_h, false);
         
         // Vida atual
-        var _vida_percentual = _obj.hp_atual / _obj.hp_max;
+        var _vida_percentual = _hp_atual / _hp_max;
         var _vida_w = _barra_w * _vida_percentual;
         
         var _cor_vida = c_green;
@@ -133,7 +183,7 @@ if (global.barras_vida_ativas) {
         draw_set_halign(fa_center);
         draw_set_valign(fa_middle);
         draw_set_color(c_white);
-        draw_text(_barra_x + _barra_w/2, _barra_y - 8, string(_obj.hp_atual) + "/" + string(_obj.hp_max));
+        draw_text(_barra_x + _barra_w/2, _barra_y - 8, string(_hp_atual) + "/" + string(_hp_max));
         
         draw_set_halign(fa_left);
         draw_set_valign(fa_top);
@@ -144,8 +194,22 @@ if (global.barras_vida_ativas) {
     function desenhar_barra_avancada(_obj, _offset_y) {
         if (!instance_exists(_obj)) return;
         if (!_obj.visible) return;  // ✅ RE-ADICIONADO: Verificar visibilidade
-        if (!variable_instance_exists(_obj, "hp_atual") || !variable_instance_exists(_obj, "hp_max")) return;
-        if (_obj.hp_atual <= 0) return;
+        
+        // ✅ CORREÇÃO: Aceitar tanto hp_atual/hp_max quanto vida/vida_max
+        var _hp_atual = 0;
+        var _hp_max = 1;
+        
+        if (variable_instance_exists(_obj, "hp_atual") && variable_instance_exists(_obj, "hp_max")) {
+            _hp_atual = _obj.hp_atual;
+            _hp_max = _obj.hp_max;
+        } else if (variable_instance_exists(_obj, "vida") && variable_instance_exists(_obj, "vida_max")) {
+            _hp_atual = _obj.vida;
+            _hp_max = _obj.vida_max;
+        } else {
+            return; // Não tem variáveis de vida
+        }
+        
+        if (_hp_atual <= 0) return;
         
         var _barra_w = 60;
         var _barra_h = 8;
@@ -158,7 +222,7 @@ if (global.barras_vida_ativas) {
         draw_rectangle(_barra_x, _barra_y, _barra_x + _barra_w, _barra_y + _barra_h, false);
         
         // Vida atual
-        var _vida_percentual = _obj.hp_atual / _obj.hp_max;
+        var _vida_percentual = _hp_atual / _hp_max;
         var _vida_w = _barra_w * _vida_percentual;
         
         var _cor_vida = c_green;
@@ -178,7 +242,7 @@ if (global.barras_vida_ativas) {
         draw_set_halign(fa_center);
         draw_set_valign(fa_middle);
         draw_set_color(c_white);
-        draw_text(_barra_x + _barra_w/2, _barra_y - 12, string(_obj.hp_atual) + "/" + string(_obj.hp_max));
+        draw_text(_barra_x + _barra_w/2, _barra_y - 12, string(_hp_atual) + "/" + string(_hp_max));
         
         // Estado (se existir)
         if (variable_instance_exists(_obj, "estado")) {
@@ -218,6 +282,13 @@ if (global.barras_vida_ativas) {
     with (obj_helicoptero_militar) {
         if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) {
             desenhar_barra_avancada(id, -25);
+        }
+    }
+
+    // C-100 TRANSPORTE
+    with (obj_c100) {
+        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) {
+            desenhar_barra_avancada(id, -30);
         }
     }
 

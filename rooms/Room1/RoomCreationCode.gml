@@ -3,6 +3,14 @@
 
 if (global.debug_enabled) show_debug_message("Room1 creation code executando...");
 
+// === CONFIGURAÇÃO CRÍTICA DA GUI ===
+// Garante que a GUI funcione corretamente para detecção de cliques
+display_set_gui_maximise(1, 1, 0, 0);
+if (global.debug_enabled) {
+    show_debug_message("✅ GUI configurado na Room1 com display_set_gui_maximise");
+    show_debug_message("   GUI Width: " + string(display_get_gui_width()) + " | Height: " + string(display_get_gui_height()));
+}
+
 // === CRIAÇÃO DE INSTÂNCIAS ESSENCIAIS ===
 
 // Dashboard para exibir recursos
@@ -62,6 +70,27 @@ if (object_exists(obj_ui_manager)) {
     }
 }
 
+// Input Manager (CRÍTICO PARA WASD)
+// ✅ CORREÇÃO: obj_input_manager é PERSISTENTE, então só criar se não existir ainda
+if (!instance_exists(obj_input_manager)) {
+    if (object_exists(obj_input_manager)) {
+        var _input_manager_instance = instance_create_layer(0, 0, "rm_mapa_principal", obj_input_manager);
+        if (global.debug_enabled && instance_exists(_input_manager_instance)) {
+            show_debug_message("✅ Input Manager criado na Room1 - ID: " + string(_input_manager_instance));
+            show_debug_message("   WASD habilitado para movimentação da câmera");
+        } else {
+            show_debug_message("❌ ERRO: Falha ao criar Input Manager - WASD não funcionará!");
+        }
+    } else {
+        show_debug_message("❌ ERRO: obj_input_manager não existe - WASD não funcionará!");
+    }
+} else {
+    if (global.debug_enabled) {
+        var _existing_instance = instance_find(obj_input_manager, 0);
+        show_debug_message("✅ Input Manager já existe (persistente) - ID: " + string(_existing_instance));
+    }
+}
+
 // === CRIAÇÃO DE INIMIGOS PARA TESTE ===
 if (global.debug_enabled) show_debug_message("=== CRIANDO INIMIGOS PARA TESTE ===");
 
@@ -95,12 +124,13 @@ if (object_exists(obj_inimigo)) {
 }
 
 // === CRIAÇÃO DA IA PRESIDENTE 1 ===
-if (object_exists(obj_presidente_1)) {
-    var _ia_instance = instance_create_layer(800, 600, "rm_mapa_principal", obj_presidente_1);
-    if (instance_exists(_ia_instance)) {
-        show_debug_message("🤖 IA Presidente 1 criada na posição (800, 600) - ID: " + string(_ia_instance));
-    }
-}
+// Removido temporariamente - adicione obj_presidente_1 manualmente no mapa quando desejar
+// if (object_exists(obj_presidente_1)) {
+//     var _ia_instance = instance_create_layer(800, 600, "rm_mapa_principal", obj_presidente_1);
+//     if (instance_exists(_ia_instance)) {
+//         show_debug_message("🤖 IA Presidente 1 criada na posição (800, 600) - ID: " + string(_ia_instance));
+//     }
+// }
 
 if (global.debug_enabled) {
 show_debug_message("🎯 Total de inimigos criados: " + string(inimigos_criados));

@@ -24,3 +24,9 @@ velocidade_max = speed * 1.2; // Velocidade máxima em linha reta
 // GM2016: Timers de vida declarados no Create event
 timer_vida_maximo = 72; // 1.2 segundos de vida
 timer_vida_atual = timer_vida_maximo;
+
+// === SISTEMA DE POOLING ===
+pooled = false; // false = disponível no pool, true = em uso
+
+// === CONTADOR PARA FUMACA (reduzir rastro) ===
+contador_fumaca = 0;

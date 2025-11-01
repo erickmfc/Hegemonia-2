@@ -193,11 +193,11 @@ for (var i = 0; i < min(_total_aeronaves, 6); i++) {
     if (_aeronave.nome == "Caça F-5" && sprite_exists(spr_caca_f5)) {
         draw_sprite_ext(spr_caca_f5, 0, _icon_x, _icon_y, 1.5, 1.5, 0, c_white, _anim.alpha);
     } else if (_aeronave.nome == "F-15 Eagle" && sprite_exists(spr_f15)) {
-        draw_sprite_ext(spr_f15, 0, _icon_x, _icon_y, 1.5, 1.5, 0, c_white, _anim.alpha);
+        draw_sprite_ext(spr_f15, 0, _icon_x, _icon_y, 0.75, 0.75, 0, c_white, _anim.alpha); // ✅ Reduzido 50%
     } else if (_aeronave.nome == "Helicóptero Militar" && sprite_exists(spr_helicoptero_militar)) {
         draw_sprite_ext(spr_helicoptero_militar, 0, _icon_x, _icon_y, 1.5, 1.5, 0, c_white, _anim.alpha);
     } else if (_aeronave.nome == "C-100 Transporte" && sprite_exists(spr_c100)) {
-        draw_sprite_ext(spr_c100, 0, _icon_x, _icon_y, 1.5, 1.5, 0, c_white, _anim.alpha);
+        draw_sprite_ext(spr_c100, 0, _icon_x, _icon_y, 0.75, 0.75, 0, c_white, _anim.alpha); // ✅ Reduzido 50%
     }
     
     // Descrição

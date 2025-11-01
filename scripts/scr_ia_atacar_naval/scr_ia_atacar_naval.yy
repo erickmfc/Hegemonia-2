@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_ia_atacar_naval",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_ia_atacar_naval",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

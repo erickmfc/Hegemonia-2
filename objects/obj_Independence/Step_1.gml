@@ -157,17 +157,39 @@ if ((modo_combate == LanchaMode.ATAQUE || estado == LanchaState.ATACANDO) && ins
                 var _alvo = _inimigos_terrestres[i];
                 
                 if (instance_exists(_alvo)) {
-                    var _tiro = instance_create_layer(canhao_instancia.x, canhao_instancia.y, "Instances", obj_tiro_canhao);
+                    var _tiro = scr_get_projectile_from_pool(obj_tiro_canhao, canhao_instancia.x, canhao_instancia.y, "Instances");
                     if (instance_exists(_tiro)) {
                         _tiro.alvo = _alvo;
                         _tiro.dono = id;
+                        if (variable_instance_exists(_tiro, "timer_vida")) {
+                            _tiro.timer_vida = 240;
+                        }
                         _tiros_este_frame++;
                         
-                        // Som do canhão (apenas no primeiro tiro)
+                        // ✅ CORREÇÃO: Som do canhão apenas se estiver visível na câmera (apenas no primeiro tiro)
+                        // Verificação inline (sem depender de script)
                         if (_tiros_este_frame == 1) {
-                            var _sound_index = asset_get_index("tiro_torreta");
-                            if (_sound_index != -1) {
-                                audio_play_sound(tiro_torreta, 5, false);
+                            var _cam = view_camera[0];
+                            var _visivel = true; // Fallback: considerar visível
+                            if (_cam != -1 && _cam != noone && camera_exists(_cam)) {
+                                var _cam_x = camera_get_view_x(_cam);
+                                var _cam_y = camera_get_view_y(_cam);
+                                var _cam_w = camera_get_view_width(_cam);
+                                var _cam_h = camera_get_view_height(_cam);
+                                if (_cam_w > 0 && _cam_h > 0) {
+                                    var _margin = 100;
+                                    var _view_left = _cam_x - _margin;
+                                    var _view_right = _cam_x + _cam_w + _margin;
+                                    var _view_top = _cam_y - _margin;
+                                    var _view_bottom = _cam_y + _cam_h + _margin;
+                                    _visivel = (x >= _view_left && x <= _view_right && y >= _view_top && y <= _view_bottom);
+                                }
+                            }
+                            if (_visivel) {
+                                var _sound_index = asset_get_index("tiro_torreta");
+                                if (_sound_index != -1) {
+                                    audio_play_sound(tiro_torreta, 5, false);
+                                }
                             }
                         }
                         
@@ -232,8 +254,8 @@ if ((modo_combate == LanchaMode.ATAQUE || estado == LanchaState.ATACANDO) && ins
             var _alvo_aereo = _inimigos_aereos[i];
             
             if (instance_exists(_alvo_aereo)) {
-                // Criar míssil SkyFury
-                var _missil = instance_create_layer(x, y, "Instances", obj_SkyFury_ar);
+                // Criar míssil SkyFury via pool
+                var _missil = scr_get_projectile_from_pool(obj_SkyFury_ar, x, y, "Instances");
                 if (instance_exists(_missil)) {
                     _missil.target = _alvo_aereo;
                     _missil.dono = id;
@@ -311,8 +333,8 @@ if ((modo_combate == LanchaMode.ATAQUE || estado == LanchaState.ATACANDO) && ins
             var _alvo_terrestre = _inimigos_terrestres[i];
             
             if (instance_exists(_alvo_terrestre)) {
-                // Criar míssil Ironclad
-                var _missil_iron = instance_create_layer(x, y, "Instances", obj_Ironclad_terra);
+                // Criar míssil Ironclad via pool
+                var _missil_iron = scr_get_projectile_from_pool(obj_Ironclad_terra, x, y, "Instances");
                 if (instance_exists(_missil_iron)) {
                     _missil_iron.target = _alvo_terrestre;
                     _missil_iron.alvo = _alvo_terrestre;

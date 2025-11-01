@@ -10,5 +10,11 @@
 // === VERIFICAÇÃO DE DESTRUIÇÃO ===
 // Se morrer → destrói
 if (vida <= 0) {
+    // =============================================
+    // DESTROY - Invalidar cache quando inimigo é destruído
+    // =============================================
+    // Invalidar cache relacionado a este inimigo
+    scr_invalidate_enemy_cache(id);
+    
     instance_destroy();
 }

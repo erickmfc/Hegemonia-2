@@ -1,5 +1,17 @@
-/// @description Inserir descrição aqui
-// Você pode escrever seu código neste editor
+/// @description Desenho do tanque com otimização
+
+// =============================================
+// DRAW - Otimizado com verificação de visibilidade
+// =============================================
+
+// ✅ OTIMIZAÇÃO: Verificar se deve desenhar
+if (!scr_should_draw(id)) {
+    if (instance_exists(obj_draw_optimizer)) {
+        obj_draw_optimizer.objects_skipped++;
+    }
+    exit;
+}
+
 draw_self();
 
 // Seleção (estilo da infantaria)

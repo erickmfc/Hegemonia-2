@@ -61,7 +61,9 @@ show_debug_message("   - Debug global ativado: " + string(global.debug_enabled))
 // Testar mensagens de debug
 show_debug_message("🔧 TESTE: Mensagem de debug básica");
 show_debug_message("🔧 TESTE: Mensagem com variável - Debug: " + string(global.debug_enabled));
-show_debug_message("🔧 TESTE: Mensagem com timestamp - Frame: " + string(current_frame));
+// ✅ CORREÇÃO: Usar global.game_frame ao invés de current_frame
+var _frame_num = variable_global_exists("game_frame") ? global.game_frame : 0;
+show_debug_message("🔧 TESTE: Mensagem com timestamp - Frame: " + string(_frame_num));
 
 // 4. VERIFICAÇÃO DE PERFORMANCE DO DEBUG
 show_debug_message("📊 VERIFICAÇÃO DE PERFORMANCE DO DEBUG:");

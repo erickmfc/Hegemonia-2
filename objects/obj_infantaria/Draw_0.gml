@@ -1,24 +1,23 @@
 /// @description Desenho do soldado com feedback visual
 
+// =============================================
+// DRAW - Otimizado com verificação de visibilidade
+// =============================================
+
+// ✅ OTIMIZAÇÃO: Verificar se deve desenhar antes de processar
+if (!scr_should_draw(id)) {
+    // Pular desenho se estiver fora da tela ou em LOD baixo
+    if (instance_exists(obj_draw_optimizer)) {
+        obj_draw_optimizer.objects_skipped++;
+    }
+    exit;
+}
+
 // Desenha o soldado (assumindo que tem sprite)
 draw_self();
 
-// Barra de vida
-if (vida < vida_max) {
-    var bar_width = 30;
-    var bar_height = 4;
-    var bar_x = x - bar_width/2;
-    var bar_y = y - 20;
-    
-    // Fundo da barra (vermelho)
-    draw_set_color(c_red);
-    draw_rectangle(bar_x, bar_y, bar_x + bar_width, bar_y + bar_height, false);
-    
-    // Vida atual (verde)
-    draw_set_color(c_green);
-    var vida_width = (vida / vida_max) * bar_width;
-    draw_rectangle(bar_x, bar_y, bar_x + vida_width, bar_y + bar_height, false);
-}
+// ✅ CORREÇÃO: Barra de vida removida - agora é desenhada pelo obj_game_manager centralizadamente
+// Isso evita conflito e piscar das barras
 
 // Indicador de seleção
 if (selecionado) {

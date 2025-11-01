@@ -3,12 +3,16 @@
 // Desenha botões com design moderno e fonte maior
 // =========================================================
 
-function scr_desenhar_botao_moderno(_x, _y, _width, _height, _text, _enabled) {
+function scr_desenhar_botao_moderno(_x, _y, _width, _height, _text, _enabled, _mouse_x = -1, _mouse_y = -1) {
+    
+    // ✅ OTIMIZADO: Calcular mouse apenas se não fornecido
+    if (_mouse_x < 0 || _mouse_y < 0) {
+        _mouse_x = device_mouse_x_to_gui(0);
+        _mouse_y = device_mouse_y_to_gui(0);
+    }
     
     // Verificar se mouse está sobre o botão
-    var _mouse_gui_x = device_mouse_x_to_gui(0);
-    var _mouse_gui_y = device_mouse_y_to_gui(0);
-    var _hover = point_in_rectangle(_mouse_gui_x, _mouse_gui_y, _x, _y, _x + _width, _y + _height);
+    var _hover = point_in_rectangle(_mouse_x, _mouse_y, _x, _y, _x + _width, _y + _height);
     
     // === CORES BASEADAS NO ESTADO ===
     var _bg_color, _text_color, _border_color;

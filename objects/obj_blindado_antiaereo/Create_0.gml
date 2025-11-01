@@ -39,3 +39,11 @@ especializacao = "antiaerea"; // Tipo de especialização
 // Voltando ao sistema de tiro original
 
 show_debug_message("Blindado Anti-Aéreo criado - HP: " + string(hp) + ", Dano: " + string(dano) + ", Velocidade: " + string(velocidade));
+
+// =============================================
+// SISTEMA DE FRAME SKIP COM LOD
+// =============================================
+lod_level = 2;                    // Nível de detalhe inicial (0-3)
+force_always_active = false;      // true = nunca pula frames
+lod_process_index = irandom(99);  // Índice único para distribuir processamento
+skip_frames_enabled = true;       // Habilitar frame skip

@@ -213,3 +213,11 @@ atualizar_penalidade_carga = function() {
     
     carga_anterior = carga_usada;
 }
+
+// =============================================
+// SISTEMA DE FRAME SKIP COM LOD
+// =============================================
+lod_level = 2;
+force_always_active = false;
+lod_process_index = irandom(99);
+skip_frames_enabled = true;

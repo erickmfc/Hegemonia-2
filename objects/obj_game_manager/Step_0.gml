@@ -9,6 +9,22 @@ global.game_frame++;
 // Resetar contador de debug a cada frame
 global.debug_reset_frame();
 
+// === SISTEMA DE LOD E OTIMIZAÇÃO PARA MAPAS GRANDES ===
+// Executar apenas a cada 5 frames para não sobrecarregar
+// ✅ CORREÇÃO: Usar global.game_frame ao invés de current_frame
+// ✅ DESABILITADO: Estava fazendo unidades sumirem ao mudar de local
+if (global.game_frame mod 5 == 0) {
+    // Gerenciar ativação/desativação de instâncias
+    // scr_manage_instance_lod(); // DESABILITADO - causava sumiço de unidades
+}
+
+// ✅ OTIMIZAÇÃO: Reconstruir spatial grid a cada 60 frames (1 segundo a 60 FPS)
+if (variable_global_exists("spatial_grid_initialized") && global.spatial_grid_initialized) {
+    if (global.game_frame mod 60 == 0) {
+        scr_rebuild_spatial_grid();
+    }
+}
+
 // --- SISTEMA DE DEBUG GLOBAL ---
 // A seleção agora é gerenciada pelo obj_controlador_unidades
 // Este objeto foca apenas no debug e inicialização

@@ -8,8 +8,8 @@ nacao_proprietaria = 2; // 2 = IA Inimiga
 nome_ia = "Presidente 1";
 
 // === SISTEMA DE DECISÃO ===
-intervalo_decisao = 300; // A cada 5 segundos (60 FPS × 5)
-timer_decisao = intervalo_decisao; // Começar com timer completo para dar tempo de inicializar
+intervalo_decisao = 150; // A cada 2.5 segundos (60 FPS × 2.5) - DECISÃO MAIS RÁPIDA
+timer_decisao = 60; // Começar mais rápido - Primeiro ataque em ~1 minuto (foi 300/5s)
 
 // === PRIORIDADES DA IA ===
 prioridade_economia = 0.4;  // 40% focar em economia

@@ -34,7 +34,9 @@ if (x < 0 || x > room_width || y < 0 || y > room_height) {
 }
 
 // === COLISÃO E DANO ===
-if (point_distance(x, y, alvo.x, alvo.y) <= 15) { // Colisão mais generosa
+// ✅ CORREÇÃO: Usar velocidade + margem para detecção de colisão (evita passar direto)
+var _raio_colisao = max(speed + 10, 20); // Raio baseado na velocidade + margem
+if (point_distance(x, y, alvo.x, alvo.y) <= _raio_colisao) {
     
     // === VERIFICAÇÃO DE PRECISÃO ===
     var _acerto = (random(1) < precisao);
@@ -63,21 +65,40 @@ if (point_distance(x, y, alvo.x, alvo.y) <= 15) { // Colisão mais generosa
             show_debug_message("💥 Míssil AR-CURTO atingiu alvo aéreo! Dano: " + string(dano) + " | Vida restante: " + string(alvo.vida));
         }
         
-        // === EXPLOSÃO AÉREA ===
-        if (object_exists(obj_explosao_aquatica)) {
-            var _explosao = instance_create_depth(x, y, 0, obj_explosao_aquatica);
+        // ✅ CORREÇÃO: Usar obj_explosao_ar para explosões aéreas (tem som configurado)
+        if (object_exists(obj_explosao_ar)) {
+            var _explosao = instance_create_layer(x, y, "Efeitos", obj_explosao_ar);
             if (instance_exists(_explosao)) {
-                _explosao.image_blend = make_color_rgb(255, 100, 100); // Vermelho para explosão aérea
-                _explosao.image_xscale = 2.0; // Explosão menor
+                _explosao.image_blend = make_color_rgb(255, 150, 0); // Laranja para explosão aérea
+                _explosao.image_xscale = 1.5;
+                _explosao.image_yscale = 1.5;
+                show_debug_message("💥 Explosão aérea criada!");
+            }
+        } else if (object_exists(obj_explosao_aquatica)) {
+            // Fallback para obj_explosao_aquatica se obj_explosao_ar não existir
+            var _explosao = instance_create_layer(x, y, "Efeitos", obj_explosao_aquatica);
+            if (instance_exists(_explosao)) {
+                _explosao.image_blend = make_color_rgb(255, 100, 100);
+                _explosao.image_xscale = 2.0;
                 _explosao.image_yscale = 2.0;
                 _explosao.image_angle = random(360);
             }
         }
     } else {
         show_debug_message("🎯 Míssil AR-CURTO errou o alvo! Precisão: " + string(precisao * 100) + "%");
+        // Criar explosão mesmo ao errar (visual)
+        if (object_exists(obj_explosao_ar)) {
+            var _explosao = instance_create_layer(x, y, "Efeitos", obj_explosao_ar);
+            if (instance_exists(_explosao)) {
+                _explosao.image_blend = make_color_rgb(100, 100, 100); // Cinza para indicar erro
+                _explosao.image_xscale = 1.0;
+                _explosao.image_yscale = 1.0;
+            }
+        }
     }
     
     instance_destroy();
+    exit;
 }
 
 // === TIMER DE VIDA ===

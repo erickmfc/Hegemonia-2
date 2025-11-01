@@ -8,6 +8,28 @@
 function scr_ia_construir(_ia_id, _objeto_tipo, _x, _y) {
     var _ia = _ia_id;
     
+    // ✅ NOVO: Usar posicionamento estratégico se tipo for conhecido
+    var _tipo_estrutura = "economia"; // Default
+    
+    if (_objeto_tipo == obj_fazenda || _objeto_tipo == obj_mina) {
+        _tipo_estrutura = "economia";
+    } else if (_objeto_tipo == obj_quartel) {
+        _tipo_estrutura = "militar";
+    } else if (_objeto_tipo == obj_quartel_marinha) {
+        _tipo_estrutura = "naval";
+    } else if (_objeto_tipo == obj_aeroporto_militar) {
+        _tipo_estrutura = "aereo";
+    }
+    
+    // ✅ NOVO: Encontrar posição estratégica (evita grudar)
+    var _pos_estrategica = scr_ia_encontrar_posicao_estrategica(_ia, _tipo_estrutura, 250);
+    
+    // Usar posição estratégica se válida, senão usar a recebida
+    if (_pos_estrategica.valida) {
+        _x = _pos_estrategica.x;
+        _y = _pos_estrategica.y;
+    }
+    
     // 1. Obter custos
     var _custo_d = 0;
     var _custo_m = 0;
@@ -25,6 +47,14 @@ function scr_ia_construir(_ia_id, _objeto_tipo, _x, _y) {
         _custo_d = 300;
         _custo_m = 100;
         _nome_edificio = "Mina";
+    } else if (_objeto_tipo == obj_quartel_marinha) {
+        _custo_d = 600;
+        _custo_m = 350;
+        _nome_edificio = "Quartel Naval";
+    } else if (_objeto_tipo == obj_aeroporto_militar) {
+        _custo_d = 800;
+        _custo_m = 500;
+        _nome_edificio = "Aeroporto Militar";
     }
     
     // 2. Verificar recursos

@@ -73,6 +73,14 @@ ordem_mover = function(dest_x, dest_y) {
     estado_anterior = "pousado";
 }
 
+// =============================================
+// SISTEMA DE FRAME SKIP COM LOD
+// =============================================
+lod_level = 2;
+force_always_active = false;
+lod_process_index = irandom(99);
+skip_frames_enabled = true;
+
 show_debug_message("✈️ Caça F-15 criado - Sistema de mísseis avançado");
 show_debug_message("HP: " + string(hp_atual) + " | Velocidade: " + string(velocidade_maxima));
 show_debug_message("📏 Tamanho: " + string(image_xscale) + "x" + string(image_yscale));

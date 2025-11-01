@@ -3,6 +3,18 @@
 // Draw Event - Interface Limpa e Profissional
 // ================================================
 
+// =============================================
+// DRAW - Otimizado com verificação de visibilidade
+// =============================================
+
+// ✅ OTIMIZAÇÃO: Verificar se deve desenhar
+if (!scr_should_draw(id)) {
+    if (instance_exists(obj_draw_optimizer)) {
+        obj_draw_optimizer.objects_skipped++;
+    }
+    exit;
+}
+
 // === DESENHAR SPRITE PRINCIPAL ===
 if (sprite_exists(sprite_index)) {
     // Desenhar sprite com configurações visuais

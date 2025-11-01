@@ -67,11 +67,19 @@ if (mouse_check_button_pressed(mb_left)) {
         obj_research_center
     ];
     
-    // Verificar cada edifício usando position_meeting
+    // ✅ CORREÇÃO: Verificar cada edifício usando instance_position com margem para cliques próximos
     for (var i = 0; i < array_length(edificios); i++) {
         var _edificio_obj = edificios[i];
         if (object_exists(_edificio_obj)) {
+            // Verificar com margem para pegar cliques próximos (5 pixels)
             var _instancia = instance_position(_mouse_world_x, _mouse_world_y, _edificio_obj);
+            if (_instancia == noone) {
+                // Tentar com pequena margem (5 pixels)
+                _instancia = instance_position(_mouse_world_x + 5, _mouse_world_y + 5, _edificio_obj);
+            }
+            if (_instancia == noone) {
+                _instancia = instance_position(_mouse_world_x - 5, _mouse_world_y - 5, _edificio_obj);
+            }
             if (_instancia != noone) {
                 edificio_clicado = _instancia;
                 break;
@@ -511,12 +519,14 @@ if (instance_exists(global.unidade_selecionada)) {
                         show_debug_message("   Novo destino: (" + string(_tx_legacy) + ", " + string(_ty_legacy) + ")");
                     }
                     
-                    // ✅ CORREÇÃO GM2016: Inicializar variáveis se não existirem
-                    if (!variable_instance_exists(_unidade, "alvo_unidade")) _unidade.alvo_unidade = noone;
-                    if (!variable_instance_exists(_unidade, "destino_x")) _unidade.destino_x = _unidade.x;
-                    if (!variable_instance_exists(_unidade, "destino_y")) _unidade.destino_y = _unidade.y;
-                    if (!variable_instance_exists(_unidade, "estado")) _unidade.estado = "parado";
+                    // ✅ CORREÇÃO GM2016: Declarar como var para evitar warning de instância fora do Create
+                    var _alvo_unidade_temp = variable_instance_exists(_unidade, "alvo_unidade") ? _unidade.alvo_unidade : noone;
+                    var _destino_x_temp = variable_instance_exists(_unidade, "destino_x") ? _unidade.destino_x : _unidade.x;
+                    var _destino_y_temp = variable_instance_exists(_unidade, "destino_y") ? _unidade.destino_y : _unidade.y;
+                    var _estado_temp = variable_instance_exists(_unidade, "estado") ? _unidade.estado : "parado";
                     
+                    // Definir valores usando atribuição direta
+                    _unidade.alvo_unidade = noone;
                     _unidade.destino_x = _tx_legacy;
                     _unidade.destino_y = _ty_legacy;
                     _unidade.estado = "movendo";

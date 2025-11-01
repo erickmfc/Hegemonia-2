@@ -6,7 +6,7 @@
 
 // === VERIFICAÇÃO DE SEGURANÇA ===
 if (!instance_exists(alvo)) {
-    instance_destroy();
+    scr_return_projectile_to_pool(id);
     exit;
 }
 
@@ -67,7 +67,7 @@ if (instance_exists(alvo) && point_distance(x, y, alvo.x, alvo.y) <= 20) { // Ra
                 }
             }
             
-            instance_destroy();
+            scr_return_projectile_to_pool(id);
         }
     } else {
         // Passar pelo dono/aliado sem causar dano
@@ -78,5 +78,6 @@ if (instance_exists(alvo) && point_distance(x, y, alvo.x, alvo.y) <= 20) { // Ra
 // === TIMER DE VIDA ===
 timer_vida--;
 if (timer_vida <= 0) {
-    instance_destroy();
+    scr_return_projectile_to_pool(id);
+    exit;
 }

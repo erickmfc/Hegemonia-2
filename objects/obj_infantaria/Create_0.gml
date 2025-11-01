@@ -38,3 +38,14 @@ alvo = noone;
 
 // Para seguir
 seguir_alvo = noone;
+
+// Modo de combate
+modo_ataque = true; // Por padrão, ataca automaticamente
+
+// =============================================
+// SISTEMA DE FRAME SKIP COM LOD
+// =============================================
+lod_level = 2;                    // Nível de detalhe inicial (0-3)
+force_always_active = false;      // true = nunca pula frames
+lod_process_index = irandom(99);  // Índice único para distribuir processamento
+skip_frames_enabled = true;       // Habilitar frame skip

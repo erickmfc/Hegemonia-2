@@ -27,3 +27,14 @@ alvo = noone;
 
 // Vida
 hp = 100; // bem mais resistente
+
+// Modo de combate
+modo_ataque = true; // Por padrão, ataca automaticamente
+
+// =============================================
+// SISTEMA DE FRAME SKIP COM LOD
+// =============================================
+lod_level = 2;
+force_always_active = false;
+lod_process_index = irandom(99);
+skip_frames_enabled = true;

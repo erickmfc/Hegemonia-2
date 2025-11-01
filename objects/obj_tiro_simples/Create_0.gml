@@ -22,6 +22,9 @@ image_angle = 0;                   // Ângulo inicial
 visible = true;                    // GARANTIR QUE ESTÁ VISÍVEL
 depth = -1000;                     // PROFUNDIDADE PARA FICAR NA FRENTE
 
+// === SISTEMA DE POOLING ===
+pooled = false; // false = disponível no pool, true = em uso
+
 show_debug_message("🚀 Tiro simples criado - CONFIGURAÇÃO CORRIGIDA!");
 show_debug_message("📏 Sprite: air (44x11 pixels)");
 show_debug_message("📏 Escala: " + string(image_xscale) + "x" + string(image_yscale));

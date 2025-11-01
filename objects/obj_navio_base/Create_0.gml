@@ -120,14 +120,19 @@ func_atacar_alvo = function() {
     var d = point_distance(x, y, alvo_unidade.x, alvo_unidade.y);
     if (d <= missil_alcance) {
         if (reload_timer <= 0) {
-            var _tiro = instance_create_layer(x, y, "Instances", obj_tiro_simples);
-            _tiro.alvo = alvo_unidade;
-            _tiro.dono = id;
-            _tiro.dano = 25;
-            _tiro.speed = 8;
-            _tiro.direction = point_direction(x, y, alvo_unidade.x, alvo_unidade.y);
-            reload_timer = reload_time;
-            timer_ataque = reload_timer; // Sincronizar
+            var _tiro = scr_get_projectile_from_pool(obj_tiro_simples, x, y, "Instances");
+            if (instance_exists(_tiro)) {
+                _tiro.alvo = alvo_unidade;
+                _tiro.dono = id;
+                _tiro.dano = 25;
+                _tiro.speed = 8;
+                if (variable_instance_exists(_tiro, "timer_vida")) {
+                    _tiro.timer_vida = 300;
+                }
+                _tiro.direction = point_direction(x, y, alvo_unidade.x, alvo_unidade.y);
+                reload_timer = reload_time;
+                timer_ataque = reload_timer; // Sincronizar
+            }
         }
         estado = LanchaState.ATACANDO;
     } else {

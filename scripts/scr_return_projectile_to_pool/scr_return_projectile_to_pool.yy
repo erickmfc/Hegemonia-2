@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_return_projectile_to_pool",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_return_projectile_to_pool",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

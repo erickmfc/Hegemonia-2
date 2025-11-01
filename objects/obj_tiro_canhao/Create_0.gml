@@ -23,4 +23,7 @@ image_angle = 0;
 visible = true;
 depth = -1000; // Profundidade para ficar na frente
 
+// === SISTEMA DE POOLING ===
+pooled = false; // false = disponível no pool, true = em uso
+
 show_debug_message("🔫 Tiro do canhão criado - Velocidade: " + string(speed) + ", Dano: " + string(dano));

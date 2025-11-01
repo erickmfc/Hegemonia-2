@@ -6,7 +6,7 @@ if (irandom(2) == 0) {
     }
 }
 
-// Se o alvo não existir mais, destruir o míssil
+// Se o alvo não existir mais, retornar ao pool
 if (!instance_exists(target)) {
     // Explosão automática quando o alvo desaparece
     if (object_exists(obj_explosao_terra)) {
@@ -17,7 +17,7 @@ if (!instance_exists(target)) {
             _explosao.image_yscale = 1.2;
         }
     }
-    instance_destroy();
+    scr_return_projectile_to_pool(id);
     exit;
 }
 
@@ -87,7 +87,7 @@ if (instance_exists(target)) {
         if (object_exists(obj_explosao_terra)) {
             instance_create_layer(x, y, "Efeitos", obj_explosao_terra);
         }
-        instance_destroy();
+        scr_return_projectile_to_pool(id);
         exit;
     }
 }
@@ -108,5 +108,5 @@ if (timer_vida_atual <= 0) {
             _explosao.image_yscale = 1.5;
         }
     }
-    instance_destroy();
+    scr_return_projectile_to_pool(id);
 }

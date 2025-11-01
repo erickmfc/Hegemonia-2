@@ -33,8 +33,14 @@ if (global.construindo_agora != noone) {
             _escala = 2.7; // ✅ ESCALA REDUZIDA 10% PARA SPRITE PEQUENO (64x64 -> 172x172)
         }
         
+        // ✅ CORREÇÃO: Ajustar posição considerando offset do sprite para alinhar com o mouse
+        // O grid_x/grid_y é calculado baseado no mouse, então o sprite deve ser desenhado
+        // considerando que grid_x/y representa o centro ou ponto de origem do edifício
+        var _draw_x = grid_x;
+        var _draw_y = grid_y;
+        
         // Desenha o sprite com 50% de transparência para dar o efeito de "fantasma"
-        draw_sprite_ext(_sprite_fantasma, 0, grid_x, grid_y, _escala, _escala, 0, c_white, 0.5);
+        draw_sprite_ext(_sprite_fantasma, 0, _draw_x, _draw_y, _escala, _escala, 0, c_white, 0.5);
     } else {
         // DEBUG: Mostrar informações sobre o sprite que não foi encontrado
         show_debug_message("❌ FANTASMA NÃO DESENHADO:");

@@ -4,7 +4,7 @@
 // ==========================================
 
 // Só desenha se o menu estiver visível
-show_debug_message("DEBUG DRAW: menu_visivel = " + string(menu_visivel));
+// ✅ REMOVIDO: Debug excessivo que causava lentidão (executado a cada frame)
 if (!menu_visivel) exit;
 
 // === DESENHAR FUNDO DO MENU ===

@@ -3,25 +3,22 @@
 // Correção para zoom instável e movimentação demorada
 // ===============================================
 
-// === DEBUG CONTÍNUO (A CADA 3 SEGUNDOS) ===
-if (current_time mod 3000 < 17) { // Aprox. a cada 3 segundos
+// === DEBUG CONTÍNUO (REDUZIDO PARA MELHOR PERFORMANCE) ===
+if (current_time mod 10000 < 17 && global.debug_enabled) { // ✅ Alterado de 3000 para 10000 (10 segundos)
     show_debug_message("[INPUT] Modo construção: " + string(global.modo_construcao) + " | Construindo: " + string(global.construindo_agora));
+    show_debug_message("[INPUT] Input Manager está ativo? SIM | Step_2 executando | Room: " + room_get_name(room));
 }
 
-// === SISTEMA DE ZOOM ROBUSTO ===
+// === SISTEMA DE ZOOM ROBUSTO COM LIMITES ===
 var _wheel = mouse_wheel_down() - mouse_wheel_up();
 if (_wheel != 0) {
     // ✅ CORREÇÃO: Zoom mais suave e responsivo
-    var _zoom_factor = 0.15; // Aumentar sensibilidade
-    var _old_zoom = zoom_level;
+    var _zoom_factor = 0.25; // ✅ Aumentado para zoom mais responsivo com range maior
     
     zoom_level -= _wheel * _zoom_factor;
-    zoom_level = clamp(zoom_level, 0.2, 3.0); // Ampliar range de zoom
-    
-    // Debug do zoom
-    if (abs(_old_zoom - zoom_level) > 0.01) {
-        show_debug_message("🔍 ZOOM: " + string(_old_zoom) + " → " + string(zoom_level) + " (Δ" + string(_wheel) + ")");
-    }
+    // ✅ LIMITE MÍNIMO: 3.5 (não pode diminuir mais - jogo fica lento)
+    // ✅ LIMITE MÁXIMO: 25.0 (pode ampliar bastante)
+    zoom_level = clamp(zoom_level, 3.5, 25.0);
 }
 
 // === SISTEMA DE MOVIMENTO DE CÂMERA ROBUSTO ===
@@ -34,48 +31,85 @@ if (mouse_check_button(mb_middle)) {
     camera_x -= _dx * zoom_level * _move_sensitivity;
     camera_y -= _dy * zoom_level * _move_sensitivity;
     
-    // Debug do movimento
-    if (abs(_dx) > 2 || abs(_dy) > 2) {
-        show_debug_message("📷 CÂMERA: (" + string(camera_x) + ", " + string(camera_y) + ") Δ(" + string(_dx) + ", " + string(_dy) + ")");
+    // ✅ REMOVIDO: Debug do movimento da câmera que causa lentidão
+    // Debug removido para melhorar performance
+}
+
+// === CONTROLE POR TECLADO WASD (FUNCIONA SEMPRE, EXCETO EM CONSTRUÇÃO) ===
+// ✅ CORREÇÃO: WASD deve funcionar mesmo com menus abertos (mas não durante construção)
+if (!instance_exists(global.construindo_edificio)) {
+    // ✅ CORREÇÃO: Velocidade inversamente proporcional ao zoom - zoom alto = movimento mais lento
+    var _spd = camera_speed * (1.0 / zoom_level) * 4.0;
+    
+    // Debug temporário para verificar se WASD está sendo detectado
+    var _wasd_pressed = false;
+    
+    if (keyboard_check(ord("W"))) { 
+        camera_y -= _spd;
+        _wasd_pressed = true;
+    }
+    if (keyboard_check(ord("S"))) { 
+        camera_y += _spd;
+        _wasd_pressed = true;
+    }
+    if (keyboard_check(ord("A"))) { 
+        camera_x -= _spd;
+        _wasd_pressed = true;
+    }
+    if (keyboard_check(ord("D"))) { 
+        camera_x += _spd;
+        _wasd_pressed = true;
+    }
+    
+    // ✅ REMOVIDO: Debug excessivo do WASD que causa lentidão
+    // Debug removido para melhorar performance
+} else {
+    // Debug: Mostrar por que WASD está bloqueado
+    if (current_time mod 3000 < 17) {
+        show_debug_message("⚠️ WASD bloqueado - Construindo edifício: " + string(global.construindo_edificio));
     }
 }
 
-// === CONTROLE POR TECLADO MELHORADO ===
-var _spd = camera_speed * zoom_level * 1.5; // ✅ CORREÇÃO: Velocidade aumentada
-if (keyboard_check(ord("W"))) { 
-    camera_y -= _spd;
-    show_debug_message("⬆️ CÂMERA: W - Y: " + string(camera_y));
-}
-if (keyboard_check(ord("S"))) { 
-    camera_y += _spd;
-    show_debug_message("⬇️ CÂMERA: S - Y: " + string(camera_y));
-}
-if (keyboard_check(ord("A"))) { 
-    camera_x -= _spd;
-    show_debug_message("⬅️ CÂMERA: A - X: " + string(camera_x));
-}
-if (keyboard_check(ord("D"))) { 
-    camera_x += _spd;
-    show_debug_message("➡️ CÂMERA: D - X: " + string(camera_x));
+// === LIMITAR POSIÇÃO DA CÂMERA PARA EVITAR BUGS ===
+// ✅ CORREÇÃO: Zoom deve DIVIDIR (não multiplicar) - zoom maior = câmera menor = ver mais perto
+var _cam_w_planned = room_width / zoom_level;
+var _cam_h_planned = room_height / zoom_level;
+
+// ✅ Limitar posição da câmera permitindo apenas 10 pixels de borda preta fora do mapa
+var _borda_maxima = 10; // Apenas 10 pixels de borda fora do mapa
+camera_x = clamp(camera_x, _cam_w_planned / 2 - _borda_maxima, room_width - _cam_w_planned / 2 + _borda_maxima);
+camera_y = clamp(camera_y, _cam_h_planned / 2 - _borda_maxima, room_height - _cam_h_planned / 2 + _borda_maxima);
+
+// === ATUALIZAÇÃO IMEDIATA DA CÂMERA (COM CACHE) ===
+// ✅ OTIMIZAÇÃO: Cachear dimensões da câmera para evitar atualizações desnecessárias
+// ✅ CORREÇÃO GM2016: Usar variáveis locais em vez de instância fora do Create
+var _cam_cache_w = variable_instance_exists(id, "cam_cache_w") ? cam_cache_w : -1;
+var _cam_cache_h = variable_instance_exists(id, "cam_cache_h") ? cam_cache_h : -1;
+
+// Só atualizar câmera se as dimensões mudaram
+if (_cam_cache_w != _cam_w_planned || _cam_cache_h != _cam_h_planned) {
+    camera_set_view_size(camera, _cam_w_planned, _cam_h_planned);
+    // ✅ CORREÇÃO GM2016: Variáveis já declaradas no Create, apenas atualizar
+    cam_cache_w = _cam_w_planned;
+    cam_cache_h = _cam_h_planned;
 }
 
-// === ATUALIZAÇÃO IMEDIATA DA CÂMERA ===
-// ✅ CORREÇÃO: Atualizar câmera IMEDIATAMENTE para evitar lag
-var _cam_w = room_width * zoom_level;
-var _cam_h = room_height * zoom_level;
-camera_set_view_size(camera, _cam_w, _cam_h);
-camera_set_view_pos(camera, camera_x - _cam_w / 2, camera_y - _cam_h / 2);
+// Atualizar posição sempre (mas dimensões apenas quando necessário)
+camera_set_view_pos(camera, camera_x - _cam_w_planned / 2, camera_y - _cam_h_planned / 2);
 
 // === SISTEMA DE COORDENADAS UNIFICADO ===
-// ✅ CORREÇÃO: Criar função global para coordenadas
+// ✅ CORREÇÃO: Criar função global para coordenadas (compatibilidade)
 if (!variable_global_exists("scr_mouse_to_world")) {
     // Função global para conversão de coordenadas
     global.scr_mouse_to_world = function() {
         // Usar nossa função centralizada
         return scr_mouse_to_world();
     };
-    show_debug_message("✅ Função global scr_mouse_to_world inicializada");
 }
+
+// === REMOVIDO: COMANDOS DE TECLADO C E B ===
+// ✅ CORREÇÃO: Teclas C e B foram movidas para Step_0 para evitar duplicação
+// As teclas agora são processadas apenas no Step_0 para evitar toggle duplo
 
 // --- LÓGICA DE INPUT DE JOGO (LEGACY COM SUPORTE A ZOOM) ---
 if (instance_exists(global.construindo_edificio)) {
@@ -100,12 +134,10 @@ if (instance_exists(global.construindo_edificio)) {
         instance_destroy(global.construindo_edificio);
         global.construindo_edificio = noone;
     }
-} else {
-    // Research menu control - Press B to open/close
-    if (keyboard_check_pressed(ord("B"))) {
-        global.menu_pesquisa_aberto = !global.menu_pesquisa_aberto;
-        show_debug_message("Research menu toggled: " + string(global.menu_pesquisa_aberto));
-    }
+}
+
+// === OUTROS COMANDOS DE DEBUG E TESTE ===
+if (!instance_exists(global.construindo_edificio)) {
     
     // === DEBUG: TECLA T PARA TESTAR SISTEMA DE PESQUISA ===
     if (keyboard_check_pressed(ord("T"))) {
@@ -173,36 +205,6 @@ if (instance_exists(global.construindo_edificio)) {
     // === TESTE DE FUNCIONAMENTO DO TECLADO ===
     if (keyboard_check_pressed(ord("X"))) {
         show_debug_message("*** TECLA X FUNCIONA! O TECLADO ESTÁ RESPONDENDO ***");
-    }
-    
-
-
-    // === TECLA C PARA ATIVAR/DESATIVAR MODO DE CONSTRUÇÃO ===
-    if (keyboard_check_pressed(ord("C"))) {
-        show_debug_message("=== TECLA C PRESSIONADA ===");
-        show_debug_message("Estado atual global.modo_construcao: " + string(global.modo_construcao));
-        
-        // DEBUG: Verificar se o menu de construção existe
-        var _menu_instance = instance_find(obj_menu_construcao, 0);
-        if (instance_exists(_menu_instance)) {
-            show_debug_message("MENU ENCONTRADO! ID: " + string(_menu_instance) + " | Visível: " + string(_menu_instance.visible));
-        } else {
-            show_debug_message("ERRO: Menu de construção NÃO encontrado!");
-        }
-        
-        global.modo_construcao = !global.modo_construcao;
-        
-        if (global.modo_construcao) {
-            show_debug_message("MODO DE CONSTRUÇÃO: ATIVADO");
-            show_debug_message("Verificar se menu aparece na tela");
-        } else {
-            show_debug_message("MODO DE CONSTRUÇÃO: DESATIVADO");
-            global.construcao_selecionada = ""; // Limpa seleção ao desativar
-            global.construindo_agora = noone; // Limpa seleção de construção
-        }
-        
-        show_debug_message("Novo estado global.modo_construcao: " + string(global.modo_construcao));
-        show_debug_message("===========================");
     }
     
     // === COMANDOS TÁTICOS PARA UNIDADES SELECIONADAS (REMOVIDOS - DUPLICADOS) ===
@@ -329,11 +331,8 @@ if (instance_exists(global.construindo_edificio)) {
 mouse_x_previous = window_mouse_get_x();
 mouse_y_previous = window_mouse_get_y();
 
-// ATUALIZAR CÂMERA PRIMEIRO para sincronizar com cálculos de coordenadas
-var _cam_w_final = room_width * zoom_level;
-var _cam_h_final = room_height * zoom_level;
-camera_set_view_size(camera, _cam_w_final, _cam_h_final);
-camera_set_view_pos(camera, camera_x - _cam_w_final / 2, camera_y - _cam_h_final / 2);
+// ✅ OTIMIZAÇÃO: Removida atualização duplicada da câmera (já atualizada acima com cache)
+// A câmera já é atualizada no início do Step com sistema de cache
 
 // === COMANDOS DE TESTE ===
 // Tecla T: Teste de sistema

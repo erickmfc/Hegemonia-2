@@ -1,7 +1,15 @@
 // ===============================================
 // HEGEMONIA GLOBAL - STEP EVENT: PARTÍCULA DE FOGO
-// Animação da Partícula de Fogo
+// Animação da Partícula de Fogo (OTIMIZADO)
 // ===============================================
+
+// ✅ OTIMIZAÇÃO: Destruir partículas em zoom muito afastado
+var _lod_level = scr_get_lod_level();
+if (_lod_level == 0) {
+    // Zoom muito afastado - destruir partículas pequenas imediatamente
+    instance_destroy();
+    exit;
+}
 
 tempo_vida++;
 

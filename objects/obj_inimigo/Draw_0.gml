@@ -3,22 +3,20 @@
 // Draw Event - Sistema Simples e Funcional
 // ================================================
 
+// =============================================
+// DRAW - Otimizado com verificação de visibilidade
+// =============================================
+
+// ✅ OTIMIZAÇÃO: Verificar se deve desenhar
+if (!scr_should_draw(id)) {
+    if (instance_exists(obj_draw_optimizer)) {
+        obj_draw_optimizer.objects_skipped++;
+    }
+    exit;
+}
+
 // === DESENHAR O SPRITE BASE ===
 draw_self();
 
-// === BARRA DE VIDA SIMPLES ===
-var w = 40;
-var h = 5;
-var vida_maxima = 500; // Vida máxima do inimigo
-var perc = max(0, vida) / vida_maxima;
-
-// Background da barra (vermelho)
-draw_set_color(make_color_rgb(255, 0, 0));
-draw_rectangle(x - w/2, y - 40, x + w/2, y - 40 + h, false);
-
-// Vida restante (verde)
-draw_set_color(make_color_rgb(0, 255, 0));
-draw_rectangle(x - w/2, y - 40, x - w/2 + (w * perc), y - 40 + h, false);
-
-// Reset da cor
-draw_set_color(make_color_rgb(255, 255, 255));
+// ✅ CORREÇÃO: Barra de vida removida - agora é desenhada pelo obj_game_manager centralizadamente
+// Isso evita conflito e piscar das barras

@@ -1,5 +1,32 @@
 /// @description Lógica principal do navio (movimento, ataque, patrulha)
 
+// =============================================
+// SISTEMA DE FRAME SKIP COM LOD (OTIMIZADO)
+// =============================================
+
+var should_always_process = (selecionado || 
+                              (variable_instance_exists(id, "force_always_active") && force_always_active) ||
+                              estado == LanchaState.ATACANDO || submerso);
+
+if (!should_always_process && skip_frames_enabled) {
+    var current_lod = scr_get_lod_level();
+    var should_process = scr_calculate_frame_skip(current_lod, lod_process_index);
+    
+    if (!should_process) {
+        if (estado == LanchaState.MOVENDO) {
+            var speed_mult = scr_get_speed_multiplier(current_lod, lod_process_index);
+            if (variable_instance_exists(id, "destino_x")) {
+                var still_moving = scr_process_lod_simple_movement(id, destino_x, destino_y, velocidade_movimento, speed_mult);
+                if (!still_moving && estado == LanchaState.MOVENDO) {
+                    estado = LanchaState.PARADO;
+                }
+            }
+        }
+        exit;
+    }
+    lod_level = current_lod;
+}
+
 // --- 1. PROCESSAR INPUTS DO JOGADOR (SE SELECIONADO) ---
 if (selecionado) {
     // Comandos de Modo (P/O)

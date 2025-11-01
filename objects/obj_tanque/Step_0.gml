@@ -1,3 +1,69 @@
+// =============================================
+// ✅ STANDBY DESABILITADO PARA UNIDADES INIMIGAS
+// (Sistema estava impedindo ataque da IA)
+// =============================================
+/*
+if (scr_is_enemy_unit(id)) {
+    if (variable_instance_exists(id, "standby_mode") && standby_mode) {
+        // Unidade em standby - apenas atualizar posição básica se estiver movendo
+        if (variable_instance_exists(id, "estado") && estado == "movendo") {
+            // Movimento simplificado em standby (apenas a cada 3 frames)
+            var _frame_count = (variable_global_exists("game_frame") ? global.game_frame : current_time) % 3;
+            if (_frame_count != 0) {
+                exit; // Pular Step
+            }
+            // Continuar para processar movimento simplificado abaixo
+            var dist_destino = point_distance(x, y, destino_x, destino_y);
+            if (dist_destino > velocidade * 2) {
+                var dir_x = destino_x - x;
+                var dir_y = destino_y - y;
+                var dist_norm = point_distance(0, 0, dir_x, dir_y);
+                if (dist_norm > 0) {
+                    x += (dir_x / dist_norm) * velocidade * 2;
+                    y += (dir_y / dist_norm) * velocidade * 2;
+                }
+            } else {
+                x = destino_x;
+                y = destino_y;
+                estado = "parado";
+            }
+        }
+        exit; // Unidade parada em standby - pular Step completamente
+    }
+}
+*/
+
+// =============================================
+// SISTEMA DE FRAME SKIP COM LOD (OTIMIZADO)
+// =============================================
+
+// ✅ SEMPRE processar se selecionado ou em combate crítico
+var should_always_process = (selecionado || 
+                              (variable_instance_exists(id, "force_always_active") && force_always_active) ||
+                              estado == "atacando");
+
+// ✅ Se não for sempre processar, verificar frame skip
+if (!should_always_process && skip_frames_enabled) {
+    // Obter LOD atual usando script otimizado
+    var current_lod = scr_get_lod_level();
+    
+    // Calcular se deve pular este frame
+    var should_process = scr_calculate_frame_skip(current_lod, lod_process_index);
+    
+    if (!should_process) {
+        // Frame skip: movimento simplificado apenas
+        if (estado == "movendo") {
+            var speed_mult = scr_get_speed_multiplier(current_lod, lod_process_index);
+            var still_moving = scr_process_lod_simple_movement(id, destino_x, destino_y, velocidade, speed_mult);
+            if (!still_moving && estado == "movendo") {
+                estado = "parado";
+            }
+        }
+        exit;
+    }
+    lod_level = current_lod;
+}
+
 // =======================
 // RESFRIAMENTO DO TIRO
 // =======================
@@ -6,8 +72,8 @@ if (atq_cooldown > 0) atq_cooldown--;
 // =======================
 // DETECÇÃO DE INIMIGOS (melhorada)
 // =======================
-// Procura inimigos sempre, exceto quando em movimento manual
-if (estado != "movendo") {
+// ✅ CORRIGIDO: Unidades podem procurar inimigos mesmo movendo
+if (modo_ataque) {
     // Se não está atacando ou perdeu o alvo, procurar novo alvo
     if (estado != "atacando" || alvo == noone || !instance_exists(alvo)) {
         // ✅ CORREÇÃO: Usar scr_buscar_inimigo() para considerar nacao_proprietaria
@@ -19,24 +85,44 @@ if (estado != "movendo") {
         
         if (alvo != noone && instance_exists(alvo) && point_distance(x, y, alvo.x, alvo.y) <= alcance_visao) {
             estado = "atacando";
-            show_debug_message("🎯 Tanque encontrou inimigo - atacando!");
-        } else {
-            // Se não há alvo próximo, volta para patrulha se tiver pontos
-            if (ds_list_size(patrulha) > 0) {
-                estado = "patrulhando";
-            } else {
-                estado = "parado";
-            }
+            if (global.debug_enabled) show_debug_message("🎯 Tanque encontrou inimigo - atacando!");
         }
     }
+} else if (!modo_ataque) {
+    // Modo passivo - não ataca
+    alvo = noone;
+    if (estado == "atacando") estado = "parado";
 }
 
-// CONTROLES (iguais ao soldado, com coordenadas de mundo)
+// CONTROLES
 if (selecionado) {
+    // ✅ NOVO: Modo Passivo (P)
+    if (keyboard_check_pressed(ord("P"))) {
+        modo_ataque = false;
+        alvo = noone;
+        if (estado == "atacando") estado = "parado";
+        if (global.debug_enabled) show_debug_message("🛡️ Tanque - Modo PASSIVO");
+    }
+    
+    // ✅ NOVO: Modo Ataque (O)
+    if (keyboard_check_pressed(ord("O"))) {
+        modo_ataque = true;
+        if (global.debug_enabled) show_debug_message("⚔️ Tanque - Modo ATAQUE");
+    }
+    
+    // ✅ NOVO: Parar (L)
+    if (keyboard_check_pressed(ord("L"))) {
+        estado = "parado";
+        alvo = noone;
+        modo_patrulha = false;
+        if (global.debug_enabled) show_debug_message("⏹️ Tanque - PARADO");
+    }
+    
+    // Movimento com clique direito (se não estiver no modo patrulha)
     // Mover com clique direito
     if (mouse_check_button_pressed(mb_right) && !modo_patrulha) {
-        // ✅ CORREÇÃO: Usar função global para coordenadas precisas
-        var _coords = global.scr_mouse_to_world();
+        // ✅ CORREÇÃO: Usar função para coordenadas precisas
+        var _coords = scr_mouse_to_world();
         var world_x = _coords[0];
         var world_y = _coords[1];
         
@@ -124,8 +210,8 @@ if (selecionado) {
     
     // Adicionar pontos de patrulha com clique direito quando em modo patrulha
     if (modo_patrulha && mouse_check_button_pressed(mb_right)) {
-        // ✅ CORREÇÃO: Usar função global para coordenadas precisas
-        var _coords = global.scr_mouse_to_world();
+        // ✅ CORREÇÃO: Usar função para coordenadas precisas
+        var _coords = scr_mouse_to_world();
         var px = _coords[0];
         var py = _coords[1];
         
@@ -239,22 +325,46 @@ switch (estado) {
             if (dist <= alcance_tiro) {
                 // Atira se estiver no alcance
                 if (atq_cooldown <= 0) {
-                    var b = instance_create_layer(x, y, layer, obj_tiro_infantaria);
-                    b.direction = point_direction(x, y, alvo.x, alvo.y);
-                    b.speed = 12;      // mais rápido que infantaria
-                    b.dano = 70;       // DOBRO DO DANO (era 35, agora 70)
-                    b.dano_area = 40;  // Dano de área para explosão
-                    b.raio_area = 80;  // Raio de explosão (80 pixels)
-                    b.eh_tiro_tanque = true; // Flag para identificar tiro de tanque
-                    b.alvo = alvo;     // manter alvo
-                    b.image_blend = c_yellow; // cor amarela para diferenciar
+                    var b = scr_get_projectile_from_pool(obj_tiro_infantaria, x, y, layer);
+                    if (instance_exists(b)) {
+                        b.direction = point_direction(x, y, alvo.x, alvo.y);
+                        b.speed = 12;      // mais rápido que infantaria
+                        b.dano = 70;       // DOBRO DO DANO (era 35, agora 70)
+                        b.dano_area = 40;  // Dano de área para explosão
+                        b.raio_area = 80;  // Raio de explosão (80 pixels)
+                        b.eh_tiro_tanque = true; // Flag para identificar tiro de tanque
+                        b.alvo = alvo;     // manter alvo
+                        b.image_blend = c_yellow; // cor amarela para diferenciar
+                        if (variable_instance_exists(b, "timer_vida")) {
+                            b.timer_vida = 120; // Resetar timer de vida
+                        }
+                    }
                     atq_cooldown = atq_rate;
                     
-                    // Tocar som do tanque
-                    if (variable_global_exists("som_tanque")) {
-                        var _sound_index = asset_get_index("som_tanque");
-                        if (_sound_index != -1) {
-                            audio_play_sound(som_tanque, 5, false);
+                    // ✅ CORREÇÃO: Tocar som apenas se a unidade estiver visível na câmera
+                    // Verificação inline (sem depender de script)
+                    var _cam = view_camera[0];
+                    var _visivel = true; // Fallback: considerar visível
+                    if (_cam != -1 && _cam != noone && camera_exists(_cam)) {
+                        var _cam_x = camera_get_view_x(_cam);
+                        var _cam_y = camera_get_view_y(_cam);
+                        var _cam_w = camera_get_view_width(_cam);
+                        var _cam_h = camera_get_view_height(_cam);
+                        if (_cam_w > 0 && _cam_h > 0) {
+                            var _margin = 100;
+                            var _view_left = _cam_x - _margin;
+                            var _view_right = _cam_x + _cam_w + _margin;
+                            var _view_top = _cam_y - _margin;
+                            var _view_bottom = _cam_y + _cam_h + _margin;
+                            _visivel = (x >= _view_left && x <= _view_right && y >= _view_top && y <= _view_bottom);
+                        }
+                    }
+                    if (_visivel) {
+                        if (variable_global_exists("som_tanque")) {
+                            var _sound_index = asset_get_index("som_tanque");
+                            if (_sound_index != -1) {
+                                audio_play_sound(som_tanque, 5, false);
+                            }
                         }
                     }
                 }

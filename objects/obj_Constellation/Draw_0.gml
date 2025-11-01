@@ -1,12 +1,26 @@
-/// @description Inserir descrição aqui
-// Você pode escrever seu código neste editor
+/// @description Draw Event da Constellation
+
 // ===============================================
 // HEGEMONIA GLOBAL - CONSTELLATION (HERDA DE NAVIO_BASE)
 // Draw Event - Indicadores específicos
 // ===============================================
 
+// =============================================
+// DRAW - Otimizado com verificação de visibilidade
+// =============================================
+
+// ✅ OTIMIZAÇÃO: Verificar se deve desenhar
+if (!scr_should_draw(id)) {
+    if (instance_exists(obj_draw_optimizer)) {
+        obj_draw_optimizer.objects_skipped++;
+    }
+    exit;
+}
+
 // Chamar o Draw do objeto pai (herda indicadores básicos)
-event_inherited();
+if (object_get_parent(object_index) != -1) {
+    event_inherited();
+}
 
 // === INDICADORES ESPECÍFICOS DO CONSTELLATION ===
 if (selecionado) {

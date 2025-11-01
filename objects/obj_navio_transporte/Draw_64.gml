@@ -96,7 +96,8 @@ if (variable_instance_exists(id, "menu_carga_aberto") && menu_carga_aberto) {
     // Título
     draw_set_halign(fa_left);
     draw_set_color(c_yellow);
-    draw_set_valign(fa_center);
+    // ✅ CORREÇÃO GM1044: fa_center não é válido para valign, usar fa_middle
+    draw_set_valign(fa_middle);
     draw_text(_menu_x + 15, _menu_y + 15, "📦 CARGA DO NAVIO");
 
     var _line_y = _menu_y + 45;
@@ -144,7 +145,8 @@ if (variable_instance_exists(id, "menu_carga_aberto") && menu_carga_aberto) {
 
     // Botão DESEMBARCAR TODOS
     draw_set_halign(fa_center);
-    draw_set_valign(fa_center);
+    // ✅ CORREÇÃO GM1044: fa_center não é válido para valign, usar fa_middle
+    draw_set_valign(fa_middle);
     var _btn1_x = _menu_x + 80;
     var _btn1_y = _line_y + 20;
     var _btn1_w = 120;

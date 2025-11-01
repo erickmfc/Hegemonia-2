@@ -4,6 +4,18 @@
 // Draw - Mostrar capacidade e unidades armazenadas
 // ===============================================
 
+// =============================================
+// DRAW - Otimizado com verificação de visibilidade
+// =============================================
+
+// ✅ OTIMIZAÇÃO: Verificar se deve desenhar
+if (!scr_should_draw(id)) {
+    if (instance_exists(obj_draw_optimizer)) {
+        obj_draw_optimizer.objects_skipped++;
+    }
+    exit;
+}
+
 // Chamar Draw do pai
 // GM2040: Verificar se há parent antes de chamar event_inherited
 if (object_get_parent(object_index) != -1) {

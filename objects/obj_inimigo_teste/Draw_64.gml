@@ -6,19 +6,18 @@
 // === VERIFICAÇÃO DE FUNCIONAMENTO ===
 if (timer_draw == 0) {
     timer_draw = 1;
-    show_debug_message("🎯 Draw Event OBJETO NOVO funcionando - ID: " + string(id));
-    show_debug_message("🎯 Posição: " + string(x) + ", " + string(y));
+    // ✅ REMOVIDO: Debug removido para melhorar performance
 }
 
 // === DESENHAR O SPRITE BASE ===
 if (sprite_index != noone) {
     draw_sprite_ext(sprite_index, image_index, x, y, image_xscale, image_yscale, image_angle, image_blend, image_alpha);
-    show_debug_message("🎯 Desenhando sprite OBJETO NOVO: " + string(sprite_index) + " em " + string(x) + ", " + string(y));
+    // ✅ REMOVIDO: Debug removido para melhorar performance
 } else {
     // Fallback: círculo vermelho
     draw_set_color(make_color_rgb(255, 0, 0));
     draw_circle(x, y, 20, true);
-    show_debug_message("🎯 Desenhando fallback visual OBJETO NOVO em " + string(x) + ", " + string(y));
+    // ✅ REMOVIDO: Debug removido para melhorar performance
 }
 
 // === DESENHAR BARRA DE HP ===

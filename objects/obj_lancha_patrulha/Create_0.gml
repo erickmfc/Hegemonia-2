@@ -129,12 +129,17 @@ func_atacar_alvo = function() {
     var d = point_distance(x, y, alvo_unidade.x, alvo_unidade.y);
     if (d <= missil_alcance) {
         if (reload_timer <= 0) {
-            var _tiro = instance_create_layer(x, y, "Instances", obj_tiro_simples);
-            _tiro.alvo = alvo_unidade;
-            _tiro.dono = id;
-            _tiro.dano = 25;
-            _tiro.speed = 8;
-            _tiro.direction = point_direction(x, y, alvo_unidade.x, alvo_unidade.y);
+            var _tiro = scr_get_projectile_from_pool(obj_tiro_simples, x, y, "Instances");
+            if (instance_exists(_tiro)) {
+                _tiro.alvo = alvo_unidade;
+                _tiro.dono = id;
+                _tiro.dano = 25;
+                _tiro.speed = 8;
+                _tiro.direction = point_direction(x, y, alvo_unidade.x, alvo_unidade.y);
+                if (variable_instance_exists(_tiro, "timer_vida")) {
+                    _tiro.timer_vida = 300;
+                }
+            }
             reload_timer = reload_time;
             timer_ataque = reload_timer; // Sincronizar
             if (global.debug_enabled) show_debug_message("🚢 Tiro disparado!");
@@ -195,5 +200,13 @@ func_sincronizar_estado = function() {
 func_sincronizar_indice = function() {
     indice_patrulha = indice_patrulha_atual;
 }
+
+// =============================================
+// SISTEMA DE FRAME SKIP COM LOD
+// =============================================
+lod_level = 2;
+force_always_active = false;
+lod_process_index = irandom(99);
+skip_frames_enabled = true;
 
 if (global.debug_enabled) show_debug_message("🚢 Lancha Patrulha criada!");

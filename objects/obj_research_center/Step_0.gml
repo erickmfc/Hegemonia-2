@@ -37,17 +37,19 @@ if (mouse_check_button_pressed(mb_left)) {
     var mouse_gui_x = device_mouse_x_to_gui(0);
     var mouse_gui_y = device_mouse_y_to_gui(0);
     
-    // === DEFINIR DIMENSÕES DO MENU (AJUSTADAS PARA 52.5% - MAIS PROPORCIONAL) ===
-    var container_w = display_get_gui_width() * 0.525; // Reduzido de 75% para 52.5%
-    var container_h = display_get_gui_height() * 0.7;
-    var container_x = (display_get_gui_width() - container_w) / 2;
-    var container_y = (display_get_gui_height() - container_h) / 2;
+    // === DEFINIR DIMENSÕES DO MENU (SINCRONIZADAS COM DRAW_64.GML) ===
+    var _gui_w = display_get_gui_width();
+    var _gui_h = display_get_gui_height();
+    var container_w = _gui_w * 0.9; // Mesmo do Draw_64.gml - 90% da tela
+    var container_h = _gui_h * 0.9; // Mesmo do Draw_64.gml - 90% da tela
+    var container_x = (_gui_w - container_w) / 2;
+    var container_y = (_gui_h - container_h) / 2;
     
     // === 1. VERIFICAR BOTÃO FECHAR (PRIORIDADE MÁXIMA) ===
-    var close_btn_x = container_x + container_w - 120;
-    var close_btn_y = container_y + container_h - 80;
-    var close_btn_w = 80;
-    var close_btn_h = 35;
+    var close_btn_w = 140; // Mesmo do Draw_64.gml
+    var close_btn_h = 45; // Mesmo do Draw_64.gml
+    var close_btn_x = container_x + container_w - close_btn_w - 20;
+    var close_btn_y = container_y + container_h - 60;
     
     if (point_in_rectangle(mouse_gui_x, mouse_gui_y, close_btn_x, close_btn_y, close_btn_x + close_btn_w, close_btn_y + close_btn_h)) {
         global.menu_pesquisa_aberto = false;
@@ -66,10 +68,11 @@ if (mouse_check_button_pressed(mb_left)) {
     
     // === 3. VERIFICAR BOTÃO SLOT EXTRA ===
     if (global.slots_pesquisa_total == 3) {
-        var slot_btn_x = container_x + 30 + (container_w * 0.10); // Mover 10% para direita
-        var slot_btn_y = container_y + container_h - 80;
-        var slot_btn_w = 200;
-        var slot_btn_h = 35;
+        var _slot_y = container_y + container_h - 160;
+        var slot_btn_x = container_x + 40;
+        var slot_btn_y = _slot_y + 40;
+        var slot_btn_w = 240; // Mesmo do Draw_64.gml
+        var slot_btn_h = 35; // Mesmo do Draw_64.gml
         
         if (point_in_rectangle(mouse_gui_x, mouse_gui_y, slot_btn_x, slot_btn_y, slot_btn_x + slot_btn_w, slot_btn_y + slot_btn_h)) {
             // Check if player can afford the extra slot
@@ -87,21 +90,20 @@ if (mouse_check_button_pressed(mb_left)) {
         }
     }
     
-    // === 4. VERIFICAR CARTÕES DE PESQUISA ===
-    var header_h = 60;
-    var header_y = container_y + 10;
-    var info_panel_w = 200;
-    var info_panel_x = container_x + container_w - info_panel_w - 20;
+    // === 4. VERIFICAR CARTÕES DE PESQUISA (SINCRONIZADO COM DRAW_64.GML) ===
+    var header_h = 100; // Mesmo do Draw_64.gml
+    var recursos_h = 60; // Mesmo do Draw_64.gml
+    var recursos_y = container_y + header_h + 10;
     
-    var grid_start_x = container_x + 30;
-    var grid_start_y = header_y + header_h + 30;
-    var grid_w = container_w - info_panel_w - 60;
-    var grid_h = container_h - header_h - 140;
+    var grid_start_y = recursos_y + recursos_h + 20; // Mesmo do Draw_64.gml
+    var grid_h = container_h - header_h - recursos_h - 220; // Espaço para footer e botões
     
+    var grid_start_x = container_x + 20; // Mesmo do Draw_64.gml
     var grid_cols = 4;
     var grid_rows = 3;
-    var card_w = (grid_w - (grid_cols - 1) * 25) / grid_cols;
-    var card_h = (grid_h - (grid_rows - 1) * 20) / grid_rows;
+    var card_spacing = 20; // Mesmo do Draw_64.gml
+    var card_w = (container_w - 40 - (grid_cols - 1) * card_spacing) / grid_cols;
+    var card_h = ((grid_h - (grid_rows - 1) * card_spacing) / grid_rows) * 0.85;
     
     // Verificar se research_names existe e é válido
     if (!variable_instance_exists(id, "research_names") || !is_array(research_names)) {
@@ -112,15 +114,15 @@ if (mouse_check_button_pressed(mb_left)) {
     // Processar cliques nos cartões
     for (var i = 0; i < array_length(research_names); i++) {
         var col = i mod grid_cols;
-        var row = i div grid_cols;
+        var row = floor(i / grid_cols);
         
-        var card_x = grid_start_x + col * (card_w + 25);
-        var card_y = grid_start_y + row * (card_h + 20);
+        var card_x = grid_start_x + col * (card_w + card_spacing); // Mesmo do Draw_64.gml
+        var card_y = grid_start_y + row * (card_h + card_spacing); // Mesmo do Draw_64.gml
         
         // Check if mouse is over this research card
         if (point_in_rectangle(mouse_gui_x, mouse_gui_y, card_x, card_y, card_x + card_w, card_y + card_h)) {
             
-            if (debug_enabled) show_debug_message("*** CLIQUE DETECTADO NO CARTÃO: " + research_names[i] + " ***");
+            show_debug_message("✅ CLIQUE DETECTADO NO CARTÃO: " + research_names[i] + " | Pos: (" + string(card_x) + ", " + string(card_y) + ")");
             
             var research_name = research_names[i];
             

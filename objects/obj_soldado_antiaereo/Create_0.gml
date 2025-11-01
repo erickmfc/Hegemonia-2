@@ -53,3 +53,11 @@ missil_criado = noone;
 
 // Contador para debug
 step_counter = 0;
+
+// =============================================
+// SISTEMA DE FRAME SKIP COM LOD
+// =============================================
+lod_level = 2;
+force_always_active = false;
+lod_process_index = irandom(99);
+skip_frames_enabled = true;

@@ -21,3 +21,6 @@ impact_radius = 28; // Raio de acerto aumentado
 last_tx = -1;
 last_ty = -1;
 still_frames = 0;
+
+// === SISTEMA DE POOLING ===
+pooled = false; // false = disponível no pool, true = em uso

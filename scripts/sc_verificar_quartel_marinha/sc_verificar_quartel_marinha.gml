@@ -55,7 +55,9 @@ function sc_verificar_quartel_marinha(tipo_instalacao, operacao, parametros = []
                 // Repara a instalação
                 if (array_length(parametros) > 0) {
                     var _valor_reparo = parametros[0];
-                    hp_atual = min(hp_max, hp_atual + _valor_reparo);
+                    // ✅ CORREÇÃO GM1041: Verificar se _valor_reparo é Real antes de usar
+                    var _reparo_val = is_real(_valor_reparo) ? _valor_reparo : 0;
+                    hp_atual = min(hp_max, hp_atual + _reparo_val);
                     show_debug_message("🔧 " + string(tipo_instalacao) + " reparado: +" + string(_valor_reparo) + " HP");
                 } else {
                     hp_atual = hp_max; // Reparo completo

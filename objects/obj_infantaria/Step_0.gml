@@ -1,9 +1,84 @@
 /// STEP EVENT - Lógica do soldado
 
-// Verificação de vida
+// =============================================
+// VERIFICAÇÃO CRÍTICA (SEMPRE PROCESSAR)
+// =============================================
 if (hp_atual <= 0) {
     instance_destroy();
     exit;
+}
+
+// =============================================
+// ✅ STANDBY DESABILITADO PARA UNIDADES INIMIGAS
+// (Sistema estava impedindo ataque da IA)
+// =============================================
+/*
+if (scr_is_enemy_unit(id)) {
+    if (variable_instance_exists(id, "standby_mode") && standby_mode) {
+        // Unidade em standby - apenas atualizar posição básica se estiver movendo
+        if (variable_instance_exists(id, "estado") && estado == "movendo") {
+            // Movimento simplificado em standby (apenas a cada 3 frames)
+            var _frame_count = (variable_global_exists("game_frame") ? global.game_frame : current_time) % 3;
+            if (_frame_count != 0) {
+                exit; // Pular Step
+            }
+            // Continuar para processar movimento simplificado abaixo
+            var dist_destino = point_distance(x, y, destino_x, destino_y);
+            if (dist_destino > velocidade * 2) {
+                var dir_x = destino_x - x;
+                var dir_y = destino_y - y;
+                var dist_norm = point_distance(0, 0, dir_x, dir_y);
+                if (dist_norm > 0) {
+                    x += (dir_x / dist_norm) * velocidade * 2;
+                    y += (dir_y / dist_norm) * velocidade * 2;
+                }
+            } else {
+                x = destino_x;
+                y = destino_y;
+                estado = "parado";
+            }
+        }
+        exit; // Unidade parada em standby - pular Step completamente
+    }
+}
+*/
+
+// =============================================
+// SISTEMA DE FRAME SKIP COM LOD (OTIMIZADO)
+// =============================================
+
+// ✅ SEMPRE processar se selecionado ou em combate crítico
+var should_always_process = (selecionado || 
+                              (variable_instance_exists(id, "force_always_active") && force_always_active) ||
+                              estado == "atacando");
+
+// ✅ Se não for sempre processar, verificar frame skip
+if (!should_always_process && skip_frames_enabled) {
+    // Obter LOD atual usando script otimizado
+    var current_lod = scr_get_lod_level();
+    
+    // Calcular se deve pular este frame
+    var should_process = scr_calculate_frame_skip(current_lod, lod_process_index);
+    
+    if (!should_process) {
+        // === MODO FRAME SKIP: Processar apenas movimento básico ===
+        
+        // Se está movendo, aplicar movimento simplificado
+        if (estado == "movendo") {
+            var speed_mult = scr_get_speed_multiplier(current_lod, lod_process_index);
+            var still_moving = scr_process_lod_simple_movement(id, destino_x, destino_y, velocidade, speed_mult);
+            
+            if (!still_moving && estado == "movendo") {
+                estado = "parado";
+            }
+        }
+        
+        // Sair sem processar IA, animações, cooldowns, etc.
+        exit;
+    }
+    
+    // Atualizar lod_level para outras lógicas
+    lod_level = current_lod;
 }
 
 // =======================
@@ -14,20 +89,47 @@ if (atq_cooldown > 0) atq_cooldown--;
 // =======================
 // DETECÇÃO DE INIMIGOS
 // =======================
-// Só procura novo alvo se não estiver atacando
-if (estado != "atacando" || alvo == noone || !instance_exists(alvo)) {
+// Só procura novo alvo se modo ataque está ativo
+if (modo_ataque && (estado != "atacando" || alvo == noone || !instance_exists(alvo))) {
     // Buscar inimigos considerando nacao_proprietaria
     var _nacao = (variable_instance_exists(id, "nacao_proprietaria")) ? nacao_proprietaria : 1;
-    alvo = scr_buscar_inimigo(x, y, alcance_visao, _nacao);
-    if (alvo != noone && point_distance(x, y, alvo.x, alvo.y) <= alcance_visao) {
+    var _alcance = variable_instance_exists(id, "alcance_visao") && is_real(alcance_visao) ? alcance_visao : 200;
+    alvo = scr_buscar_inimigo(x, y, _alcance, _nacao);
+    if (alvo != noone && point_distance(x, y, alvo.x, alvo.y) <= _alcance) {
         estado = "atacando";
     }
+} else if (!modo_ataque) {
+    // Modo passivo - não ataca
+    alvo = noone;
+    if (estado == "atacando") estado = "parado";
 }
 
 // ======================
 // CONTROLE POR TECLAS
 // ======================
 if (selecionado) {
+    
+    // ✅ NOVO: Modo Passivo (P)
+    if (keyboard_check_pressed(ord("P"))) {
+        modo_ataque = false;
+        alvo = noone;
+        if (estado == "atacando") estado = "parado";
+        if (global.debug_enabled) show_debug_message("🛡️ Infantaria - Modo PASSIVO");
+    }
+    
+    // ✅ NOVO: Modo Ataque (O)
+    if (keyboard_check_pressed(ord("O"))) {
+        modo_ataque = true;
+        if (global.debug_enabled) show_debug_message("⚔️ Infantaria - Modo ATAQUE");
+    }
+    
+    // ✅ NOVO: Parar (L)
+    if (keyboard_check_pressed(ord("L"))) {
+        estado = "parado";
+        alvo = noone;
+        modo_patrulha = false; // Cancela patrulha
+        if (global.debug_enabled) show_debug_message("⏹️ Infantaria - PARADA");
+    }
     
     // ENTRAR/SAIR DO MODO PATRULHA (Q)
     if (keyboard_check_pressed(ord("Q"))) {
@@ -62,8 +164,8 @@ if (selecionado) {
     
     // ADICIONAR PONTO DE PATRULHA (botão direito no modo patrulha)
     if (modo_patrulha && mouse_check_button_pressed(mb_right)) {
-        // ✅ CORREÇÃO: Usar função global para coordenadas precisas
-        var _coords = global.scr_mouse_to_world();
+        // ✅ CORREÇÃO: Usar função para coordenadas precisas
+        var _coords = scr_mouse_to_world();
         var world_x = _coords[0];
         var world_y = _coords[1];
         var pos = [world_x, world_y];
@@ -73,8 +175,8 @@ if (selecionado) {
     
     // ANDAR (botão direito - só se não estiver no modo patrulha)
     if (!modo_patrulha && mouse_check_button_pressed(mb_right)) {
-        // ✅ CORREÇÃO: Usar função global para coordenadas precisas
-        var _coords = global.scr_mouse_to_world();
+        // ✅ CORREÇÃO: Usar função para coordenadas precisas
+        var _coords = scr_mouse_to_world();
         var world_x = _coords[0];
         var world_y = _coords[1];
         
@@ -154,8 +256,8 @@ if (selecionado) {
     
     // SEGUIR (E)
     if (keyboard_check_pressed(ord("E"))) {
-        // ✅ CORREÇÃO: Usar função global para coordenadas precisas
-        var _coords = global.scr_mouse_to_world();
+        // ✅ CORREÇÃO: Usar função para coordenadas precisas
+        var _coords = scr_mouse_to_world();
         var world_x = _coords[0];
         var world_y = _coords[1];
         var alvo_seg = instance_position(world_x, world_y, obj_infantaria);
@@ -226,21 +328,23 @@ switch (estado) {
     break;
     
     case "patrulhando":
-        if (ds_list_size(patrulha) > 0) {
+        // ✅ CORREÇÃO GM1041: Verificar se patrulha é ds_list válido
+        if (ds_exists(patrulha, ds_type_list) && ds_list_size(patrulha) > 0) {
             // Se estamos iniciando patrulha, garante começar do ponto mais próximo ao soldado
             if (patrulha_indice >= ds_list_size(patrulha)) patrulha_indice = 0;
             var pt = ds_list_find_value(patrulha, patrulha_indice);
             if (is_array(pt) && array_length(pt) >= 2) {
-                var px = pt[0];
-                var py = pt[1];
+                var px = is_real(pt[0]) ? pt[0] : x;
+                var py = is_real(pt[1]) ? pt[1] : y;
+                var _vel = variable_instance_exists(id, "velocidade") && is_real(velocidade) ? velocidade : 2;
                 var dist_patrulha = point_distance(x, y, px, py);
-                if (dist_patrulha > velocidade) {
+                if (dist_patrulha > _vel) {
                     var dir_x = px - x;
                     var dir_y = py - y;
                     var dist_norm = point_distance(0, 0, dir_x, dir_y);
                     if (dist_norm > 0) {
-                        x += (dir_x / dist_norm) * velocidade;
-                        y += (dir_y / dist_norm) * velocidade;
+                        x += (dir_x / dist_norm) * _vel;
+                        y += (dir_y / dist_norm) * _vel;
                         image_angle = point_direction(0, 0, dir_x, dir_y);
                     }
                 } else {
@@ -288,7 +392,7 @@ switch (estado) {
             if (dist_alvo <= alcance) {
                 // Atira se estiver no alcance
                 if (atq_cooldown <= 0) {
-                    var b = instance_create_layer(x, y, layer, obj_tiro_infantaria);
+                    var b = scr_get_projectile_from_pool(obj_tiro_infantaria, x, y, layer);
                     b.direction = point_direction(x, y, alvo.x, alvo.y);
                     b.speed = 8;
                     b.dano = 5;

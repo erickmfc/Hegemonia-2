@@ -1,7 +1,19 @@
 // ================================================
-// HEGEMONIA GLOBAL - OBJETO: TIRO SIMPLES
+// HEGEMONIA GLOBAL - OBJETO: TIRO INFANTARIA
 // Draw Event - Visual do Projétil
 // ================================================
+
+// =============================================
+// DRAW - Otimizado com verificação de visibilidade
+// =============================================
+
+// ✅ OTIMIZAÇÃO: Verificar se deve desenhar
+if (!scr_should_draw(id)) {
+    if (instance_exists(obj_draw_optimizer)) {
+        obj_draw_optimizer.objects_skipped++;
+    }
+    exit;
+}
 
 // === DESENHAR O TIRO ===
 draw_set_color(c_yellow);

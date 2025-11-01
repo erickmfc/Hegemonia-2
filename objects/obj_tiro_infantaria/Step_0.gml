@@ -6,7 +6,7 @@
 // === TIMER DE VIDA ===
 timer_vida--;
 if (timer_vida <= 0) {
-    instance_destroy();
+    scr_return_projectile_to_pool(id);
     exit;
 }
 
@@ -139,14 +139,17 @@ if (alvo != noone && instance_exists(alvo)) {
                 }
             }
             
-            // Destruir o tiro
-            instance_destroy();
+            // Retornar tiro ao pool
+            scr_return_projectile_to_pool(id);
+            exit;
         }
     } else {
-        // Alvo muito próximo, destruir tiro
-        instance_destroy();
+        // Alvo muito próximo, retornar tiro ao pool
+        scr_return_projectile_to_pool(id);
+        exit;
     }
 } else {
-    // Alvo não existe mais, destruir tiro
-    instance_destroy();
+    // Alvo não existe mais, retornar tiro ao pool
+    scr_return_projectile_to_pool(id);
+    exit;
 }

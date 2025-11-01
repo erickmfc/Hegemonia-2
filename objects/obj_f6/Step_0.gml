@@ -216,11 +216,14 @@ if (estado == "caçando") {
         // Atacar se estiver no alcance e o timer permitir
         if (point_distance(x, y, destino_x, destino_y) <= radar_alcance && timer_ataque <= 0) {
             var _angulo = point_direction(x, y, alvo_em_mira.x, alvo_em_mira.y);
-            var _missil = instance_create_layer(x, y, "Instances", obj_tiro_simples);
+            var _missil = scr_get_projectile_from_pool(obj_tiro_simples, x, y, "Instances");
             
             if (instance_exists(_missil)) {
                 _missil.alvo = alvo_em_mira;
                 _missil.dono = id;
+                if (variable_instance_exists(_missil, "timer_vida")) {
+                    _missil.timer_vida = 300;
+                }
                 
                 // Verificar tipo de alvo para usar míssil apropriado
                 if (alvo_em_mira.object_index == obj_helicoptero_militar || alvo_em_mira.object_index == obj_caca_f5) {

@@ -1,4 +1,4 @@
-/// @description Buscar inimigo mais próximo considerando nacao_proprietaria
+/// @description Buscar inimigo mais próximo considerando nacao_proprietaria (COM CACHE)
 /// @param _x Posição X
 /// @param _y Posição Y
 /// @param _raio Raio de busca
@@ -6,6 +6,14 @@
 /// @return ID do inimigo mais próximo ou noone
 
 function scr_buscar_inimigo(_x, _y, _raio, _minha_nacao) {
+    
+    // ✅ PRIMEIRO: Tentar obter do cache
+    var _inimigo_cached = scr_get_cached_enemy_search(_x, _y, _raio, _minha_nacao);
+    if (_inimigo_cached != noone && instance_exists(_inimigo_cached)) {
+        return _inimigo_cached; // ✅ Cache HIT - Retornar imediatamente
+    }
+    
+    // ❌ Cache MISS - Buscar normalmente
     var _inimigo_mais_proximo = noone;
     var _menor_distancia = _raio + 1;
     
@@ -40,6 +48,12 @@ function scr_buscar_inimigo(_x, _y, _raio, _minha_nacao) {
         obj_quartel_marinha
     ];
     
+    // ✅ NOVO: Verificar se obj_presidente_1 existe e adicionar
+    var _obj_presidente = asset_get_index("obj_presidente_1");
+    if (_obj_presidente != -1 && asset_get_type(_obj_presidente) == asset_object) {
+        array_push(_tipos_estruturas, _obj_presidente);
+    }
+    
     // Procurar unidades inimigas
     for (var i = 0; i < array_length(_tipos_unidades); i++) {
         with (_tipos_unidades[i]) {
@@ -49,7 +63,8 @@ function scr_buscar_inimigo(_x, _y, _raio, _minha_nacao) {
                     if (_dist <= _raio && _dist < _menor_distancia) {
                         _menor_distancia = _dist;
                         _inimigo_mais_proximo = id;
-                        show_debug_message("🎯 Encontrou unidade inimiga: " + object_get_name(object_index) + " | dist: " + string(_dist) + " | nacao: " + string(nacao_proprietaria));
+                        // ✅ REMOVIDO: Debug excessivo - comentado para melhor performance
+                        // if (global.debug_enabled) show_debug_message("🎯 Encontrou unidade inimiga");
                     }
                 }
             }
@@ -71,6 +86,9 @@ function scr_buscar_inimigo(_x, _y, _raio, _minha_nacao) {
             }
         }
     }
+    
+    // ✅ ARMAZENAR NO CACHE (se encontrou algo)
+    scr_set_cached_enemy_search(_x, _y, _raio, _minha_nacao, _inimigo_mais_proximo);
     
     return _inimigo_mais_proximo;
 }

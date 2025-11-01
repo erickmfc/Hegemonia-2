@@ -13,9 +13,17 @@ if (destrutivel && hp_atual <= 0) {
 
 // === SISTEMA DE PRODUÇÃO AÉREA COM FILA ===
 
-// ✅ CORREÇÃO CRÍTICA: NÃO iniciar produção automaticamente
-// O aeroporto só deve produzir quando o jogador explicitamente adicionar unidades via menu
-// NÃO iniciar automaticamente mesmo que haja unidades na fila - aguardar ação do jogador
+// ✅ CORREÇÃO: Iniciar produção automaticamente se tiver unidades na fila mas não estiver produzindo
+if (!produzindo && !ds_queue_empty(fila_producao)) {
+    produzindo = true;
+    timer_producao = 0;
+    
+    var _unidade_data = ds_queue_head(fila_producao);
+    if (_unidade_data != undefined) {
+        show_debug_message("🚀 Aeroporto iniciando produção de: " + _unidade_data.nome);
+        show_debug_message("📊 Unidades na fila: " + string(ds_queue_size(fila_producao)));
+    }
+}
 
 if (produzindo && !ds_queue_empty(fila_producao)) {
     
