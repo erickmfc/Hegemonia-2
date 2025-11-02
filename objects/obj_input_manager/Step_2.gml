@@ -394,3 +394,13 @@ if (keyboard_check_pressed(ord("H"))) {
         show_debug_message("⚠️ Função scr_forcar_fantasma não encontrada");
     }
 }
+
+// Tecla F9: Diagnóstico da IA
+if (keyboard_check_pressed(vk_f9)) {
+    show_debug_message("🔍 Executando diagnóstico da IA...");
+    try {
+        scr_diagnostico_ia();
+    } catch (e) {
+        show_debug_message("⚠️ Função scr_diagnostico_ia não encontrada");
+    }
+}

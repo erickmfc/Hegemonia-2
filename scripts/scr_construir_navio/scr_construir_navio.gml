@@ -43,7 +43,7 @@ function scr_construir_navio(quartel_id, tipo_navio, pos_x, pos_y) {
     }
     
     // Verificar se a posição é válida (em água)
-    if (!scr_check_water_tile()) {
+    if (!scr_check_water_tile(pos_x, pos_y)) {
         scr_debug_log("CONSTRUIR NAVIO", "Erro: Posição não está em água");
         return -1;
     }

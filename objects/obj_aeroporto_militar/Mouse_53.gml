@@ -102,6 +102,13 @@ if (!_clique_detectado) {
 if (mouse_check_button_pressed(mb_left) && _clique_detectado) {
     show_debug_message("✅ CLIQUE NO AEROPORTO DETECTADO!");
     
+    // === CORREÇÃO: FECHAR APENAS O MENU DESTE AEROPORTO (se existir) ===
+    // Permite múltiplos menus abertos simultaneamente - cada um operando independentemente
+    if (variable_instance_exists(id, "menu_recrutamento") && instance_exists(menu_recrutamento)) {
+        instance_destroy(menu_recrutamento);
+        menu_recrutamento = noone;
+    }
+    
     // Verificar se o objeto do menu existe
     if (!object_exists(obj_menu_recrutamento_aereo)) {
         show_debug_message("❌ ERRO: obj_menu_recrutamento_aereo não existe!");
@@ -114,6 +121,7 @@ if (mouse_check_button_pressed(mb_left) && _clique_detectado) {
         var _menu = instance_create_layer(0, 0, "rm_mapa_principal", obj_menu_recrutamento_aereo);
         if (instance_exists(_menu)) {
             _menu.id_do_aeroporto = id;
+            menu_recrutamento = _menu; // Guardar referência no aeroporto
             show_debug_message("📱 Menu de recrutamento aéreo aberto");
             show_debug_message("🔗 Conectado ao aeroporto ID: " + string(id));
             show_debug_message("📍 Posição do menu: (" + string(_menu.x) + ", " + string(_menu.y) + ")");

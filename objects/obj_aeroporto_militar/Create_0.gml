@@ -30,7 +30,7 @@ ds_list_add(unidades_disponiveis, {
     objeto: obj_caca_f5,
     custo_dinheiro: 800,
     custo_populacao: 3,
-    tempo_treino: 180, // 3 segundos
+    tempo_treino: 240, // ✅ MUDADO: 4 segundos (240 frames) - MÁXIMO
     descricao: "Caça-bombardeiro de alta velocidade"
 });
 
@@ -40,7 +40,7 @@ ds_list_add(unidades_disponiveis, {
     objeto: obj_helicoptero_militar,
     custo_dinheiro: 600,
     custo_populacao: 2,
-    tempo_treino: 180, // 3 segundos
+    tempo_treino: 240, // ✅ MUDADO: 4 segundos (240 frames) - MÁXIMO
     descricao: "Helicóptero de ataque e transporte"
 });
 
@@ -50,7 +50,7 @@ ds_list_add(unidades_disponiveis, {
     objeto: obj_c100,
     custo_dinheiro: 1200,
     custo_populacao: 4,
-    tempo_treino: 180, // 3 segundos
+    tempo_treino: 240, // ✅ MUDADO: 4 segundos (240 frames) - MÁXIMO
     descricao: "Avião de transporte com embarque de tropas e flares defensivos"
 });
 
@@ -60,7 +60,7 @@ ds_list_add(unidades_disponiveis, {
     objeto: obj_f15,
     custo_dinheiro: 1500,
     custo_populacao: 5,
-    tempo_treino: 180, // 3 segundos
+    tempo_treino: 240, // ✅ MUDADO: 4 segundos (240 frames) - MÁXIMO
     descricao: "Caça superior com HP 800 e sistema de mísseis avançado"
 });
 

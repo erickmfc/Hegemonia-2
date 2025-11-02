@@ -63,20 +63,74 @@ function scr_ia_construir(_ia_id, _objeto_tipo, _x, _y) {
         return false;
     }
     
+    // ✅ NOVO: Verificar se quartel naval está em água
+    if (_objeto_tipo == obj_quartel_marinha) {
+        if (!scr_check_water_tile(_x, _y)) {
+            // Tentar encontrar água próxima
+            var _posicao_agua = scr_find_nearest_water(_x, _y, 500);
+            if (_posicao_agua[0] != -1) {
+                _x = _posicao_agua[0];
+                _y = _posicao_agua[1];
+                if (variable_global_exists("debug_enabled") && global.debug_enabled) {
+                    show_debug_message("🌊 IA ajustou posição do quartel naval para água: (" + string(_x) + ", " + string(_y) + ")");
+                }
+            } else {
+                show_debug_message("❌ IA não encontrou água próxima para quartel naval em (" + string(_x) + ", " + string(_y) + ")");
+                return false;
+            }
+        }
+    }
+    
     // 3. Verificar se há espaço (sem overlap) com variação aleatória
     var _variacao_x = random_range(-50, 50); // Variação de ±50 pixels
     var _variacao_y = random_range(-50, 50); // Variação de ±50 pixels
     var _pos_x_final = _x + _variacao_x;
     var _pos_y_final = _y + _variacao_y;
     
+    // ✅ CORRIGIDO: Se for quartel naval, garantir que a variação ainda está em água
+    if (_objeto_tipo == obj_quartel_marinha) {
+        if (!scr_check_water_tile(_pos_x_final, _pos_y_final)) {
+            // Se a variação saiu da água, buscar água próxima
+            var _pos_agua_variacao = scr_find_nearest_water(_pos_x_final, _pos_y_final, 100);
+            if (_pos_agua_variacao[0] != -1) {
+                _pos_x_final = _pos_agua_variacao[0];
+                _pos_y_final = _pos_agua_variacao[1];
+            } else {
+                // Não encontrou, usar posição original (já validada como água)
+                _pos_x_final = _x;
+                _pos_y_final = _y;
+            }
+        }
+    }
+    
     var _ja_existe = instance_position(_pos_x_final, _pos_y_final, _objeto_tipo);
     if (_ja_existe != noone) {
         // Tentar posição alternativa se ocupada
+        for (var _tentativa = 0; _tentativa < 5; _tentativa++) {
         _variacao_x = random_range(-80, 80);
         _variacao_y = random_range(-80, 80);
         _pos_x_final = _x + _variacao_x;
         _pos_y_final = _y + _variacao_y;
+            
+            // ✅ Se for quartel naval, verificar água novamente
+            if (_objeto_tipo == obj_quartel_marinha) {
+                if (!scr_check_water_tile(_pos_x_final, _pos_y_final)) {
+                    var _pos_agua_alt = scr_find_nearest_water(_pos_x_final, _pos_y_final, 150);
+                    if (_pos_agua_alt[0] != -1) {
+                        _pos_x_final = _pos_agua_alt[0];
+                        _pos_y_final = _pos_agua_alt[1];
+                    } else {
+                        continue; // Tentar próxima variação
+                    }
+                }
+            }
+            
         _ja_existe = instance_position(_pos_x_final, _pos_y_final, _objeto_tipo);
+            if (_ja_existe == noone) {
+                break; // Encontrou posição livre
+            }
+        }
+        
         if (_ja_existe != noone) {
             show_debug_message("❌ IA: Posição ocupada após tentativas");
             return false;

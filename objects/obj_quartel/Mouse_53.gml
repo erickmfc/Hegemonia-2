@@ -52,13 +52,24 @@ if (!_clique_detectado) {
 }
 
 if (mouse_check_button_pressed(mb_left) && _clique_detectado) {
+    // ✅ VALIDAR NAÇÃO ANTES DE TUDO
+    var _minha_nacao = 1; // Jogador sempre é nação 1
+    if (variable_instance_exists(id, "nacao_proprietaria")) {
+        if (nacao_proprietaria != _minha_nacao) {
+            // Quartel não é do jogador - BLOQUEAR
+            show_debug_message("🚫 Este quartel pertence à nação " + string(nacao_proprietaria) + " - Você não pode controlá-lo!");
+            exit;
+        }
+    }
+    
     // ✅ REDUZIDO: Debug apenas se debug_enabled
     if (global.debug_enabled) show_debug_message("✅ CLIQUE NO QUARTEL DETECTADO!");
     
-    // === CORREÇÃO: FECHAR MENUS EXISTENTES PRIMEIRO ===
-    // Garantir que não há menus órfãos antes de criar um novo
-    if (global.menu_recrutamento_aberto) {
-        scr_limpar_menus_recrutamento();
+    // === CORREÇÃO: FECHAR APENAS O MENU DESTE QUARTEL (se existir) ===
+    // Permite múltiplos menus abertos simultaneamente - cada um operando independentemente
+    if (variable_instance_exists(id, "menu_recrutamento") && instance_exists(menu_recrutamento)) {
+        instance_destroy(menu_recrutamento);
+        menu_recrutamento = noone;
     }
     
     // === VERIFICAÇÃO DE CONDIÇÕES ===
@@ -67,6 +78,7 @@ if (mouse_check_button_pressed(mb_left) && _clique_detectado) {
         // Como o quartel já foi criado como instância, ele está completo
         var _menu_recrutamento = instance_create_layer(x, y + 64, "Instances", obj_menu_recrutamento);
         _menu_recrutamento.id_do_quartel = id; // Informa ao menu qual quartel o criou
+        menu_recrutamento = _menu_recrutamento; // Guardar referência no quartel
         global.menu_recrutamento_aberto = true;
     }
 }

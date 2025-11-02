@@ -8,12 +8,12 @@ nacao_proprietaria = 2; // 2 = IA Inimiga
 nome_ia = "Presidente 1";
 
 // === SISTEMA DE DECISÃO ===
-intervalo_decisao = 150; // A cada 2.5 segundos (60 FPS × 2.5) - DECISÃO MAIS RÁPIDA
-timer_decisao = 60; // Começar mais rápido - Primeiro ataque em ~1 minuto (foi 300/5s)
+intervalo_decisao = 60; // REDUZIDO de 90 para 60 - DECISÃO A CADA 1 SEGUNDO (ULTRA RÁPIDA)
+timer_decisao = 10; // REDUZIDO de 30 para 10 - COMEÇAR QUASE IMEDIATAMENTE
 
 // === PRIORIDADES DA IA ===
-prioridade_economia = 0.4;  // 40% focar em economia
-prioridade_militar = 0.6;   // 60% focar em militar
+prioridade_economia = 0.2;  // REDUZIDO de 0.4 para 0.2 - MENOS ECONOMIA
+prioridade_militar = 0.8;   // AUMENTADO de 0.6 para 0.8 - MAIS AGRESSIVA
 
 // === ESTADO ATUAL ===
 objetivo_atual = "expandir"; // expandir, atacar, defender
@@ -23,7 +23,7 @@ estruturas_totais = 0;
 // === POSIÇÃO BASE (onde a IA está posicionada no mapa) ===
 base_x = x;
 base_y = y;
-raio_expansao = 800; // Distância máxima de expansão
+raio_expansao = 3000; // AUMENTADO de 800 para 3000 - DETECTA EM TODO O MAPA
 
 // === UNIDADES EM CONTROLE (cache para performance) ===
 lista_unidades = ds_list_create();
@@ -32,7 +32,7 @@ lista_inimigas_visiveis = ds_list_create();
 
 // === COMANDOS MILITARES ===
 esquadrao_formando = false;
-esquadrao_tamanho_minimo = 5;
+esquadrao_tamanho_minimo = 2; // REDUZIDO de 5 para 2 - ATACAR COM MENOS UNIDADES
 unidades_em_esquadrao = ds_list_create();
 alvo_atual = noone;
 

@@ -54,33 +54,11 @@ if (_click_detected) {
     // ✅ REDUZIDO: Debug apenas se debug_enabled
     if (global.debug_enabled) show_debug_message("✅ CLIQUE NO QUARTEL MARINHA!");
     
-    // === CORREÇÃO: FECHAR MENUS EXISTENTES ===
-    // Garantir que não há menus órfãos antes de criar um novo
-    if (global.menu_recrutamento_aberto) {
-        scr_limpar_menus_recrutamento();
-    }
-    
-    // Fechar menu deste quartel se existir
-    if (menu_recrutamento != noone) {
+    // === CORREÇÃO: FECHAR APENAS O MENU DESTE QUARTEL (se existir) ===
+    // Permite múltiplos menus abertos simultaneamente - cada um operando independentemente
+    if (menu_recrutamento != noone && instance_exists(menu_recrutamento)) {
         instance_destroy(menu_recrutamento);
         menu_recrutamento = noone;
-    }
-    
-    // Desmarcar outros quartéis
-    with (obj_quartel) { 
-        selecionado = false;
-        if (variable_instance_exists(id, "menu_recrutamento") && menu_recrutamento != noone) {
-            instance_destroy(menu_recrutamento);
-            menu_recrutamento = noone;
-        }
-    }
-    
-    with (obj_quartel_marinha) { 
-        selecionado = false;
-        if (menu_recrutamento != noone) {
-            instance_destroy(menu_recrutamento);
-            menu_recrutamento = noone;
-        }
     }
     
     // Marcar este quartel de marinha

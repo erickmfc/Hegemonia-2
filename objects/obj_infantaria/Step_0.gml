@@ -47,10 +47,12 @@ if (scr_is_enemy_unit(id)) {
 // SISTEMA DE FRAME SKIP COM LOD (OTIMIZADO)
 // =============================================
 
-// ✅ SEMPRE processar se selecionado ou em combate crítico
+// ✅ SEMPRE processar se selecionado, em combate crítico, OU se for unidade da IA
+var _eh_unidade_ia = (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 2);
 var should_always_process = (selecionado || 
                               (variable_instance_exists(id, "force_always_active") && force_always_active) ||
-                              estado == "atacando");
+                              estado == "atacando" ||
+                              _eh_unidade_ia); // ✅ NOVO: Unidades da IA sempre processam
 
 // ✅ Se não for sempre processar, verificar frame skip
 if (!should_always_process && skip_frames_enabled) {
@@ -89,19 +91,53 @@ if (atq_cooldown > 0) atq_cooldown--;
 // =======================
 // DETECÇÃO DE INIMIGOS
 // =======================
-// Só procura novo alvo se modo ataque está ativo
-if (modo_ataque && (estado != "atacando" || alvo == noone || !instance_exists(alvo))) {
-    // Buscar inimigos considerando nacao_proprietaria
-    var _nacao = (variable_instance_exists(id, "nacao_proprietaria")) ? nacao_proprietaria : 1;
-    var _alcance = variable_instance_exists(id, "alcance_visao") && is_real(alcance_visao) ? alcance_visao : 200;
-    alvo = scr_buscar_inimigo(x, y, _alcance, _nacao);
-    if (alvo != noone && point_distance(x, y, alvo.x, alvo.y) <= _alcance) {
-        estado = "atacando";
+// ✅ NOVO: Unidades da IA sempre atacam automaticamente
+if (_eh_unidade_ia) {
+    // Forçar modo ataque para unidades da IA
+    modo_ataque = true;
+    
+    // Se tem alvo definido externamente (pela IA do presidente), usar ele
+    if (variable_instance_exists(id, "alvo") && alvo != noone && instance_exists(alvo)) {
+        var _dist_alvo = point_distance(x, y, alvo.x, alvo.y);
+        if (_dist_alvo <= alcance) {
+            estado = "atacando";
+        } else if (_dist_alvo > alcance && variable_instance_exists(id, "destino_x") && variable_instance_exists(id, "destino_y")) {
+            // Mover em direção ao alvo se tiver destino definido
+            estado = "movendo";
+            destino_x = alvo.x;
+            destino_y = alvo.y;
+        }
+    } else if (estado == "atacando" && (alvo == noone || !instance_exists(alvo))) {
+        // Buscar novo alvo se o anterior foi destruído
+        var _nacao = 2; // IA
+        var _alcance = variable_instance_exists(id, "alcance_visao") && is_real(alcance_visao) ? alcance_visao : 200;
+        alvo = scr_buscar_inimigo(x, y, _alcance, _nacao);
+        if (alvo != noone && point_distance(x, y, alvo.x, alvo.y) <= _alcance) {
+            estado = "atacando";
+        } else {
+            // Se tem destino definido, mover para lá
+            if (variable_instance_exists(id, "destino_x") && variable_instance_exists(id, "destino_y")) {
+                estado = "movendo";
+            } else {
+                estado = "parado";
+            }
+        }
     }
-} else if (!modo_ataque) {
-    // Modo passivo - não ataca
-    alvo = noone;
-    if (estado == "atacando") estado = "parado";
+} else {
+    // Jogador - lógica original
+    if (modo_ataque && (estado != "atacando" || alvo == noone || !instance_exists(alvo))) {
+        // Buscar inimigos considerando nacao_proprietaria
+        var _nacao = (variable_instance_exists(id, "nacao_proprietaria")) ? nacao_proprietaria : 1;
+        var _alcance = variable_instance_exists(id, "alcance_visao") && is_real(alcance_visao) ? alcance_visao : 200;
+        alvo = scr_buscar_inimigo(x, y, _alcance, _nacao);
+        if (alvo != noone && point_distance(x, y, alvo.x, alvo.y) <= _alcance) {
+            estado = "atacando";
+        }
+    } else if (!modo_ataque) {
+        // Modo passivo - não ataca
+        alvo = noone;
+        if (estado == "atacando") estado = "parado";
+    }
 }
 
 // ======================
@@ -315,15 +351,25 @@ switch (estado) {
             var dir_y = destino_y - y;
             var dist_norm = point_distance(0, 0, dir_x, dir_y);
             if (dist_norm > 0) {
-                x += (dir_x / dist_norm) * velocidade;
-                y += (dir_y / dist_norm) * velocidade;
+                // ✅ NOVO: Para unidades da IA, garantir velocidade mínima
+                var _vel_efetiva = velocidade;
+                if (_eh_unidade_ia && velocidade <= 0) {
+                    _vel_efetiva = 2; // Velocidade padrão se não tiver definida
+                }
+                x += (dir_x / dist_norm) * _vel_efetiva;
+                y += (dir_y / dist_norm) * _vel_efetiva;
                 image_angle = point_direction(0, 0, dir_x, dir_y);
             }
         } else {
             // Para exatamente no destino
             x = destino_x;
             y = destino_y;
-            estado = "parado";
+            // ✅ NOVO: Se for unidade da IA e tem alvo, mudar para atacar
+            if (_eh_unidade_ia && variable_instance_exists(id, "alvo") && alvo != noone && instance_exists(alvo)) {
+                estado = "atacando";
+            } else {
+                estado = "parado";
+            }
         }
     break;
     

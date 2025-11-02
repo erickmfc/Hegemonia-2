@@ -27,18 +27,18 @@ if (!variable_instance_exists(id, "step_counter")) {
 step_counter++;
 
 // ✅ DEBUG: Informações importantes sempre
-var _fila_size = 0;
+var _fila_size_debug = 0; // ✅ RENOMEADO para evitar conflito
 if (ds_exists(fila_recrutamento, ds_type_queue)) {
-    _fila_size = ds_queue_size(fila_recrutamento);
+    _fila_size_debug = ds_queue_size(fila_recrutamento);
 }
 
 // ✅ DEBUG MELHORADO: Informações a cada 3 segundos (180 frames) se tiver algo na fila ou estiver treinando
-if ((_fila_size > 0 || esta_treinando) && step_counter % 180 == 0) {
-    show_debug_message("⚙️ Quartel Step - Treinando: " + string(esta_treinando) + " | Fila: " + string(_fila_size) + " | Timer: " + string(tempo_treinamento_restante));
+if ((_fila_size_debug > 0 || esta_treinando) && step_counter % 180 == 0) {
+    show_debug_message("⚙️ Quartel Step - Treinando: " + string(esta_treinando) + " | Fila: " + string(_fila_size_debug) + " | Timer: " + string(tempo_treinamento_restante));
 }
 
 // ✅ DEBUG REDUZIDO: Apenas a cada 10 segundos se debug_enabled e não há atividade
-if (variable_global_exists("debug_enabled") && global.debug_enabled && _fila_size == 0 && !esta_treinando && step_counter % 600 == 0) {
+if (variable_global_exists("debug_enabled") && global.debug_enabled && _fila_size_debug == 0 && !esta_treinando && step_counter % 600 == 0) {
     show_debug_message("⚙️ Quartel Step - Ocioso - ID: " + string(id));
 }
 
@@ -70,13 +70,127 @@ if (ds_exists(fila_recrutamento, ds_type_queue)) {
 // Processar treinamento
 // ✅ CORREÇÃO: Verificar se fila existe antes de usar
 if (esta_treinando && ds_exists(fila_recrutamento, ds_type_queue) && !ds_queue_empty(fila_recrutamento)) {
-    tempo_treinamento_restante++;
     
+    var _quantidade_na_fila = ds_queue_size(fila_recrutamento);
     var _indice_unidade = ds_queue_head(fila_recrutamento);
     var _unidade_data = ds_list_find_value(unidades_disponiveis, _indice_unidade);
     
-    // ✅ CORREÇÃO CRÍTICA: Verificar se dados da unidade são válidos
-    if (_unidade_data == undefined) {
+    // ✅ NOVO: SISTEMA DE CRIAÇÃO EM LOTE
+    var _criar_em_lote = false;
+    if (_unidade_data != undefined && _quantidade_na_fila >= 5) {
+        // Contar quantas unidades do mesmo tipo estão na fila
+        var _mesmo_tipo = 0;
+        var _queue_temp = ds_queue_create();
+        
+        // Verificar fila sem desenfileirar
+        var _queue_size = _quantidade_na_fila;
+        for (var _i = 0; _i < _queue_size; _i++) {
+            var _item = ds_queue_dequeue(fila_recrutamento);
+            ds_queue_enqueue(_queue_temp, _item);
+            if (_item == _indice_unidade) {
+                _mesmo_tipo++;
+            }
+        }
+        
+        // Restaurar fila
+        while (!ds_queue_empty(_queue_temp)) {
+            ds_queue_enqueue(fila_recrutamento, ds_queue_dequeue(_queue_temp));
+        }
+        ds_queue_destroy(_queue_temp);
+        
+        if (_mesmo_tipo >= 5) {
+            _criar_em_lote = true;
+        }
+    }
+    
+    // ✅ SISTEMA DE LOTE: Criar todas de uma vez após timer
+    if (_criar_em_lote) {
+        tempo_treinamento_restante++;
+        
+        // Tempo fixo de 4 segundos (240 frames) para lote
+        if (tempo_treinamento_restante >= 240) {
+            show_debug_message("🚀 CRIAÇÃO EM LOTE INICIADA! Quantidade na fila: " + string(_quantidade_na_fila));
+            
+            // Contar quantas unidades do mesmo tipo
+            var _queue_temp = ds_queue_create();
+            var _mesmo_tipo_count = 0;
+            var _queue_size = ds_queue_size(fila_recrutamento);
+            
+            // Separar unidades do mesmo tipo
+            for (var _i = 0; _i < _queue_size; _i++) {
+                var _item = ds_queue_dequeue(fila_recrutamento);
+                if (_item == _indice_unidade) {
+                    _mesmo_tipo_count++;
+                } else {
+                    ds_queue_enqueue(_queue_temp, _item); // Manter outros tipos na fila
+                }
+            }
+            
+            // Restaurar fila (sem as unidades que serão criadas)
+            while (!ds_queue_empty(_queue_temp)) {
+                ds_queue_enqueue(fila_recrutamento, ds_queue_dequeue(_queue_temp));
+            }
+            ds_queue_destroy(_queue_temp);
+            
+            // ✅ CRIAR TODAS AS UNIDADES DE UMA VEZ
+            for (var _c = 0; _c < _mesmo_tipo_count; _c++) {
+                var _offset_x = (_c mod 4) * 50; // Grid 4x4
+                var _offset_y = floor(_c / 4) * 50;
+                var _spawn_x = x + sprite_width + _offset_x;
+                var _spawn_y = y + sprite_height + _offset_y;
+                
+                var _unidade_criada = noone;
+                var _quartel_layer = layer_get_name(layer);
+                if (layer_exists(_quartel_layer)) {
+                    _unidade_criada = instance_create_layer(_spawn_x, _spawn_y, _quartel_layer, _unidade_data.objeto);
+                }
+                
+                if (!instance_exists(_unidade_criada)) {
+                    var _camadas = ["Instances", "Instances_0", "rm_mapa_principal", "Main"];
+                    for (var _c2 = 0; _c2 < array_length(_camadas) && !instance_exists(_unidade_criada); _c2++) {
+                        var _camada_nome = _camadas[_c2];
+                        if (layer_exists(_camada_nome)) {
+                            _unidade_criada = instance_create_layer(_spawn_x, _spawn_y, _camada_nome, _unidade_data.objeto);
+                        }
+                    }
+                }
+                
+                if (!instance_exists(_unidade_criada)) {
+                    _unidade_criada = instance_create(_spawn_x, _spawn_y, _unidade_data.objeto);
+                }
+                
+                if (instance_exists(_unidade_criada)) {
+                    unidades_criadas++;
+                    _unidade_criada.nacao_proprietaria = nacao_proprietaria;
+                    
+                    if (variable_instance_exists(_unidade_criada, "estado")) {
+                        _unidade_criada.estado = "parado";
+                    }
+                    if (variable_instance_exists(_unidade_criada, "selecionado")) {
+                        _unidade_criada.selecionado = false;
+                    }
+                }
+            }
+            
+            show_debug_message("✅ " + string(_mesmo_tipo_count) + "x " + _unidade_data.nome + " criadas em LOTE!");
+            
+            // Resetar timer e verificar próxima unidade
+            tempo_treinamento_restante = 0;
+            if (!ds_queue_empty(fila_recrutamento)) {
+                _indice_unidade = ds_queue_head(fila_recrutamento);
+                unidade_selecionada = _indice_unidade;
+                show_debug_message("🔄 Iniciando próximo treinamento...");
+            } else {
+                esta_treinando = false;
+                show_debug_message("🏁 Treinamento completo - Quartel ocioso");
+            }
+        }
+    } else {
+        // ✅ SISTEMA NORMAL: Criar uma por vez (menos de 5 unidades)
+        tempo_treinamento_restante++;
+        
+        // ✅ CORREÇÃO CRÍTICA: Verificar se dados da unidade são válidos
+        if (_unidade_data == undefined) {
         show_debug_message("❌ ERRO: Dados da unidade inválidos para índice " + string(_indice_unidade));
         show_debug_message("❌ Removendo entrada inválida da fila");
         ds_queue_dequeue(fila_recrutamento); // Remover entrada inválida
@@ -97,8 +211,8 @@ if (esta_treinando && ds_exists(fila_recrutamento, ds_type_queue) && !ds_queue_e
         
         // Debug a cada segundo
         if (tempo_treinamento_restante % 60 == 0) {
-            var _fila_size = ds_queue_size(fila_recrutamento);
-            show_debug_message("⏱️ Treinamento: " + string(tempo_treinamento_restante) + "/" + string(_tempo_necessario) + " frames | Fila: " + string(_fila_size));
+            var _fila_size_atual = ds_queue_size(fila_recrutamento); // Variável local para evitar conflito
+            show_debug_message("⏱️ Treinamento: " + string(tempo_treinamento_restante) + "/" + string(_tempo_necessario) + " frames | Fila: " + string(_fila_size_atual));
         }
         
         // Verificar se treinamento concluído
@@ -168,9 +282,13 @@ if (esta_treinando && ds_exists(fila_recrutamento, ds_type_queue) && !ds_queue_e
                     // Remover da fila apenas após sucesso
                     ds_queue_dequeue(fila_recrutamento);
                     
-                    // Atribuir nação
-                    if (variable_instance_exists(_unidade_criada, "nacao_proprietaria")) {
-                        _unidade_criada.nacao_proprietaria = nacao_proprietaria;
+                    // ✅ FORÇAR nação - CRÍTICO para IA funcionar
+                    _unidade_criada.nacao_proprietaria = nacao_proprietaria;
+                    
+                    // ✅ DEBUG FORTE: Confirmar nação da unidade criada
+                    show_debug_message("🏴 UNIDADE CRIADA - Nação do quartel: " + string(nacao_proprietaria) + " → Nação da unidade: " + string(_unidade_criada.nacao_proprietaria));
+                    if (nacao_proprietaria == 2) {
+                        show_debug_message("🤖 TROPA DA IA CRIADA! ID:" + string(_unidade_criada) + " Tipo:" + object_get_name(_unidade_criada.object_index));
                     }
                     
                     // Definir propriedades básicas da unidade

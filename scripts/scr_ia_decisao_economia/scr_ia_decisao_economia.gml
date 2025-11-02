@@ -185,6 +185,55 @@ function scr_ia_decisao_economia(_ia_id) {
     var _recursos_criticos = global.ia_dinheiro < 200 || global.ia_minerio < 150; // Mais leniente
     
     // ==========================================
+    // ✅ NOVO: DETECTAR QUARTÉIS DO JOGADOR
+    // ==========================================
+    var _quartel_jogador = 0;
+    var _quartel_naval_jogador = 0;
+    var _aeroporto_jogador = 0;
+    
+    with (obj_quartel) {
+        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) {
+            _quartel_jogador++;
+        }
+    }
+    
+    with (obj_quartel_marinha) {
+        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) {
+            _quartel_naval_jogador++;
+        }
+    }
+    
+    with (obj_aeroporto_militar) {
+        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) {
+            _aeroporto_jogador++;
+        }
+    }
+    
+    // ✅ REAÇÃO IMEDIATA: Se jogador tem quartel, IA deve ter também!
+    if (_quartel_jogador > _num_quartel && _dinheiro_suficiente && _minerio_suficiente) {
+        if (variable_global_exists("debug_enabled") && global.debug_enabled) {
+            show_debug_message("⚔️ ALERTA! Jogador tem " + string(_quartel_jogador) + " quartéis! IA tem apenas " + string(_num_quartel) + " - CONSTRUINDO AGORA!");
+        }
+        return "construir_militar"; // PRIORIDADE MÁXIMA
+    }
+    
+    // Se jogador tem quartel naval, IA deve ter também
+    if (_quartel_naval_jogador > _num_quartel_marinha && _unidades_terrestres >= 2 && _dinheiro_suficiente && _minerio_suficiente) {
+        if (variable_global_exists("debug_enabled") && global.debug_enabled) {
+            show_debug_message("🌊 ALERTA NAVAL! Jogador tem quartel naval - CONSTRUINDO DEFESA NAVAL!");
+        }
+        return "construir_naval";
+    }
+    
+    // Se jogador tem aeroporto, IA deve ter também
+    if (_aeroporto_jogador > _num_aeroporto && _total_unidades >= 4 && _dinheiro_suficiente && _minerio_suficiente) {
+        if (variable_global_exists("debug_enabled") && global.debug_enabled) {
+            show_debug_message("✈️ ALERTA AÉREA! Jogador tem aeroporto - CONSTRUINDO DEFESA AÉREA!");
+        }
+        return "construir_aereo";
+    }
+    
+    // ==========================================
     // ✅ PRIORIDADE MÁXIMA: DEFENDER quando atacada
     // ==========================================
     
@@ -221,23 +270,23 @@ function scr_ia_decisao_economia(_ia_id) {
     }
     
     // Contar unidades navais
-    var _tipos_navais = [obj_lancha_patrulha, obj_navio_base, obj_submarino_base, obj_Constellation, obj_Independence, obj_RonaldReagan];
+    var _tipos_navais_jogador = [obj_lancha_patrulha, obj_navio_base, obj_submarino_base, obj_Constellation, obj_Independence, obj_RonaldReagan];
     var _obj_fragata_check = asset_get_index("obj_fragata");
     if (_obj_fragata_check != -1 && asset_get_type(_obj_fragata_check) == asset_object) {
-        array_push(_tipos_navais, _obj_fragata_check);
+        array_push(_tipos_navais_jogador, _obj_fragata_check);
     }
-    for (var i = 0; i < array_length(_tipos_navais); i++) {
-        if (!object_exists(_tipos_navais[i])) continue;
-        with (_tipos_navais[i]) {
+    for (var i = 0; i < array_length(_tipos_navais_jogador); i++) {
+        if (!object_exists(_tipos_navais_jogador[i])) continue;
+        with (_tipos_navais_jogador[i]) {
             if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) _total_unidades_jogador++;
         }
     }
     
     // Contar unidades aéreas
-    var _tipos_aereos = [obj_helicoptero_militar, obj_caca_f5, obj_f6, obj_f15, obj_c100];
-    for (var i = 0; i < array_length(_tipos_aereos); i++) {
-        if (!object_exists(_tipos_aereos[i])) continue;
-        with (_tipos_aereos[i]) {
+    var _tipos_aereos_jogador = [obj_helicoptero_militar, obj_caca_f5, obj_f6, obj_f15, obj_c100];
+    for (var i = 0; i < array_length(_tipos_aereos_jogador); i++) {
+        if (!object_exists(_tipos_aereos_jogador[i])) continue;
+        with (_tipos_aereos_jogador[i]) {
             if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) _total_unidades_jogador++;
         }
     }
@@ -319,8 +368,8 @@ function scr_ia_decisao_economia(_ia_id) {
     var _decisao = "expandir";
     var _prioridade = 0;
     
-    // ✅ PRIORIDADE 1: ATAQUE ULTRA AGRESSIVO - Atacar com só 2 unidades!
-    if (_total_inimigos > 0 && _total_unidades >= 2) { // REDUZIDO de 3 para 2 - ATAQUE MAIS RÁPIDO
+    // ✅ PRIORIDADE 1: ATAQUE ULTRA AGRESSIVO - Atacar com só 1 unidade!
+    if (_total_inimigos > 0 && _total_unidades >= 1) { // MUDADO de 2 para 1 - ATAQUE IMEDIATO
         _decisao = "atacar";
         _prioridade = 10;
         if (variable_global_exists("debug_enabled") && global.debug_enabled) {
@@ -328,7 +377,7 @@ function scr_ia_decisao_economia(_ia_id) {
         }
     }
     // ✅ PRIORIDADE 2: ATAQUE PREVENTIVO - Procurar inimigos mais longe
-    else if (_total_unidades >= 3 && _total_inimigos == 0) { // REDUZIDO de 8 para 3
+    else if (_total_unidades >= 1 && _total_inimigos == 0) { // MUDADO de 3 para 1 - BUSCAR E ATACAR
         // Expandir raio de busca e atacar se encontrar
         var _raio_estendido = _ia.raio_expansao * 2.5; // AUMENTADO de 2.0 para 2.5
         var _inimigo_distante = noone;
@@ -365,7 +414,7 @@ function scr_ia_decisao_economia(_ia_id) {
         _prioridade = 7;
     }
     // ✅ PRIORIDADE 4: MILITAR PRIMEIRO - Construir quartel ANTES de economia
-    else if (_num_quartel < 1 && _dinheiro_suficiente && _minerio_suficiente) {
+    else if (_num_quartel < 2 && _dinheiro_suficiente && _minerio_suficiente) { // MUDADO de < 1 para < 2
         _decisao = "construir_militar";
         _prioridade = 6;
     }

@@ -61,7 +61,7 @@ function scr_verificar_posicao_valida(objeto_tipo, pos_x, pos_y) {
         case obj_destroyer:
         case obj_submarino:
         case obj_RonaldReagan:
-            return scr_check_water_tile();
+            return scr_check_water_tile(pos_x, pos_y);
         default:
             return true;
     }

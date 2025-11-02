@@ -29,6 +29,7 @@ if (alarm[0] > 0) alarm[0] = -1; // Forçar desativação se ainda estiver ativo
 
 // === CONFIGURAÇÕES DE RECRUTAMENTO ===
 menu_recrutamento_ativo = false;
+menu_recrutamento = noone; // ✅ Referência ao menu de recrutamento deste quartel
 recrutamento_em_andamento = false;
 unidade_sendo_treinada = noone;
 tempo_treinamento_restante = 0;
@@ -54,7 +55,7 @@ ds_list_add(unidades_disponiveis, {
     objeto: obj_infantaria,
     custo_dinheiro: 100,
     custo_populacao: 1,
-    tempo_treino: 180, // 3 segundos (180 frames)
+    tempo_treino: 240, // ✅ MUDADO: 4 segundos (240 frames) - MÁXIMO
     descricao: "Unidade de combate básica com rifle",
     sprite: spr_infantaria
 });
@@ -64,7 +65,7 @@ ds_list_add(unidades_disponiveis, {
     objeto: obj_soldado_antiaereo,
     custo_dinheiro: 200,
     custo_populacao: 1,
-    tempo_treino: 300, // 5 segundos
+    tempo_treino: 240, // ✅ MUDADO: 4 segundos (240 frames) - MÁXIMO
     descricao: "Especialista com mísseis de longo alcance",
     sprite: spr_soldado_antiaereo,
     categoria: "terrestre"
@@ -75,7 +76,7 @@ ds_list_add(unidades_disponiveis, {
     objeto: obj_tanque,
     custo_dinheiro: 500,
     custo_populacao: 3,
-    tempo_treino: 300, // 5 segundos
+    tempo_treino: 240, // ✅ MUDADO: 4 segundos (240 frames) - MÁXIMO
     descricao: "Unidade blindada pesada com canhão",
     sprite: spr_tanque
 });
@@ -85,7 +86,7 @@ ds_list_add(unidades_disponiveis, {
     objeto: obj_blindado_antiaereo,
     custo_dinheiro: 800,
     custo_populacao: 4,
-    tempo_treino: 300, // 5 segundos
+    tempo_treino: 240, // ✅ MUDADO: 4 segundos (240 frames) - MÁXIMO
     descricao: "Veículo especializado em defesa aérea",
     sprite: spr_blindado_antiaereo,
     categoria: "terrestre"

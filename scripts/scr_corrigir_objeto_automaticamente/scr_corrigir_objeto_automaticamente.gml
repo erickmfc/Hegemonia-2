@@ -184,11 +184,11 @@ function scr_corrigir_propriedades_objeto(objeto) {
         case obj_submarino:
         case obj_RonaldReagan:
             // Verificar se está em água
-            if (!scr_check_water_tile()) {
-                var pos_agua = scr_find_nearest_water();
-                if (pos_agua.x != -1) {
-                    objeto.x = pos_agua.x;
-                    objeto.y = pos_agua.y;
+            if (!scr_check_water_tile(objeto.x, objeto.y)) {
+                var pos_agua = scr_find_nearest_water(objeto.x, objeto.y, 500);
+                if (pos_agua[0] != -1) {
+                    objeto.x = pos_agua[0];
+                    objeto.y = pos_agua[1];
                     resultado.correcoes_aplicadas[array_length(resultado.correcoes_aplicadas)] = "Posição corrigida para água";
                 } else {
                     resultado.avisos[array_length(resultado.avisos)] = "Navio não está em água e não foi possível encontrar posição válida";

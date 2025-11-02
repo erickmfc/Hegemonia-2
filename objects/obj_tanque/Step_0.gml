@@ -345,7 +345,7 @@ switch (estado) {
                     // Verificação inline (sem depender de script)
                     var _cam = view_camera[0];
                     var _visivel = true; // Fallback: considerar visível
-                    if (_cam != -1 && _cam != noone && camera_exists(_cam)) {
+                    if (_cam != -1 && _cam != noone) {
                         var _cam_x = camera_get_view_x(_cam);
                         var _cam_y = camera_get_view_y(_cam);
                         var _cam_w = camera_get_view_width(_cam);

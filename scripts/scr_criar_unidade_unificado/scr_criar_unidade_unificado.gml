@@ -98,7 +98,7 @@ function scr_verificar_posicao_unidade(tipo_unidade, pos_x, pos_y) {
         case "destroyer":
         case "submarino":
         case "porta_avioes":
-            return scr_check_water_tile();
+            return scr_check_water_tile(pos_x, pos_y);
         default:
             return true;
     }

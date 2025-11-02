@@ -8,7 +8,7 @@
 /// @return {Array<Real>} [tile_start_x, tile_start_y, tile_end_x, tile_end_y]
 function scr_calculate_culling_area() {
     var cam = view_camera[0];
-    if (cam == noone || !camera_exists(cam)) {
+    if (cam == noone || cam == -1) {
         // Fallback: toda a room
         var _tile_size = variable_global_exists("tile_size") ? global.tile_size : 32;
         return [

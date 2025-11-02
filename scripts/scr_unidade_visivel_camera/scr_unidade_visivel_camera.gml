@@ -12,7 +12,7 @@ var _margin = (argument_count >= 3) ? argument2 : 100; // Margem padrão: 100 pi
 var _cam = view_camera[0];
 
 // Se não há câmera, considerar visível (fallback)
-if (_cam == -1 || _cam == noone || !camera_exists(_cam)) {
+if (_cam == -1 || _cam == noone) {
     return true;
 }
 

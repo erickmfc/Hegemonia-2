@@ -139,6 +139,24 @@ function scr_ia_atacar(_ia_id) {
     
     // === EXECUTAR ATAQUE ===
     if (instance_exists(_alvo_prioritario)) {
+        // ✅ NOVO: SISTEMA TÁTICO AVANÇADO
+        var _analise_tatica = scr_ia_analisar_alvos(_ia);
+        
+        if (ds_list_size(_analise_tatica.alvos) > 0) {
+            // Usar sistema tático avançado
+            scr_ia_ataque_tatico(_ia, _analise_tatica);
+            
+            // Limpar análise após uso
+            ds_list_destroy(_analise_tatica.alvos);
+            
+            if (variable_global_exists("debug_enabled") && global.debug_enabled) {
+                show_debug_message("⚔️ IA ATAQUE TÁTICO EXECUTADO! Estratégia: " + _analise_tatica.estrategia);
+            }
+            
+            return; // Sair após usar sistema tático
+        }
+        
+        // Fallback: sistema antigo se análise não encontrou alvos
         // ✅ Ativar squad antes de atacar
         scr_activate_enemy_squad(_alvo_prioritario.x, _alvo_prioritario.y, 1500);
         
@@ -150,6 +168,89 @@ function scr_ia_atacar(_ia_id) {
         
         var _comandos = 0;
         
+        // === ✅ NOVO: COMANDAR TODAS AS UNIDADES (NÃO SÓ INFANTARIA E TANQUE) ===
+        
+        // Comandar blindados antiaéreos
+        with (obj_blindado_antiaereo) {
+            if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _ia.nacao_proprietaria) {
+                if (variable_instance_exists(id, "destino_x")) {
+                    destino_x = _alvo_prioritario.x;
+                    destino_y = _alvo_prioritario.y;
+                }
+                if (variable_instance_exists(id, "alvo")) {
+                    alvo = _alvo_prioritario;
+                }
+                if (variable_instance_exists(id, "estado")) {
+                    estado = "atacando";
+                }
+                _comandos++;
+            }
+        }
+        
+        // Comandar soldados antiaéreos
+        with (obj_soldado_antiaereo) {
+            if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _ia.nacao_proprietaria) {
+                if (variable_instance_exists(id, "destino_x")) {
+                    destino_x = _alvo_prioritario.x;
+                    destino_y = _alvo_prioritario.y;
+                }
+                if (variable_instance_exists(id, "alvo")) {
+                    alvo = _alvo_prioritario;
+                }
+                if (variable_instance_exists(id, "estado")) {
+                    estado = "atacando";
+                }
+                _comandos++;
+            }
+        }
+        
+        // Comandar navios (se houver)
+        var _tipos_navais_ia = [obj_lancha_patrulha, obj_navio_base, obj_submarino_base];
+        var _obj_fragata_ia = asset_get_index("obj_fragata");
+        if (_obj_fragata_ia != -1 && asset_get_type(_obj_fragata_ia) == asset_object) {
+            array_push(_tipos_navais_ia, _obj_fragata_ia);
+        }
+        
+        for (var i = 0; i < array_length(_tipos_navais_ia); i++) {
+            if (!object_exists(_tipos_navais_ia[i])) continue;
+            with (_tipos_navais_ia[i]) {
+                if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _ia.nacao_proprietaria) {
+                    if (variable_instance_exists(id, "destino_x")) {
+                        destino_x = _alvo_prioritario.x;
+                        destino_y = _alvo_prioritario.y;
+                    }
+                    if (variable_instance_exists(id, "alvo")) {
+                        alvo = _alvo_prioritario;
+                    }
+                    if (variable_instance_exists(id, "estado")) {
+                        estado = "atacando";
+                    }
+                    _comandos++;
+                }
+            }
+        }
+        
+        // Comandar aeronaves (se houver)
+        var _tipos_aereos_ia = [obj_helicoptero_militar, obj_caca_f5, obj_f6, obj_f15];
+        for (var i = 0; i < array_length(_tipos_aereos_ia); i++) {
+            if (!object_exists(_tipos_aereos_ia[i])) continue;
+            with (_tipos_aereos_ia[i]) {
+                if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _ia.nacao_proprietaria) {
+                    if (variable_instance_exists(id, "destino_x")) {
+                        destino_x = _alvo_prioritario.x;
+                        destino_y = _alvo_prioritario.y;
+                    }
+                    if (variable_instance_exists(id, "alvo")) {
+                        alvo = _alvo_prioritario;
+                    }
+                    if (variable_instance_exists(id, "estado")) {
+                        estado = "atacando";
+                    }
+                    _comandos++;
+                }
+            }
+        }
+        
         // === ATAQUE BASEADO NO TIPO ===
         if (_tipo_guerra == "naval") {
             // Usar navios para atacar
@@ -158,7 +259,6 @@ function scr_ia_atacar(_ia_id) {
             // ✅ NOVO: Mover tropas estrategicamente (não tudo junto)
             scr_ia_mover_tropas_estrategico(_ia, _alvo_prioritario.x, _alvo_prioritario.y, 350);
             
-            // Também comandar unidades individualmente para garantir
             // Comandar infantaria
             with (obj_infantaria) {
                 if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _ia.nacao_proprietaria) {
@@ -195,7 +295,7 @@ function scr_ia_atacar(_ia_id) {
         }
         
         if (variable_global_exists("debug_enabled") && global.debug_enabled) {
-            show_debug_message("⚔️ IA ATAQUE [" + _tipo_guerra + "]! " + string(_comandos) + " unidades | Alvo: (" + string(round(_alvo_prioritario.x)) + ", " + string(round(_alvo_prioritario.y)) + ")");
+            show_debug_message("⚔️ IA ATAQUE TOTAL [" + _tipo_guerra + "]! " + string(_comandos) + " unidades | Alvo: (" + string(round(_alvo_prioritario.x)) + ", " + string(round(_alvo_prioritario.y)) + ")");
         }
     } else {
         if (variable_global_exists("debug_enabled") && global.debug_enabled) {

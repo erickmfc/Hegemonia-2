@@ -57,14 +57,43 @@ function scr_ia_encontrar_posicao_estrategica(_ia_id, _tipo_estrutura = "economi
         }
         
     } else if (_tipo_estrutura == "naval") {
-        // Quartéis navais: próximo a água, mas espaçados
-        var _distancia_agua = _raio_expansao * 0.8; // Próximo mas não grudado
-        var _angulos = [90, 135, 180, 225, 270]; // Direções onde pode ter água
+        // ✅ CORRIGIDO: Quartéis navais DEVEM estar EM ÁGUA
+        // Buscar posições de água próximas à base
+        var _posicao_agua = scr_find_nearest_water(_base_x, _base_y, _raio_expansao * 1.5);
         
+        if (_posicao_agua[0] != -1) {
+            // Encontrou água, usar essa posição e tentar variações ao redor
+            var _px_base = _posicao_agua[0];
+            var _py_base = _posicao_agua[1];
+            
+            // Tentar posições próximas em água (formar um círculo na água)
+            for (var i = 0; i < 12; i++) {
+                var _angulo = i * 30; // 12 posições em círculo
+                var _raio_variacao = 50 + random_range(0, 100); // Variação de 50-150 pixels
+                var _px = _px_base + lengthdir_x(_raio_variacao, _angulo);
+                var _py = _py_base + lengthdir_y(_raio_variacao, _angulo);
+                
+                // Verificar se está em água antes de adicionar
+                if (scr_check_water_tile(_px, _py)) {
+                    array_push(_posicoes_tentativas, {x: _px, y: _py, angulo: _angulo});
+                }
+            }
+        } else {
+            // Não encontrou água próxima, tentar buscar em direções específicas
+        var _angulos = [90, 135, 180, 225, 270]; // Direções onde pode ter água
         for (var i = 0; i < array_length(_angulos); i++) {
-            var _px = _base_x + lengthdir_x(_distancia_agua, _angulos[i]);
-            var _py = _base_y + lengthdir_y(_distancia_agua, _angulos[i]);
+                var _distancia = 200;
+                for (var j = 0; j < 10; j++) { // Tentar até 10 distâncias diferentes
+                    var _px = _base_x + lengthdir_x(_distancia, _angulos[i]);
+                    var _py = _base_y + lengthdir_y(_distancia, _angulos[i]);
+                    
+                    if (scr_check_water_tile(_px, _py)) {
             array_push(_posicoes_tentativas, {x: _px, y: _py, angulo: _angulos[i]});
+                        break; // Encontrou, para de buscar nesta direção
+                    }
+                    _distancia += 100; // Aumenta distância
+                }
+            }
         }
         
     } else if (_tipo_estrutura == "aereo") {
@@ -125,6 +154,18 @@ function scr_ia_encontrar_posicao_estrategica(_ia_id, _tipo_estrutura = "economi
             }
         }
         
+        // ✅ NOVO: Para estruturas navais, verificar se está em água
+        if (_tipo_estrutura == "naval") {
+            if (!scr_check_water_tile(_pos.x, _pos.y)) {
+                _valida = false; // Não é água, inválida para quartel naval
+            } else {
+                // Bônus extra se toda a área for água
+                if (scr_check_water_area(_pos.x, _pos.y, 128, 128)) { // Assumindo tamanho padrão
+                    _score += 2000; // Grande bônus para área totalmente em água
+                }
+            }
+        }
+        
         // Calcular score: preferir posições com algumas estruturas próximas (não isolado demais) mas não grudadas
         if (_valida) {
             _score = 1000 - (_estruturas_proximas * 100); // Menos estruturas próximas = melhor
@@ -142,13 +183,31 @@ function scr_ia_encontrar_posicao_estrategica(_ia_id, _tipo_estrutura = "economi
         }
     }
     
-    // Se não encontrou posição válida, usar posição padrão com variação maior
+    // Se não encontrou posição válida, tentar encontrar água novamente
     if (!_melhor_pos.valida || _melhor_score < 0) {
+        if (_tipo_estrutura == "naval") {
+            // Para naval, buscar água de novo com raio maior
+            var _posicao_agua = scr_find_nearest_water(_base_x, _base_y, _raio_expansao * 2.5);
+            if (_posicao_agua[0] != -1) {
+                _melhor_pos.x = _posicao_agua[0];
+                _melhor_pos.y = _posicao_agua[1];
+                _melhor_pos.valida = scr_check_water_tile(_posicao_agua[0], _posicao_agua[1]);
+            } else {
+                // Último recurso: posição aleatória e marcar como inválida
+                var _angulo_random = random(360);
+                var _dist_random = _raio_minimo + random_range(100, 300);
+                _melhor_pos.x = _base_x + lengthdir_x(_dist_random, _angulo_random);
+                _melhor_pos.y = _base_y + lengthdir_y(_dist_random, _angulo_random);
+                _melhor_pos.valida = false; // Não pode construir aqui
+            }
+        } else {
+            // Para outras estruturas, usar posição padrão
         var _angulo_random = random(360);
         var _dist_random = _raio_minimo + random_range(100, 300);
         _melhor_pos.x = _base_x + lengthdir_x(_dist_random, _angulo_random);
         _melhor_pos.y = _base_y + lengthdir_y(_dist_random, _angulo_random);
         _melhor_pos.valida = true;
+        }
     }
     
     return _melhor_pos;
