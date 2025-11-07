@@ -30,6 +30,18 @@ if (selecionado) {
     draw_circle(x, y, 35, false);
     draw_set_alpha(1.0);
     
+    // Círculo de alcance dos mísseis (800px)
+    draw_set_color(c_red);
+    draw_set_alpha(0.12);
+    draw_circle(x, y, 800, false);
+    draw_set_alpha(1.0);
+    
+    // Círculo de alcance do radar (1000px)
+    draw_set_color(c_blue);
+    draw_set_alpha(0.08);
+    draw_circle(x, y, 1000, false);
+    draw_set_alpha(1.0);
+    
     // Indicador de nome específico
     draw_set_halign(fa_center);
     draw_set_color(c_yellow);

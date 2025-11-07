@@ -6,8 +6,8 @@
 
 speed = 8; // Velocidade melhorada para interceptação
 gravity = 0.03; // Gravitade ajustada para melhor precisão
-dano = 168; // Dano aumentado em 20% (140 * 1.2 = 168) - SUPER PESADO COM DANO EM ÁREA
-dano_area = 40; // Dano de área aérea - afeta unidades próximas
+dano = 1000; // ✅ AUMENTADO: Dano suficiente para matar 10 soldados
+dano_area = 1000; // ✅ AUMENTADO: Dano em área para matar todos os soldados próximos
 dono = noone; // Quem disparou
 target = noone; // Alvo do míssil
 alvo = noone; // Variável alternativa para compatibilidade com F-15
@@ -30,14 +30,14 @@ if (variable_global_exists("som_tanque")) {
 alarm[0] = game_get_speed(gamespeed_fps) * 3; // Autodestruição após 3 segundos se não acertar
 
 // Configurações visuais
-image_xscale = 0.1; // Escala horizontal
-image_yscale = 0.1; // Escala vertical
-image_angle = 0; // Ângulo inicial
-image_speed = 0.5; // Velocidade da animação
+image_xscale = 0.08; // ✅ REDUZIDO 20%: 0.1 * 0.8 = 0.08
+image_yscale = 0.08; // ✅ REDUZIDO 20%: 0.1 * 0.8 = 0.08
+image_angle = 0;
+image_speed = 0.5;
 
-// Parâmetros de guiamento/impacto (ajustáveis)
-turn_rate = 0.20; // Taxa de curva melhorada para 99% de acerto
-impact_radius = 30; // Raio de acerto aumentado para garantir 99%
+// Parâmetros de guiamento/impacto (100% de precisão garantida)
+turn_rate = 1.0; // ✅ AUMENTADO: Taxa máxima para sempre seguir o alvo (100% de precisão)
+impact_radius = 100; // ✅ AUMENTADO: Raio muito grande para garantir 100% de acerto
 
 // Rastreamento do alvo para detectar se está parado (garantir 100% quando imóvel)
 last_tx = -1;

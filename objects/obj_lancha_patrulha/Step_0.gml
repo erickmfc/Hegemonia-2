@@ -60,8 +60,8 @@ if (selecionado) {
 // ======================================================================
 // --- 2. LÓGICA DE AQUISIÇÃO DE ALVO (ADAPTADA PARA NAVAL) ---
 // ======================================================================
-// Se o modo ataque está ativo E a lancha não está parada E não está já atacando alguém...
-if (modo_combate == LanchaMode.ATAQUE && estado != LanchaState.PARADO && estado != LanchaState.ATACANDO) {
+// Se o modo ataque está ativo E não está já atacando alguém...
+if (modo_combate == LanchaMode.ATAQUE && estado != LanchaState.ATACANDO) {
     // Prioriza alvos navais primeiro, depois terrestres
     var _alvo_naval = instance_nearest(x, y, obj_lancha_patrulha);
     var _alvo_helicoptero = instance_nearest(x, y, obj_helicoptero_militar);

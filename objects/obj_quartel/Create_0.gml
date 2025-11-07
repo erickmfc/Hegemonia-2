@@ -118,6 +118,13 @@ visible = true;
 force_always_active = true; // Nunca desativar estruturas importantes
 instance_activate_object(id); // Garantir que está ativo
 
+// ✅ DEBUG: Confirmar que quartel está ativo
+show_debug_message("✅ Quartel ID: " + string(id) + " criado com force_always_active = true | Nação: " + string(nacao_proprietaria));
+
+// ✅ ALTERNATIVA: Usar Alarm como backup para garantir execução
+// Se o Step não executar, o Alarm vai chamar o Step manualmente
+alarm[1] = 1; // Executar no próximo frame
+
 show_debug_message("Um quartel foi construído e está pronto para recrutar unidades.");
 show_debug_message("Custo de construção: $" + string(custo_dinheiro) + " dinheiro, " + string(custo_minerio) + " minério");
 show_debug_message("✅ Quartel protegido contra desativação - ID: " + string(id));

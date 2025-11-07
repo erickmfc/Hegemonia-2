@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_ia_calcular_forca_total",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_ia_calcular_forca_total",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

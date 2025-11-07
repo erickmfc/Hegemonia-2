@@ -3,12 +3,6 @@
 // Sistema de Recrutamento com Menu
 // =========================================================
 
-// Se o quartel já estiver ocupado, não faz nada.
-if (esta_treinando) {
-    show_debug_message("Quartel ID " + string(id) + " já está em treinamento.");
-    exit; // Sai do script
-}
-
 // Verificar se foi definida uma quantidade, senão usar 1 como padrão
 if (!variable_instance_exists(id, "quantidade_recrutar")) {
     quantidade_recrutar = 1;
@@ -38,25 +32,28 @@ if (global.dinheiro >= _custo_total_d && global.populacao >= _custo_total_p) {
     global.dinheiro -= _custo_total_d;
     global.populacao -= _custo_total_p;
     
-    // Marca o quartel como ocupado
-    esta_treinando = true;
+    // === SISTEMA NOVO: ADICIONAR À FILA DE RECRUTAMENTO ===
+    // Garantir que a fila existe
+    if (!ds_exists(fila_recrutamento, ds_type_queue)) {
+        fila_recrutamento = ds_queue_create();
+        show_debug_message("⚠️ Fila de recrutamento criada");
+    }
     
-    // Armazenar informações do recrutamento
-    unidades_para_criar = quantidade_recrutar;
-    unidades_criadas = 0;
-    ultimo_recrutamento_tanque = (_unidade_data.objeto == obj_tanque); // Para compatibilidade
+    // Adicionar múltiplas unidades à fila (uma por vez)
+    for (var i = 0; i < quantidade_recrutar; i++) {
+        ds_queue_enqueue(fila_recrutamento, unidade_selecionada);
+    }
     
-    // Ativa o alarme com o tempo de treino da unidade selecionada
-    alarm[0] = _tempo_treino;
-    
-    show_debug_message("==== RECRUTAMENTO INICIADO ====");
+    show_debug_message("==== UNIDADES ADICIONADAS À FILA ====");
     show_debug_message("Quartel ID: " + string(id));
     show_debug_message("Unidade: " + _unidade_data.nome);
-    show_debug_message("Objeto: " + string(_unidade_data.objeto));
-    show_debug_message("Quantidade a recrutar: " + string(quantidade_recrutar));
+    show_debug_message("Quantidade: " + string(quantidade_recrutar));
+    show_debug_message("Tamanho da fila: " + string(ds_queue_size(fila_recrutamento)));
     show_debug_message("Custo total deduzido: $" + string(_custo_total_d) + " dinheiro, " + string(_custo_total_p) + " população");
-    show_debug_message("Primeira unidade pronta em " + string(alarm[0]) + " frames (" + string(alarm[0]/60) + " segundos)");
     show_debug_message("Recursos restantes: $" + string(global.dinheiro) + " dinheiro, " + string(global.populacao) + " população");
+    
+    // O sistema Step_0.gml irá automaticamente processar a fila
+    // e iniciar o treinamento quando apropriado
     
     // Resetar a quantidade para o próximo uso
     quantidade_recrutar = 1;

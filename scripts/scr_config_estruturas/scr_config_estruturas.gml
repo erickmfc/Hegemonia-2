@@ -80,7 +80,7 @@ function scr_config_quartel(parametros) {
                 objeto: obj_blindado,
                 custo_dinheiro: 300,
                 custo_populacao: 2,
-                tempo_treino: 360, // 6 segundos
+                tempo_treino: 240, // 4 segundos
                 descricao: "Veículo blindado de combate"
             },
             {
@@ -88,7 +88,7 @@ function scr_config_quartel(parametros) {
                 objeto: obj_tanque,
                 custo_dinheiro: 500,
                 custo_populacao: 3,
-                tempo_treino: 480, // 8 segundos
+                tempo_treino: 240, // 4 segundos
                 descricao: "Tanque pesado de combate"
             }
         ]

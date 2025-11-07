@@ -32,24 +32,36 @@ function scr_ia_ataque_tatico(_ia_id, _analise) {
     // === ESCOLHER FORMAÇÃO BASEADO NA ESTRATÉGIA ===
     var _formacao = _analise.estrategia;
     
-    // Mapear estratégia para formação
+    // ✅ NOVO: Mapeamento expandido de estratégias para formações
     var _tipo_formacao = "linha"; // Padrão
     
     switch (_formacao) {
+        case "ataque_total":
+            _tipo_formacao = "assalto_massivo"; // Todos os tipos de unidades em formação densa
+            break;
         case "foco_estruturas":
             _tipo_formacao = "cerco"; // Cercar estrutura
             break;
+        case "guerra_economica":
+            _tipo_formacao = "dispersao_tatica"; // Espalhar para atingir múltiplos alvos econômicos
+            break;
         case "cerco":
-            _tipo_formacao = "cerco";
+            _tipo_formacao = "cerco_completo"; // Círculo completo ao redor
             break;
         case "emboscada":
-            _tipo_formacao = "emboscada";
+            _tipo_formacao = "emboscada_em_V"; // Formação em V para emboscada
             break;
         case "ataque_multi_frontal":
-            _tipo_formacao = "avanco_coordenado";
+            _tipo_formacao = "avanco_coordenado"; // Múltiplos grupos
+            break;
+        case "ataque_limitado":
+            _tipo_formacao = "pincer_basico"; // Ataque limitado em pinça
+            break;
+        case "defesa_reforcos":
+            _tipo_formacao = "defensiva"; // Formação defensiva esperando reforços
             break;
         default:
-            _tipo_formacao = "linha";
+            _tipo_formacao = "linha"; // Formação básica em linha
     }
     
     // === APLICAR FORMAÇÃO TÁTICA ===

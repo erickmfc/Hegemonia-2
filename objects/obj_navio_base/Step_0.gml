@@ -53,7 +53,17 @@ if (modo_combate == LanchaMode.ATAQUE && estado != LanchaState.ATACANDO) {
     }
     var _alvo_infantaria = noone;
     if (object_exists(obj_infantaria)) {
-        _alvo_infantaria = instance_nearest(x, y, obj_infantaria);
+        // ✅ CORREÇÃO: Escolher primeiro da fila quando há múltiplas unidades próximas
+        var _alvo_mais_proximo = instance_nearest(x, y, obj_infantaria);
+        if (instance_exists(_alvo_mais_proximo)) {
+            var _dist_alvo = point_distance(x, y, _alvo_mais_proximo.x, _alvo_mais_proximo.y);
+            // Se há múltiplas unidades próximas (dentro de 200px), escolher primeiro da fila
+            if (_dist_alvo <= 200) {
+                _alvo_infantaria = scr_escolher_primeiro_da_fila(x, y, obj_infantaria, 200);
+            } else {
+                _alvo_infantaria = _alvo_mais_proximo;
+            }
+        }
     }
     
     var _alvo_encontrado = noone;

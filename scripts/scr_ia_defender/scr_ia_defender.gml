@@ -65,16 +65,11 @@ function scr_ia_defender(_ia_id, _dados_ataque) {
     
     // === DEFESA NAVAL ===
     if (_dados_ataque.unidades_navais_atacadas > 0) {
-        var _navios_defensores = [
-            obj_lancha_patrulha,
-            obj_navio_base,
-            obj_submarino_base
-        ];
-        
-        // Verificar se obj_fragata existe antes de adicionar
-        var _obj_fragata = asset_get_index("obj_fragata");
-        if (_obj_fragata != -1 && asset_get_type(_obj_fragata) == asset_object) {
-            array_push(_navios_defensores, _obj_fragata);
+        // ✅ CORRIGIDO: Implementação direta (sem depender de função externa)
+        var _navios_defensores = [obj_lancha_patrulha, obj_navio_base, obj_submarino_base, obj_navio_transporte, obj_Constellation, obj_Independence, obj_RonaldReagan];
+        var _obj_fragata_defender = asset_get_index("obj_fragata");
+        if (_obj_fragata_defender != -1 && asset_get_type(_obj_fragata_defender) == asset_object) {
+            array_push(_navios_defensores, _obj_fragata_defender);
         }
         
         var _raio_defesa_naval = 800;

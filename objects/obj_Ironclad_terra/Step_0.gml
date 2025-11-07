@@ -49,8 +49,8 @@ if (instance_exists(target)) {
     // Só faz curva se estiver próximo do alvo
     if (_distancia_alvo <= _distancia_maxima_rastreamento) {
         var ang = point_direction(x, y, target.x, target.y);
-        var _turn_base = (variable_instance_exists(id, "turn_rate") ? turn_rate : 0.06);
-        var _turn = alvo_parado ? max(_turn_base, 0.10) : _turn_base; // curva mais forte se parado
+        var _turn_base = (variable_instance_exists(id, "turn_rate") ? turn_rate : 1.0);
+        var _turn = 1.0; // ✅ FORÇADO: Sempre 1.0 para seguir o alvo perfeitamente (100% de precisão)
         direction = lerp(direction, ang, _turn);
     }
     // Se estiver longe do alvo, continua na direção atual (sem curva)
@@ -64,12 +64,12 @@ var _grav = alvo_parado ? gravity * 0.5 : gravity;
 x += lengthdir_x(speed, direction);
 y += lengthdir_y(speed, direction) + _grav;
 
-// Checagem de impacto por proximidade (100% parado, 99% em movimento)
+// Checagem de impacto por proximidade (100% GARANTIDO)
 if (instance_exists(target)) {
-    var _radius_base = (variable_instance_exists(id, "impact_radius") ? impact_radius : max(28, speed));
-    var _radius = alvo_parado ? max(_radius_base, 40) : _radius_base; // 100% em alvo parado, 99% em movimento
+    var _radius_base = (variable_instance_exists(id, "impact_radius") ? impact_radius : 100);
+    var _radius = 100; // ✅ FORÇADO: Sempre 100 para garantir 100% de acerto
     if (point_distance(x, y, target.x, target.y) <= _radius) {
-        // Aplicar dano seguro
+        // ✅ APLICAR DANO NO ALVO PRINCIPAL
         var _dano_aplicado = false;
         if (variable_instance_exists(target, "vida")) {
             target.vida -= dano;
@@ -84,6 +84,42 @@ if (instance_exists(target)) {
         if (_dano_aplicado) {
             show_debug_message("💥 Ironclad impactou alvo. Dano: " + string(dano));
         }
+        
+        // ✅ NOVO: DANO EM ÁREA - MATA TODOS OS SOLDADOS PRÓXIMOS
+        var _raio_dano_area = (variable_instance_exists(id, "raio_dano_area") ? raio_dano_area : 150);
+        var _dano_area_valor = (variable_instance_exists(id, "dano_area") ? dano_area : 1000);
+        
+        // Lista de objetos terrestres para verificar
+        var _tipos_unidades_terrestres = [
+            obj_infantaria, obj_tanque, obj_soldado_antiaereo, obj_blindado_antiaereo
+        ];
+        
+        var _unidades_atingidas = 0;
+        for (var i = 0; i < array_length(_tipos_unidades_terrestres); i++) {
+            with (_tipos_unidades_terrestres[i]) {
+                if (id != other.target) { // Não aplicar dano duplo no alvo principal
+                    var _dist = point_distance(x, y, other.x, other.y);
+                    if (_dist <= _raio_dano_area) {
+                        // Aplicar dano suficiente para matar (1000 de dano mata qualquer soldado)
+                        if (variable_instance_exists(id, "hp_atual")) {
+                            hp_atual -= _dano_area_valor;
+                            _unidades_atingidas++;
+                        } else if (variable_instance_exists(id, "vida")) {
+                            vida -= _dano_area_valor;
+                            _unidades_atingidas++;
+                        } else if (variable_instance_exists(id, "hp")) {
+                            hp -= _dano_area_valor;
+                            _unidades_atingidas++;
+                        }
+                    }
+                }
+            }
+        }
+        
+        if (_unidades_atingidas > 0) {
+            show_debug_message("💥💥 IRONCLAD - DANO EM ÁREA! " + string(_unidades_atingidas) + " unidades atingidas no raio de " + string(_raio_dano_area) + "px!");
+        }
+        
         if (object_exists(obj_explosao_terra)) {
             instance_create_layer(x, y, "Efeitos", obj_explosao_terra);
         }

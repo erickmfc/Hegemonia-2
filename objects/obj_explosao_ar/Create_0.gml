@@ -17,7 +17,14 @@ if (_cam != -1 && _cam != noone) {
         _visivel = (x >= _view_left && x <= _view_right && y >= _view_top && y <= _view_bottom);
     }
 }
-if (_visivel) {
+
+// ✅ NOVO: Verificar se deve tocar som (removido para mísseis do F-5)
+var _sem_som = false;
+if (variable_instance_exists(id, "sem_som")) {
+    _sem_som = sem_som;
+}
+
+if (_visivel && !_sem_som) {
     var _sound_index = asset_get_index("som_anti");
     if (_sound_index != -1) {
         audio_play_sound(som_anti, 1, false);

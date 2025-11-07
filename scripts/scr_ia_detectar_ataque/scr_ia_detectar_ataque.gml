@@ -52,17 +52,11 @@ function scr_ia_detectar_ataque(_ia_id) {
     }
     
     // === DETECTAR ATAQUES NAVAIS ===
-    var _navios_ia = [
-        obj_lancha_patrulha,
-        obj_navio_base,
-        obj_submarino_base,
-        obj_navio_transporte
-    ];
-    
-    // Verificar se obj_fragata existe antes de adicionar
-    var _obj_fragata = asset_get_index("obj_fragata");
-    if (_obj_fragata != -1 && asset_get_type(_obj_fragata) == asset_object) {
-        array_push(_navios_ia, _obj_fragata);
+    // ✅ CORRIGIDO: Implementação direta (sem depender de função externa)
+    var _navios_ia = [obj_lancha_patrulha, obj_navio_base, obj_submarino_base, obj_navio_transporte, obj_Constellation, obj_Independence, obj_RonaldReagan];
+    var _obj_fragata_detectar = asset_get_index("obj_fragata");
+    if (_obj_fragata_detectar != -1 && asset_get_type(_obj_fragata_detectar) == asset_object) {
+        array_push(_navios_ia, _obj_fragata_detectar);
     }
     
     for (var i = 0; i < array_length(_navios_ia); i++) {

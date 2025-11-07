@@ -65,8 +65,8 @@ if (instance_exists(target)) {
     // Só faz curva se estiver próximo do alvo
     if (_distancia_alvo <= _distancia_maxima_rastreamento) {
         var ang = point_direction(x, y, target.x, target.y);
-        var _turn_base = (variable_instance_exists(id, "turn_rate") ? turn_rate : 0.06);
-        var _turn = alvo_parado ? max(_turn_base, 0.10) : _turn_base; // curva mais forte se parado
+        var _turn_base = (variable_instance_exists(id, "turn_rate") ? turn_rate : 1.0);
+        var _turn = 1.0; // ✅ FORÇADO: Sempre 1.0 para seguir o alvo perfeitamente (100% de precisão)
         direction = lerp(direction, ang, _turn);
     }
     // Se estiver longe do alvo, continua na direção atual (sem curva)
@@ -80,10 +80,10 @@ var _grav = alvo_parado ? gravity * 0.5 : gravity;
 x += lengthdir_x(speed, direction);
 y += lengthdir_y(speed, direction) + _grav;
 
-// Checagem de impacto por proximidade
+// Checagem de impacto por proximidade (100% GARANTIDO)
 if (instance_exists(target)) {
-    var _radius_base = (variable_instance_exists(id, "impact_radius") ? impact_radius : max(30, speed));
-    var _radius = alvo_parado ? max(_radius_base, 35) : _radius_base; // 99% de acerto garantido
+    var _radius_base = (variable_instance_exists(id, "impact_radius") ? impact_radius : 100);
+    var _radius = 100; // ✅ FORÇADO: Sempre 100 para garantir 100% de acerto
     if (point_distance(x, y, target.x, target.y) <= _radius) {
         // ✅ DANO PRINCIPAL NO ALVO
         var _dano_aplicado = false;
@@ -102,8 +102,9 @@ if (instance_exists(target)) {
         }
         
         // ✅ DANO EM ÁREA - AFETA TODAS AS UNIDADES PRÓXIMAS (terrestres e aéreas)
-        var _raio_dano_area = 80; // Raio de dano em área
+        var _raio_dano_area = 150; // ✅ AUMENTADO: Raio maior para pegar mais soldados
         var _dano_area_aplicado = false;
+        var _unidades_atingidas = 0;
         
         // Lista de objetos para verificar
         var _tipos_unidades = [
@@ -116,20 +117,21 @@ if (instance_exists(target)) {
                 if (id != other.target) { // Não aplicar dano duplo no alvo principal
                     var _dist = point_distance(x, y, other.x, other.y);
                     if (_dist <= _raio_dano_area) {
-                        // Calcular dano proporcional à distância (mais próximo = mais dano)
-                        var _dano_multiplier = 1 - (_dist / _raio_dano_area); // 1.0 no centro, 0.0 na borda
-                        var _dano_area_valor = (variable_instance_exists(other.id, "dano_area") ? other.dano_area : 40);
-                        var _dano_area_final = round(_dano_area_valor * _dano_multiplier);
+                        // ✅ AUMENTADO: Dano suficiente para matar qualquer soldado
+                        var _dano_area_valor = (variable_instance_exists(other.id, "dano_area") ? other.dano_area : 1000);
                         
                         if (variable_instance_exists(id, "hp_atual")) {
-                            hp_atual -= _dano_area_final;
+                            hp_atual -= _dano_area_valor;
                             _dano_area_aplicado = true;
+                            _unidades_atingidas++;
                         } else if (variable_instance_exists(id, "vida")) {
-                            vida -= _dano_area_final;
+                            vida -= _dano_area_valor;
                             _dano_area_aplicado = true;
+                            _unidades_atingidas++;
                         } else if (variable_instance_exists(id, "hp")) {
-                            hp -= _dano_area_final;
+                            hp -= _dano_area_valor;
                             _dano_area_aplicado = true;
+                            _unidades_atingidas++;
                         }
                     }
                 }
@@ -137,7 +139,7 @@ if (instance_exists(target)) {
         }
         
         if (_dano_area_aplicado) {
-            show_debug_message("💥💥 DANO EM ÁREA! Unidades próximas também foram atingidas! Raio: " + string(_raio_dano_area));
+            show_debug_message("💥💥 HASH - DANO EM ÁREA! " + string(_unidades_atingidas) + " unidades atingidas no raio de " + string(_raio_dano_area) + "px!");
         }
         
         if (object_exists(obj_explosao_terra)) {

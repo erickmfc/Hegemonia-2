@@ -172,16 +172,39 @@ function scr_ia_analisar_alvos(_ia_id) {
     
     var _num_criticos = ds_list_size(_alvos_criticos);
     var _num_unidades_inimigas = ds_list_size(_alvos_unidades) + ds_list_size(_alvos_fracos);
+    var _num_importantes = ds_list_size(_alvos_importantes);
     
-    // Estratégia baseada na situação
-    if (_num_criticos >= 2 && _num_unidades_inimigas >= 10) {
+    // ✅ NOVO: Análise de forças da IA
+    var _forca_ia = 0;
+    var _tipos_ia = [obj_infantaria, obj_tanque, obj_soldado_antiaereo, obj_blindado_antiaereo, 
+                     obj_lancha_patrulha, obj_navio_base, obj_caca_f5, obj_f6, obj_helicoptero_militar];
+    
+    for (var i = 0; i < array_length(_tipos_ia); i++) {
+        if (!object_exists(_tipos_ia[i])) continue;
+        with (_tipos_ia[i]) {
+            if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _ia.nacao_proprietaria) {
+                _forca_ia++;
+            }
+        }
+    }
+    
+    // ✅ NOVO: Estratégias inteligentes baseadas em forças relativas
+    if (_forca_ia >= 15 && _num_unidades_inimigas <= 5) {
+        _estrategia = "ataque_total"; // Atacar com tudo quando superior
+    } else if (_num_criticos >= 2 && _num_unidades_inimigas >= 10) {
         _estrategia = "ataque_multi_frontal"; // Dividir tropas em grupos
-    } else if (_num_criticos >= 1) {
+    } else if (_num_criticos >= 1 && _forca_ia >= 8) {
         _estrategia = "foco_estruturas"; // Concentrar no quartel
-    } else if (_num_unidades_inimigas >= 8) {
+    } else if (_num_importantes >= 3 && _forca_ia >= 5) {
+        _estrategia = "guerra_economica"; // Destruir economia primeiro
+    } else if (_num_unidades_inimigas >= 8 && _forca_ia >= 10) {
         _estrategia = "cerco"; // Cercar unidades
-    } else if (_num_unidades_inimigas >= 5) {
+    } else if (_num_unidades_inimigas >= 5 && _forca_ia >= 6) {
         _estrategia = "emboscada"; // Emboscada tática
+    } else if (_forca_ia >= 3) {
+        _estrategia = "ataque_limitado"; // Atacar com cautela
+    } else {
+        _estrategia = "defesa_reforcos"; // Esperar reforços
     }
     
     // Limpar listas temporárias
@@ -197,3 +220,4 @@ function scr_ia_analisar_alvos(_ia_id) {
         num_unidades: _num_unidades_inimigas
     };
 }
+

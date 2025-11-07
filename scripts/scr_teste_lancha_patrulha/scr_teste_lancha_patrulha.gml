@@ -1,8 +1,10 @@
-// =========================================================
-// HEGEMONIA GLOBAL - SCRIPT DE TESTE PARA LANCHA PATRULHA
-// =========================================================
+/// @description Teste completo da lancha patrulha
+function scr_teste_lancha_patrulha() {
+    // =========================================================
+    // HEGEMONIA GLOBAL - SCRIPT DE TESTE PARA LANCHA PATRULHA
+    // =========================================================
 
-// Script principal de teste da lancha patrulha
+    // Script principal de teste da lancha patrulha
     show_debug_message("🧪 === TESTE COMPLETO DA LANCHA PATRULHA ===");
     
     // 1. Verificar se há lanchas no jogo
@@ -49,7 +51,7 @@
     show_debug_message("🧪 === TESTE CONCLUÍDO ===");
     return true;
 
-// Script de teste de seleção da lancha
+    // Script de teste de seleção da lancha
     show_debug_message("🔍 === TESTE DE SELEÇÃO DA LANCHA ===");
     
     var _lancha = instance_find(obj_lancha_patrulha, 0);
@@ -77,3 +79,4 @@
     show_debug_message("  - Tipo: " + string(object_get_name(_lancha.object_index)));
     
     return true;
+}

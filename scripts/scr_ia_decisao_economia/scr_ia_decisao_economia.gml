@@ -49,68 +49,75 @@ function scr_ia_decisao_economia(_ia_id) {
     }
     
     // 3. Contar TODAS as unidades militares (terrestre + naval + aéreo)
+    // ✅ CORRIGIDO: Implementação direta para evitar problemas de carregamento
+    var _nacao_ia = 2; // Valor padrão para IA
+    if (!is_undefined(_ia)) {
+        if (!is_undefined(_ia.nacao_proprietaria)) {
+            _nacao_ia = _ia.nacao_proprietaria;
+        }
+    }
+    
+    // Garantir que nacao_proprietaria é válida
+    if (_nacao_ia <= 0) {
+        _nacao_ia = 2; // Valor padrão para IA
+    }
+    
+    // Contar unidades diretamente (sem depender de função externa)
     var _total_unidades = 0;
     var _unidades_terrestres = 0;
     var _unidades_navais = 0;
     var _unidades_aereas = 0;
     
+    // Contar unidades terrestres
     with (obj_infantaria) {
-        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _ia.nacao_proprietaria) {
+        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _nacao_ia) {
             _total_unidades++;
             _unidades_terrestres++;
         }
     }
-    
     with (obj_tanque) {
-        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _ia.nacao_proprietaria) {
+        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _nacao_ia) {
             _total_unidades++;
             _unidades_terrestres++;
         }
     }
-    
     with (obj_soldado_antiaereo) {
-        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _ia.nacao_proprietaria) {
+        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _nacao_ia) {
             _total_unidades++;
             _unidades_terrestres++;
         }
     }
-    
     with (obj_blindado_antiaereo) {
-        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _ia.nacao_proprietaria) {
+        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _nacao_ia) {
             _total_unidades++;
             _unidades_terrestres++;
         }
     }
     
-    // Contar navios (apenas objetos que existem)
-    var _tipos_navais = [obj_lancha_patrulha, obj_navio_base, obj_submarino_base];
-    
-    // Verificar se obj_fragata existe antes de adicionar
+    // Contar unidades navais
+    var _tipos_navais = [obj_lancha_patrulha, obj_navio_base, obj_submarino_base, obj_navio_transporte, obj_Constellation, obj_Independence, obj_RonaldReagan];
     var _obj_fragata = asset_get_index("obj_fragata");
     if (_obj_fragata != -1 && asset_get_type(_obj_fragata) == asset_object) {
         array_push(_tipos_navais, _obj_fragata);
     }
-    
     for (var i = 0; i < array_length(_tipos_navais); i++) {
-        if (object_exists(_tipos_navais[i])) {
-            with (_tipos_navais[i]) {
-                if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _ia.nacao_proprietaria) {
-                    _total_unidades++;
-                    _unidades_navais++;
-                }
+        if (!object_exists(_tipos_navais[i])) continue;
+        with (_tipos_navais[i]) {
+            if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _nacao_ia) {
+                _total_unidades++;
+                _unidades_navais++;
             }
         }
     }
     
-    // Contar aeronaves
-    var _tipos_aereos = [obj_helicoptero_militar, obj_caca_f5, obj_f6, obj_f15];
+    // Contar unidades aéreas
+    var _tipos_aereos = [obj_helicoptero_militar, obj_caca_f5, obj_f6, obj_f15, obj_c100];
     for (var i = 0; i < array_length(_tipos_aereos); i++) {
-        if (object_exists(_tipos_aereos[i])) {
-            with (_tipos_aereos[i]) {
-                if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _ia.nacao_proprietaria) {
-                    _total_unidades++;
-                    _unidades_aereas++;
-                }
+        if (!object_exists(_tipos_aereos[i])) continue;
+        with (_tipos_aereos[i]) {
+            if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _nacao_ia) {
+                _total_unidades++;
+                _unidades_aereas++;
             }
         }
     }
@@ -122,6 +129,7 @@ function scr_ia_decisao_economia(_ia_id) {
     var _total_inimigos = 0;
     
     // Inimigos terrestres
+    // ✅ CORRIGIDO: Implementação direta (sem depender de função externa)
     var _tipos_inimigos_terra = [obj_infantaria, obj_tanque, obj_soldado_antiaereo, obj_blindado_antiaereo];
     for (var i = 0; i < array_length(_tipos_inimigos_terra); i++) {
         if (object_exists(_tipos_inimigos_terra[i])) {
@@ -138,12 +146,11 @@ function scr_ia_decisao_economia(_ia_id) {
     }
     
     // Inimigos navais (apenas objetos que existem)
-    var _tipos_inimigos_naval = [obj_lancha_patrulha, obj_navio_base, obj_submarino_base, obj_Constellation, obj_Independence, obj_RonaldReagan];
-    
-    // ✅ CORREÇÃO: Reutilizar _obj_fragata já declarado acima
-    // Verificar se obj_fragata existe antes de adicionar
-    if (_obj_fragata != -1 && asset_get_type(_obj_fragata) == asset_object) {
-        array_push(_tipos_inimigos_naval, _obj_fragata);
+    // ✅ CORRIGIDO: Implementação direta (sem depender de função externa)
+    var _tipos_inimigos_naval = [obj_lancha_patrulha, obj_navio_base, obj_submarino_base, obj_navio_transporte, obj_Constellation, obj_Independence, obj_RonaldReagan];
+    var _obj_fragata_inimigo = asset_get_index("obj_fragata");
+    if (_obj_fragata_inimigo != -1 && asset_get_type(_obj_fragata_inimigo) == asset_object) {
+        array_push(_tipos_inimigos_naval, _obj_fragata_inimigo);
     }
     
     for (var i = 0; i < array_length(_tipos_inimigos_naval); i++) {
@@ -161,6 +168,7 @@ function scr_ia_decisao_economia(_ia_id) {
     }
     
     // Inimigos aéreos
+    // ✅ CORRIGIDO: Implementação direta (sem depender de função externa)
     var _tipos_inimigos_aereo = [obj_helicoptero_militar, obj_caca_f5, obj_f6, obj_f15, obj_c100];
     for (var i = 0; i < array_length(_tipos_inimigos_aereo); i++) {
         if (object_exists(_tipos_inimigos_aereo[i])) {
@@ -251,43 +259,55 @@ function scr_ia_decisao_economia(_ia_id) {
     // ✅ NOVO: DETECTAR AMEAÇA DO JOGADOR (10+ unidades)
     // ==========================================
     
-    // ✅ CORREÇÃO: Calcular ameaça diretamente (sem depender de função externa)
-    // Contar unidades do jogador manualmente para evitar erros de função não encontrada
+    // ✅ CORRIGIDO: Contar unidades do jogador diretamente (sem depender de função externa)
     var _total_unidades_jogador = 0;
+    var _nacao_jogador = 1; // Nação do jogador
     
-    // Contar unidades terrestres
+    // Contar unidades terrestres do jogador
     with (obj_infantaria) {
-        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) _total_unidades_jogador++;
+        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _nacao_jogador) {
+            _total_unidades_jogador++;
+        }
     }
     with (obj_tanque) {
-        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) _total_unidades_jogador++;
+        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _nacao_jogador) {
+            _total_unidades_jogador++;
+        }
     }
     with (obj_soldado_antiaereo) {
-        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) _total_unidades_jogador++;
+        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _nacao_jogador) {
+            _total_unidades_jogador++;
+        }
     }
     with (obj_blindado_antiaereo) {
-        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) _total_unidades_jogador++;
+        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _nacao_jogador) {
+            _total_unidades_jogador++;
+        }
     }
     
-    // Contar unidades navais
-    var _tipos_navais_jogador = [obj_lancha_patrulha, obj_navio_base, obj_submarino_base, obj_Constellation, obj_Independence, obj_RonaldReagan];
-    var _obj_fragata_check = asset_get_index("obj_fragata");
-    if (_obj_fragata_check != -1 && asset_get_type(_obj_fragata_check) == asset_object) {
-        array_push(_tipos_navais_jogador, _obj_fragata_check);
+    // Contar unidades navais do jogador
+    var _tipos_navais_jogador = [obj_lancha_patrulha, obj_navio_base, obj_submarino_base, obj_navio_transporte, obj_Constellation, obj_Independence, obj_RonaldReagan];
+    var _obj_fragata_jogador = asset_get_index("obj_fragata");
+    if (_obj_fragata_jogador != -1 && asset_get_type(_obj_fragata_jogador) == asset_object) {
+        array_push(_tipos_navais_jogador, _obj_fragata_jogador);
     }
     for (var i = 0; i < array_length(_tipos_navais_jogador); i++) {
         if (!object_exists(_tipos_navais_jogador[i])) continue;
         with (_tipos_navais_jogador[i]) {
-            if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) _total_unidades_jogador++;
+            if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _nacao_jogador) {
+                _total_unidades_jogador++;
+            }
         }
     }
     
-    // Contar unidades aéreas
+    // Contar unidades aéreas do jogador
     var _tipos_aereos_jogador = [obj_helicoptero_militar, obj_caca_f5, obj_f6, obj_f15, obj_c100];
     for (var i = 0; i < array_length(_tipos_aereos_jogador); i++) {
         if (!object_exists(_tipos_aereos_jogador[i])) continue;
         with (_tipos_aereos_jogador[i]) {
-            if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) _total_unidades_jogador++;
+            if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _nacao_jogador) {
+                _total_unidades_jogador++;
+            }
         }
     }
     
@@ -295,9 +315,9 @@ function scr_ia_decisao_economia(_ia_id) {
     var _avaliacao_ameaca = {
         nivel_ameaca: "baixo",
         total_unidades_jogador: _total_unidades_jogador,
-        unidades_terrestres: 0,
-        unidades_navais: 0,
-        unidades_aereas: 0,
+        unidades_terrestres: 0, // Não usado no código atual
+        unidades_navais: 0,      // Não usado no código atual
+        unidades_aereas: 0,      // Não usado no código atual
         precisa_preparar: false,
         alerta_critico: false
     };

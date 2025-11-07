@@ -12,6 +12,10 @@ if (timer_vida <= 0) {
 
 // === MOVIMENTO EM DIREÇÃO AO ALVO ===
 if (alvo != noone && instance_exists(alvo)) {
+    // ✅ GUARDAR POSIÇÃO ANTERIOR (para detecção de colisão por linha)
+    var _x_anterior = x;
+    var _y_anterior = y;
+    
     // Calcular direção para o alvo
     var dir_x = alvo.x - x;
     var dir_y = alvo.y - y;
@@ -22,8 +26,31 @@ if (alvo != noone && instance_exists(alvo)) {
         x += (dir_x / dist) * speed;
         y += (dir_y / dist) * speed;
         
+        // ✅ CORREÇÃO CRÍTICA: Verificar colisão usando linha (detecta se passou pelo alvo)
+        var _distancia_atual = point_distance(x, y, alvo.x, alvo.y);
+        var _distancia_anterior = point_distance(_x_anterior, _y_anterior, alvo.x, alvo.y);
+        
+        // ✅ NOVO: Verificar se passou pelo alvo (distância anterior > atual) OU se está muito perto
+        var _raio_colisao = 25; // Raio fixo maior para garantir detecção
+        var _passou_pelo_alvo = (_distancia_anterior > _distancia_atual && _distancia_atual <= _raio_colisao);
+        var _esta_muito_perto = (_distancia_atual <= _raio_colisao);
+        
+        // ✅ CORREÇÃO: Também verificar colisão por linha (mais preciso para projéteis rápidos)
+        var _colisao_linha = false;
+        if (variable_instance_exists(alvo, "sprite_index") && sprite_exists(alvo.sprite_index)) {
+            _colisao_linha = collision_line(_x_anterior, _y_anterior, x, y, alvo, false, true);
+        }
+        
         // Verificar se atingiu o alvo
-        if (dist <= speed) {
+        if (_passou_pelo_alvo || _esta_muito_perto || _colisao_linha || dist <= speed) {
+            // ✅ CORREÇÃO CRÍTICA: Guardar posição do alvo ANTES de aplicar dano (pode ser destruído)
+            var _explosao_x = x; // Posição do projétil como fallback
+            var _explosao_y = y;
+            if (instance_exists(alvo)) {
+                _explosao_x = alvo.x;
+                _explosao_y = alvo.y;
+            }
+            
             // Atingiu o alvo!
             if (instance_exists(alvo)) {
                 var _dano_aplicado = (variable_instance_exists(id, "dano")) ? dano : 25;
@@ -65,9 +92,11 @@ if (alvo != noone && instance_exists(alvo)) {
                     }
                 }
                 
+                // ✅ CORREÇÃO: Usar posição guardada do alvo para explosão (já foi guardada acima)
+                
                 // Criar explosão visual
                 if (object_exists(obj_explosao_pequena)) {
-                    var _explosao = instance_create_layer(x, y, "Efeitos", obj_explosao_pequena);
+                    var _explosao = instance_create_layer(_explosao_x, _explosao_y, "Efeitos", obj_explosao_pequena);
                     if (instance_exists(_explosao)) {
                         _explosao.image_xscale = 1.2;
                         _explosao.image_yscale = 1.2;

@@ -183,6 +183,7 @@
     {"name":"scr_ia_atacar_naval","order":94,"path":"scripts/scr_ia_atacar_naval/scr_ia_atacar_naval.yy",},
     {"name":"scr_ia_atacar","order":59,"path":"scripts/scr_ia_atacar/scr_ia_atacar.yy",},
     {"name":"scr_ia_ataque_tatico","order":100,"path":"scripts/scr_ia_ataque_tatico/scr_ia_ataque_tatico.yy",},
+    {"name":"scr_ia_calcular_forca_total","order":101,"path":"scripts/scr_ia_calcular_forca_total/scr_ia_calcular_forca_total.yy",},
     {"name":"scr_ia_construir","order":56,"path":"scripts/scr_ia_construir/scr_ia_construir.yy",},
     {"name":"scr_ia_decisao_economia","order":57,"path":"scripts/scr_ia_decisao_economia/scr_ia_decisao_economia.yy",},
     {"name":"scr_ia_defender","order":93,"path":"scripts/scr_ia_defender/scr_ia_defender.yy",},

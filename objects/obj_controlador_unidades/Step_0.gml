@@ -346,8 +346,11 @@ if (instance_exists(global.unidade_selecionada)) {
     
     // Se é um navio, pular processamento de comandos (eles têm Mouse_4 próprio)
     if (_eh_navio_transporte) {
-        show_debug_message("⚠️ Navio de transporte detectado - ignorando controle centralizado");
-        show_debug_message("   Navio usa Mouse_4 event próprio para movimento");
+        // Silenciado por padrão para evitar spam no console
+        if (variable_global_exists("debug_enabled") && global.debug_enabled && variable_global_exists("verbose_navios") && global.verbose_navios) {
+            show_debug_message("⚠️ Navio de transporte detectado - ignorando controle centralizado");
+            show_debug_message("   Navio usa Mouse_4 event próprio para movimento");
+        }
         // Não fazer nada - o Mouse_4 do navio cuida disso
     } else {
 

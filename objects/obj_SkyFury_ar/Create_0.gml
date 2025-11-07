@@ -10,10 +10,10 @@ target = noone; // Alvo do míssil (usar sempre target, não alvo)
 alarm[0] = game_get_speed(gamespeed_fps) * 3; // 3 segundos para alcançar alvos distantes
 
 // Configurações visuais
-image_xscale = 0.6; // Escala horizontal
-image_yscale = 0.6; // Escala vertical
-image_angle = 0; // Ângulo inicial
-image_speed = 0.5; // Velocidade da animação
+image_xscale = 0.48; // ✅ REDUZIDO 20%: 0.6 * 0.8 = 0.48
+image_yscale = 0.48; // ✅ REDUZIDO 20%: 0.6 * 0.8 = 0.48
+image_angle = 0;
+image_speed = 0.5;
 
 // Parâmetros de guiamento/impacto (otimizados para 97% de acerto)
 turn_rate = 0.25; // Taxa de curva mais agressiva para 97% de acerto

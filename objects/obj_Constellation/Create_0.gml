@@ -19,7 +19,7 @@ velocidade_movimento = 2.5;
 radar_alcance = 1000; // IGUAL aos outros navios
 missil_alcance = 1000; // IGUAL aos outros navios
 alcance_ataque = missil_alcance;
-dano_ataque = 100;
+dano_ataque = 1000; // ✅ AUMENTADO: Dano suficiente para matar 10 soldados (10 x 100 HP)
 reload_time = 120;
 
 // Nome da unidade

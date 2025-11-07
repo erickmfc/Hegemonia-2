@@ -43,16 +43,18 @@ function scr_ia_recrutar_unidade(_ia_id, _tipo_unidade, _quantidade) {
     
     // 3. Procurar quartel da IA (pode estar treinando - fila aceita sempre)
     var _quartel_da_ia = noone;
+    var _nacao_ia = 2; // Nação da IA (normalmente 2 para IA vs 1 para jogador)
+    
     with (obj_quartel) {
-        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _ia.nacao_proprietaria) {
+        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _nacao_ia) {
             // ✅ CORREÇÃO: Pode usar quartel mesmo se estiver treinando (fila aceita)
             _quartel_da_ia = id;
             break;
         }
     }
     
-    if (!instance_exists(_quartel_da_ia)) {
-        show_debug_message("❌ IA não tem quartel disponível");
+    if (_quartel_da_ia == noone) {
+        show_debug_message("❌ IA não tem quartel disponível (não encontrou quartel da nação " + string(_nacao_ia) + ")");
         return false;
     }
     

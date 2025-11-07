@@ -184,23 +184,6 @@ ds_map_add(global.estoque_recursos, "Aço", global.aco);
 // Adicionando recursos complementares
 ds_map_add(global.estoque_recursos, "Energia", global.energia);
 
-// === SISTEMA DE INFLATION ===
-// Inicializar variáveis de inflação
-global.taxa_inflacao = 0.0;        // Inflação atual (0% inicial)
-global.inflacao_maxima = 0.50;     // Máximo 50% de inflação
-global.inflacao_decay = 0.001;     // Redução automática por frame
-global.ultima_impressao = 0;       // Timer da última impressão
-
-// === SISTEMA DE CUSTOS COM INFLATION ===
-// Função para calcular custos com inflação
-global.calcular_custo_inflacionado = function(custo_base) {
-    return custo_base * (1 + global.taxa_inflacao);
-};
-
-// === SISTEMA DE ESTABILIDADE SOCIAL ===
-global.estabilidade_social = 100;   // 100% de estabilidade inicial
-global.instabilidade_por_inflacao = 0.8; // Perda de estabilidade por inflação
-
 show_debug_message("Tesouro da Nação definido com sucesso.");
 show_debug_message("Total de recursos inicializados: " + string(ds_map_size(global.estoque_recursos)));
 
@@ -413,6 +396,11 @@ global.unidade_selecionada = noone;
 global.mostrar_painel_comandos = false;
 
 show_debug_message("CONTROLES GLOBAIS: Inicialização completa!");
+
+// === CONFIGURAÇÃO DE DEBUG VERBOSO (SILENCIAR NAVIOS POR PADRÃO) ===
+if (!variable_global_exists("verbose_navios")) {
+    global.verbose_navios = false; // Pode ativar em testes para ver logs detalhados de navios
+}
 
 // === RECURSOS DA IA (PRESIDENTE 1) ===
 // Sistema de recursos separados para a IA inimiga

@@ -145,21 +145,24 @@ switch (estado) {
             
             // Atira se estiver no alcance e o timer permitir
             if (point_distance(x, y, destino_x, destino_y) <= radar_alcance && timer_ataque <= 0) {
+                // ✅ CORREÇÃO: Criar míssil na altura correta (mesma altura visual do avião)
+                var _missil_y = y - altura_voo;
+                
                 // Verifica se o alvo é uma unidade aérea para usar míssil ar-ar
                 var _missil;
-                if (alvo_em_mira.object_index == obj_caca_f5 || alvo_em_mira.object_index == obj_f6 || alvo_em_mira.object_index == obj_helicoptero_militar) {
-                    // Alvo aéreo - usa míssil ar-ar
-                    _missil = instance_create_layer(x, y, "Instances", obj_ar_curto);
-                    show_debug_message("🚀 F-5 lançou míssil AR-CURTO em alvo aéreo: " + string(alvo_em_mira));
-        } else {
-                    // Alvo terrestre - usa míssil normal
-                    _missil = scr_get_projectile_from_pool(obj_tiro_simples, x, y, "Instances");
-                    show_debug_message("🚀 F-5 lançou míssil normal em alvo terrestre: " + string(alvo_em_mira));
+                if (alvo_em_mira.object_index == obj_caca_f5 || alvo_em_mira.object_index == obj_f6 || alvo_em_mira.object_index == obj_helicoptero_militar || alvo_em_mira.object_index == obj_f15 || alvo_em_mira.object_index == obj_c100) {
+                    // Alvo aéreo - usa míssil SkyFury (ar-ar)
+                    _missil = scr_get_projectile_from_pool(obj_SkyFury_ar, x, _missil_y, "Instances");
+                } else {
+                    // Alvo terrestre - usa míssil Ironclad (terra-terra)
+                    _missil = scr_get_projectile_from_pool(obj_Ironclad_terra, x, _missil_y, "Instances");
                 }
                 
                 if (instance_exists(_missil)) {
                     _missil.alvo = alvo_em_mira;
+                    _missil.target = alvo_em_mira;
                     _missil.dono = id;
+                    _missil.sem_som = true; // ✅ Flag para não tocar som
                     if (variable_instance_exists(_missil, "timer_vida")) {
                         _missil.timer_vida = 300;
                     }
