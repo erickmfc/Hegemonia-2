@@ -65,31 +65,32 @@ if (object_exists(obj_ui_manager)) {
 // === CRIAÇÃO DE INIMIGOS PARA TESTE ===
 if (global.debug_enabled) show_debug_message("=== CRIANDO INIMIGOS PARA TESTE ===");
 
+// ✅ CORREÇÃO: obj_inimigo removido - não criar mais inimigos
 var inimigos_criados = 0;
-if (object_exists(obj_inimigo)) {
-    for (var i = 0; i < 2; i++) {
-        var inimigo = instance_create_layer(400 + (i * 150), 300 + (i * 100), "rm_mapa_principal", obj_inimigo);
-        if (instance_exists(inimigo)) {
-            inimigos_criados++;
-            if (global.debug_enabled) {
-                show_debug_message("🎯 Inimigo " + string(inimigos_criados) + " criado - ID: " + string(inimigo));
-            }
-        }
-    }
-} else {
-    // Fallback: usar obj_infantaria como inimigo
-    for (var i = 0; i < 2; i++) {
-        var inimigo = instance_create_layer(400 + (i * 150), 300 + (i * 100), "rm_mapa_principal", obj_infantaria);
-        if (instance_exists(inimigo)) {
-            inimigo.nacao_proprietaria = 2; // 2 = inimigo
-            inimigo.hp_atual = 100;
-            inimigo.hp_max = 100;
-            inimigo.estado = "livre";
-            inimigo.comando_atual = "LIVRE";
-            inimigos_criados++;
-            if (global.debug_enabled) {
-                show_debug_message("🎯 Inimigo " + string(inimigos_criados) + " criado (fallback) - ID: " + string(inimigo));
-            }
+// if (object_exists(obj_inimigo)) {
+//     for (var i = 0; i < 2; i++) {
+//         var inimigo = instance_create_layer(400 + (i * 150), 300 + (i * 100), "rm_mapa_principal", obj_inimigo);
+//         if (instance_exists(inimigo)) {
+//             inimigos_criados++;
+//             if (global.debug_enabled) {
+//                 show_debug_message("🎯 Inimigo " + string(inimigos_criados) + " criado - ID: " + string(inimigo));
+//             }
+//         }
+//     }
+// }
+
+// Fallback: usar obj_infantaria como inimigo
+for (var i = 0; i < 2; i++) {
+    var inimigo = instance_create_layer(400 + (i * 150), 300 + (i * 100), "rm_mapa_principal", obj_infantaria);
+    if (instance_exists(inimigo)) {
+        inimigo.nacao_proprietaria = 2; // 2 = inimigo
+        inimigo.hp_atual = 100;
+        inimigo.hp_max = 100;
+        inimigo.estado = "livre";
+        inimigo.comando_atual = "LIVRE";
+        inimigos_criados++;
+        if (global.debug_enabled) {
+            show_debug_message("🎯 Inimigo " + string(inimigos_criados) + " criado (fallback) - ID: " + string(inimigo));
         }
     }
 }

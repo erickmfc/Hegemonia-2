@@ -27,6 +27,10 @@ alvo_y = y;
 modo_definicao_patrulha = false;
 pontos_patrulha = ds_list_create();
 indice_patrulha_atual = 0;
+direcao_patrulha = 1; // 1 = horário (avançar), -1 = anti-horário (retroceder)
+
+// === TERRENOS PERMITIDOS ===
+terrenos_permitidos = [TERRAIN.AGUA]; // Só água
 
 // Seleção e UI
 selecionado = false;
@@ -35,11 +39,18 @@ selecionado = false;
 reload_time = 60; // steps entre tiros
 reload_timer = 0;
 
+// Sistema de rotação
+velocidade_rotacao = 0.98; // Velocidade de rotação em graus por frame
+
 // Identificador e nome
 nome_unidade = "Lancha Patrulha";
 
 // Variáveis auxiliares
 alvo_unidade = noone; // id da instancia inimiga a atacar
+
+// ✅ OTIMIZAÇÃO: Timer para verificação periódica de inimigos (a cada 30 frames = ~0.5s a 60 FPS)
+timer_verificacao_inimigos = 0;
+intervalo_verificacao_inimigos = 30; // Verificar inimigos a cada 30 frames
 
 // --- VARIÁVEIS ADAPTADAS DO F5 (APÓS DEFINIR TODAS AS VARIÁVEIS) ---
 estado_anterior = LanchaState.PARADO; // Guarda estado anterior para retorno após ataque
@@ -62,7 +73,11 @@ ordem_mover = function(dest_x, dest_y) {
     estado = LanchaState.MOVENDO;
     estado_string = "movendo"; // Sincronizar
     modo_definicao_patrulha = false;
-    if (global.debug_enabled) show_debug_message("🚢 Ordem de movimento: (" + string(dest_x) + ", " + string(dest_y) + ")");
+    
+    // ✅ DEBUG: Mostrar apenas se debug estiver ativo
+    if (variable_global_exists("debug_enabled") && global.debug_enabled) {
+        show_debug_message("🚢 Ordem de movimento: (" + string(dest_x) + ", " + string(dest_y) + ")");
+    }
 }
 
 // Mantém compatibilidade
@@ -95,7 +110,12 @@ func_proximo_ponto = function() {
         estado_string = "parado"; // Sincronizar
         return;
     }
-    indice_patrulha_atual = (indice_patrulha_atual + 1) mod ds_list_size(pontos_patrulha);
+    // ✅ NOVO: Sistema de rotação de patrulha (horário/anti-horário)
+    var _total_pontos = ds_list_size(pontos_patrulha);
+    if (!variable_instance_exists(id, "direcao_patrulha")) {
+        direcao_patrulha = 1; // Padrão: horário
+    }
+    indice_patrulha_atual = (indice_patrulha_atual + direcao_patrulha + _total_pontos) mod _total_pontos;
     indice_patrulha = indice_patrulha_atual; // Sincronizar
     var p = pontos_patrulha[| indice_patrulha_atual];
     alvo_x = p[0];
@@ -105,9 +125,10 @@ func_proximo_ponto = function() {
 }
 
 func_procurar_inimigo = function() {
+    // ✅ CORREÇÃO: obj_inimigo removido - buscar apenas obj_infantaria
     var melhor = noone;
     var melhor_d = 999999;
-    with (obj_inimigo) {
+    with (obj_infantaria) {
         if (nacao_proprietaria != other.nacao_proprietaria) {
             var d = point_distance(other.x, other.y, x, y);
             if (d < other.radar_alcance && d < melhor_d) {
@@ -133,7 +154,7 @@ func_atacar_alvo = function() {
             if (instance_exists(_tiro)) {
                 _tiro.alvo = alvo_unidade;
                 _tiro.dono = id;
-                _tiro.dano = 25;
+                _tiro.dano = 35;
                 _tiro.speed = 8;
                 _tiro.direction = point_direction(x, y, alvo_unidade.x, alvo_unidade.y);
                 if (variable_instance_exists(_tiro, "timer_vida")) {
@@ -208,5 +229,14 @@ lod_level = 2;
 force_always_active = false;
 lod_process_index = irandom(99);
 skip_frames_enabled = true;
+
+// ✅ Timer para controle de efeito de espuma do mar
+timer_espuma = 0;
+
+// ✅ CORREÇÃO: Variáveis para controle de rotação infinita
+distancia_anterior = 0;
+timer_afastando = 0;
+angulo_anterior = 0;
+timer_girando = 0;
 
 if (global.debug_enabled) show_debug_message("🚢 Lancha Patrulha criada!");

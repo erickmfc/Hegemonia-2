@@ -13,7 +13,8 @@ if (dist > 2) {
 if (atira) {
     // _cd já declarado no Create event
     _cd = max(0, _cd - 1);
-    var alvo = instance_nearest(x, y, obj_inimigo);
+    // ✅ CORREÇÃO: obj_inimigo removido - buscar apenas obj_infantaria
+    var alvo = instance_nearest(x, y, obj_infantaria);
     if (instance_exists(alvo) && point_distance(x, y, alvo.x, alvo.y) <= alcance_ataque) {
         if (_cd <= 0) {
             var b = scr_get_projectile_from_pool(obj_tiro_infantaria, x, y, layer);

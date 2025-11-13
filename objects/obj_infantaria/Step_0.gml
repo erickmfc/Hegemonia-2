@@ -23,8 +23,8 @@ if (scr_is_enemy_unit(id)) {
                 exit; // Pular Step
             }
             // Continuar para processar movimento simplificado abaixo
-            var dist_destino = point_distance(x, y, destino_x, destino_y);
-            if (dist_destino > velocidade * 2) {
+            var _dist_destino_standby = point_distance(x, y, destino_x, destino_y);
+            if (_dist_destino_standby > velocidade * 2) {
                 var dir_x = destino_x - x;
                 var dir_y = destino_y - y;
                 var dist_norm = point_distance(0, 0, dir_x, dir_y);
@@ -67,8 +67,10 @@ if (!should_always_process && skip_frames_enabled) {
         
         // Se está movendo, aplicar movimento simplificado
         if (estado == "movendo") {
+            // ✅ CORREÇÃO: Normalizar velocidade antes de aplicar multiplicador do LOD
+            var _vel_normalizada = scr_normalize_unit_speed(velocidade);
             var speed_mult = scr_get_speed_multiplier(current_lod, lod_process_index);
-            var still_moving = scr_process_lod_simple_movement(id, destino_x, destino_y, velocidade, speed_mult);
+            var still_moving = scr_process_lod_simple_movement(id, destino_x, destino_y, _vel_normalizada, speed_mult);
             
             if (!still_moving && estado == "movendo") {
                 estado = "parado";
@@ -145,193 +147,33 @@ if (_eh_unidade_ia) {
 // ======================
 if (selecionado) {
     
-    // ✅ NOVO: Modo Passivo (P)
+    // ✅ Modo Passivo (P) - IGUAL NAVIOS/AVIÕES
     if (keyboard_check_pressed(ord("P"))) {
         modo_ataque = false;
         alvo = noone;
         if (estado == "atacando") estado = "parado";
-        if (global.debug_enabled) show_debug_message("🛡️ Infantaria - Modo PASSIVO");
+        show_debug_message("🛡️ Infantaria em Modo PASSIVO");
     }
     
-    // ✅ NOVO: Modo Ataque (O)
+    // ✅ Modo Ataque (O) - IGUAL NAVIOS/AVIÕES
     if (keyboard_check_pressed(ord("O"))) {
         modo_ataque = true;
-        if (global.debug_enabled) show_debug_message("⚔️ Infantaria - Modo ATAQUE");
+        show_debug_message("⚔️ Infantaria em Modo ATAQUE AGRESSIVO");
     }
     
-    // ✅ NOVO: Parar (L)
+    // ✅ Parar (L) - IGUAL NAVIOS/AVIÕES
     if (keyboard_check_pressed(ord("L"))) {
         estado = "parado";
         alvo = noone;
-        modo_patrulha = false; // Cancela patrulha
-        if (global.debug_enabled) show_debug_message("⏹️ Infantaria - PARADA");
-    }
-    
-    // ENTRAR/SAIR DO MODO PATRULHA (Q)
-    if (keyboard_check_pressed(ord("Q"))) {
-        if (!modo_patrulha) {
-            // Entrar no modo patrulha
-            modo_patrulha = true;
-            ds_list_clear(patrulha); // limpa patrulha anterior
-            patrulha_indice = 0;
-            if (global.debug_enabled) show_debug_message("Modo patrulha ativado - clique direito nos pontos");
-        } else {
-            // Sair do modo patrulha
-            modo_patrulha = false;
-            if (ds_list_size(patrulha) > 0) {
-                estado = "patrulhando";
-                if (global.debug_enabled) show_debug_message("Patrulha iniciada com " + string(ds_list_size(patrulha)) + " pontos");
-            } else {
-                if (global.debug_enabled) show_debug_message("Modo patrulha desativado - nenhum ponto definido");
-            }
+        // Limpar patrulha se existir
+        if (variable_instance_exists(id, "pontos_patrulha") && ds_exists(pontos_patrulha, ds_type_list)) {
+            ds_list_clear(pontos_patrulha);
         }
+        show_debug_message("⏹️ Infantaria recebeu ordem para PARAR");
     }
     
-    // SAIR DO MODO PATRULHA (clique esquerdo)
-    if (modo_patrulha && mouse_check_button_pressed(mb_left)) {
-        modo_patrulha = false;
-        if (ds_list_size(patrulha) > 0) {
-            estado = "patrulhando";
-            if (global.debug_enabled) show_debug_message("Patrulha iniciada com " + string(ds_list_size(patrulha)) + " pontos");
-        } else {
-            if (global.debug_enabled) show_debug_message("Modo patrulha desativado - nenhum ponto definido");
-        }
-    }
-    
-    // ADICIONAR PONTO DE PATRULHA (botão direito no modo patrulha)
-    if (modo_patrulha && mouse_check_button_pressed(mb_right)) {
-        // ✅ CORREÇÃO: Usar função para coordenadas precisas
-        var _coords = scr_mouse_to_world();
-        var world_x = _coords[0];
-        var world_y = _coords[1];
-        var pos = [world_x, world_y];
-        ds_list_add(patrulha, pos);
-        if (global.debug_enabled) show_debug_message("[PATRULHA] Ponto adicionado (mundo): " + string(world_x) + ", " + string(world_y));
-    }
-    
-    // ANDAR (botão direito - só se não estiver no modo patrulha)
-    if (!modo_patrulha && mouse_check_button_pressed(mb_right)) {
-        // ✅ CORREÇÃO: Usar função para coordenadas precisas
-        var _coords = scr_mouse_to_world();
-        var world_x = _coords[0];
-        var world_y = _coords[1];
-        
-        // ✅ CORREÇÃO CRÍTICA: Clamp para dentro da sala
-        world_x = clamp(world_x, 8, room_width - 8);
-        world_y = clamp(world_y, 8, room_height - 8);
-        
-        // Verificar se há múltiplas unidades selecionadas
-        var unidades_selecionadas = 0;
-        var primeira_unidade = noone;
-        with (obj_infantaria) {
-            if (selecionado) {
-                unidades_selecionadas++;
-                if (primeira_unidade == noone) {
-                    primeira_unidade = id;
-                }
-            }
-        }
-        
-        if (unidades_selecionadas > 1) {
-            // MÚLTIPLAS UNIDADES - MOVIMENTO EM FORMAÇÃO
-            var indice_formacao = 0;
-            
-            // Primeiro, mover infantaria
-            with (obj_infantaria) {
-                if (selecionado) {
-                    // Calcular posição na formação (grid 4x4 para acomodar mais unidades)
-                    var coluna = indice_formacao mod 4;
-                    var linha = indice_formacao div 4;
-                    
-                    // Offset da formação (espaçamento de 45 pixels para infantaria)
-                    var offset_x = (coluna - 1.5) * 45;
-                    var offset_y = (linha - 1.5) * 45;
-                    
-                    // Posição final na formação
-                    destino_x = world_x + offset_x;
-                    destino_y = world_y + offset_y;
-                    estado = "movendo";
-                    alvo = noone;
-                    image_angle = point_direction(x, y, destino_x, destino_y);
-                    
-                    indice_formacao++;
-                }
-            }
-            
-            // Depois, mover tanques
-            with (obj_tanque) {
-                if (selecionado) {
-                    // Calcular posição na formação (grid 4x4)
-                    var coluna = indice_formacao mod 4;
-                    var linha = indice_formacao div 4;
-                    
-                    // Offset da formação (espaçamento de 60 pixels para tanques - maiores)
-                    var offset_x = (coluna - 1.5) * 60;
-                    var offset_y = (linha - 1.5) * 60;
-                    
-                    // Posição final na formação
-                    destino_x = world_x + offset_x;
-                    destino_y = world_y + offset_y;
-                    estado = "movendo";
-                    alvo = noone;
-                    image_angle = point_direction(x, y, destino_x, destino_y);
-                    
-                    indice_formacao++;
-                }
-            }
-            if (global.debug_enabled) show_debug_message("Movimento em formação com " + string(unidades_selecionadas) + " unidades");
-        } else {
-            // UMA UNIDADE - MOVIMENTO NORMAL
-            destino_x = world_x;
-            destino_y = world_y;
-            estado = "movendo";
-            alvo = noone; // para de atacar
-            image_angle = point_direction(x, y, destino_x, destino_y);
-        }
-    }
-    
-    // SEGUIR (E)
-    if (keyboard_check_pressed(ord("E"))) {
-        // ✅ CORREÇÃO: Usar função para coordenadas precisas
-        var _coords = scr_mouse_to_world();
-        var world_x = _coords[0];
-        var world_y = _coords[1];
-        var alvo_seg = instance_position(world_x, world_y, obj_infantaria);
-        if (alvo_seg != noone && alvo_seg != id) {
-            seguir_alvo = alvo_seg;
-            estado = "seguindo";
-            if (global.debug_enabled) show_debug_message("Seguindo unidade alvo");
-} else {
-            if (global.debug_enabled) show_debug_message("Nenhuma unidade encontrada para seguir");
-        }
-    }
-    
-    // PARAR (S)
-    if (keyboard_check_pressed(ord("S"))) {
-        estado = "parado";
-        alvo = noone;
-        seguir_alvo = noone;
-        modo_patrulha = false;
-        if (global.debug_enabled) show_debug_message("Soldado parado");
-    }
-    
-    // CANCELAR SEGUIR (X)
-    if (keyboard_check_pressed(ord("X"))) {
-        seguir_alvo = noone;
-        if (estado == "seguindo") {
-            estado = "parado";
-        }
-        if (global.debug_enabled) show_debug_message("Comando de seguir cancelado");
-    }
-    
-    // LIMPAR PATRULHA (R)
-    if (keyboard_check_pressed(ord("R"))) {
-        ds_list_clear(patrulha);
-        patrulha_indice = 0;
-        modo_patrulha = false;
-        estado = "parado";
-        if (global.debug_enabled) show_debug_message("Patrulha limpa");
-    }
+    // ✅ Comandos K, clique esquerdo e clique direito agora são gerenciados pelo obj_input_manager
+    // para evitar conflitos e manter o modo de patrulha persistente
 }
 
 // ========================
@@ -344,61 +186,170 @@ switch (estado) {
     break;
     
     case "movendo":
-        var dist_destino = point_distance(x, y, destino_x, destino_y);
-        if (dist_destino > velocidade) {
-            // Move na direção do destino
+        var _dist_destino_movendo = point_distance(x, y, destino_x, destino_y);
+        if (_dist_destino_movendo > velocidade) {
+            // Calcular direção para o destino
             var dir_x = destino_x - x;
             var dir_y = destino_y - y;
             var dist_norm = point_distance(0, 0, dir_x, dir_y);
             if (dist_norm > 0) {
+                var _direcao_original = point_direction(0, 0, dir_x, dir_y);
+                
+                // ✅ NOVO: Detectar obstáculos e calcular rota alternativa
+                // ✅ MELHORADO: Aumentar distância de verificação quando há múltiplas unidades
+                var _dist_verificacao = 40;
+                var _unidades_proximas_count = 0;
+                with (obj_infantaria) {
+                    if (id != other.id && point_distance(x, y, other.x, other.y) < 100) {
+                        _unidades_proximas_count++;
+                    }
+                }
+                with (obj_tanque) {
+                    if (id != other.id && point_distance(x, y, other.x, other.y) < 100) {
+                        _unidades_proximas_count++;
+                    }
+                }
+                
+                // Se há muitas unidades próximas (formação), aumentar sensibilidade
+                if (_unidades_proximas_count >= 2) {
+                    _dist_verificacao = 60; // Aumentar distância de verificação em formações
+                }
+                
+                var _resultado_desvio = scr_detectar_obstaculo(x, y, _direcao_original, destino_x, destino_y, _dist_verificacao, id);
+                var _direcao_final = _resultado_desvio[0];
+                var _destino_temp_x = _resultado_desvio[1];
+                var _destino_temp_y = _resultado_desvio[2];
+                
+                // ✅ NOVO: Se encontrou obstáculo, atualizar destino temporário para contornar
+                if (_destino_temp_x != destino_x || _destino_temp_y != destino_y) {
+                    // Guardar destino original se ainda não foi guardado
+                    // ✅ CORREÇÃO: Verificar se variável existe antes de acessar
+                    if (!variable_instance_exists(id, "destino_original_x")) {
+                        destino_original_x = destino_x;
+                        destino_original_y = destino_y;
+                    }
+                    // Usar destino temporário para contornar obstáculo
+                    destino_x = _destino_temp_x;
+                    destino_y = _destino_temp_y;
+                    // Recalcular direção para o novo destino
+                    _direcao_final = point_direction(x, y, destino_x, destino_y);
+                }
+                
                 // ✅ NOVO: Para unidades da IA, garantir velocidade mínima
                 var _vel_efetiva = velocidade;
                 if (_eh_unidade_ia && velocidade <= 0) {
                     _vel_efetiva = 2; // Velocidade padrão se não tiver definida
                 }
-                x += (dir_x / dist_norm) * _vel_efetiva;
-                y += (dir_y / dist_norm) * _vel_efetiva;
-                image_angle = point_direction(0, 0, dir_x, dir_y);
+                
+                // ✅ CORREÇÃO: Guardar posição antes de mover para verificar travamento
+                var _x_antes = x;
+                var _y_antes = y;
+                
+                // ✅ CORREÇÃO: Normalizar velocidade baseado no zoom para manter velocidade visual constante
+                var _vel_normalizada = scr_normalize_unit_speed(_vel_efetiva);
+                
+                // Mover na direção final (com desvio se necessário)
+                x += lengthdir_x(_vel_normalizada, _direcao_final);
+                y += lengthdir_y(_vel_normalizada, _direcao_final);
+                image_angle = _direcao_final;
+                
+                // ✅ VERIFICAÇÃO: Se está travado (não se moveu muito)
+                var _dist_movida = point_distance(x, y, _x_antes, _y_antes);
+                if (_dist_movida < _vel_efetiva * 0.5) {
+                    // Está travado - tentar desvio maior e atualizar destino
+                    _direcao_final = _direcao_original + 90; // Virar 90 graus
+                    destino_x = x + lengthdir_x(100, _direcao_final);
+                    destino_y = y + lengthdir_y(100, _direcao_final);
+                    x += lengthdir_x(_vel_efetiva, _direcao_final);
+                    y += lengthdir_y(_vel_efetiva, _direcao_final);
+                    image_angle = _direcao_final;
+                }
             }
         } else {
-            // Para exatamente no destino
-            x = destino_x;
-            y = destino_y;
-            // ✅ NOVO: Se for unidade da IA e tem alvo, mudar para atacar
-            if (_eh_unidade_ia && variable_instance_exists(id, "alvo") && alvo != noone && instance_exists(alvo)) {
-                estado = "atacando";
+            // Chegou ao destino temporário ou final
+            // ✅ NOVO: Se estava usando destino temporário, voltar ao destino original
+            // ✅ CORREÇÃO: Verificar se variável existe E se os valores são válidos (não undefined)
+            if (variable_instance_exists(id, "destino_original_x") && variable_instance_exists(id, "destino_original_y") &&
+                !is_undefined(destino_original_x) && !is_undefined(destino_original_y) &&
+                is_real(destino_original_x) && is_real(destino_original_y)) {
+                // Verificar se chegou ao destino temporário (não é o original)
+                var _dist_original = point_distance(x, y, destino_original_x, destino_original_y);
+                if (_dist_original > 50) {
+                    // Ainda não chegou ao destino original - continuar para ele
+                    destino_x = destino_original_x;
+                    destino_y = destino_original_y;
+                    estado = "movendo";
+                } else {
+                    // Chegou ao destino original - limpar variáveis temporárias
+                    // ✅ CORREÇÃO: Limpar variáveis temporárias (definir como undefined se existirem)
+                    if (variable_instance_exists(id, "destino_original_x")) {
+                        destino_original_x = undefined;
+                    }
+                    if (variable_instance_exists(id, "destino_original_y")) {
+                        destino_original_y = undefined;
+                    }
+                    x = destino_x;
+                    y = destino_y;
+                    // ✅ NOVO: Se for unidade da IA e tem alvo, mudar para atacar
+                    if (_eh_unidade_ia && variable_instance_exists(id, "alvo") && alvo != noone && instance_exists(alvo)) {
+                        estado = "atacando";
+                    } else {
+                        estado = "parado";
+                    }
+                }
             } else {
-                estado = "parado";
+                // Para exatamente no destino
+                x = destino_x;
+                y = destino_y;
+                // ✅ NOVO: Se for unidade da IA e tem alvo, mudar para atacar
+                if (_eh_unidade_ia && variable_instance_exists(id, "alvo") && alvo != noone && instance_exists(alvo)) {
+                    estado = "atacando";
+                } else {
+                    estado = "parado";
+                }
             }
         }
     break;
     
     case "patrulhando":
-        // ✅ CORREÇÃO GM1041: Verificar se patrulha é ds_list válido
-        if (ds_exists(patrulha, ds_type_list) && ds_list_size(patrulha) > 0) {
-            // Se estamos iniciando patrulha, garante começar do ponto mais próximo ao soldado
-            if (patrulha_indice >= ds_list_size(patrulha)) patrulha_indice = 0;
-            var pt = ds_list_find_value(patrulha, patrulha_indice);
-            if (is_array(pt) && array_length(pt) >= 2) {
-                var px = is_real(pt[0]) ? pt[0] : x;
-                var py = is_real(pt[1]) ? pt[1] : y;
-                var _vel = variable_instance_exists(id, "velocidade") && is_real(velocidade) ? velocidade : 2;
-                var dist_patrulha = point_distance(x, y, px, py);
-                if (dist_patrulha > _vel) {
-                    var dir_x = px - x;
-                    var dir_y = py - y;
-                    var dist_norm = point_distance(0, 0, dir_x, dir_y);
-                    if (dist_norm > 0) {
-                        x += (dir_x / dist_norm) * _vel;
-                        y += (dir_y / dist_norm) * _vel;
-                        image_angle = point_direction(0, 0, dir_x, dir_y);
-                    }
-                } else {
-                    x = px;
-                    y = py;
-                    patrulha_indice = (patrulha_indice + 1) mod ds_list_size(patrulha);
+        // ✅ CORREÇÃO: Sistema de patrulha igual navios/aviões com verificações de segurança
+        if (variable_instance_exists(id, "pontos_patrulha") && ds_exists(pontos_patrulha, ds_type_list) && ds_list_size(pontos_patrulha) > 0) {
+            // ✅ CORREÇÃO: Garantir que indice_patrulha_atual está dentro dos limites
+            if (!variable_instance_exists(id, "indice_patrulha_atual")) {
+                indice_patrulha_atual = 0;
+            }
+            var _total_pontos = ds_list_size(pontos_patrulha);
+            if (indice_patrulha_atual >= _total_pontos) {
+                indice_patrulha_atual = 0;
+            }
+            
+            // Se chegou ao ponto atual, vai para o próximo
+            if (point_distance(x, y, destino_x, destino_y) < 20) {
+                indice_patrulha_atual = (indice_patrulha_atual + 1) % _total_pontos;
+                var _ponto = pontos_patrulha[| indice_patrulha_atual];
+                if (is_array(_ponto) && array_length(_ponto) >= 2) {
+                    destino_x = _ponto[0];
+                    destino_y = _ponto[1];
                 }
             }
+            
+            // Movimento para o ponto atual
+            var _dist_destino_patrulha = point_distance(x, y, destino_x, destino_y);
+            if (_dist_destino_patrulha > velocidade) {
+                var dir_x = destino_x - x;
+                var dir_y = destino_y - y;
+                var dist_norm = point_distance(0, 0, dir_x, dir_y);
+                if (dist_norm > 0) {
+                    // ✅ CORREÇÃO: Normalizar velocidade baseado no zoom
+                    var _vel_normalizada = scr_normalize_unit_speed(velocidade);
+                    x += (dir_x / dist_norm) * _vel_normalizada;
+                    y += (dir_y / dist_norm) * _vel_normalizada;
+                    image_angle = point_direction(0, 0, dir_x, dir_y);
+                }
+            }
+        } else {
+            // Sem pontos de patrulha - voltar para parado
+            estado = "parado";
         }
     break;
     
@@ -441,7 +392,7 @@ switch (estado) {
                     var b = scr_get_projectile_from_pool(obj_tiro_infantaria, x, y, layer);
                     b.direction = point_direction(x, y, alvo.x, alvo.y);
                     b.speed = 8;
-                    b.dano = 5;
+                    b.dano = 15;
                     b.alvo = alvo;
                     atq_cooldown = atq_rate;
                 }

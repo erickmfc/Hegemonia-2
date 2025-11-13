@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_criar_aviao_morto",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_criar_aviao_morto",
+  "parent":{
+    "name":"aeronaltica",
+    "path":"folders/Sprites/aeronaltica.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

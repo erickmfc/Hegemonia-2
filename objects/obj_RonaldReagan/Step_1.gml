@@ -16,10 +16,11 @@ if (variable_instance_exists(id, "estado_embarque") && estado_embarque == "embar
 } else if ((variable_instance_exists(id, "modo_combate") && modo_combate == LanchaMode.ATAQUE) || 
            (variable_instance_exists(id, "estado") && estado == LanchaState.ATACANDO)) {
     
-    // Limpar arrays a cada step (usar variáveis locais)
-    var _inimigos_navais = [];
-    var _inimigos_aereos = [];
-    var _inimigos_terrestres = [];
+    // ✅ CORREÇÃO: Declarar como propriedades da instância (sem var) para poder acessar via 'other' em blocos 'with'
+    // Limpar arrays a cada step
+    _inimigos_navais = [];
+    _inimigos_aereos = [];
+    _inimigos_terrestres = [];
     
     // PROCURAR TODOS OS INIMIGOS DENTRO DO RAIO
     // Navios inimigos
@@ -63,15 +64,6 @@ if (variable_instance_exists(id, "estado_embarque") && estado_embarque == "embar
     
     // Unidades terrestres inimigas
     with (obj_infantaria) {
-        if (nacao_proprietaria != 1 && nacao_proprietaria != other.nacao_proprietaria) {
-            var _dist = point_distance(other.x, other.y, x, y);
-            if (_dist <= other.missil_max_alcance) {
-                array_push(other._inimigos_terrestres, id);
-            }
-        }
-    }
-    
-    with (obj_inimigo) {
         if (nacao_proprietaria != 1 && nacao_proprietaria != other.nacao_proprietaria) {
             var _dist = point_distance(other.x, other.y, x, y);
             if (_dist <= other.missil_max_alcance) {
@@ -358,7 +350,6 @@ if (desembarque_ativo && ds_queue_size(desembarque_fila) > 0) {
                 object_is_ancestor(_unidade_id.object_index, obj_f6)) {
                 avioes_count--;
             } else if (object_is_ancestor(_unidade_id.object_index, obj_infantaria) ||
-                      object_is_ancestor(_unidade_id.object_index, obj_inimigo) ||
                       object_is_ancestor(_unidade_id.object_index, obj_tanque)) {
                 unidades_count--;
             } else if (object_is_ancestor(_unidade_id.object_index, obj_soldado_antiaereo)) {

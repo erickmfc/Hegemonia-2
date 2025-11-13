@@ -11,8 +11,8 @@ custo_dinheiro = 400;
 custo_minerio = 250;
 
 // === SISTEMA DE VIDA ===
-hp_max = 300;
-hp_atual = 300;
+hp_max = 1000; // ✅ AUMENTADO: Mais resistente (era 300)
+hp_atual = 1000; // ✅ AUMENTADO: Mais resistente (era 300)
 destrutivel = true; // ✅ Quartel pode ser destruído 
 
 // === CONFIGURAÇÕES DE PRODUÇÃO ===
@@ -92,6 +92,38 @@ ds_list_add(unidades_disponiveis, {
     categoria: "terrestre"
 });
 
+// ✅ NOVO: M1A Abrams - Tanque de Elite
+var _obj_abrams = asset_get_index("obj_M1A_Abrams");
+var _spr_abrams = asset_get_index("spr_abrams_casco");
+if (_obj_abrams != -1 && asset_get_type(_obj_abrams) == asset_object) {
+    ds_list_add(unidades_disponiveis, {
+        nome: "M1A Abrams",
+        objeto: _obj_abrams,
+        custo_dinheiro: 1200, // Mais caro que tanque comum (500) - unidade de elite
+        custo_populacao: 5, // Mais população que tanque comum (3)
+        tempo_treino: 300, // 5 segundos (300 frames) - mais tempo para unidade de elite
+        descricao: "Tanque de elite com torre modular e projétil SABOT",
+        sprite: (_spr_abrams != -1 && sprite_exists(_spr_abrams)) ? _spr_abrams : spr_tanque, // Fallback para spr_tanque se não encontrar
+        categoria: "terrestre"
+    });
+}
+
+// ✅ NOVO: Gepard Anti-Aéreo - Tanque Anti-Aéreo
+var _obj_gepard = asset_get_index("obj_gepard");
+var _spr_gepard_casco = asset_get_index("TYPE_39_SAM_HULL");
+if (_obj_gepard != -1 && asset_get_type(_obj_gepard) == asset_object) {
+    ds_list_add(unidades_disponiveis, {
+        nome: "Gepard Anti-Aéreo",
+        objeto: _obj_gepard,
+        custo_dinheiro: 1500, // Mais caro que Abrams - unidade especializada anti-aérea
+        custo_populacao: 6, // Mais população que Abrams
+        tempo_treino: 360, // 6 segundos (360 frames) - mais tempo para unidade especializada
+        descricao: "Tanque anti-aéreo com mísseis SAM e projéteis SABOT",
+        sprite: (_spr_gepard_casco != -1 && sprite_exists(_spr_gepard_casco)) ? _spr_gepard_casco : spr_tanque, // Fallback para spr_tanque se não encontrar
+        categoria: "terrestre"
+    });
+}
+
 // === FILA DE RECRUTAMENTO SIMPLES ===
 fila_recrutamento = ds_queue_create();
 
@@ -124,6 +156,9 @@ show_debug_message("✅ Quartel ID: " + string(id) + " criado com force_always_a
 // ✅ ALTERNATIVA: Usar Alarm como backup para garantir execução
 // Se o Step não executar, o Alarm vai chamar o Step manualmente
 alarm[1] = 1; // Executar no próximo frame
+
+// === TERRENO PERMITIDO ===
+terreno_permitido = TERRAIN.CAMPO; // Quartéis só em terreno de campo
 
 show_debug_message("Um quartel foi construído e está pronto para recrutar unidades.");
 show_debug_message("Custo de construção: $" + string(custo_dinheiro) + " dinheiro, " + string(custo_minerio) + " minério");

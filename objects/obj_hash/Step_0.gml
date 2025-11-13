@@ -29,9 +29,23 @@ if (variable_instance_exists(id, "alvo") && instance_exists(alvo)) {
 }
 
 if (target == noone || !instance_exists(target)) {
-    // Buscar qualquer unidade inimiga próxima
-    if (object_exists(obj_inimigo)) {
-        target = instance_nearest(x, y, obj_inimigo);
+    // ✅ CORREÇÃO: Escolher primeiro da fila quando há múltiplas unidades próximas
+    // ✅ CORREÇÃO: obj_inimigo removido - buscar apenas obj_infantaria
+    if (object_exists(obj_infantaria)) {
+        var _alvo_mais_proximo = instance_nearest(x, y, obj_infantaria);
+        if (instance_exists(_alvo_mais_proximo)) {
+            var _dist_alvo = point_distance(x, y, _alvo_mais_proximo.x, _alvo_mais_proximo.y);
+            // Se há múltiplas unidades próximas (dentro de 300px), escolher primeiro da fila
+            var _nacao_missil = 1; // Padrão: jogador
+            if (variable_instance_exists(id, "dono") && instance_exists(dono) && variable_instance_exists(dono, "nacao_proprietaria")) {
+                _nacao_missil = dono.nacao_proprietaria;
+            }
+            if (_dist_alvo <= 300) {
+                target = scr_escolher_primeiro_da_fila(x, y, obj_infantaria, 300, _nacao_missil);
+            } else {
+                target = _alvo_mais_proximo;
+            }
+        }
     }
     // Também pode buscar submarinos
     if ((target == noone || !instance_exists(target)) && object_exists(obj_submarino)) {
@@ -109,7 +123,7 @@ if (instance_exists(target)) {
         // Lista de objetos para verificar
         var _tipos_unidades = [
             obj_infantaria, obj_tanque, obj_soldado_antiaereo, obj_blindado_antiaereo,
-            obj_caca_f5, obj_f15, obj_f6, obj_helicoptero_militar, obj_c100
+            obj_caca_f5, obj_f15, obj_su35, obj_f6, obj_helicoptero_militar, obj_c100
         ];
         
         for (var i = 0; i < array_length(_tipos_unidades); i++) {

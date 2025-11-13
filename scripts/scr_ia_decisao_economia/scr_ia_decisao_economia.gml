@@ -48,6 +48,9 @@ function scr_ia_decisao_economia(_ia_id) {
         }
     }
     
+    // ✅ LOG: Mostrar contagem de quartéis
+    show_debug_message("🔍 IA CONTAGEM: Quartéis terrestres: " + string(_num_quartel) + " | Nação IA: " + string(_ia.nacao_proprietaria));
+    
     // 3. Contar TODAS as unidades militares (terrestre + naval + aéreo)
     // ✅ CORRIGIDO: Implementação direta para evitar problemas de carregamento
     var _nacao_ia = 2; // Valor padrão para IA
@@ -345,7 +348,14 @@ function scr_ia_decisao_economia(_ia_id) {
             show_debug_message("⚠️ ALERTA! Jogador tem " + string(_avaliacao_ameaca.total_unidades_jogador) + " unidades! Nível: " + _avaliacao_ameaca.nivel_ameaca);
         }
         
-        // Prioridade máxima: construir estruturas militares e recrutar
+        // ✅ CORREÇÃO CRÍTICA: SEMPRE construir quartel primeiro se não tiver nenhum
+        if (_num_quartel < 1 && _dinheiro_suficiente && _minerio_suficiente) {
+            // SEM QUARTEL = PRIORIDADE ABSOLUTA
+            show_debug_message("🏗️ URGENTE: IA SEM QUARTEL! Construindo quartel AGORA!");
+            return "construir_militar";
+        }
+        
+        // Prioridade máxima: construir mais quartéis se tiver menos de 2
         if (_num_quartel < 2 && _dinheiro_suficiente && _minerio_suficiente) {
             // Precisa de mais quartéis para produzir unidades
             if (variable_global_exists("debug_enabled") && global.debug_enabled) {
@@ -354,7 +364,7 @@ function scr_ia_decisao_economia(_ia_id) {
             return "construir_militar";
         }
         
-        // Prioridade alta: recrutar unidades (mesmo se já tiver algumas)
+        // Prioridade alta: recrutar unidades (APENAS se tiver quartel)
         if (_num_quartel >= 1 && _total_unidades < (_avaliacao_ameaca.total_unidades_jogador * 0.8)) {
             // Tentar ter pelo menos 80% das unidades do jogador
             if (variable_global_exists("debug_enabled") && global.debug_enabled) {
@@ -387,6 +397,48 @@ function scr_ia_decisao_economia(_ia_id) {
     
     var _decisao = "expandir";
     var _prioridade = 0;
+    
+    // ✅ PRIORIDADE 0.5: RESPOSTA ESTRATÉGICA ADAPTATIVA - Criar contrapartida ao exército do jogador
+    // ✅ CORREÇÃO: Só fazer isso se tiver quartel, senão construir quartel primeiro
+    var _decisao_estrategica = scr_ia_decisao_unidade_estrategica(_ia);
+    if (_decisao_estrategica.precisa_resposta && _num_quartel >= 1 && _total_unidades < 20) {
+        // Verificar se tem recursos para criar a unidade estratégica
+        var _custo_dinheiro = 0;
+        var _custo_minerio = 0;
+        var _custo_populacao = 0;
+        
+        if (_decisao_estrategica.tipo_unidade == "infantaria") {
+            _custo_dinheiro = 100;
+            _custo_populacao = 1;
+        } else if (_decisao_estrategica.tipo_unidade == "tanque") {
+            _custo_dinheiro = 500;
+            _custo_minerio = 250;
+            _custo_populacao = 3;
+        } else if (_decisao_estrategica.tipo_unidade == "soldado_antiaereo") {
+            _custo_dinheiro = 150;
+            _custo_minerio = 50;
+            _custo_populacao = 1;
+        } else if (_decisao_estrategica.tipo_unidade == "blindado_antiaereo") {
+            _custo_dinheiro = 600;
+            _custo_minerio = 300;
+            _custo_populacao = 2;
+        }
+        
+        var _custo_total_d = _custo_dinheiro * _decisao_estrategica.quantidade;
+        var _custo_total_m = _custo_minerio * _decisao_estrategica.quantidade;
+        var _custo_total_p = _custo_populacao * _decisao_estrategica.quantidade;
+        
+        if (global.ia_dinheiro >= _custo_total_d && 
+            global.ia_minerio >= _custo_total_m && 
+            global.ia_populacao >= _custo_total_p) {
+            _decisao = "recrutar_estrategico";
+            _prioridade = 10.5; // Prioridade máxima (acima de ataque)
+            if (variable_global_exists("debug_enabled") && global.debug_enabled) {
+                show_debug_message("🎯 RESPOSTA ESTRATÉGICA: Criar " + string(_decisao_estrategica.quantidade) + "x " + _decisao_estrategica.tipo_unidade);
+                show_debug_message("  📋 Razão: " + _decisao_estrategica.razao);
+            }
+        }
+    }
     
     // ✅ PRIORIDADE 1: ATAQUE ULTRA AGRESSIVO - Atacar com só 1 unidade!
     if (_total_inimigos > 0 && _total_unidades >= 1) { // MUDADO de 2 para 1 - ATAQUE IMEDIATO
@@ -434,34 +486,44 @@ function scr_ia_decisao_economia(_ia_id) {
         _prioridade = 7;
     }
     // ✅ PRIORIDADE 4: MILITAR PRIMEIRO - Construir quartel ANTES de economia
-    else if (_num_quartel < 2 && _dinheiro_suficiente && _minerio_suficiente) { // MUDADO de < 1 para < 2
+    // ✅ CORREÇÃO CRÍTICA: Se não tem quartel, SEMPRE construir primeiro (prioridade absoluta)
+    else if (_num_quartel < 1 && _dinheiro_suficiente && _minerio_suficiente) {
+        _decisao = "construir_militar";
+        _prioridade = 10; // PRIORIDADE MÁXIMA se não tem quartel
+    }
+    else if (_num_quartel < 2 && _dinheiro_suficiente && _minerio_suficiente) {
         _decisao = "construir_militar";
         _prioridade = 6;
     }
-    // ✅ PRIORIDADE 5: RECRUTAR AGRESSIVO - Produzir mais unidades
+    // ✅ PRIORIDADE 5: INFRAESTRUTURA NAVAL - Mais cedo e mais agressivo (ANTES de recrutar)
+    else if (_num_quartel_marinha < 1 && _unidades_terrestres >= 2 && _dinheiro_suficiente && _minerio_suficiente) { // REDUZIDO de 4 para 2 - construir naval mais cedo
+        _decisao = "construir_naval";
+        _prioridade = 5.5; // Prioridade maior que recrutar - construir infraestrutura primeiro
+    }
+    // ✅ PRIORIDADE 6: INFRAESTRUTURA AÉREA - Mais cedo e mais agressivo (ANTES de recrutar)
+    else if (_num_aeroporto < 1 && _total_unidades >= 3 && _dinheiro_suficiente && _minerio_suficiente) { // REDUZIDO de 6 para 3 - construir aeroporto mais cedo
+        _decisao = "construir_aereo";
+        _prioridade = 5.3; // Prioridade maior que recrutar - construir infraestrutura primeiro
+    }
+    // ✅ PRIORIDADE 7: RECRUTAR AGRESSIVO - Produzir mais unidades (APENAS se tiver quartel)
     else if (_total_unidades < 8 && _num_quartel >= 1) { // REDUZIDO de 10 para 8
         _decisao = "recrutar_unidades";
         _prioridade = 5;
-    }
-    // ✅ PRIORIDADE 6: INFRAESTRUTURA NAVAL - Mais cedo
-    else if (_num_quartel_marinha < 1 && _unidades_terrestres >= 4 && _dinheiro_suficiente && _minerio_suficiente) { // REDUZIDO de 8 para 4
-        _decisao = "construir_naval";
-        _prioridade = 4;
-    }
-    // ✅ PRIORIDADE 7: INFRAESTRUTURA AÉREA - Mais cedo
-    else if (_num_aeroporto < 1 && _total_unidades >= 6 && _dinheiro_suficiente && _minerio_suficiente) { // REDUZIDO de 12 para 6
-        _decisao = "construir_aereo";
-        _prioridade = 3;
     }
     // ✅ PRIORIDADE 8: EXPANDIR ECONOMIA - Só se recursos muito baixos
     else if (global.ia_dinheiro < 400 && _num_fazendas < 2) { // REDUZIDO de 500 e 3
         _decisao = "expandir_economia";
         _prioridade = 2;
     }
-    // ✅ PRIORIDADE 9: RECRUTAR CONTINUAMENTE - Sempre manter força militar
+    // ✅ PRIORIDADE 9: RECRUTAR CONTINUAMENTE - Sempre manter força militar (APENAS se tiver quartel)
     else if (_total_unidades < 15 && _num_quartel >= 1) {
         _decisao = "recrutar_unidades";
         _prioridade = 1;
+    }
+    // ✅ NOVO: Se não tem quartel e chegou aqui, construir quartel é a única opção
+    else if (_num_quartel < 1 && _dinheiro_suficiente && _minerio_suficiente) {
+        _decisao = "construir_militar";
+        _prioridade = 0;
     }
     // ✅ PRIORIDADE 10: PADRÃO - Se não há o que fazer, procurar inimigos
     else {
@@ -473,8 +535,16 @@ function scr_ia_decisao_economia(_ia_id) {
     // DEBUG E LOG
     // ==========================================
     
+    // ✅ SEMPRE mostrar logs de decisão (não apenas se debug_enabled)
+    show_debug_message("🤖 IA DECISÃO [" + string(_prioridade) + "]: " + _decisao);
+    show_debug_message("  📊 Fazendas: " + string(_num_fazendas) + " | Minas: " + string(_num_minas));
+    show_debug_message("  🎖️ Quartéis: " + string(_num_quartel) + " | Naval: " + string(_num_quartel_marinha) + " | Aéreo: " + string(_num_aeroporto));
+    show_debug_message("  ⚔️ Unidades: " + string(_total_unidades) + " (Terrestre: " + string(_unidades_terrestres) + " | Naval: " + string(_unidades_navais) + " | Aéreo: " + string(_unidades_aereas) + ")");
+    show_debug_message("  💰 Recursos: $" + string(global.ia_dinheiro) + " | Minério: " + string(global.ia_minerio));
+    show_debug_message("  ✅ Dinheiro suficiente: " + string(_dinheiro_suficiente) + " | Minério suficiente: " + string(_minerio_suficiente));
+    
     if (variable_global_exists("debug_enabled") && global.debug_enabled) {
-        show_debug_message("🤖 IA DECISÃO [" + string(_prioridade) + "]: " + _decisao);
+        // Logs adicionais apenas se debug_enabled
         show_debug_message("  📊 Fazendas: " + string(_num_fazendas) + " | Minas: " + string(_num_minas));
         show_debug_message("  🎖️ Quartéis: " + string(_num_quartel) + " | Naval: " + string(_num_quartel_marinha) + " | Aéreo: " + string(_num_aeroporto));
         show_debug_message("  ⚔️ Unidades: " + string(_total_unidades) + " (Terra: " + string(_unidades_terrestres) + ", Naval: " + string(_unidades_navais) + ", Aéreo: " + string(_unidades_aereas) + ")");

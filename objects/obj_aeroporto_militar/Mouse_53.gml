@@ -41,7 +41,7 @@ show_debug_message("Origem Y: " + string(sprite_get_yoffset(sprite_index)));
 var _tem_unidade_sobre = false;
 var _tipos_unidades = [
     obj_infantaria, obj_tanque, obj_soldado_antiaereo, obj_blindado_antiaereo,
-    obj_caca_f5, obj_helicoptero_militar, obj_f15, obj_f6, obj_c100
+    obj_caca_f5, obj_helicoptero_militar, obj_f15, obj_su35, obj_f6, obj_c100
 ];
 
 for (var i = 0; i < array_length(_tipos_unidades); i++) {
@@ -100,6 +100,16 @@ if (!_clique_detectado) {
 }
 
 if (mouse_check_button_pressed(mb_left) && _clique_detectado) {
+    // ✅ VALIDAR NAÇÃO ANTES DE TUDO
+    var _minha_nacao = 1; // Jogador sempre é nação 1
+    if (variable_instance_exists(id, "nacao_proprietaria")) {
+        if (nacao_proprietaria != _minha_nacao) {
+            // Aeroporto não é do jogador - BLOQUEAR
+            show_debug_message("🚫 Este aeroporto pertence à nação " + string(nacao_proprietaria) + " - Você não pode controlá-lo!");
+            exit;
+        }
+    }
+    
     show_debug_message("✅ CLIQUE NO AEROPORTO DETECTADO!");
     
     // === CORREÇÃO: FECHAR APENAS O MENU DESTE AEROPORTO (se existir) ===

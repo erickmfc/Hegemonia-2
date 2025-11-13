@@ -15,13 +15,16 @@ if (!scr_should_draw(id)) {
     exit;
 }
 
-// Efeito de altitude com sombra
-draw_sprite_ext(sprite_index, image_index, x, y, image_xscale, image_yscale, image_angle, c_black, 0.4);
-draw_sprite_ext(sprite_index, image_index, x, y - altura_voo, image_xscale, image_yscale, image_angle, image_blend, image_alpha);
+// ✅ CORREÇÃO: Efeito de altitude com sombra
+// Quando pousado (altura_voo = 0), desenha em y (posição do mapa)
+// Quando voando (altura_voo > 0), desenha em y - altura_voo (acima do chão)
+var _draw_y = y - altura_voo; // ✅ Posição de desenho baseada na altitude
+draw_sprite_ext(sprite_index, image_index, x, y, image_xscale, image_yscale, image_angle, c_black, 0.4); // Sombra no chão
+draw_sprite_ext(sprite_index, image_index, x, _draw_y, image_xscale, image_yscale, image_angle, image_blend, image_alpha); // Sprite na altitude correta
 
 // --- FEEDBACK VISUAL (SE SELECIONADO) ---
 if (selecionado) {
-    var _draw_y = y - altura_voo;
+    // ✅ Usar _draw_y já calculado acima
     
     // Círculo de seleção (vermelho para inimigo)
     draw_set_color(c_red);

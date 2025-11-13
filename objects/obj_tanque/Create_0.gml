@@ -8,6 +8,8 @@ estado = "parado";
 // Movimento
 destino_x = x;
 destino_y = y;
+destino_original_x = undefined; // Para sistema de desvio de obstáculos
+destino_original_y = undefined; // Para sistema de desvio de obstáculos
 velocidade = 1.2; // mais lento que a infantaria
 
 // Patrulha
@@ -15,6 +17,13 @@ patrulha = ds_list_create();
 patrulha_indice = 0;
 modo_patrulha = false;
 seguir_alvo = noone;
+
+// ✅ NOVO: Sistema de patrulha igual navios/aviões
+pontos_patrulha = ds_list_create();
+indice_patrulha_atual = 0;
+
+// === TERRENOS PERMITIDOS ===
+terrenos_permitidos = [TERRAIN.CAMPO, TERRAIN.DESERTO]; // Terra e deserto (não floresta)
 
 // Ataque
 alcance_visao = 600;  // bem maior

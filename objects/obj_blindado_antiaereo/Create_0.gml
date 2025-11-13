@@ -13,6 +13,8 @@ estado = "parado";
 // === MOVIMENTO ===
 destino_x = x;
 destino_y = y;
+destino_original_x = undefined; // Para sistema de desvio de obstáculos
+destino_original_y = undefined; // Para sistema de desvio de obstáculos
 velocidade = 1.5; // Velocidade especificada: 1.5
 
 // === PATRULHA ===
@@ -20,6 +22,10 @@ patrulha = ds_list_create();
 patrulha_indice = 0;
 modo_patrulha = false;
 seguir_alvo = noone;
+
+// ✅ NOVO: Sistema de patrulha igual navios/aviões
+pontos_patrulha = ds_list_create();
+indice_patrulha_atual = 0;
 
 // === ATAQUE ANTI-AÉREO ===
 alcance_visao = 700;  // Alcance de detecção amplo
@@ -31,8 +37,11 @@ atq_rate = 180; // 3 segundos (60 FPS * 3 = 180 frames)
 alvo = noone;
 hp = 200; // Vida especificada: 200 HP
 
+// Modo de combate
+modo_ataque = true; // Por padrão, ataca automaticamente
+
 // === ESPECIALIZAÇÃO ANTI-AÉREA ===
-dano = 60; // Dano 20% maior que o soldado (50 * 1.2 = 60)
+dano = 150; // Dano aumentado
 especializacao = "antiaerea"; // Tipo de especialização
 
 // === OBJETOS ESPECÍFICOS DO BLINDADO ===

@@ -44,11 +44,16 @@ function scr_get_projectile_from_pool(obj_type, x, y, layer_name = "Instances") 
         _pool = _pool_mgr.pool_ironclad;
         _pool_key = "ironclad";
     } else {
-        // ✅ CORREÇÃO: Verificar objetos opcionais (obj_tiro_tanque, obj_tiro_blindado)
+        // ✅ CORREÇÃO: Verificar objetos opcionais (obj_tiro_tanque, obj_tiro_blindado, obj_projetil_sabot)
         var _obj_tiro_tanque = asset_get_index("obj_tiro_tanque");
         var _obj_tiro_blindado = asset_get_index("obj_tiro_blindado");
+        var _obj_projetil_sabot = asset_get_index("obj_projetil_sabot");
         
-        if (_obj_tiro_tanque != -1 && asset_get_type(_obj_tiro_tanque) == asset_object && obj_type == _obj_tiro_tanque) {
+        if (_obj_projetil_sabot != -1 && asset_get_type(_obj_projetil_sabot) == asset_object && obj_type == _obj_projetil_sabot) {
+            // ✅ NOVO: Usar pool_tiro_tanque para obj_projetil_sabot também
+            _pool = _pool_mgr.pool_tiro_tanque;
+            _pool_key = "projetil_sabot";
+        } else if (_obj_tiro_tanque != -1 && asset_get_type(_obj_tiro_tanque) == asset_object && obj_type == _obj_tiro_tanque) {
             _pool = _pool_mgr.pool_tiro_tanque;
             _pool_key = "tiro_tanque";
         } else if (_obj_tiro_blindado != -1 && asset_get_type(_obj_tiro_blindado) == asset_object && obj_type == _obj_tiro_blindado) {
@@ -86,6 +91,7 @@ function scr_get_projectile_from_pool(obj_type, x, y, layer_name = "Instances") 
         _projetil.y = y;
         _projetil.pooled = true; // Marcar como em uso
         _projetil.visible = true;
+        _projetil.image_alpha = 1.0; // Garantir opacidade total
         
         // Reativar instância (se estava desativada)
         instance_activate_object(_projetil);
@@ -114,6 +120,10 @@ function scr_get_projectile_from_pool(obj_type, x, y, layer_name = "Instances") 
             if (!variable_instance_exists(_novo_proj, "pooled")) {
                 _novo_proj.pooled = false; // Será marcado como true quando retornar ao pool
             }
+            
+            // Garantir visibilidade do novo projétil
+            _novo_proj.visible = true;
+            _novo_proj.image_alpha = 1.0;
             
             _pool_mgr.objetos_criados++;
             

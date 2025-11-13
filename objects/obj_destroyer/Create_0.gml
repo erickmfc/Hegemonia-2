@@ -22,11 +22,18 @@ raio_selecao = 25;
 modo_combate = "passivo";
 alvo = noone;
 
+// ✅ OTIMIZAÇÃO: Timer para verificação periódica de inimigos (a cada 30 frames = ~0.5s a 60 FPS)
+timer_verificacao_inimigos = 0;
+intervalo_verificacao_inimigos = 30; // Verificar inimigos a cada 30 frames
+
 // === SISTEMA DE MOVIMENTO ===
 destino_x = x;
 destino_y = y;
 estado = "parado";
 movendo = false;
+
+// Sistema de rotação
+velocidade_rotacao = 0.8; // Velocidade de rotação em graus por frame
 
 // === SISTEMA DE MOVIMENTO PARA NAVEGAÇÃO ===
 moving_to_target = false;

@@ -104,12 +104,62 @@ if (variable_instance_exists(id, "selecionado") && selecionado) {
     draw_set_color(c_white);
 }
 
-// === CÍRCULO PULSANTE DE EMBARQUE ===
+// === RETÂNGULO DE EMBARQUE (IGUAL AO PAI) ===
 if (variable_instance_exists(id, "estado_embarque") && estado_embarque == "embarcando") {
-    // Círculo verde pulsante para indicar área de embarque
-    var _alpha = 0.3 + 0.2 * sin(current_time * 0.01);
+    // ✅ CORREÇÃO: Cor transparente (verde claro muito transparente) em vez de azul
     draw_set_color(c_lime);
-    draw_set_alpha(_alpha);
-    draw_circle(x, y, raio_embarque, false);
+    draw_set_alpha(0.15); // ✅ MUITO TRANSPARENTE: era 0.3, agora 0.15
+    
+    // ✅ NOVO: Desenhar retângulo que cobre o navio (em vez de círculo)
+    var _largura = variable_instance_exists(id, "largura_embarque") ? largura_embarque : 200;
+    var _altura = variable_instance_exists(id, "altura_embarque") ? altura_embarque : 960; // ✅ AUMENTADO: 50% proa + 50% popa (960 = 480 + 240 + 240)
+    
+    // Calcular posição do retângulo baseado na rotação do navio
+    var _angulo_rad = degtorad(image_angle);
+    var _cos_a = dcos(_angulo_rad);
+    var _sin_a = dsin(_angulo_rad);
+    
+    // Pontos do retângulo (centrado no navio)
+    var _half_w = _largura / 2;
+    var _half_h = _altura / 2;
+    
+    // Canto superior esquerdo (antes da rotação)
+    var _x1 = -_half_w;
+    var _y1 = -_half_h;
+    // Canto superior direito
+    var _x2 = _half_w;
+    var _y2 = -_half_h;
+    // Canto inferior direito
+    var _x3 = _half_w;
+    var _y3 = _half_h;
+    // Canto inferior esquerdo
+    var _x4 = -_half_w;
+    var _y4 = _half_h;
+    
+    // Rotacionar pontos
+    var _rx1 = x + (_x1 * _cos_a - _y1 * _sin_a);
+    var _ry1 = y + (_x1 * _sin_a + _y1 * _cos_a);
+    var _rx2 = x + (_x2 * _cos_a - _y2 * _sin_a);
+    var _ry2 = y + (_x2 * _sin_a + _y2 * _cos_a);
+    var _rx3 = x + (_x3 * _cos_a - _y3 * _sin_a);
+    var _ry3 = y + (_x3 * _sin_a + _y3 * _cos_a);
+    var _rx4 = x + (_x4 * _cos_a - _y4 * _sin_a);
+    var _ry4 = y + (_x4 * _sin_a + _y4 * _cos_a);
+    
+    // Desenhar retângulo rotacionado
+    draw_primitive_begin(pr_trianglefan);
+    draw_vertex(_rx1, _ry1);
+    draw_vertex(_rx2, _ry2);
+    draw_vertex(_rx3, _ry3);
+    draw_vertex(_rx4, _ry4);
+    draw_primitive_end();
+    
+    // Borda do retângulo (transparente)
+    draw_set_alpha(0.3); // ✅ TRANSPARENTE: era 0.6, agora 0.3
+    draw_set_color(c_lime);
+    draw_line(_rx1, _ry1, _rx2, _ry2);
+    draw_line(_rx2, _ry2, _rx3, _ry3);
+    draw_line(_rx3, _ry3, _rx4, _ry4);
+    draw_line(_rx4, _ry4, _rx1, _ry1);
     draw_set_alpha(1.0);
 }

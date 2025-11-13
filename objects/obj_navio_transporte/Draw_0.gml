@@ -35,29 +35,29 @@ if (selecionado) {
     draw_set_alpha(1.0);
     draw_set_halign(fa_center);
     
-    // PRIORIDADE: Mostrar status de EMBARQUE primeiro (mais importante)
+    // ✅ PRIORIDADE: Mostrar status de EMBARQUE primeiro (mais importante e legível)
     var _transporte_texto = "";
     var _transporte_cor = c_white;
     
     if (estado_transporte == NavioTransporteEstado.EMBARQUE_ATIVO) {
-        _transporte_texto = "🚚 EMBARQUE ATIVO";
+        _transporte_texto = "EMBARQUE";
         _transporte_cor = c_yellow;
     } else if (estado_transporte == NavioTransporteEstado.EMBARQUE_OFF) {
-        _transporte_texto = "✅ CHEIO";
-        _transporte_cor = c_orange;
-    } else if (estado_transporte == NavioTransporteEstado.DESEMBARCANDO) {
-        _transporte_texto = "📦 DESEMBARQUE";
+        _transporte_texto = "EMBARCADO";
         _transporte_cor = c_lime;
+    } else if (estado_transporte == NavioTransporteEstado.DESEMBARCANDO) {
+        _transporte_texto = "DESEMBARQUE";
+        _transporte_cor = c_orange;
     } else if (estado_transporte == NavioTransporteEstado.NAVEGANDO) {
-        _transporte_texto = "⚓ NAVEGANDO";
+        _transporte_texto = "NAVEGANDO";
         _transporte_cor = make_color_rgb(0, 255, 255); // c_aqua
     } else {
         // Status normal de movimento
-        if (estado == LanchaState.ATACANDO) _transporte_texto = "⚔️ ATACANDO";
-        else if (estado == LanchaState.PATRULHANDO) _transporte_texto = "🔄 PATRULHANDO";
-        else if (estado == LanchaState.MOVENDO) _transporte_texto = "⛵ NAVEGANDO";
-        else if (estado == LanchaState.DEFININDO_PATRULHA) _transporte_texto = "📍 DEFININDO ROTA";
-        else _transporte_texto = "⏸️ PARADO";
+        if (estado == LanchaState.ATACANDO) _transporte_texto = "ATACANDO";
+        else if (estado == LanchaState.PATRULHANDO) _transporte_texto = "PATRULHANDO";
+        else if (estado == LanchaState.MOVENDO) _transporte_texto = "NAVEGANDO";
+        else if (estado == LanchaState.DEFININDO_PATRULHA) _transporte_texto = "DEFININDO ROTA";
+        else _transporte_texto = "PARADO";
         
         if (estado == LanchaState.ATACANDO) _transporte_cor = c_red;
         else if (estado == LanchaState.PATRULHANDO) _transporte_cor = c_orange;
@@ -65,16 +65,37 @@ if (selecionado) {
         else _transporte_cor = c_gray;
     }
     
-    // Desenhar status PRINCIPAL (GRANDE)
+    // ✅ NOVO: Fundo escuro para legibilidade do status
+    var _status_x = x;
+    var _status_y = _draw_y - 65;
+    var _status_w = string_width(_transporte_texto) + 20;
+    var _status_h = 25;
+    
+    draw_set_color(c_black);
+    draw_set_alpha(0.8);
+    draw_rectangle(_status_x - _status_w/2, _status_y - _status_h/2, 
+                    _status_x + _status_w/2, _status_y + _status_h/2, false);
+    draw_set_alpha(1.0);
+    
+    // Borda do status
+    draw_set_color(_transporte_cor);
+    draw_set_alpha(0.6);
+    draw_rectangle(_status_x - _status_w/2, _status_y - _status_h/2, 
+                    _status_x + _status_w/2, _status_y + _status_h/2, true);
+    draw_set_alpha(1.0);
+    
+    // Desenhar status PRINCIPAL (GRANDE e legível)
     draw_set_color(_transporte_cor);
     draw_set_font(-1);  // Fonte padrão maior
-    draw_text(x, _draw_y - 50, _transporte_texto);
+    draw_text(_status_x, _status_y, _transporte_texto);
     
-    // Controles
+    // Controles (menor, abaixo do status)
     draw_set_color(c_white);
+    draw_set_alpha(0.9);
     draw_text(x, _draw_y - 35, "[K] Patrulha | [L] Parar");
-    draw_text(x, _draw_y - 20, "[P] Embarcar/Desembarcar");
+    draw_text(x, _draw_y - 20, "[P] Embarcar | [PP] Fechar | [PPP] Desembarcar");
     draw_text(x, _draw_y - 5, "[O] Ataque | [J] Menu Carga");
+    draw_set_alpha(1.0);
     
     // --- INDICADOR DE CARGA ---
     var _percentual = ((avioes_count + unidades_count + soldados_count) / (avioes_max + unidades_max + soldados_max)) * 100;
@@ -154,4 +175,84 @@ if (estado == LanchaState.PATRULHANDO || estado == LanchaState.DEFININDO_PATRULH
     }
 }
 
-draw_set_alpha(1.0);
+// === DESENHAR ÁREA DE CAPTURA (RETÂNGULO VERDE) ===
+// ✅ APENAS quando modo embarque está ATIVO (portas abertas) e pode receber unidades
+// ✅ NÃO mostrar quando portas estão fechadas (EMBARCADO) ou em qualquer outro estado
+var _mostrar_retangulo = false;
+if (variable_instance_exists(id, "estado_transporte") && 
+    variable_instance_exists(id, "modo_embarque")) {
+    
+    // ✅ Só mostrar se EXATAMENTE em modo EMBARQUE_ATIVO com portas abertas
+    if (estado_transporte == NavioTransporteEstado.EMBARQUE_ATIVO && modo_embarque) {
+        // Verificar se ainda tem espaço para embarcar
+        var _total_embarcado = soldados_count + unidades_count + avioes_count;
+        var _capacidade_total = soldados_max + unidades_max + avioes_max;
+        var _pode_embarcar = (_total_embarcado < _capacidade_total);
+        
+        // ✅ Só mostrar retângulo se PODE embarcar (tem espaço) E portas estão abertas
+        if (_pode_embarcar) {
+            _mostrar_retangulo = true;
+        }
+    }
+}
+
+// ✅ Desenhar retângulo APENAS se todas as condições forem verdadeiras
+if (_mostrar_retangulo) {
+        draw_set_color(c_lime);
+        draw_set_alpha(0.2); // Verde transparente
+        
+        // Desenhar retângulo que cobre o navio (reduzido 20%)
+        var _largura = variable_instance_exists(id, "largura_embarque") ? largura_embarque : 136; // ✅ REDUZIDO 20%
+        var _altura = variable_instance_exists(id, "altura_embarque") ? altura_embarque : 163; // ✅ REDUZIDO 20%
+        
+        // Calcular posição do retângulo baseado na rotação do navio
+        var _angulo_rad = degtorad(image_angle);
+        var _cos_a = dcos(_angulo_rad);
+        var _sin_a = dsin(_angulo_rad);
+        
+        // Pontos do retângulo (centrado no navio)
+        var _half_w = _largura / 2;
+        var _half_h = _altura / 2;
+        
+        // Canto superior esquerdo (antes da rotação)
+        var _x1 = -_half_w;
+        var _y1 = -_half_h;
+        // Canto superior direito
+        var _x2 = _half_w;
+        var _y2 = -_half_h;
+        // Canto inferior direito
+        var _x3 = _half_w;
+        var _y3 = _half_h;
+        // Canto inferior esquerdo
+        var _x4 = -_half_w;
+        var _y4 = _half_h;
+        
+        // Rotacionar pontos
+        var _rx1 = x + (_x1 * _cos_a - _y1 * _sin_a);
+        var _ry1 = y + (_x1 * _sin_a + _y1 * _cos_a);
+        var _rx2 = x + (_x2 * _cos_a - _y2 * _sin_a);
+        var _ry2 = y + (_x2 * _sin_a + _y2 * _cos_a);
+        var _rx3 = x + (_x3 * _cos_a - _y3 * _sin_a);
+        var _ry3 = y + (_x3 * _sin_a + _y3 * _cos_a);
+        var _rx4 = x + (_x4 * _cos_a - _y4 * _sin_a);
+        var _ry4 = y + (_x4 * _sin_a + _y4 * _cos_a);
+        
+        // Desenhar retângulo rotacionado (preenchido)
+        draw_primitive_begin(pr_trianglefan);
+        draw_vertex(_rx1, _ry1);
+        draw_vertex(_rx2, _ry2);
+        draw_vertex(_rx3, _ry3);
+        draw_vertex(_rx4, _ry4);
+        draw_primitive_end();
+        
+        // Borda do retângulo (um pouco mais visível)
+        draw_set_alpha(0.4);
+        draw_set_color(c_lime);
+        draw_line(_rx1, _ry1, _rx2, _ry2);
+        draw_line(_rx2, _ry2, _rx3, _ry3);
+        draw_line(_rx3, _ry3, _rx4, _ry4);
+        draw_line(_rx4, _ry4, _rx1, _ry1);
+        
+        draw_set_alpha(1.0);
+        draw_set_color(c_white);
+    }

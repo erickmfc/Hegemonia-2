@@ -57,41 +57,78 @@ function scr_ia_encontrar_posicao_estrategica(_ia_id, _tipo_estrutura = "economi
         }
         
     } else if (_tipo_estrutura == "naval") {
-        // ✅ CORRIGIDO: Quartéis navais DEVEM estar EM ÁGUA
-        // Buscar posições de água próximas à base
-        var _posicao_agua = scr_find_nearest_water(_base_x, _base_y, _raio_expansao * 1.5);
-        
-        if (_posicao_agua[0] != -1) {
-            // Encontrou água, usar essa posição e tentar variações ao redor
-            var _px_base = _posicao_agua[0];
-            var _py_base = _posicao_agua[1];
-            
-            // Tentar posições próximas em água (formar um círculo na água)
-            for (var i = 0; i < 12; i++) {
-                var _angulo = i * 30; // 12 posições em círculo
-                var _raio_variacao = 50 + random_range(0, 100); // Variação de 50-150 pixels
-                var _px = _px_base + lengthdir_x(_raio_variacao, _angulo);
-                var _py = _py_base + lengthdir_y(_raio_variacao, _angulo);
+        // ✅ NOVO: Usar posições de costa conhecidas da IA
+        if (variable_instance_exists(_ia, "territorio_identificado") && _ia.territorio_identificado) {
+            if (variable_instance_exists(_ia, "posicoes_costa") && ds_list_size(_ia.posicoes_costa) > 0) {
+                // Usar posições de costa conhecidas
+                var _num_posicoes_costa = ds_list_size(_ia.posicoes_costa);
+                var _posicoes_usar = min(_num_posicoes_costa, 20); // Máximo 20 posições
                 
-                // Verificar se está em água antes de adicionar
-                if (scr_check_water_tile(_px, _py)) {
-                    array_push(_posicoes_tentativas, {x: _px, y: _py, angulo: _angulo});
-                }
-            }
-        } else {
-            // Não encontrou água próxima, tentar buscar em direções específicas
-        var _angulos = [90, 135, 180, 225, 270]; // Direções onde pode ter água
-        for (var i = 0; i < array_length(_angulos); i++) {
-                var _distancia = 200;
-                for (var j = 0; j < 10; j++) { // Tentar até 10 distâncias diferentes
-                    var _px = _base_x + lengthdir_x(_distancia, _angulos[i]);
-                    var _py = _base_y + lengthdir_y(_distancia, _angulos[i]);
-                    
-                    if (scr_check_water_tile(_px, _py)) {
-            array_push(_posicoes_tentativas, {x: _px, y: _py, angulo: _angulos[i]});
-                        break; // Encontrou, para de buscar nesta direção
+                for (var i = 0; i < _posicoes_usar; i++) {
+                    var _pos_costa = ds_list_find_value(_ia.posicoes_costa, i);
+                    if (is_struct(_pos_costa) && variable_struct_exists(_pos_costa, "x")) {
+                        // Adicionar posição de costa e variações próximas
+                        var _px_base = _pos_costa.x;
+                        var _py_base = _pos_costa.y;
+                        
+                        // Adicionar posição exata
+                        array_push(_posicoes_tentativas, {x: _px_base, y: _py_base, angulo: 0, distancia: _pos_costa.distancia_base});
+                        
+                        // Adicionar variações próximas (em círculo)
+                        for (var j = 0; j < 4; j++) {
+                            var _angulo = j * 90;
+                            var _raio = 32 + random_range(0, 32); // 32-64 pixels de variação
+                            var _px = _px_base + lengthdir_x(_raio, _angulo);
+                            var _py = _py_base + lengthdir_y(_raio, _angulo);
+                            
+                            // Verificar se ainda está em água
+                            if (scr_validar_terreno_construcao(obj_quartel_marinha, _px, _py, 96, 96)) {
+                                array_push(_posicoes_tentativas, {x: _px, y: _py, angulo: _angulo, distancia: point_distance(_px, _py, _base_x, _base_y)});
+                            }
+                        }
                     }
-                    _distancia += 100; // Aumenta distância
+                }
+                
+                show_debug_message("🌊 IA usando " + string(_posicoes_usar) + " posições de costa conhecidas");
+            }
+        }
+        
+        // Se não encontrou posições de costa ou não tem muitas, buscar água próxima como fallback
+        if (array_length(_posicoes_tentativas) < 5) {
+            var _posicao_agua = scr_find_nearest_water(_base_x, _base_y, _raio_expansao * 1.5);
+            
+            if (_posicao_agua[0] != -1) {
+                // Encontrou água, usar essa posição e tentar variações ao redor
+                var _px_base = _posicao_agua[0];
+                var _py_base = _posicao_agua[1];
+                
+                // Tentar posições próximas em água (formar um círculo na água)
+                for (var i = 0; i < 12; i++) {
+                    var _angulo = i * 30; // 12 posições em círculo
+                    var _raio_variacao = 50 + random_range(0, 100); // Variação de 50-150 pixels
+                    var _px = _px_base + lengthdir_x(_raio_variacao, _angulo);
+                    var _py = _py_base + lengthdir_y(_raio_variacao, _angulo);
+                    
+                    // Verificar se está em água antes de adicionar
+                    if (scr_validar_terreno_construcao(obj_quartel_marinha, _px, _py, 96, 96)) {
+                        array_push(_posicoes_tentativas, {x: _px, y: _py, angulo: _angulo});
+                    }
+                }
+            } else {
+                // Não encontrou água próxima, tentar buscar em direções específicas
+                var _angulos = [90, 135, 180, 225, 270]; // Direções onde pode ter água
+                for (var i = 0; i < array_length(_angulos); i++) {
+                    var _distancia = 200;
+                    for (var j = 0; j < 10; j++) { // Tentar até 10 distâncias diferentes
+                        var _px = _base_x + lengthdir_x(_distancia, _angulos[i]);
+                        var _py = _base_y + lengthdir_y(_distancia, _angulos[i]);
+                        
+                        if (scr_validar_terreno_construcao(obj_quartel_marinha, _px, _py, 96, 96)) {
+                            array_push(_posicoes_tentativas, {x: _px, y: _py, angulo: _angulos[i]});
+                            break; // Encontrou, para de buscar nesta direção
+                        }
+                        _distancia += 100; // Aumenta distância
+                    }
                 }
             }
         }
@@ -154,15 +191,16 @@ function scr_ia_encontrar_posicao_estrategica(_ia_id, _tipo_estrutura = "economi
             }
         }
         
-        // ✅ NOVO: Para estruturas navais, verificar se está em água
+        // ✅ NOVO: Para estruturas navais, verificar se está em água usando validação de terreno
         if (_tipo_estrutura == "naval") {
-            if (!scr_check_water_tile(_pos.x, _pos.y)) {
+            if (!scr_validar_terreno_construcao(obj_quartel_marinha, _pos.x, _pos.y, 96, 96)) {
                 _valida = false; // Não é água, inválida para quartel naval
             } else {
-                // Bônus extra se toda a área for água
-                if (scr_check_water_area(_pos.x, _pos.y, 128, 128)) { // Assumindo tamanho padrão
-                    _score += 2000; // Grande bônus para área totalmente em água
+                // Bônus extra se for posição de costa conhecida
+                if (variable_struct_exists(_pos, "distancia") && _pos.distancia < 2000) {
+                    _score += 1500; // Grande bônus para costa próxima da base
                 }
+                _score += 1000; // Bônus base para estar em água válida
             }
         }
         
@@ -185,13 +223,21 @@ function scr_ia_encontrar_posicao_estrategica(_ia_id, _tipo_estrutura = "economi
     
     // Se não encontrou posição válida, tentar encontrar água novamente
     if (!_melhor_pos.valida || _melhor_score < 0) {
+        show_debug_message("⚠️ IA não encontrou posição estratégica válida, tentando fallback...");
+        
         if (_tipo_estrutura == "naval") {
             // Para naval, buscar água de novo com raio maior
             var _posicao_agua = scr_find_nearest_water(_base_x, _base_y, _raio_expansao * 2.5);
             if (_posicao_agua[0] != -1) {
                 _melhor_pos.x = _posicao_agua[0];
                 _melhor_pos.y = _posicao_agua[1];
-                _melhor_pos.valida = scr_check_water_tile(_posicao_agua[0], _posicao_agua[1]);
+                // ✅ CORRIGIDO: Usar validação real em vez de heurística
+                _melhor_pos.valida = scr_validar_terreno_construcao(obj_quartel_marinha, _posicao_agua[0], _posicao_agua[1], 96, 96);
+                if (_melhor_pos.valida) {
+                    show_debug_message("✅ IA encontrou água no fallback: (" + string(_melhor_pos.x) + ", " + string(_melhor_pos.y) + ")");
+                } else {
+                    show_debug_message("⚠️ AVISO: scr_find_nearest_water retornou posição, mas validação de terreno falhou");
+                }
             } else {
                 // Último recurso: posição aleatória e marcar como inválida
                 var _angulo_random = random(360);
@@ -199,14 +245,54 @@ function scr_ia_encontrar_posicao_estrategica(_ia_id, _tipo_estrutura = "economi
                 _melhor_pos.x = _base_x + lengthdir_x(_dist_random, _angulo_random);
                 _melhor_pos.y = _base_y + lengthdir_y(_dist_random, _angulo_random);
                 _melhor_pos.valida = false; // Não pode construir aqui
+                show_debug_message("❌ IA não encontrou água para quartel naval");
             }
         } else {
-            // Para outras estruturas, usar posição padrão
-        var _angulo_random = random(360);
-        var _dist_random = _raio_minimo + random_range(100, 300);
-        _melhor_pos.x = _base_x + lengthdir_x(_dist_random, _angulo_random);
-        _melhor_pos.y = _base_y + lengthdir_y(_dist_random, _angulo_random);
-        _melhor_pos.valida = true;
+            // Para outras estruturas, usar posição padrão e verificar se é válida
+            var _tentativas_fallback = 20;
+            var _encontrou_fallback = false;
+            
+            for (var i = 0; i < _tentativas_fallback && !_encontrou_fallback; i++) {
+                var _angulo_random = random(360);
+                var _dist_random = _raio_minimo + random_range(50, 200);
+                var _px = _base_x + lengthdir_x(_dist_random, _angulo_random);
+                var _py = _base_y + lengthdir_y(_dist_random, _angulo_random);
+                
+                // Verificar se não há overlap
+                var _overlap = false;
+                with (obj_fazenda) {
+                    if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _ia.nacao_proprietaria) {
+                        if (point_distance(x, y, _px, _py) < 100) {
+                            _overlap = true;
+                        }
+                    }
+                }
+                with (obj_quartel) {
+                    if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _ia.nacao_proprietaria) {
+                        if (point_distance(x, y, _px, _py) < 100) {
+                            _overlap = true;
+                        }
+                    }
+                }
+                
+                if (!_overlap) {
+                    _melhor_pos.x = _px;
+                    _melhor_pos.y = _py;
+                    _melhor_pos.valida = true;
+                    _encontrou_fallback = true;
+                    show_debug_message("✅ IA encontrou posição fallback válida: (" + string(_melhor_pos.x) + ", " + string(_melhor_pos.y) + ")");
+                }
+            }
+            
+            // Se ainda não encontrou, usar posição padrão mesmo assim
+            if (!_encontrou_fallback) {
+                var _angulo_random = random(360);
+                var _dist_random = _raio_minimo + random_range(100, 300);
+                _melhor_pos.x = _base_x + lengthdir_x(_dist_random, _angulo_random);
+                _melhor_pos.y = _base_y + lengthdir_y(_dist_random, _angulo_random);
+                _melhor_pos.valida = true; // Tentar mesmo assim
+                show_debug_message("⚠️ IA usando posição padrão (pode ter overlap): (" + string(_melhor_pos.x) + ", " + string(_melhor_pos.y) + ")");
+            }
         }
     }
     

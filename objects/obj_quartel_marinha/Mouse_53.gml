@@ -51,6 +51,16 @@ if (mouse_check_button_pressed(mb_left)) {
 }
 
 if (_click_detected) {
+    // ✅ VALIDAR NAÇÃO ANTES DE TUDO
+    var _minha_nacao = 1; // Jogador sempre é nação 1
+    if (variable_instance_exists(id, "nacao_proprietaria")) {
+        if (nacao_proprietaria != _minha_nacao) {
+            // Quartel não é do jogador - BLOQUEAR
+            show_debug_message("🚫 Este quartel de marinha pertence à nação " + string(nacao_proprietaria) + " - Você não pode controlá-lo!");
+            exit;
+        }
+    }
+    
     // ✅ REDUZIDO: Debug apenas se debug_enabled
     if (global.debug_enabled) show_debug_message("✅ CLIQUE NO QUARTEL MARINHA!");
     

@@ -37,4 +37,14 @@ global.construindo_edificio = noone; // Guarda a instância do "fantasma"
 global.definindo_patrulha = noone; // Unidade definindo patrulha
 global.unidade_selecionada = noone; // Unidade atualmente selecionada
 
+// ✅ NOVO: Variáveis para duplo clique e seleção por área
+ultimo_clique_tempo = 0;
+ultimo_clique_obj = noone;
+selecionando_area = false;
+inicio_selecao_x = 0;
+inicio_selecao_y = 0;
+tempo_duplo_clique = 0.3; // 300ms para considerar duplo clique
+mouse_foi_soltou_este_frame = false; // Flag para rastrear se mouse foi solto neste frame
+mouse_pressionado_frame_anterior = false; // Rastrear estado anterior do mouse
+
 show_debug_message("✅ obj_input_manager inicializado completamente");

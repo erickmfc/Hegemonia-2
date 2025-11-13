@@ -60,8 +60,19 @@ function scr_fallback_f5(_funcao, _parametros) {
             
         case "scr_combate_aereo":
             // Fallback para combate
+            // ✅ CORREÇÃO: obj_inimigo removido - buscar obj_infantaria inimiga
             if (modo_ataque && altura_voo > 0) {
-                var _alvo = instance_nearest(x, y, obj_inimigo);
+                var _alvo = noone;
+                var _dist_min = 999999;
+                with (obj_infantaria) {
+                    if (variable_instance_exists(self, "nacao_proprietaria") && nacao_proprietaria != other.nacao_proprietaria) {
+                        var _dist_alvo = point_distance(other.x, other.y, x, y);
+                        if (_dist_alvo < _dist_min && _dist_alvo <= other.radar_alcance) {
+                            _dist_min = _dist_alvo;
+                            _alvo = id;
+                        }
+                    }
+                }
                 if (instance_exists(_alvo) && point_distance(x, y, _alvo.x, _alvo.y) <= radar_alcance) {
                     var _missil = instance_create_layer(x, y, "Instances", obj_tiro_simples);
                     if (instance_exists(_missil)) {

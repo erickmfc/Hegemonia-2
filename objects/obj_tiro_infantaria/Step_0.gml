@@ -3,10 +3,36 @@
 // Step Event - Movimento e Colisão
 // ================================================
 
+// === VERIFICAÇÃO DE SEGURANÇA ===
+// ✅ VERIFICAÇÃO DE SEGURANÇA: Se está invisível ou desativado, não processar
+if (!visible || image_alpha <= 0 || speed <= 0) {
+    // Projétil já foi acertado ou está sendo desativado
+    exit;
+}
+
 // === TIMER DE VIDA ===
 timer_vida--;
 if (timer_vida <= 0) {
-    scr_return_projectile_to_pool(id);
+    // ✅ CRÍTICO: Destruir projétil IMEDIATAMENTE quando timer expira
+    visible = false;
+    image_alpha = 0;
+    image_xscale = 0;
+    image_yscale = 0;
+    speed = 0;
+    
+    // ✅ DESATIVAR IMEDIATAMENTE
+    instance_deactivate_object(id);
+    
+    // ✅ TENTAR RETORNAR AO POOL, MAS SE FALHAR, DESTRUIR DIRETAMENTE
+    var _pool_mgr = instance_find(obj_projectile_pool_manager, 0);
+    if (!instance_exists(_pool_mgr) || !_pool_mgr.pool_enabled) {
+        // Pool não disponível - destruir diretamente
+        instance_destroy(id);
+    } else {
+        // Tentar retornar ao pool
+        scr_return_projectile_to_pool(id);
+    }
+    
     exit;
 }
 
@@ -145,7 +171,8 @@ if (alvo != noone && instance_exists(alvo)) {
                 }
                 
                 // Aplicar dano em área em outros inimigos terrestres
-                with (obj_inimigo) {
+                // ✅ CORREÇÃO: obj_inimigo removido - buscar apenas obj_infantaria
+                with (obj_infantaria) {
                     var _dist_area = point_distance(other.x, other.y, x, y);
                     if (_dist_area <= _raio_area && _dist_area > 0) {
                         if (variable_instance_exists(id, "vida")) {
@@ -168,17 +195,54 @@ if (alvo != noone && instance_exists(alvo)) {
                 }
             }
             
-            // Retornar tiro ao pool
-            scr_return_projectile_to_pool(id);
+            // ✅ CRÍTICO: Destruir projétil IMEDIATAMENTE após acertar
+            // ✅ FORÇAR: Tornar invisível e desativar ANTES de retornar ao pool
+            visible = false;
+            image_alpha = 0;
+            image_xscale = 0;
+            image_yscale = 0;
+            speed = 0;
+            
+            // ✅ DESATIVAR IMEDIATAMENTE
+            instance_deactivate_object(id);
+            
+            // ✅ TENTAR RETORNAR AO POOL, MAS SE FALHAR, DESTRUIR DIRETAMENTE
+            var _pool_mgr = instance_find(obj_projectile_pool_manager, 0);
+            if (!instance_exists(_pool_mgr) || !_pool_mgr.pool_enabled) {
+                // Pool não disponível - destruir diretamente
+                instance_destroy(id);
+            } else {
+                // Tentar retornar ao pool
+                scr_return_projectile_to_pool(id);
+            }
+            
             exit;
         }
     } else {
-        // Alvo muito próximo, retornar tiro ao pool
-        scr_return_projectile_to_pool(id);
+        // Alvo muito próximo, destruir tiro
+        visible = false;
+        image_alpha = 0;
+        speed = 0;
+        instance_deactivate_object(id);
+        var _pool_mgr = instance_find(obj_projectile_pool_manager, 0);
+        if (!instance_exists(_pool_mgr) || !_pool_mgr.pool_enabled) {
+            instance_destroy(id);
+        } else {
+            scr_return_projectile_to_pool(id);
+        }
         exit;
     }
 } else {
-    // Alvo não existe mais, retornar tiro ao pool
-    scr_return_projectile_to_pool(id);
+    // Alvo não existe mais, destruir tiro
+    visible = false;
+    image_alpha = 0;
+    speed = 0;
+    instance_deactivate_object(id);
+    var _pool_mgr = instance_find(obj_projectile_pool_manager, 0);
+    if (!instance_exists(_pool_mgr) || !_pool_mgr.pool_enabled) {
+        instance_destroy(id);
+    } else {
+        scr_return_projectile_to_pool(id);
+    }
     exit;
 }

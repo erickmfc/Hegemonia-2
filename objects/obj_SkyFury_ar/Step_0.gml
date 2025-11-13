@@ -16,31 +16,32 @@ if (contador_fumaca >= 10 && irandom(3) == 0) { // Apenas 1 em 3 vezes, a cada 1
 
 // Se o alvo não existe mais, explodir e retornar ao pool
 if (!instance_exists(target)) {
-    if (object_exists(obj_explosao_ar)) {
+    // ✅ CORREÇÃO: Verificar se explosão já foi criada para evitar múltiplas criações
+    if (!variable_instance_exists(id, "explosao_criada")) {
+        explosao_criada = false;
+    }
+    if (!explosao_criada && object_exists(obj_explosao_ar)) {
+        explosao_criada = true; // Marcar como criada
         var _expl = instance_create_layer(x, y, "Efeitos", obj_explosao_ar);
         if (instance_exists(_expl)) {
             _expl.image_blend = make_color_rgb(255,150,0);
             _expl.image_xscale = 1.2;
             _expl.image_yscale = 1.2;
+            _expl.alarm[0] = 90; // ✅ CORREÇÃO: 1.5 segundos (90 frames)
         }
     }
     scr_return_projectile_to_pool(id);
     exit;
 }
 
-// Aquisição de alvo automática (prioridade: F6 > F5 > Helicóptero)
-if (target == noone) {
-    var _alvo_aereo = noone;
-    if (instance_exists(obj_f6)) _alvo_aereo = instance_nearest(x, y, obj_f6);
-    else if (instance_exists(obj_caca_f5)) _alvo_aereo = instance_nearest(x, y, obj_caca_f5);
-    else if (instance_exists(obj_helicoptero_militar)) _alvo_aereo = instance_nearest(x, y, obj_helicoptero_militar);
-    if (instance_exists(_alvo_aereo)) target = _alvo_aereo;
-}
+// ✅ CORREÇÃO: Removida aquisição automática de alvos
+// Míssil só deve existir se tiver alvo válido definido pelo avião
+// Se target == noone, o míssil já foi destruído acima (linha 18-29)
 
 // Guiamento e interceptação
 if (instance_exists(target)) {
     var _dist = point_distance(x, y, target.x, target.y);
-    var _max_track = (variable_instance_exists(id, "distancia_maxima_rastreamento") ? distancia_maxima_rastreamento : 600);
+    var _max_track = (variable_instance_exists(id, "distancia_maxima_rastreamento") ? distancia_maxima_rastreamento : 800); // ✅ MELHORADO: 600 -> 800
 
     // Predição simples de posição do alvo
     var _time_to_intercept = (_dist > 0) ? (_dist / max(1, speed)) : 0;
@@ -82,9 +83,9 @@ image_angle = direction;
 x += lengthdir_x(speed, direction);
 y += lengthdir_y(speed, direction);
 
-// Impacto por proximidade (97% de acerto)
+// Impacto por proximidade (melhorado)
 if (instance_exists(target)) {
-    var _radius = (variable_instance_exists(id, "impact_radius") ? impact_radius : max(35, speed));
+    var _radius = (variable_instance_exists(id, "impact_radius") ? impact_radius : max(50, speed * 1.2)); // ✅ MELHORADO: raio maior
     if (point_distance(x, y, target.x, target.y) <= _radius) {
         var _hit = false;
         if (variable_instance_exists(target, "vida")) { target.vida -= dano; _hit = true; }
@@ -92,7 +93,20 @@ if (instance_exists(target)) {
         else if (variable_instance_exists(target, "hp")) { target.hp -= dano; _hit = true; }
 
         if (_hit) {
-            if (object_exists(obj_explosao_ar)) instance_create_layer(x, y, "Efeitos", obj_explosao_ar);
+            // ✅ CORREÇÃO: Verificar se explosão já foi criada para evitar múltiplas criações
+            if (!variable_instance_exists(id, "explosao_criada")) {
+                explosao_criada = false;
+            }
+            if (!explosao_criada && object_exists(obj_explosao_ar)) {
+                explosao_criada = true; // Marcar como criada
+                var _expl = instance_create_layer(x, y, "Efeitos", obj_explosao_ar);
+                if (instance_exists(_expl)) {
+                    _expl.image_blend = make_color_rgb(255,150,0);
+                    _expl.image_xscale = 1.2;
+                    _expl.image_yscale = 1.2;
+                    _expl.alarm[0] = 90; // ✅ CORREÇÃO: 1.5 segundos (90 frames)
+                }
+            }
             scr_return_projectile_to_pool(id);
             exit;
         }
@@ -102,6 +116,19 @@ if (instance_exists(target)) {
 // Timer de vida - usando variáveis já declaradas no Create event
 timer_vida_atual--;
 if (timer_vida_atual <= 0) {
-    if (object_exists(obj_explosao_ar)) instance_create_layer(x, y, "Efeitos", obj_explosao_ar);
+    // ✅ CORREÇÃO: Verificar se explosão já foi criada para evitar múltiplas criações
+    if (!variable_instance_exists(id, "explosao_criada")) {
+        explosao_criada = false;
+    }
+    if (!explosao_criada && object_exists(obj_explosao_ar)) {
+        explosao_criada = true; // Marcar como criada
+        var _expl = instance_create_layer(x, y, "Efeitos", obj_explosao_ar);
+        if (instance_exists(_expl)) {
+            _expl.image_blend = make_color_rgb(255,150,0);
+            _expl.image_xscale = 1.2;
+            _expl.image_yscale = 1.2;
+            _expl.alarm[0] = 90; // ✅ CORREÇÃO: 1.5 segundos (90 frames)
+        }
+    }
     scr_return_projectile_to_pool(id);
 }

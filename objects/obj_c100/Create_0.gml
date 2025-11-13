@@ -8,6 +8,11 @@ event_inherited();
 // Identidade
 nome_unidade = "C-100";
 
+// ✅ CORREÇÃO: Garantir que nacao_proprietaria está definida (herda do F-5, mas garantimos aqui)
+if (!variable_instance_exists(id, "nacao_proprietaria")) {
+    nacao_proprietaria = 1; // Jogador sempre é nação 1
+}
+
 // ✅ CORREÇÃO: Definir estado inicial explícito
 estado = "pousado";
 
@@ -29,6 +34,7 @@ PESO_INFANTARIA = 1;
 PESO_ANTIAEREO = 2;
 PESO_TANQUE = 4;
 PESO_BLINDADO = 3;
+PESO_ABRAMS = 5; // ✅ NOVO: Abrams é mais pesado que tanque normal
 
 // Estados/flags
 modo_receber_carga = false;
@@ -66,6 +72,7 @@ calcular_peso_unidade = function(unidade) {
         case "obj_soldado_antiaereo": return PESO_ANTIAEREO;
         case "obj_tanque": return PESO_TANQUE;
         case "obj_blindado_antiaereo": return PESO_BLINDADO;
+        case "obj_M1A_Abrams": return PESO_ABRAMS; // ✅ NOVO: Abrams pode embarcar
         default: return 1; // Unidades desconhecidas = 1 slot
     }
 }
@@ -82,9 +89,19 @@ eh_unidade_embarcavel = function(unidade) {
     if (!instance_exists(unidade)) return false;
     if (unidade.id == id) return false; // Não embarcar a si mesmo
     
-    // Verificar se é do jogador
-    if (!variable_instance_exists(unidade, "nacao_proprietaria")) return false;
-    if (unidade.nacao_proprietaria != nacao_proprietaria) return false;
+    // ✅ CORREÇÃO: Verificar se é do jogador (verificação mais robusta)
+    if (!variable_instance_exists(unidade, "nacao_proprietaria")) {
+        show_debug_message("⚠️ C-100: Unidade não tem nacao_proprietaria definida!");
+        return false;
+    }
+    if (!variable_instance_exists(id, "nacao_proprietaria")) {
+        show_debug_message("⚠️ C-100: C-100 não tem nacao_proprietaria definida!");
+        nacao_proprietaria = 1; // Definir padrão
+    }
+    if (unidade.nacao_proprietaria != nacao_proprietaria) {
+        show_debug_message("⚠️ C-100: Nação diferente! Unidade: " + string(unidade.nacao_proprietaria) + " | C-100: " + string(nacao_proprietaria));
+        return false;
+    }
     
     // Verificar se é terrestre (não tem altitude ou está no chão)
     if (variable_instance_exists(unidade, "altura_voo")) {

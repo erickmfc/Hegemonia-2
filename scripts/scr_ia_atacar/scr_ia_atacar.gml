@@ -43,30 +43,34 @@ function scr_ia_atacar(_ia_id) {
     // ✅ NOVO: Sistema de reconhecimento - explorar mapa para encontrar alvos
     // ✅ CORREÇÃO: Verificar se ultimo_reconhecimento existe antes de usar
     var _tem_ultimo_reconhecimento = variable_instance_exists(_ia, "ultimo_reconhecimento");
-    if (irandom(100) < 30 || !_tem_ultimo_reconhecimento || _ia.ultimo_reconhecimento == 0) { // 30% de chance ou primeira execução
-        // ✅ CORREÇÃO CRÍTICA: Verificar se instância é válida antes de chamar
-        // ✅ TEMPORÁRIO: Desabilitar reconhecimento para evitar erros
-        // O reconhecimento pode ser reativado depois que o problema for resolvido
-        /*
-        if (instance_exists(_ia)) {
-            try {
-                scr_ia_reconhecimento(_ia);
-                _reconhecimento_ativo = true;
-            } catch (e) {
-                if (variable_global_exists("debug_enabled") && global.debug_enabled) {
-                    show_debug_message("⚠️ scr_ia_atacar - Erro ao executar reconhecimento: " + string(e));
-                }
-                _reconhecimento_ativo = false;
+    var _tempo_ultimo_reconhecimento = _tem_ultimo_reconhecimento ? _ia.ultimo_reconhecimento : 0;
+    var _intervalo_reconhecimento = 10000; // 10 segundos entre reconhecimentos
+    
+    // Executar reconhecimento se:
+    // - 30% de chance aleatória OU
+    // - Nunca executou antes OU
+    // - Passou mais de 10 segundos desde o último
+    if (irandom(100) < 30 || _tempo_ultimo_reconhecimento == 0 || (current_time - _tempo_ultimo_reconhecimento) > _intervalo_reconhecimento) {
+        // ✅ REATIVADO: Reconhecimento agora está funcional
+        // ✅ CORREÇÃO: Verificar se o script existe antes de chamar
+        var _script_reconhecimento = asset_get_index("scr_ia_reconhecimento");
+        if (instance_exists(_ia) && _script_reconhecimento != -1 && asset_get_type(_script_reconhecimento) == asset_script) {
+            scr_ia_reconhecimento(_ia);
+            _reconhecimento_ativo = true;
+            
+            if (variable_global_exists("debug_enabled") && global.debug_enabled) {
+                show_debug_message("🔍 Reconhecimento ativado - explorando mapa para encontrar alvos");
             }
         } else {
             if (variable_global_exists("debug_enabled") && global.debug_enabled) {
-                show_debug_message("⚠️ scr_ia_atacar - Instância IA não existe para reconhecimento");
+                if (!instance_exists(_ia)) {
+                    show_debug_message("⚠️ scr_ia_atacar - Instância IA não existe para reconhecimento");
+                } else if (_script_reconhecimento == -1) {
+                    show_debug_message("⚠️ scr_ia_atacar - Script scr_ia_reconhecimento não encontrado");
+                }
             }
             _reconhecimento_ativo = false;
         }
-        */
-        // ✅ TEMPORÁRIO: Desabilitado para evitar erros
-        _reconhecimento_ativo = false;
     }
     
     // ✅ NOVO: Se tiver alvos mas força insuficiente, esperar reforços
@@ -147,6 +151,10 @@ function scr_ia_atacar(_ia_id) {
     // === DETECTAR INIMIGOS AÉREOS ===
     // ✅ CORRIGIDO: Implementação direta (sem depender de função externa)
     var _tipos_aereos = [obj_helicoptero_militar, obj_caca_f5, obj_f6, obj_f15, obj_c100];
+    var _obj_su35 = asset_get_index("obj_su35");
+    if (_obj_su35 != -1 && asset_get_type(_obj_su35) == asset_object) {
+        array_push(_tipos_aereos, _obj_su35);
+    }
     
     for (var i = 0; i < array_length(_tipos_aereos); i++) {
         var _tipo = _tipos_aereos[i];
@@ -194,6 +202,11 @@ function scr_ia_atacar(_ia_id) {
                     _alvo_prioritario = _alvo;
                 }
             }
+        }
+        
+        // ✅ NOVO: PRIORIDADE MÁXIMA - Usar TANQUES e ARTILHARIA ANTI-AÉREA contra aviões
+        if (variable_global_exists("debug_enabled") && global.debug_enabled) {
+            show_debug_message("🚨 AMEAÇA AÉREA DETECTADA! Usando tanques e artilharia anti-aérea!");
         }
     } else if (ds_list_size(_inimigos_terrestres) > 0) {
         _tipo_guerra = "terrestre";
@@ -243,37 +256,129 @@ function scr_ia_atacar(_ia_id) {
         
         // === ✅ NOVO: COMANDAR TODAS AS UNIDADES (NÃO SÓ INFANTARIA E TANQUE) ===
         
-        // Comandar blindados antiaéreos
-        with (obj_blindado_antiaereo) {
-            if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _ia.nacao_proprietaria) {
-                if (variable_instance_exists(id, "destino_x")) {
-                    destino_x = _alvo_prioritario.x;
-                    destino_y = _alvo_prioritario.y;
+        // ✅ NOVO: Se é guerra aérea, PRIORIZAR unidades anti-aéreas e tanques
+        if (_tipo_guerra == "aereo") {
+            // PRIORIDADE 1: Blindados Anti-Aéreos (mais eficazes contra aviões)
+            with (obj_blindado_antiaereo) {
+                if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _ia.nacao_proprietaria) {
+                    if (variable_instance_exists(id, "destino_x")) {
+                        destino_x = _alvo_prioritario.x;
+                        destino_y = _alvo_prioritario.y;
+                    }
+                    if (variable_instance_exists(id, "alvo")) {
+                        alvo = _alvo_prioritario;
+                    }
+                    if (variable_instance_exists(id, "modo_ataque")) {
+                        modo_ataque = true; // Ativar modo ataque
+                    }
+                    if (variable_instance_exists(id, "estado")) {
+                        estado = "atacando";
+                    }
+                    _comandos++;
                 }
-                if (variable_instance_exists(id, "alvo")) {
-                    alvo = _alvo_prioritario;
-                }
-                if (variable_instance_exists(id, "estado")) {
-                    estado = "atacando";
-                }
-                _comandos++;
             }
-        }
-        
-        // Comandar soldados antiaéreos
-        with (obj_soldado_antiaereo) {
-            if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _ia.nacao_proprietaria) {
-                if (variable_instance_exists(id, "destino_x")) {
-                    destino_x = _alvo_prioritario.x;
-                    destino_y = _alvo_prioritario.y;
+            
+            // PRIORIDADE 2: Soldados Anti-Aéreos
+            with (obj_soldado_antiaereo) {
+                if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _ia.nacao_proprietaria) {
+                    if (variable_instance_exists(id, "destino_x")) {
+                        destino_x = _alvo_prioritario.x;
+                        destino_y = _alvo_prioritario.y;
+                    }
+                    if (variable_instance_exists(id, "alvo")) {
+                        alvo = _alvo_prioritario;
+                    }
+                    if (variable_instance_exists(id, "modo_ataque")) {
+                        modo_ataque = true; // Ativar modo ataque
+                    }
+                    if (variable_instance_exists(id, "estado")) {
+                        estado = "atacando";
+                    }
+                    _comandos++;
                 }
-                if (variable_instance_exists(id, "alvo")) {
-                    alvo = _alvo_prioritario;
+            }
+            
+            // PRIORIDADE 3: Tanques (também podem atacar aviões em algumas situações)
+            with (obj_tanque) {
+                if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _ia.nacao_proprietaria) {
+                    if (variable_instance_exists(id, "destino_x")) {
+                        destino_x = _alvo_prioritario.x;
+                        destino_y = _alvo_prioritario.y;
+                    }
+                    if (variable_instance_exists(id, "alvo")) {
+                        alvo = _alvo_prioritario;
+                    }
+                    if (variable_instance_exists(id, "modo_ataque")) {
+                        modo_ataque = true; // Ativar modo ataque
+                    }
+                    if (variable_instance_exists(id, "estado")) {
+                        estado = "atacando";
+                    }
+                    _comandos++;
                 }
-                if (variable_instance_exists(id, "estado")) {
-                    estado = "atacando";
+            }
+            
+            // ✅ NOVO: M1A Abrams também pode ajudar na defesa anti-aérea
+            var _obj_abrams = asset_get_index("obj_M1A_Abrams");
+            if (_obj_abrams != -1 && asset_get_type(_obj_abrams) == asset_object) {
+                with (_obj_abrams) {
+                    if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _ia.nacao_proprietaria) {
+                        if (variable_instance_exists(id, "destino_x")) {
+                            destino_x = _alvo_prioritario.x;
+                            destino_y = _alvo_prioritario.y;
+                        }
+                        if (variable_instance_exists(id, "alvo")) {
+                            alvo = _alvo_prioritario;
+                        }
+                        if (variable_instance_exists(id, "modo_ataque")) {
+                            modo_ataque = true; // Ativar modo ataque
+                        }
+                        if (variable_instance_exists(id, "estado")) {
+                            estado = "atacando";
+                        }
+                        _comandos++;
+                    }
                 }
-                _comandos++;
+            }
+            
+            if (variable_global_exists("debug_enabled") && global.debug_enabled) {
+                show_debug_message("🎯 IA ATACANDO AVIÕES: " + string(_comandos) + " unidades anti-aéreas e tanques mobilizadas!");
+            }
+        } else {
+            // Para outros tipos de guerra, usar lógica normal
+            
+            // Comandar blindados antiaéreos
+            with (obj_blindado_antiaereo) {
+                if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _ia.nacao_proprietaria) {
+                    if (variable_instance_exists(id, "destino_x")) {
+                        destino_x = _alvo_prioritario.x;
+                        destino_y = _alvo_prioritario.y;
+                    }
+                    if (variable_instance_exists(id, "alvo")) {
+                        alvo = _alvo_prioritario;
+                    }
+                    if (variable_instance_exists(id, "estado")) {
+                        estado = "atacando";
+                    }
+                    _comandos++;
+                }
+            }
+            
+            // Comandar soldados antiaéreos
+            with (obj_soldado_antiaereo) {
+                if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _ia.nacao_proprietaria) {
+                    if (variable_instance_exists(id, "destino_x")) {
+                        destino_x = _alvo_prioritario.x;
+                        destino_y = _alvo_prioritario.y;
+                    }
+                    if (variable_instance_exists(id, "alvo")) {
+                        alvo = _alvo_prioritario;
+                    }
+                    if (variable_instance_exists(id, "estado")) {
+                        estado = "atacando";
+                    }
+                    _comandos++;
+                }
             }
         }
         
@@ -317,6 +422,10 @@ function scr_ia_atacar(_ia_id) {
                     }
                     if (variable_instance_exists(id, "alvo")) {
                         alvo = _alvo_prioritario;
+                    }
+                    // ✅ NOVO: F6 também precisa de alvo_em_mira
+                    if (variable_instance_exists(id, "alvo_em_mira")) {
+                        alvo_em_mira = _alvo_prioritario;
                     }
                     if (variable_instance_exists(id, "estado")) {
                         estado = "atacando";

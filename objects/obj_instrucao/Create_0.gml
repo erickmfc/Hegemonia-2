@@ -1,2 +1,2 @@
-/// @description Create - Botão Instruções
-// Botão não precisa de inicialização
+/// @description Create - Objeto de Instruções
+// Não precisa de inicialização especial

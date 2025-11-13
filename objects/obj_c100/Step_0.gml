@@ -21,8 +21,10 @@ if (!should_always_process && skip_frames_enabled) {
             var speed_mult = scr_get_speed_multiplier(current_lod, lod_process_index);
             // Movimento básico mantendo direção
             if (variable_instance_exists(id, "velocidade_atual")) {
-                x += lengthdir_x(velocidade_atual * speed_mult, image_angle);
-                y += lengthdir_y(velocidade_atual * speed_mult, image_angle);
+                // ✅ CORREÇÃO: Normalizar velocidade antes de aplicar multiplicador do LOD
+                var _vel_normalizada = scr_normalize_unit_speed(velocidade_atual);
+                x += lengthdir_x(_vel_normalizada * speed_mult, image_angle);
+                y += lengthdir_y(_vel_normalizada * speed_mult, image_angle);
             }
         }
         exit;
@@ -158,13 +160,33 @@ if (_is_flying && pode_voar) {
 }
 
 // Aplica o movimento (só se move se tiver velocidade)
-x += lengthdir_x(velocidade_atual, image_angle);
-y += lengthdir_y(velocidade_atual, image_angle);
+// ✅ CORREÇÃO: Normalizar velocidade baseado no zoom para manter velocidade visual constante
+var _vel_normalizada = scr_normalize_unit_speed(velocidade_atual);
+x += lengthdir_x(_vel_normalizada, image_angle);
+y += lengthdir_y(_vel_normalizada, image_angle);
 
 // --- 4. SISTEMA DE EMBARQUE SIMPLIFICADO (10 UNIDADES MÁXIMO) ---
 if (modo_receber_carga && altura_voo == 0 && estado == "pousado") {
-    // Sistema simplificado: aceita qualquer unidade terrestre do jogador
-    var _unidade_proxima = collision_circle(x, y, 30, all, false, true);
+    // ✅ CORREÇÃO: Verificar unidades terrestres específicas em vez de "all" (incluindo Abrams)
+    var _obj_abrams = asset_get_index("obj_M1A_Abrams");
+    var _tipos_embarcaveis = [obj_infantaria, obj_tanque, obj_soldado_antiaereo, obj_blindado_antiaereo];
+    if (_obj_abrams != -1 && asset_get_type(_obj_abrams) == asset_object) {
+        array_push(_tipos_embarcaveis, _obj_abrams); // ✅ NOVO: Adicionar Abrams
+    }
+    var _unidade_proxima = noone;
+    
+    // ✅ AUMENTADO: Procurar unidades próximas de cada tipo com raio maior (30% maior que antes)
+    var _raio_deteccao = 130; // ✅ AUMENTADO 30%: era 100, agora 130 (100 * 1.3 = 130) para pegar múltiplas unidades
+    for (var i = 0; i < array_length(_tipos_embarcaveis); i++) {
+        var _tipo = _tipos_embarcaveis[i];
+        if (object_exists(_tipo)) {
+            var _inst = instance_position(x, y, _tipo);
+            if (_inst != noone && point_distance(x, y, _inst.x, _inst.y) <= _raio_deteccao) {
+                _unidade_proxima = _inst;
+                break;
+            }
+        }
+    }
     
     if (instance_exists(_unidade_proxima)) {
         var _nome_obj = object_get_name(_unidade_proxima.object_index);
@@ -179,6 +201,12 @@ if (modo_receber_carga && altura_voo == 0 && estado == "pousado") {
             }
         } else {
             show_debug_message("❌ C-100: Unidade NÃO é embarcável: " + _nome_obj);
+            // Debug adicional para entender por que não é embarcável
+            if (variable_instance_exists(_unidade_proxima, "nacao_proprietaria")) {
+                show_debug_message("   Nação da unidade: " + string(_unidade_proxima.nacao_proprietaria) + " | Nação do C-100: " + string(nacao_proprietaria));
+            } else {
+                show_debug_message("   Unidade não tem nacao_proprietaria definida!");
+            }
         }
     }
     
@@ -187,6 +215,31 @@ if (modo_receber_carga && altura_voo == 0 && estado == "pousado") {
     if (variable_global_exists("unidades_selecionadas") && ds_list_size(global.unidades_selecionadas) > 0) {
         var _unidades_embarcadas = 0;
         
+        // ✅ CORREÇÃO: Também verificar unidades próximas mesmo que não estejam selecionadas (incluindo Abrams)
+        // ✅ AUMENTADO 30%: Raio maior para pegar múltiplas unidades
+        var _raio_deteccao_multipla = 130; // ✅ AUMENTADO 30%: era 100, agora 130 (100 * 1.3 = 130) para pegar múltiplas unidades
+        // ✅ CORREÇÃO: Reutilizar variáveis já declaradas acima
+        // _obj_abrams e _tipos_embarcaveis já foram declarados no início do bloco
+        if (_obj_abrams != -1 && asset_get_type(_obj_abrams) == asset_object) {
+            array_push(_tipos_embarcaveis, _obj_abrams); // ✅ NOVO: Adicionar Abrams
+        }
+        for (var j = 0; j < array_length(_tipos_embarcaveis); j++) {
+            var _tipo = _tipos_embarcaveis[j];
+            if (object_exists(_tipo)) {
+                with (_tipo) {
+                    var _dist = point_distance(other.x, other.y, x, y);
+                    if (_dist <= _raio_deteccao_multipla && other.eh_unidade_embarcavel(id)) {
+                        var _peso = other.calcular_peso_unidade(id);
+                        if (other.embarcar_unidade(id, _peso)) {
+                            other.atualizar_penalidade_carga();
+                            _unidades_embarcadas++;
+                            show_debug_message("✅ C-100: Unidade embarcada automaticamente!");
+                        }
+                    }
+                }
+            }
+        }
+        
         // Processar todas as unidades selecionadas (de trás para frente para evitar problemas de índice)
         for (var i = ds_list_size(global.unidades_selecionadas) - 1; i >= 0; i--) {
             var _unidade = global.unidades_selecionadas[| i];
@@ -194,13 +247,11 @@ if (modo_receber_carga && altura_voo == 0 && estado == "pousado") {
             if (instance_exists(_unidade) && _unidade != id) {
                 var _distancia = point_distance(x, y, _unidade.x, _unidade.y);
                 
-                if (_distancia <= 50) {
-                    // Mostrar feedback visual simples (círculo pulsante)
-                    var _alpha = 0.5 + 0.3 * sin(current_time * 0.01);
-                    var _radius = 35 + 5 * sin(current_time * 0.02);
-                    
-                    // Tentar embarcar a unidade se estiver muito próxima
-                    if (_distancia <= 30 && eh_unidade_embarcavel(_unidade)) {
+                // ✅ AUMENTADO 30%: Raio maior para pegar unidades selecionadas
+                var _raio_selecionadas = 130; // ✅ AUMENTADO 30%: era 100, agora 130 (100 * 1.3 = 130)
+                if (_distancia <= _raio_selecionadas) {
+                    // Tentar embarcar a unidade se estiver dentro do raio
+                    if (eh_unidade_embarcavel(_unidade)) {
                         var _peso = calcular_peso_unidade(_unidade);
                         if (embarcar_unidade(_unidade, _peso)) {
                             ds_list_delete(global.unidades_selecionadas, i); // Remove da seleção

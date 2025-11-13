@@ -5,7 +5,7 @@
 
 // === PROPRIEDADES DO TIRO ===
 speed = 5;                         // Velocidade do projétil
-dano = 70;                         // Dano causado
+dano = 100; // ✅ AUMENTADO: Dano suficiente para matar soldados (era 70)
 alvo = noone;                      // Unidade alvo
 dono = noone;                      // Unidade que atirou
 timer_vida = 300;                  // Tempo de vida MAIOR (5 segundos)

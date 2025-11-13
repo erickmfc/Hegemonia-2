@@ -11,8 +11,8 @@
   "name":"obj_tanque",
   "overriddenProperties":[],
   "parent":{
-    "name":"militar",
-    "path":"folders/Sprites/militar.yy",
+    "name":"tanque",
+    "path":"folders/Sprites/militar/tanque.yy",
   },
   "parentObjectId":null,
   "persistent":false,

@@ -24,7 +24,19 @@ function sc_comandos_infantaria(_unidade_id, _comando, _parametros = []) {
                 if (array_length(_parametros) > 0) {
                     alvo = _parametros[0]; // ID do alvo específico
                 } else {
-                    alvo = instance_nearest(x, y, obj_inimigo);
+                    // ✅ CORREÇÃO: obj_inimigo removido - buscar obj_infantaria inimiga
+                    var _alvo_inimigo = noone;
+                    var _dist_min = 999999;
+                    with (obj_infantaria) {
+                        if (variable_instance_exists(self, "nacao_proprietaria") && nacao_proprietaria != other.nacao_proprietaria) {
+                            var _dist = point_distance(other.x, other.y, x, y);
+                            if (_dist < _dist_min) {
+                                _dist_min = _dist;
+                                _alvo_inimigo = id;
+                            }
+                        }
+                    }
+                    alvo = _alvo_inimigo;
                 }
                 show_debug_message("⚔️ Infantaria em modo ATAQUE AGRESSIVO");
                 break;

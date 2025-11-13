@@ -37,6 +37,12 @@ function scr_buscar_inimigo(_x, _y, _raio, _minha_nacao) {
         obj_submarino_base
     ];
     
+    // ✅ NOVO: Verificar se obj_M1A_Abrams existe e adicionar
+    var _obj_abrams = asset_get_index("obj_M1A_Abrams");
+    if (_obj_abrams != -1 && asset_get_type(_obj_abrams) == asset_object) {
+        array_push(_tipos_unidades, _obj_abrams);
+    }
+    
     // ✅ ESTRUTURAS INIMIGAS TAMBÉM
     var _tipos_estruturas = [
         obj_quartel,

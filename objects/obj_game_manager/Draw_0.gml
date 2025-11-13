@@ -323,9 +323,7 @@ if (global.barras_vida_ativas) {
     }
 
     // UNIDADES INIMIGAS
-    with (obj_inimigo) {
-        desenhar_barra_basica(id, -20);
-    }
+    // ✅ CORREÇÃO: obj_inimigo removido - não há mais unidades inimigas específicas
 }
 
 // === DEBUG DE CULLING (Tecla F3) ===

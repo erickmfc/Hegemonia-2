@@ -261,9 +261,10 @@ function scr_encontrar_alvo_proximo(unidade) {
     var _distancia_minima = 999999;
     var _melhor_alvo = noone;
     
-    // Procurar inimigos próximos
-    with (obj_inimigo) {
-        if (self != unidade) {
+    // ✅ CORREÇÃO: obj_inimigo removido - buscar apenas obj_infantaria e outras unidades terrestres
+    // Procurar unidades terrestres inimigas próximas
+    with (obj_infantaria) {
+        if (self != unidade && variable_instance_exists(self, "nacao_proprietaria") && nacao_proprietaria != unidade.nacao_proprietaria) {
             var _distancia = point_distance(unidade.x, unidade.y, x, y);
             if (_distancia < _distancia_minima && _distancia <= unidade.alcance_ataque) {
                 _distancia_minima = _distancia;

@@ -88,16 +88,15 @@ if (_custo_p_inflacionado > 0) {
 if (global.dinheiro >= _custo_d_inflacionado && global.minerio >= _custo_m_inflacionado && _tem_petroleo) {
     
     // TEMOS RECURSOS! Vamos para o próximo passo.
-    show_debug_message("Recursos verificados. Verificando espaço para construir " + _nome_edificio + "...");
+    show_debug_message("Recursos verificados. Verificando terreno para construir " + _nome_edificio + "...");
 
-    // --- PASSO 2: VERIFICAR SE HÁ ESPAÇO LIVRE ---
-    
-    // Obtém o objeto que será construído
+    // --- PASSO 2: VERIFICAR TERRENO ---
+    // Obter o objeto que será construído
     var _objeto_construir = global.construindo_agora;
     var _largura = 64;
     var _altura = 64;
     
-    // Determinar dimensões baseado no tipo de edifício
+    // Determinar dimensões baseado no tipo de edifício (para validação de terreno)
     if (global.construindo_agora == asset_get_index("obj_casa")) {
         _largura = 64;
         _altura = 64;
@@ -120,6 +119,28 @@ if (global.dinheiro >= _custo_d_inflacionado && global.minerio >= _custo_m_infla
         _largura = 128;
         _altura = 128;
     }
+    
+    // ✅ NOVO: VALIDAÇÃO DE TERRENO
+    // Verificar se o terreno é compatível antes de verificar espaço
+    var _terreno_valido = scr_validar_terreno_construcao(
+        global.construindo_agora,
+        grid_x,
+        grid_y,
+        _largura,
+        _altura
+    );
+    
+    if (!_terreno_valido) {
+        show_debug_message("❌ TERRENO INVÁLIDO! " + _nome_edificio + " não pode ser construído neste tipo de terreno.");
+        show_debug_message("💡 Dica: Verifique se está construindo no terreno correto (terra/água).");
+        global.construindo_agora = noone;
+        exit;
+    }
+    
+    show_debug_message("✅ Terreno validado. Verificando espaço livre...");
+
+    // --- PASSO 3: VERIFICAR SE HÁ ESPAÇO LIVRE ---
+    // (Dimensões já foram calculadas no passo anterior)
     
     // Verifica se há espaço livre para construir (função inline)
     var _espaco_livre = true;
@@ -185,8 +206,8 @@ if (global.dinheiro >= _custo_d_inflacionado && global.minerio >= _custo_m_infla
     }
     
     show_debug_message("✅ Espaço livre verificado. Construindo " + _nome_edificio + "...");
-    
-    // --- PASSO 3: EXECUTAR A CONSTRUÇÃO ---
+
+    // --- PASSO 4: EXECUTAR A CONSTRUÇÃO ---
     
     // Deduz os recursos do tesouro da nação (com inflação aplicada).
     global.dinheiro -= _custo_d_inflacionado;

@@ -106,7 +106,8 @@ if ((modo_combate == LanchaMode.ATAQUE || estado == LanchaState.ATACANDO) && ins
     }
     
     // Verificar inimigos terrestres
-    with (obj_inimigo) {
+    // ✅ CORREÇÃO: obj_inimigo removido - buscar apenas obj_infantaria
+    with (obj_infantaria) {
         if (nacao_proprietaria != 1 && nacao_proprietaria != noone) {
             var _dist = point_distance(other.x, other.y, x, y);
             if (_dist <= other.missil_max_alcance) {

@@ -31,6 +31,10 @@ destino_y = y;
 // Patrulha
 pontos_patrulha = ds_list_create();
 indice_patrulha_atual = 0;
+direcao_patrulha = 1; // 1 = horário (avançar), -1 = anti-horário (retroceder)
+
+// === TERRENOS PERMITIDOS ===
+terrenos_permitidos = [TERRAIN.AGUA]; // Só água
 
 // Seleção e UI
 selecionado = false;
@@ -38,6 +42,9 @@ selecionado = false;
 // Controle de taxa de tiro / ataque
 reload_time = 60; // steps entre tiros
 reload_timer = 0;
+
+// Sistema de rotação
+velocidade_rotacao = 0.8; // Velocidade de rotação em graus por frame
 
 // Nome padrão
 nome_unidade = "Submarino";
@@ -54,6 +61,10 @@ tempo_submersao_atual = 0; // Timer de tempo submerso
 alvo_unidade = noone; // id da instancia inimiga a atacar
 alvo_pos_anterior_x = -1; // Rastreamento de posição anterior do alvo
 alvo_pos_anterior_y = -1; // Rastreamento de posição anterior do alvo
+
+// ✅ OTIMIZAÇÃO: Timer para verificação periódica de inimigos (a cada 30 frames = ~0.5s a 60 FPS)
+timer_verificacao_inimigos = 0;
+intervalo_verificacao_inimigos = 30; // Verificar inimigos a cada 30 frames
 
 // --- VARIÁVEIS ADAPTADAS DO F5 (APÓS DEFINIR TODAS AS VARIÁVEIS) ---
 estado_anterior = LanchaState.PARADO; // Guarda estado anterior para retorno após ataque
@@ -102,16 +113,22 @@ func_proximo_ponto = function() {
         estado = LanchaState.PARADO;
         return;
     }
-    indice_patrulha_atual = (indice_patrulha_atual + 1) mod ds_list_size(pontos_patrulha);
+    // ✅ NOVO: Sistema de rotação de patrulha (horário/anti-horário)
+    var _total_pontos = ds_list_size(pontos_patrulha);
+    if (!variable_instance_exists(id, "direcao_patrulha")) {
+        direcao_patrulha = 1; // Padrão: horário
+    }
+    indice_patrulha_atual = (indice_patrulha_atual + direcao_patrulha + _total_pontos) mod _total_pontos;
     var p = pontos_patrulha[| indice_patrulha_atual];
     destino_x = p[0];
     destino_y = p[1];
 }
 
 func_procurar_inimigo = function() {
+    // ✅ CORREÇÃO: obj_inimigo removido - buscar apenas obj_infantaria
     var melhor = noone;
     var melhor_d = 999999;
-    with (obj_inimigo) {
+    with (obj_infantaria) {
         if (nacao_proprietaria != other.nacao_proprietaria) {
             var d = point_distance(other.x, other.y, x, y);
             if (d < other.radar_alcance && d < melhor_d) {

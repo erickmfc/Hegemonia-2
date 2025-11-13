@@ -14,7 +14,8 @@ var _unidades_selecionaveis = [
     obj_tanque,
     obj_blindado_antiaereo,
     obj_caca_f5,
-    obj_helicoptero_militar
+    obj_helicoptero_militar,
+    obj_f6 // ✅ F6 adicionado para controle do presidente
 ];
 
 // =========================================================================
@@ -100,12 +101,20 @@ if (mouse_check_button_pressed(mb_left)) {
     
     // --- PASSO 6: Usar as coordenadas CORRETAS para selecionar ---
     // Itera sobre a lista para encontrar a unidade clicada
+    var _nacao_jogador = 1; // Jogador sempre é nação 1
     for (var i = 0; i < array_length(_unidades_selecionaveis); i++) {
         var _obj = _unidades_selecionaveis[i];
         var _inst = collision_point(_mouse_world_x, _mouse_world_y, _obj, true, true); // ✅ CORREÇÃO: Colisão precisa ativada
         if (_inst != noone) {
-            _instancia_selecionada = _inst;
-            break; // Para na primeira unidade encontrada
+            // ✅ VERIFICAR SE A UNIDADE É DO JOGADOR OU É O F6 (controlado pelo presidente)
+            var _eh_f6 = (_inst.object_index == obj_f6);
+            if ((variable_instance_exists(_inst, "nacao_proprietaria") && _inst.nacao_proprietaria == _nacao_jogador) || _eh_f6) {
+                _instancia_selecionada = _inst;
+                break; // Para na primeira unidade encontrada
+            } else {
+                // Unidade de outro país - não pode selecionar
+                show_debug_message("🚫 Esta unidade pertence à nação " + string(_inst.nacao_proprietaria) + " - Você não pode controlá-la!");
+            }
         }
     }
 
@@ -316,12 +325,17 @@ if (mouse_check_button(mb_left)) {
         var max_y = max(inicio_selecao_y, world_y);
         
         // Refatorado: Itera sobre o array de unidades selecionáveis
+        var _nacao_jogador = 1; // Jogador sempre é nação 1
         for (var i = 0; i < array_length(_unidades_selecionaveis); i++) {
             var _obj = _unidades_selecionaveis[i];
             
             with (_obj) {
+                // ✅ VERIFICAR SE A UNIDADE É DO JOGADOR OU É O F6 (controlado pelo presidente)
+                var _eh_f6_local = (object_index == obj_f6);
                 if (x >= min_x && x <= max_x && y >= min_y && y <= max_y) {
-                    selecionado = true;
+                    if ((variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _nacao_jogador) || _eh_f6_local) {
+                        selecionado = true;
+                    }
                 }
             }
         }
@@ -359,60 +373,6 @@ if (instance_exists(global.unidade_selecionada)) {
         // Comandos P e O já estão no Step do próprio F-5
         // Comandos Q e E já estão no obj_input_manager
         // Aqui só mantemos comandos específicos do controlador
-
-        // Comando de Teste de Mísseis (Tecla T)
-        if (keyboard_check_pressed(ord("T"))) {
-            show_debug_message("🔍 === TESTE SISTEMA MÍSSEIS F-5 ===");
-            
-            // Contar unidades
-            var _f5_count = instance_number(obj_caca_f5);
-            var _inimigo_count = instance_number(obj_inimigo);
-            
-            show_debug_message("📊 F-5s no mapa: " + string(_f5_count));
-            show_debug_message("📊 Inimigos no mapa: " + string(_inimigo_count));
-            
-            if (_f5_count == 0) {
-                show_debug_message("❌ ERRO: Nenhum F-5 encontrado no mapa!");
-                return;
-            }
-            
-            if (_inimigo_count == 0) {
-                show_debug_message("❌ ERRO: Nenhum inimigo encontrado no mapa!");
-                show_debug_message("💡 SOLUÇÃO: Crie alguns obj_inimigo no mapa para testar");
-                return;
-            }
-            
-            // Testar cada F-5
-            with (obj_caca_f5) {
-                show_debug_message("✈️ Testando F-5 ID: " + string(id));
-                show_debug_message("   - Velocidade: " + string(velocidade_atual));
-                show_debug_message("   - Modo ataque: " + string(modo_ataque));
-                show_debug_message("   - Altura voo: " + string(altura_voo));
-                show_debug_message("   - Timer ataque: " + string(timer_ataque));
-                
-                // Forçar modo ataque para teste
-                modo_ataque = true;
-                show_debug_message("   - Modo ataque ativado para teste");
-                
-                // Verificar inimigos próximos
-                var _alvo_proximo = instance_nearest(x, y, obj_inimigo);
-                if (instance_exists(_alvo_proximo)) {
-                    var _distancia = point_distance(x, y, _alvo_proximo.x, _alvo_proximo.y);
-                    show_debug_message("   - Inimigo mais próximo: " + string(_alvo_proximo) + " a " + string(_distancia) + " pixels");
-                    show_debug_message("   - Alcance radar: " + string(radar_alcance));
-                    
-                    if (_distancia <= radar_alcance) {
-                        show_debug_message("   ✅ F-5 pode atacar este inimigo!");
-                    } else {
-                        show_debug_message("   ❌ F-5 não pode atacar - muito longe");
-                    }
-                } else {
-                    show_debug_message("   ❌ Nenhum inimigo encontrado");
-                }
-            }
-            
-            show_debug_message("🔍 === FIM DO TESTE ===");
-        }
 
         // Comando de Movimento (Clique Direito) - UNIFICADO PARA TODAS AS UNIDADES
         if (mouse_check_button_pressed(mb_right)) {
@@ -453,10 +413,13 @@ if (instance_exists(global.unidade_selecionada)) {
                 }
             }
             
-            // ✅ CORREÇÃO: Bloquear movimento do C-100 quando em modo de embarque
-            if (object_get_name(_unidade.object_index) == "obj_c100" && _unidade.modo_receber_carga) {
-                show_debug_message("🚁 C-100: Comando de movimento bloqueado - modo embarque ativo");
-                return; // Não processar movimento
+            // ✅ CORREÇÃO: Bloquear movimento APENAS do C-100 quando em modo de embarque
+            // Não bloquear movimento de outras unidades (como Abrams) quando C-100 está em modo de embarque
+            if (object_get_name(_unidade.object_index) == "obj_c100") {
+                if (variable_instance_exists(_unidade, "modo_receber_carga") && _unidade.modo_receber_carga) {
+                    show_debug_message("🚁 C-100: Comando de movimento bloqueado - modo embarque ativo");
+                    return; // Não processar movimento do C-100
+                }
             }
             
             // Se estiver definindo patrulha, adiciona um ponto

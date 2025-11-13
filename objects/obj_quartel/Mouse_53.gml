@@ -20,6 +20,18 @@ var _tipos_unidades = [
     obj_caca_f5, obj_helicoptero_militar, obj_f15, obj_f6, obj_c100
 ];
 
+// ✅ NOVO: Adicionar M1A Abrams à lista (verificação segura)
+var _obj_abrams = asset_get_index("obj_M1A_Abrams");
+if (_obj_abrams != -1 && asset_get_type(_obj_abrams) == asset_object) {
+    array_push(_tipos_unidades, _obj_abrams);
+}
+
+// ✅ NOVO: Adicionar Gepard Anti-Aéreo à lista (verificação segura)
+var _obj_gepard = asset_get_index("obj_gepard");
+if (_obj_gepard != -1 && asset_get_type(_obj_gepard) == asset_object) {
+    array_push(_tipos_unidades, _obj_gepard);
+}
+
 for (var i = 0; i < array_length(_tipos_unidades); i++) {
     var _inst = instance_position(_world_mouse_x, _world_mouse_y, _tipos_unidades[i]);
     if (_inst != noone && instance_exists(_inst)) {

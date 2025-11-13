@@ -10,8 +10,8 @@
   "name":"obj_missel_ice",
   "overriddenProperties":[],
   "parent":{
-    "name":"equipamentos",
-    "path":"folders/Sprites/naval/equipamentos.yy",
+    "name":"missil",
+    "path":"folders/Sprites/missil.yy",
   },
   "parentObjectId":null,
   "persistent":false,

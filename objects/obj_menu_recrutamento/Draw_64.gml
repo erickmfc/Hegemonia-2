@@ -212,6 +212,62 @@ for (var i = 0; i < min(_total_unidades, 6); i++) {
     } else if (_unidade.nome == "Blindado Anti-Aéreo" && sprite_exists(spr_blindado_antiaereo)) {
         draw_sprite_ext(spr_blindado_antiaereo, 0, _icon_x, _icon_y, 1.5, 1.5, 0, c_white, _anim.alpha);
         _sprite_desenhado = true;
+    } else if (_unidade.nome == "M1A Abrams") {
+        // ✅ NOVO: M1A Abrams - Desenhar casco + torre (igual no jogo)
+        // Escala: Tanque aumentado 15% (1.5 * 1.15 = 1.725)
+        var _escala_tanque = 1.725;
+        
+        var _spr_casco = asset_get_index("spr_abrams_casco");
+        var _spr_torre = asset_get_index("spr_abrams_torre");
+        
+        // Desenhar casco (camada 1)
+        if (_spr_casco != -1 && sprite_exists(_spr_casco)) {
+            draw_sprite_ext(_spr_casco, 0, _icon_x, _icon_y, _escala_tanque, _escala_tanque, 0, c_white, _anim.alpha);
+            _sprite_desenhado = true;
+        }
+        
+        // Desenhar torre (camada 2) - mesma posição, sem rotação no menu
+        if (_spr_torre != -1 && sprite_exists(_spr_torre)) {
+            draw_sprite_ext(_spr_torre, 0, _icon_x, _icon_y, _escala_tanque, _escala_tanque, 0, c_white, _anim.alpha);
+        }
+        
+        // Fallback: se não encontrar os sprites modulares, usar sprite da unidade
+        if (!_sprite_desenhado && variable_instance_exists(_unidade, "sprite") && sprite_exists(_unidade.sprite)) {
+            draw_sprite_ext(_unidade.sprite, 0, _icon_x, _icon_y, _escala_tanque, _escala_tanque, 0, c_white, _anim.alpha);
+            _sprite_desenhado = true;
+        }
+    } else if (_unidade.nome == "Gepard Anti-Aéreo") {
+        // ✅ NOVO: Gepard Anti-Aéreo - Desenhar casco + torre/lançador + Type_39_4 (míssil) em cima (igual no jogo)
+        // Escala: Tanque aumentado 15% (1.5 * 1.15 = 1.725)
+        var _escala_tanque = 1.725;
+        
+        var _spr_casco = asset_get_index("TYPE_39_SAM_HULL");
+        var _spr_torre = asset_get_index("Type_39_SAM");
+        var _spr_type39_4 = asset_get_index("Type_39_4"); // ✅ Míssil em cima
+        
+        // Desenhar casco (camada 1)
+        if (_spr_casco != -1 && sprite_exists(_spr_casco)) {
+            draw_sprite_ext(_spr_casco, 0, _icon_x, _icon_y, _escala_tanque, _escala_tanque, 0, c_white, _anim.alpha);
+            _sprite_desenhado = true;
+        }
+        
+        // Desenhar torre/lançador (camada 2) - mesma posição, sem rotação no menu
+        if (_spr_torre != -1 && sprite_exists(_spr_torre)) {
+            draw_sprite_ext(_spr_torre, 0, _icon_x, _icon_y, _escala_tanque, _escala_tanque, 0, c_white, _anim.alpha);
+        }
+        
+        // ✅ NOVO: Desenhar Type_39_4 (míssil) em cima (camada 3) - posicionado ligeiramente acima
+        if (_spr_type39_4 != -1 && sprite_exists(_spr_type39_4)) {
+            // Offset para posicionar o míssil em cima do tanque (ajustado para o menu)
+            var _offset_y = -8; // Posição vertical do míssil (acima do centro)
+            draw_sprite_ext(_spr_type39_4, 0, _icon_x, _icon_y + _offset_y, _escala_tanque, _escala_tanque, 0, c_white, _anim.alpha);
+        }
+        
+        // Fallback: se não encontrar os sprites modulares, usar sprite da unidade
+        if (!_sprite_desenhado && variable_instance_exists(_unidade, "sprite") && sprite_exists(_unidade.sprite)) {
+            draw_sprite_ext(_unidade.sprite, 0, _icon_x, _icon_y, _escala_tanque, _escala_tanque, 0, c_white, _anim.alpha);
+            _sprite_desenhado = true;
+        }
     }
     
     // Descrição - AUMENTADO 20% (0.75 * 1.2 = 0.9)

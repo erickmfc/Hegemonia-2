@@ -53,6 +53,47 @@ function scr_ia_formar_esquadrao(_ia_id) {
         }
     }
     
+    // ✅ NOVO: Procurar unidades navais da IA
+    var _tipos_navais = [obj_lancha_patrulha, obj_navio_base, obj_submarino_base, obj_Constellation, obj_Independence];
+    var _obj_fragata = asset_get_index("obj_fragata");
+    if (_obj_fragata != -1 && asset_get_type(_obj_fragata) == asset_object) {
+        array_push(_tipos_navais, _obj_fragata);
+    }
+    
+    for (var i = 0; i < array_length(_tipos_navais); i++) {
+        if (!object_exists(_tipos_navais[i])) continue;
+        with (_tipos_navais[i]) {
+            if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _ia.nacao_proprietaria) {
+                var _dist = point_distance(x, y, _ia.base_x, _ia.base_y);
+                if (_dist <= 800) { // Raio maior para navios
+                    ds_list_add(_unidades_disponiveis, {
+                        id: id,
+                        tipo: "naval",
+                        distancia: _dist
+                    });
+                }
+            }
+        }
+    }
+    
+    // ✅ NOVO: Procurar unidades aéreas da IA (F6, F5, helicópteros)
+    var _tipos_aereos = [obj_f6, obj_caca_f5, obj_helicoptero_militar, obj_f15];
+    for (var i = 0; i < array_length(_tipos_aereos); i++) {
+        if (!object_exists(_tipos_aereos[i])) continue;
+        with (_tipos_aereos[i]) {
+            if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _ia.nacao_proprietaria) {
+                var _dist = point_distance(x, y, _ia.base_x, _ia.base_y);
+                if (_dist <= 1000) { // Raio muito maior para aviões
+                    ds_list_add(_unidades_disponiveis, {
+                        id: id,
+                        tipo: "aereo",
+                        distancia: _dist
+                    });
+                }
+            }
+        }
+    }
+    
     // Verificar se temos unidades suficientes
     var _num_unidades = ds_list_size(_unidades_disponiveis);
     

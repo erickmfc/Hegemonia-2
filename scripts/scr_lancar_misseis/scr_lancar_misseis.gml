@@ -58,10 +58,11 @@ function lancar_missil_automatico(alvo, dono) {
     }
     
     // Determinar tipo de alvo
+    // ✅ CORREÇÃO: obj_inimigo removido
     var _tipo_alvo = "";
     if (alvo.object_index == obj_helicoptero_militar || alvo.object_index == obj_caca_f5) {
         _tipo_alvo = "aereo";
-    } else if (alvo.object_index == obj_inimigo || alvo.object_index == obj_lancha_patrulha) {
+    } else if (alvo.object_index == obj_lancha_patrulha || alvo.object_index == obj_infantaria) {
         _tipo_alvo = "terrestre";
     } else {
         _tipo_alvo = "terrestre"; // Padrão

@@ -41,9 +41,21 @@ function sc_comandos_militares(unidade_id, comando, parametros = []) {
                 
             case "modo_agressivo":
                 // Coloca unidade em modo agressivo
+                // ✅ CORREÇÃO: obj_inimigo removido - buscar obj_infantaria inimiga
                 modo_ataque = true;
                 estado = "atacando";
-                alvo = instance_nearest(x, y, obj_inimigo);
+                var _alvo_inimigo = noone;
+                var _dist_min = 999999;
+                with (obj_infantaria) {
+                    if (variable_instance_exists(self, "nacao_proprietaria") && nacao_proprietaria != other.nacao_proprietaria) {
+                        var _dist = point_distance(other.x, other.y, x, y);
+                        if (_dist < _dist_min) {
+                            _dist_min = _dist;
+                            _alvo_inimigo = id;
+                        }
+                    }
+                }
+                alvo = _alvo_inimigo;
                 show_debug_message("⚔️ " + object_get_name(_tipo_unidade) + " em modo AGRESSIVO");
                 break;
                 

@@ -23,8 +23,10 @@ if (!should_always_process && skip_frames_enabled) {
                 x += lengthdir_x(speed * speed_mult, image_angle);
                 y += lengthdir_y(speed * speed_mult, image_angle);
             } else if (variable_instance_exists(id, "velocidade_atual")) {
-                x += lengthdir_x(velocidade_atual * speed_mult, image_angle);
-                y += lengthdir_y(velocidade_atual * speed_mult, image_angle);
+                // ✅ CORREÇÃO: Normalizar velocidade antes de aplicar multiplicador do LOD
+                var _vel_normalizada = scr_normalize_unit_speed(velocidade_atual);
+                x += lengthdir_x(_vel_normalizada * speed_mult, image_angle);
+                y += lengthdir_y(_vel_normalizada * speed_mult, image_angle);
             }
         }
         exit;
@@ -63,43 +65,66 @@ if (modo_ataque && estado != "pousando" && estado != "decolando" && estado != "a
     var _alvo_f6 = instance_nearest(x, y, obj_f6);
     var _alvo_helicoptero = instance_nearest(x, y, obj_helicoptero_militar);
     
-    // ✅ NOVO: Procurar TODAS as unidades terrestres inimigas (não só obj_inimigo)
+    // ✅ NOVO: Procurar TODAS as unidades terrestres inimigas
+    // ✅ CORREÇÃO: obj_inimigo removido
     var _alvo_infantaria = instance_nearest(x, y, obj_infantaria);
     var _alvo_tanque = instance_nearest(x, y, obj_tanque);
     var _alvo_soldado_aa = instance_nearest(x, y, obj_soldado_antiaereo);
     var _alvo_blindado_aa = instance_nearest(x, y, obj_blindado_antiaereo);
-    var _alvo_inimigo = instance_nearest(x, y, obj_inimigo); // Fallback
+    
+    // ✅ NOVO: Procurar ESTRUTURAS INIMIGAS (casas, quarteis, bancos)
+    var _alvo_casa = instance_nearest(x, y, obj_casa);
+    var _alvo_banco = instance_nearest(x, y, obj_banco);
+    var _alvo_quartel = instance_nearest(x, y, obj_quartel);
+    var _alvo_quartel_marinha = instance_nearest(x, y, obj_quartel_marinha);
+    var _alvo_aeroporto = instance_nearest(x, y, obj_aeroporto_militar);
     
     var _alvo_encontrado = noone;
     var _tipo_alvo = "";
     
     // Verifica alvos aéreos primeiro (prioridade máxima)
-    if (instance_exists(_alvo_aereo) && _alvo_aereo != id && _alvo_aereo.nacao_proprietaria != nacao_proprietaria && point_distance(x, y, _alvo_aereo.x, _alvo_aereo.y) <= radar_alcance) {
+    if (instance_exists(_alvo_aereo) && _alvo_aereo != id && variable_instance_exists(_alvo_aereo, "nacao_proprietaria") && _alvo_aereo.nacao_proprietaria != nacao_proprietaria && point_distance(x, y, _alvo_aereo.x, _alvo_aereo.y) <= radar_alcance) {
         _alvo_encontrado = _alvo_aereo;
         _tipo_alvo = "aéreo (F-5 inimigo)";
-    } else if (instance_exists(_alvo_f6) && _alvo_f6.nacao_proprietaria != nacao_proprietaria && point_distance(x, y, _alvo_f6.x, _alvo_f6.y) <= radar_alcance) {
+    } else if (instance_exists(_alvo_f6) && variable_instance_exists(_alvo_f6, "nacao_proprietaria") && _alvo_f6.nacao_proprietaria != nacao_proprietaria && point_distance(x, y, _alvo_f6.x, _alvo_f6.y) <= radar_alcance) {
         _alvo_encontrado = _alvo_f6;
         _tipo_alvo = "aéreo (F-6 TESTE)";
-    } else if (instance_exists(_alvo_helicoptero) && _alvo_helicoptero.nacao_proprietaria != nacao_proprietaria && point_distance(x, y, _alvo_helicoptero.x, _alvo_helicoptero.y) <= radar_alcance) {
+    } else if (instance_exists(_alvo_helicoptero) && variable_instance_exists(_alvo_helicoptero, "nacao_proprietaria") && _alvo_helicoptero.nacao_proprietaria != nacao_proprietaria && point_distance(x, y, _alvo_helicoptero.x, _alvo_helicoptero.y) <= radar_alcance) {
         _alvo_encontrado = _alvo_helicoptero;
         _tipo_alvo = "aéreo (Helicóptero inimigo)";
     } 
     // ✅ NOVO: Verificar unidades terrestres inimigas
-    else if (instance_exists(_alvo_infantaria) && _alvo_infantaria.nacao_proprietaria != nacao_proprietaria && point_distance(x, y, _alvo_infantaria.x, _alvo_infantaria.y) <= radar_alcance) {
+    else if (instance_exists(_alvo_infantaria) && variable_instance_exists(_alvo_infantaria, "nacao_proprietaria") && _alvo_infantaria.nacao_proprietaria != nacao_proprietaria && point_distance(x, y, _alvo_infantaria.x, _alvo_infantaria.y) <= radar_alcance) {
         _alvo_encontrado = _alvo_infantaria;
         _tipo_alvo = "terrestre (Infantaria inimiga)";
-    } else if (instance_exists(_alvo_tanque) && _alvo_tanque.nacao_proprietaria != nacao_proprietaria && point_distance(x, y, _alvo_tanque.x, _alvo_tanque.y) <= radar_alcance) {
+    } else if (instance_exists(_alvo_tanque) && variable_instance_exists(_alvo_tanque, "nacao_proprietaria") && _alvo_tanque.nacao_proprietaria != nacao_proprietaria && point_distance(x, y, _alvo_tanque.x, _alvo_tanque.y) <= radar_alcance) {
         _alvo_encontrado = _alvo_tanque;
         _tipo_alvo = "terrestre (Tanque inimigo)";
-    } else if (instance_exists(_alvo_soldado_aa) && _alvo_soldado_aa.nacao_proprietaria != nacao_proprietaria && point_distance(x, y, _alvo_soldado_aa.x, _alvo_soldado_aa.y) <= radar_alcance) {
+    } else if (instance_exists(_alvo_soldado_aa) && variable_instance_exists(_alvo_soldado_aa, "nacao_proprietaria") && _alvo_soldado_aa.nacao_proprietaria != nacao_proprietaria && point_distance(x, y, _alvo_soldado_aa.x, _alvo_soldado_aa.y) <= radar_alcance) {
         _alvo_encontrado = _alvo_soldado_aa;
         _tipo_alvo = "terrestre (Soldado Anti-Aéreo inimigo)";
-    } else if (instance_exists(_alvo_blindado_aa) && _alvo_blindado_aa.nacao_proprietaria != nacao_proprietaria && point_distance(x, y, _alvo_blindado_aa.x, _alvo_blindado_aa.y) <= radar_alcance) {
+    } else if (instance_exists(_alvo_blindado_aa) && variable_instance_exists(_alvo_blindado_aa, "nacao_proprietaria") && _alvo_blindado_aa.nacao_proprietaria != nacao_proprietaria && point_distance(x, y, _alvo_blindado_aa.x, _alvo_blindado_aa.y) <= radar_alcance) {
         _alvo_encontrado = _alvo_blindado_aa;
         _tipo_alvo = "terrestre (Blindado Anti-Aéreo inimigo)";
-    } else if (instance_exists(_alvo_inimigo) && _alvo_inimigo.nacao_proprietaria != nacao_proprietaria && point_distance(x, y, _alvo_inimigo.x, _alvo_inimigo.y) <= radar_alcance) {
-        _alvo_encontrado = _alvo_inimigo;
-        _tipo_alvo = "terrestre (Inimigo genérico)";
+    }
+    // ✅ CORREÇÃO CRÍTICA: Removida referência a _alvo_inimigo (obj_inimigo foi removido do projeto)
+    // A variável _alvo_inimigo nunca foi definida e causava erro em tempo de execução
+    // ✅ NOVO: Verificar estruturas inimigas (prioridade baixa, mas atacáveis)
+    else if (instance_exists(_alvo_quartel) && variable_instance_exists(_alvo_quartel, "nacao_proprietaria") && _alvo_quartel.nacao_proprietaria != nacao_proprietaria && point_distance(x, y, _alvo_quartel.x, _alvo_quartel.y) <= radar_alcance) {
+        _alvo_encontrado = _alvo_quartel;
+        _tipo_alvo = "estrutura (Quartel inimigo)";
+    } else if (instance_exists(_alvo_quartel_marinha) && variable_instance_exists(_alvo_quartel_marinha, "nacao_proprietaria") && _alvo_quartel_marinha.nacao_proprietaria != nacao_proprietaria && point_distance(x, y, _alvo_quartel_marinha.x, _alvo_quartel_marinha.y) <= radar_alcance) {
+        _alvo_encontrado = _alvo_quartel_marinha;
+        _tipo_alvo = "estrutura (Quartel Marinha inimigo)";
+    } else if (instance_exists(_alvo_aeroporto) && variable_instance_exists(_alvo_aeroporto, "nacao_proprietaria") && _alvo_aeroporto.nacao_proprietaria != nacao_proprietaria && point_distance(x, y, _alvo_aeroporto.x, _alvo_aeroporto.y) <= radar_alcance) {
+        _alvo_encontrado = _alvo_aeroporto;
+        _tipo_alvo = "estrutura (Aeroporto inimigo)";
+    } else if (instance_exists(_alvo_banco) && variable_instance_exists(_alvo_banco, "nacao_proprietaria") && _alvo_banco.nacao_proprietaria != nacao_proprietaria && point_distance(x, y, _alvo_banco.x, _alvo_banco.y) <= radar_alcance) {
+        _alvo_encontrado = _alvo_banco;
+        _tipo_alvo = "estrutura (Banco inimigo)";
+    } else if (instance_exists(_alvo_casa) && variable_instance_exists(_alvo_casa, "nacao_proprietaria") && _alvo_casa.nacao_proprietaria != nacao_proprietaria && point_distance(x, y, _alvo_casa.x, _alvo_casa.y) <= radar_alcance) {
+        _alvo_encontrado = _alvo_casa;
+        _tipo_alvo = "estrutura (Casa inimiga)";
     }
     
     // Se encontrou um inimigo dentro do radar...
@@ -144,13 +169,20 @@ switch (estado) {
             destino_y = alvo_em_mira.y;
             
             // Atira se estiver no alcance e o timer permitir
-            if (point_distance(x, y, destino_x, destino_y) <= radar_alcance && timer_ataque <= 0) {
+            // ✅ VALIDAÇÃO: Verificar se alvo é válido antes de disparar
+            var _alvo_valido = (instance_exists(alvo_em_mira) && 
+                                alvo_em_mira != noone && 
+                                !is_undefined(alvo_em_mira.x) && 
+                                !is_undefined(alvo_em_mira.y) &&
+                                point_distance(x, y, alvo_em_mira.x, alvo_em_mira.y) <= radar_alcance);
+            
+            if (_alvo_valido && timer_ataque <= 0) {
                 // ✅ CORREÇÃO: Criar míssil na altura correta (mesma altura visual do avião)
                 var _missil_y = y - altura_voo;
                 
                 // Verifica se o alvo é uma unidade aérea para usar míssil ar-ar
                 var _missil;
-                if (alvo_em_mira.object_index == obj_caca_f5 || alvo_em_mira.object_index == obj_f6 || alvo_em_mira.object_index == obj_helicoptero_militar || alvo_em_mira.object_index == obj_f15 || alvo_em_mira.object_index == obj_c100) {
+                if (alvo_em_mira.object_index == obj_caca_f5 || alvo_em_mira.object_index == obj_f6 || alvo_em_mira.object_index == obj_helicoptero_militar || alvo_em_mira.object_index == obj_f15 || alvo_em_mira.object_index == obj_su35 || alvo_em_mira.object_index == obj_c100) {
                     // Alvo aéreo - usa míssil SkyFury (ar-ar)
                     _missil = scr_get_projectile_from_pool(obj_SkyFury_ar, x, _missil_y, "Instances");
                 } else {
@@ -159,14 +191,24 @@ switch (estado) {
                 }
                 
                 if (instance_exists(_missil)) {
-                    _missil.alvo = alvo_em_mira;
-                    _missil.target = alvo_em_mira;
-                    _missil.dono = id;
-                    _missil.sem_som = true; // ✅ Flag para não tocar som
-                    if (variable_instance_exists(_missil, "timer_vida")) {
-                        _missil.timer_vida = 300;
+                    // ✅ VALIDAÇÃO: Verificar se alvo ainda existe antes de atribuir
+                    if (instance_exists(alvo_em_mira)) {
+                        _missil.alvo = alvo_em_mira;
+                        _missil.target = alvo_em_mira;
+                        _missil.dono = id;
+                        _missil.sem_som = true; // ✅ Flag para não tocar som
+                        if (variable_instance_exists(_missil, "timer_vida")) {
+                            _missil.timer_vida = 300;
+                        }
+                        timer_ataque = intervalo_ataque;
+                    } else {
+                        // Alvo desapareceu - destruir míssil
+                        if (variable_instance_exists(_missil, "scr_return_projectile_to_pool")) {
+                            scr_return_projectile_to_pool(_missil);
+                        } else {
+                            instance_destroy(_missil);
+                        }
                     }
-                    timer_ataque = intervalo_ataque;
                 }
             }
         } 
@@ -204,8 +246,10 @@ if (_is_flying) {
 }
 
 // Aplica o movimento (só se move se tiver velocidade)
-x += lengthdir_x(velocidade_atual, image_angle);
-y += lengthdir_y(velocidade_atual, image_angle);
+// ✅ CORREÇÃO: Normalizar velocidade baseado no zoom para manter velocidade visual constante
+var _vel_normalizada = scr_normalize_unit_speed(velocidade_atual);
+x += lengthdir_x(_vel_normalizada, image_angle);
+y += lengthdir_y(_vel_normalizada, image_angle);
 
 // --- 5. LÓGICA DO TIMER DE ATAQUE ---
 if (timer_ataque > 0) {

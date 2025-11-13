@@ -110,8 +110,9 @@ function scr_unificar_objetos_similares() {
     scr_debug_log("UNIFICACAO", "Verificando objetos similares para unificação", DEBUG_LEVEL.BASIC);
     
     // Lista de objetos que podem ser similares
+    // ✅ CORREÇÃO: obj_inimigo removido
     var _objetos_similares = [
-        ["obj_infantaria", "obj_inimigo"],
+        // ["obj_infantaria", "obj_inimigo"], // obj_inimigo removido
         ["obj_lancha_patrulha", "obj_navio_guerra"],
         ["obj_recursos_madeira", "obj_recursos_pedra"]
     ];

@@ -26,8 +26,14 @@ if (selecionado) {
 // ======================================================================
 // --- 2. LÓGICA DE AQUISIÇÃO DE ALVO (ADAPTADA PARA NAVAL) ---
 // ======================================================================
+// ✅ OTIMIZAÇÃO: Decrementar timer de verificação
+if (timer_verificacao_inimigos > 0) {
+    timer_verificacao_inimigos--;
+}
+
 // Se o modo ataque está ativo E a lancha não está parada E não está já atacando alguém...
-if (modo_combate == LanchaMode.ATAQUE && estado != LanchaState.ATACANDO) {
+// ✅ OTIMIZAÇÃO: Só verificar inimigos periodicamente (quando timer chegar a 0) ou se não tem alvo
+if (modo_combate == LanchaMode.ATAQUE && estado != LanchaState.ATACANDO && (timer_verificacao_inimigos <= 0 || alvo_unidade == noone || !instance_exists(alvo_unidade))) {
     // Prioriza alvos navais (qualquer objeto filho de obj_navio_base), depois aéreos e terrestres
     var _alvo_submarino = noone;
     // Submarino desabilitado (obj_submarino não existe no projeto)
@@ -47,10 +53,8 @@ if (modo_combate == LanchaMode.ATAQUE && estado != LanchaState.ATACANDO) {
     if (object_exists(obj_helicoptero_militar)) {
         _alvo_helicoptero = instance_nearest(x, y, obj_helicoptero_militar);
     }
+    // ✅ CORREÇÃO: obj_inimigo removido - buscar apenas obj_infantaria
     var _alvo_terrestre = noone;
-    if (object_exists(obj_inimigo)) {
-        _alvo_terrestre = instance_nearest(x, y, obj_inimigo);
-    }
     var _alvo_infantaria = noone;
     if (object_exists(obj_infantaria)) {
         // ✅ CORREÇÃO: Escolher primeiro da fila quando há múltiplas unidades próximas
@@ -59,7 +63,8 @@ if (modo_combate == LanchaMode.ATAQUE && estado != LanchaState.ATACANDO) {
             var _dist_alvo = point_distance(x, y, _alvo_mais_proximo.x, _alvo_mais_proximo.y);
             // Se há múltiplas unidades próximas (dentro de 200px), escolher primeiro da fila
             if (_dist_alvo <= 200) {
-                _alvo_infantaria = scr_escolher_primeiro_da_fila(x, y, obj_infantaria, 200);
+                var _nacao_navio = (variable_instance_exists(id, "nacao_proprietaria")) ? nacao_proprietaria : 1;
+                _alvo_infantaria = scr_escolher_primeiro_da_fila(x, y, obj_infantaria, 200, _nacao_navio);
             } else {
                 _alvo_infantaria = _alvo_mais_proximo;
             }
@@ -108,6 +113,9 @@ if (modo_combate == LanchaMode.ATAQUE && estado != LanchaState.ATACANDO) {
             show_debug_message("🎯 " + nome_unidade + " detectou alvo " + _tipo_alvo + "! Interrompendo tarefa para atacar.");
         }
     }
+    
+    // ✅ OTIMIZAÇÃO: Resetar timer após verificação
+    timer_verificacao_inimigos = intervalo_verificacao_inimigos;
 }
 // ======================================================================
 
@@ -257,11 +265,17 @@ if (_is_moving) {
     var _dist = point_distance(x, y, destino_x, destino_y);
     if (_dist > 5) {
         var _dir = point_direction(x, y, destino_x, destino_y);
-        // Rotação suave
-        image_angle = angle_difference(image_angle, _dir) * -0.1 + image_angle;
-        // Movimento
-        x += lengthdir_x(velocidade_movimento, _dir);
-        y += lengthdir_y(velocidade_movimento, _dir);
+        // ✅ CORREÇÃO: Rotação suave com velocidade de 0.8 graus por frame
+        var _diff = angle_difference(image_angle, _dir);
+        var _vel_rotacao = min(velocidade_rotacao, abs(_diff));
+        image_angle += sign(_diff) * -_vel_rotacao;
+        
+        // ✅ REALISMO: Movimento curvo - sempre move na direção que está apontando enquanto vira
+        // ✅ CORREÇÃO: Normalizar velocidade baseado no zoom para manter velocidade visual constante
+        var _vel_normalizada = scr_normalize_unit_speed(velocidade_movimento);
+        // Movimento na direção que o navio está apontando (cria curva suave)
+        x += lengthdir_x(_vel_normalizada, image_angle);
+        y += lengthdir_y(_vel_normalizada, image_angle);
     } else {
         // Chegou ao destino (se estava se movendo)
         if (estado == LanchaState.MOVENDO) {

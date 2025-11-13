@@ -10,8 +10,8 @@ target = noone;
 alarm[0] = game_get_speed(gamespeed_fps) * 2; // Autodestruição após 2 segundos se não acertar
 
 // Configurações visuais
-image_xscale = 0.56; // ✅ REDUZIDO 20%: 0.7 * 0.8 = 0.56
-image_yscale = 0.56; // ✅ REDUZIDO 20%: 0.7 * 0.8 = 0.56
+image_xscale = 0.448; // ✅ REDUZIDO 20% ADICIONAL: 0.56 * 0.8 = 0.448
+image_yscale = 0.448; // ✅ REDUZIDO 20% ADICIONAL: 0.56 * 0.8 = 0.448
 image_angle = 0;
 image_speed = 0.5;
 

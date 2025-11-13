@@ -48,6 +48,11 @@ sc_game_init();
 // ✅ CORREÇÃO GM2039: scr_enums_navais contém apenas enums que são globais automaticamente
 // Não precisa chamar - os enums já estão disponíveis quando o script é incluído no projeto
 
+// === CONFIGURAÇÃO DE QUALIDADE DE GRÁFICOS ===
+// ✅ CORREÇÃO: Habilitar interpolação de pixels para evitar pixelização
+gpu_set_texfilter(true); // Habilita filtro de textura (suavização)
+show_debug_message("✅ Filtro de textura habilitado para melhor qualidade gráfica");
+
 // === SISTEMA GLOBAL DE UI ===
 // Configurar sistema de interface global para resolver problemas de fonte
 scr_config_ui_global();
@@ -62,16 +67,16 @@ show_debug_message("✅ GUI configurado com display_set_gui_maximise para detec�
 // Estes são os 4 recursos base essenciais para o funcionamento da nação
 
 // Dinheiro: Usado para investimentos, construções e manutenção.
-global.dinheiro = 50000000; // $50.000.000 Créditos Globais (CG)
+global.dinheiro = 5000000; // $5.000.000 Créditos Globais (CG) - DEFINIDO PARA 5 MILHÕES
 
 // Minério: Essencial para a produção industrial e militar.
-global.minerio = 1500;
+global.minerio = 4500; // ✅ TRIPLICADO: 1500 * 3 = 4500
 
 // Petróleo: Fundamental para unidades motorizadas e setores energéticos.
-global.petroleo = 1000;
+global.petroleo = 3000; // ✅ TRIPLICADO: 1000 * 3 = 3000
 
 // População: Representa a força de trabalho e a base para o crescimento da nação.
-global.populacao = 2000;
+global.populacao = 5000; // ✅ AUMENTADO PARA 5000
 
 // === SISTEMA DE LIMITE POPULACIONAL ===
 // Limite inicial de população (sem casas)
@@ -85,27 +90,27 @@ global.alimento = 0; // Inicia com 0, será produzido pelas fazendas
 // Recursos obtidos através de pesquisa e exploração
 
 // Metais Preciosos
-global.ouro = 100;      // Reservas monetárias e tecnologia avançada
-global.titanio = 50;    // Tecnologia militar e aeroespacial
-global.uranio = 25;     // Energia nuclear e armamento pesado
+global.ouro = 300;      // ✅ TRIPLICADO: 100 * 3 = 300 - Reservas monetárias e tecnologia avançada
+global.titanio = 150;   // ✅ TRIPLICADO: 50 * 3 = 150 - Tecnologia militar e aeroespacial
+global.uranio = 75;     // ✅ TRIPLICADO: 25 * 3 = 75 - Energia nuclear e armamento pesado
 
 // Metais Industriais
-global.aluminio = 200;  // Construção e indústria aeronáutica
-global.cobre = 300;     // Eletrônicos e infraestrutura elétrica
-global.litio = 75;      // Baterias e tecnologia moderna
+global.aluminio = 600;  // ✅ TRIPLICADO: 200 * 3 = 600 - Construção e indústria aeronáutica
+global.cobre = 900;     // ✅ TRIPLICADO: 300 * 3 = 900 - Eletrônicos e infraestrutura elétrica
+global.litio = 225;     // ✅ TRIPLICADO: 75 * 3 = 225 - Baterias e tecnologia moderna
 
 // Recursos Orgânicos
-global.borracha = 150;  // Indústria automotiva e militar
-global.madeira = 500;   // Construção básica e infraestrutura
+global.borracha = 450;  // ✅ TRIPLICADO: 150 * 3 = 450 - Indústria automotiva e militar
+global.madeira = 1500;  // ✅ TRIPLICADO: 500 * 3 = 1500 - Construção básica e infraestrutura
 
 // Recursos Tecnológicos
-global.silicio = 100;   // Eletrônicos e computadores
-global.aco = 400;       // Construção pesada e armamento
+global.silicio = 300;   // ✅ TRIPLICADO: 100 * 3 = 300 - Eletrônicos e computadores
+global.aco = 1200;      // ✅ TRIPLICADO: 400 * 3 = 1200 - Construção pesada e armamento
 
 // === RECURSOS COMPLEMENTARES ===
 // Recursos secundários importantes para o funcionamento
 
-global.energia = 1000;        // Capacidade energética da nação
+global.energia = 3000;  // ✅ TRIPLICADO: 1000 * 3 = 3000 - Capacidade energética da nação
 
 // === SISTEMA DE INFLATION ===
 // Inicializar variáveis de inflação
@@ -411,6 +416,13 @@ global.ia_populacao = 100;
 global.ia_alimento = 0;
 
 show_debug_message("✅ Recursos da IA inicializados");
+
+// === SISTEMA DE DEFESA DO PRESIDENTE ===
+// Variáveis globais para sistema de defesa
+global.defesa_presidente_ativa = true;
+global.tiles_sistema_ativo = false; // ⚠️ Será true quando tiles forem implementados
+
+show_debug_message("🛡️ Sistema de defesa do presidente configurado");
 
 // === SISTEMA DE DEACTIVATION MANAGER ===
 // ✅ DESABILITADO: Estava fazendo unidades sumirem ao mudar de local

@@ -31,8 +31,10 @@ if (!should_always_process && skip_frames_enabled) {
         if (estado == "movendo" || estado == "patrulhando") {
             var speed_mult = scr_get_speed_multiplier(current_lod, lod_process_index);
             if (velocidade_atual > 0) {
-                x += lengthdir_x(velocidade_atual * speed_mult, image_angle);
-                y += lengthdir_y(velocidade_atual * speed_mult, image_angle);
+                // ✅ CORREÇÃO: Normalizar velocidade antes de aplicar multiplicador do LOD
+                var _vel_normalizada = scr_normalize_unit_speed(velocidade_atual);
+                x += lengthdir_x(_vel_normalizada * speed_mult, image_angle);
+                y += lengthdir_y(_vel_normalizada * speed_mult, image_angle);
             }
         }
         exit;
@@ -109,7 +111,14 @@ switch (estado) {
             destino_y = alvo_em_mira.y;
             
             // ✅ F-15 LANÇA MÚLTIPLOS MÍSSEIS SIMULTANEAMENTES (ar, terra, submarino e ESTRUTURAS)
-            if (point_distance(x, y, destino_x, destino_y) <= radar_alcance && timer_ataque <= 0) {
+            // ✅ VALIDAÇÃO: Verificar se alvo é válido antes de disparar
+            var _alvo_valido = (instance_exists(alvo_em_mira) && 
+                                alvo_em_mira != noone && 
+                                !is_undefined(alvo_em_mira.x) && 
+                                !is_undefined(alvo_em_mira.y) &&
+                                point_distance(x, y, alvo_em_mira.x, alvo_em_mira.y) <= radar_alcance);
+            
+            if (_alvo_valido && timer_ataque <= 0) {
                 // Detectar tipo de alvo
                 var _alvo_aereo = (alvo_em_mira.object_index == obj_caca_f5 || 
                                   alvo_em_mira.object_index == obj_f6 || 
@@ -144,23 +153,28 @@ switch (estado) {
                 var _missois_lancados = 0;
                 
                 // ✅ AÉREO → SKY via pool
-                if (_alvo_aereo) {
+                if (_alvo_aereo && instance_exists(alvo_em_mira)) {
                     var _missil_ar = scr_get_projectile_from_pool(obj_SkyFury_ar, x, y, "Instances");
                     if (instance_exists(_missil_ar)) {
-                        _missil_ar.alvo = alvo_em_mira;
-                        _missil_ar.target = alvo_em_mira;
-                        _missil_ar.dono = id;
-                        _missois_lancados++;
-                        show_debug_message("✈️ F-15 lançou Sky contra alvo aéreo");
+                        // ✅ VALIDAÇÃO: Verificar se alvo ainda existe antes de atribuir
+                        if (instance_exists(alvo_em_mira)) {
+                            _missil_ar.alvo = alvo_em_mira;
+                            _missil_ar.target = alvo_em_mira;
+                            _missil_ar.dono = id;
+                            _missois_lancados++;
+                            show_debug_message("✈️ F-15 lançou Sky contra alvo aéreo");
+                        } else {
+                            scr_return_projectile_to_pool(_missil_ar);
+                        }
                     }
                 }
                 
                 // ✅ TERRESTRE → HASH + IRONCLAD
-                if (_alvo_terrestre) {
+                if (_alvo_terrestre && instance_exists(alvo_em_mira)) {
                     // Hash (70% de chance)
                     if (random(1) < 0.7) {
                         var _missil_hash = instance_create_layer(x, y, "Instances", obj_hash);
-                        if (instance_exists(_missil_hash)) {
+                        if (instance_exists(_missil_hash) && instance_exists(alvo_em_mira)) {
                             _missil_hash.alvo = alvo_em_mira;
                             _missil_hash.target = alvo_em_mira;
                             _missil_hash.dono = id;
@@ -173,19 +187,23 @@ switch (estado) {
                     if (random(1) < 0.7) {
                         var _missil_iron = scr_get_projectile_from_pool(obj_Ironclad_terra, x, y, "Instances");
                         if (instance_exists(_missil_iron)) {
-                            _missil_iron.alvo = alvo_em_mira;
-                            _missil_iron.target = alvo_em_mira;
-                            _missil_iron.dono = id;
-                            _missois_lancados++;
-                            show_debug_message("💥 F-15 lançou Ironclad contra alvo terrestre");
+                            if (instance_exists(alvo_em_mira)) {
+                                _missil_iron.alvo = alvo_em_mira;
+                                _missil_iron.target = alvo_em_mira;
+                                _missil_iron.dono = id;
+                                _missois_lancados++;
+                                show_debug_message("💥 F-15 lançou Ironclad contra alvo terrestre");
+                            } else {
+                                scr_return_projectile_to_pool(_missil_iron);
+                            }
                         }
                     }
                 }
                 
                 // ✅ SUBMARINO → HASH
-                if (_alvo_submarino) {
+                if (_alvo_submarino && instance_exists(alvo_em_mira)) {
                     var _missil_sub = instance_create_layer(x, y, "Instances", obj_hash);
-                    if (instance_exists(_missil_sub)) {
+                    if (instance_exists(_missil_sub) && instance_exists(alvo_em_mira)) {
                         _missil_sub.alvo = alvo_em_mira;
                         _missil_sub.target = alvo_em_mira;
                         _missil_sub.dono = id;
@@ -195,20 +213,24 @@ switch (estado) {
                 }
                 
                 // ✅ NOVO: ESTRUTURAS E PRESIDENTE → IRONCLAD (míssil terra-terra poderoso)
-                if (_alvo_estrutura || _alvo_presidente) {
+                if ((_alvo_estrutura || _alvo_presidente) && instance_exists(alvo_em_mira)) {
                     // Lançar 2-3 mísseis Ironclad contra estruturas (mais devastador)
                     for (var _i = 0; _i < 2; _i++) {
                         var _missil_iron = scr_get_projectile_from_pool(obj_Ironclad_terra, x + random_range(-10, 10), y + random_range(-10, 10), "Instances");
                         if (instance_exists(_missil_iron)) {
-                            _missil_iron.alvo = alvo_em_mira;
-                            _missil_iron.target = alvo_em_mira;
-                            _missil_iron.dono = id;
-                            _missois_lancados++;
+                            if (instance_exists(alvo_em_mira)) {
+                                _missil_iron.alvo = alvo_em_mira;
+                                _missil_iron.target = alvo_em_mira;
+                                _missil_iron.dono = id;
+                                _missois_lancados++;
+                            } else {
+                                scr_return_projectile_to_pool(_missil_iron);
+                            }
                         }
                     }
                     // Também lançar Hash para dano adicional
                     var _missil_hash = instance_create_layer(x, y, "Instances", obj_hash);
-                    if (instance_exists(_missil_hash)) {
+                    if (instance_exists(_missil_hash) && instance_exists(alvo_em_mira)) {
                         _missil_hash.alvo = alvo_em_mira;
                         _missil_hash.target = alvo_em_mira;
                         _missil_hash.dono = id;
@@ -259,8 +281,10 @@ if (_is_flying) {
 }
 
 // Aplica o movimento (só se move se tiver velocidade)
-x += lengthdir_x(velocidade_atual, image_angle);
-y += lengthdir_y(velocidade_atual, image_angle);
+// ✅ CORREÇÃO: Normalizar velocidade baseado no zoom para manter velocidade visual constante
+var _vel_normalizada = scr_normalize_unit_speed(velocidade_atual);
+x += lengthdir_x(_vel_normalizada, image_angle);
+y += lengthdir_y(_vel_normalizada, image_angle);
 
 // --- 5. LÓGICA DO TIMER DE ATAQUE ---
 if (timer_ataque > 0) {

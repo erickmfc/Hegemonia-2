@@ -65,43 +65,55 @@ if (object_exists(obj_ui_manager)) {
 // === CRIAÇÃO DE INIMIGOS PARA TESTE ===
 if (global.debug_enabled) show_debug_message("=== CRIANDO INIMIGOS PARA TESTE ===");
 
+// ✅ CORREÇÃO: obj_inimigo removido - não criar mais inimigos
 var inimigos_criados = 0;
-if (object_exists(obj_inimigo)) {
-    for (var i = 0; i < 2; i++) {
-        var inimigo = instance_create_layer(400 + (i * 150), 300 + (i * 100), "rm_mapa_principal", obj_inimigo);
-        if (instance_exists(inimigo)) {
-            inimigos_criados++;
-            if (global.debug_enabled) {
-                show_debug_message("🎯 Inimigo " + string(inimigos_criados) + " criado - ID: " + string(inimigo));
-            }
-        }
-    }
-} else {
-    // Fallback: usar obj_infantaria como inimigo
-    for (var i = 0; i < 2; i++) {
-        var inimigo = instance_create_layer(400 + (i * 150), 300 + (i * 100), "rm_mapa_principal", obj_infantaria);
-        if (instance_exists(inimigo)) {
-            inimigo.nacao_proprietaria = 2; // 2 = inimigo
-            inimigo.hp_atual = 100;
-            inimigo.hp_max = 100;
-            inimigo.estado = "livre";
-            inimigo.comando_atual = "LIVRE";
-            inimigos_criados++;
-            if (global.debug_enabled) {
-                show_debug_message("🎯 Inimigo " + string(inimigos_criados) + " criado (fallback) - ID: " + string(inimigo));
-            }
+// if (object_exists(obj_inimigo)) {
+//     for (var i = 0; i < 2; i++) {
+//         var inimigo = instance_create_layer(400 + (i * 150), 300 + (i * 100), "rm_mapa_principal", obj_inimigo);
+//         if (instance_exists(inimigo)) {
+//             inimigos_criados++;
+//             if (global.debug_enabled) {
+//                 show_debug_message("🎯 Inimigo " + string(inimigos_criados) + " criado - ID: " + string(inimigo));
+//             }
+//         }
+//     }
+// }
+
+// Fallback: usar obj_infantaria como inimigo
+for (var i = 0; i < 2; i++) {
+    var inimigo = instance_create_layer(400 + (i * 150), 300 + (i * 100), "rm_mapa_principal", obj_infantaria);
+    if (instance_exists(inimigo)) {
+        inimigo.nacao_proprietaria = 2; // 2 = inimigo
+        inimigo.hp_atual = 100;
+        inimigo.hp_max = 100;
+        inimigo.estado = "livre";
+        inimigo.comando_atual = "LIVRE";
+        inimigos_criados++;
+        if (global.debug_enabled) {
+            show_debug_message("🎯 Inimigo " + string(inimigos_criados) + " criado (fallback) - ID: " + string(inimigo));
         }
     }
 }
 
 // === CRIAÇÃO DA IA PRESIDENTE 1 ===
-// Removido temporariamente - adicione obj_presidente_1 manualmente no mapa quando desejar
-// if (object_exists(obj_presidente_1)) {
-//     var _ia_instance = instance_create_layer(800, 600, "rm_mapa_principal", obj_presidente_1);
-//     if (instance_exists(_ia_instance)) {
-//         show_debug_message("🤖 IA Presidente 1 criada na posição (800, 600) - ID: " + string(_ia_instance));
-//     }
-// }
+// ✅ REMOVIDO: obj_presidente_1 não deve aparecer no mapa2
+// Garantir que nenhuma instância de obj_presidente_1 exista nesta room
+// ✅ FORÇA BRUTA: Destruir TODAS as instâncias, mesmo que já tenham sido criadas
+if (object_exists(obj_presidente_1)) {
+    var _total_presidentes = instance_number(obj_presidente_1);
+    if (_total_presidentes > 0) {
+        with (obj_presidente_1) {
+            instance_destroy();
+        }
+        if (global.debug_enabled) {
+            show_debug_message("🗑️ Removido " + string(_total_presidentes) + " instância(s) de obj_presidente_1 do mapa2 (RoomCreationCode)");
+        }
+    }
+}
+
+// ✅ VERIFICAÇÃO ADICIONAL: Marcar para verificação contínua
+// O obj_presidente_1 agora se auto-destrói no Create e Step se estiver no mapa2
+// Esta verificação adicional garante remoção imediata
 
 if (global.debug_enabled) {
 show_debug_message("🎯 Total de inimigos criados: " + string(inimigos_criados));

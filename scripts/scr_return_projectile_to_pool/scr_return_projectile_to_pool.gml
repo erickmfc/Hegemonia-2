@@ -75,13 +75,22 @@ function scr_return_projectile_to_pool(proj_id) {
     
     // === ADICIONAR AO POOL ===
     
-    // Resetar propriedades
-    proj_id.x = -1000; // Mover para fora da tela
-    proj_id.y = -1000;
+    // ✅ CRÍTICO: Desativar e tornar invisível ANTES de qualquer coisa
     proj_id.visible = false;
+    proj_id.image_alpha = 0;
+    proj_id.image_xscale = 0;
+    proj_id.image_yscale = 0;
+    proj_id.speed = 0;
     proj_id.pooled = false; // Disponível no pool
     proj_id.alvo = noone;
     proj_id.dono = noone;
+    
+    // ✅ CRÍTICO: Desativar instância IMEDIATAMENTE
+    instance_deactivate_object(proj_id);
+    
+    // Mover para fora da tela APÓS desativar
+    proj_id.x = -10000; // ✅ AUMENTADO: Mais longe para garantir que não apareça
+    proj_id.y = -10000;
     
     // Resetar variáveis se existirem
     if (variable_instance_exists(proj_id, "timer_vida")) {
@@ -90,18 +99,23 @@ function scr_return_projectile_to_pool(proj_id) {
     if (variable_instance_exists(proj_id, "tempo_vida")) {
         proj_id.tempo_vida = 0;
     }
-    if (variable_instance_exists(proj_id, "speed")) {
-        proj_id.speed = 0;
+    if (variable_instance_exists(proj_id, "direction")) {
+        proj_id.direction = 0;
+    }
+    if (variable_instance_exists(proj_id, "image_angle")) {
+        proj_id.image_angle = 0;
     }
     
-    // Desativar instância (economia de processamento)
-    instance_deactivate_object(proj_id);
+    // ✅ GARANTIR: Não está processando
+    if (variable_instance_exists(proj_id, "alvo")) {
+        proj_id.alvo = noone;
+    }
     
     // Adicionar ao pool
     ds_list_add(_pool, proj_id);
     _pool_mgr.objetos_no_pool++;
     
     if (variable_global_exists("debug_enabled") && global.debug_enabled) {
-        show_debug_message("💾 Projétil " + _pool_key + " retornado ao pool");
+        show_debug_message("💾 Projétil " + _pool_key + " retornado ao pool e desativado");
     }
 }

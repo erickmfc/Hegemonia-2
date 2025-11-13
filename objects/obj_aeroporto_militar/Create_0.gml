@@ -6,8 +6,8 @@
 // === CONFIGURAÇÕES BÁSICAS ===
 custo_dinheiro = 1000;
 custo_minerio = 500;
-hp_max = 800;
-hp_atual = 800;
+hp_max = 2000; // ✅ AUMENTADO: Mais resistente (era 800)
+hp_atual = 2000; // ✅ AUMENTADO: Mais resistente (era 800)
 destrutivel = true; // ✅ Aeroporto pode ser destruído
 nacao_proprietaria = 1;
 
@@ -64,6 +64,16 @@ ds_list_add(unidades_disponiveis, {
     descricao: "Caça superior com HP 800 e sistema de mísseis avançado"
 });
 
+// Caça SU-35 Flanker
+ds_list_add(unidades_disponiveis, {
+    nome: "SU-35 Flanker",
+    objeto: obj_su35,
+    custo_dinheiro: 5900,
+    custo_populacao: 5,
+    tempo_treino: 240, // ✅ MUDADO: 4 segundos (240 frames) - MÁXIMO
+    descricao: "Caça superior com HP 800 e sistema de mísseis avançado"
+});
+
 // === SISTEMA DE SELEÇÃO ===
 selecionado = false;
 menu_recrutamento = noone;
@@ -77,6 +87,9 @@ image_alpha = 1.0; // ✅ VISÍVEL
 // === CONFIGURAÇÕES DE INTERAÇÃO ===
 raio_interacao = 90; // Raio ajustado para sprite reduzido (172x172)
 pode_interagir = true;
+
+// === TERRENO PERMITIDO ===
+terreno_permitido = TERRAIN.CAMPO; // Aeroportos só em terreno de campo
 
 show_debug_message("🏢 Aeroporto Militar criado - Sistema aéreo ativo");
 show_debug_message("💰 Custo: $" + string(custo_dinheiro) + " dinheiro, " + string(custo_minerio) + " minério");

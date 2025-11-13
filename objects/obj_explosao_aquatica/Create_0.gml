@@ -1,5 +1,5 @@
 // Duração do efeito em frames (1 segundo para explosão)
-timer_duracao = 60; // 60 frames = 1 segundo
+timer_duracao = 24; // ✅ REDUZIDO: 0.4 segundos (era 60 frames = 1 segundo)
 timer_atual = 0;
 image_alpha = 1; // Começa totalmente visível
 

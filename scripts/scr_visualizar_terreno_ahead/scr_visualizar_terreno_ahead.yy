@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_visualizar_terreno_ahead",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_visualizar_terreno_ahead",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

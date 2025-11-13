@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_enums_planos_estrategicos",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_enums_planos_estrategicos",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

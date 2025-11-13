@@ -12,7 +12,7 @@ nacao_proprietaria = 1;
 
 vida = 100;
 vida_max = 100;
-dano = 35; // Mais dano contra alvos aéreos
+dano = 100; // Dano aumentado contra alvos aéreos
 velocidade = 2; // Mesma velocidade da infantaria
 
 // Estado inicial
@@ -22,11 +22,17 @@ estado = "parado";
 // Movimento (idêntico à infantaria)
 destino_x = x;
 destino_y = y;
+destino_original_x = undefined; // Para sistema de desvio de obstáculos
+destino_original_y = undefined; // Para sistema de desvio de obstáculos
 
 // Patrulha (sistema idêntico à infantaria)
 patrulha = ds_list_create();
 patrulha_indice = 0;
 modo_patrulha = false;
+
+// ✅ NOVO: Sistema de patrulha igual navios/aviões
+pontos_patrulha = ds_list_create();
+indice_patrulha_atual = 0;
 
 // Ataque especializado contra alvos aéreos e terrestres
 alcance_visao = 500; // Maior alcance para detectar alvos
@@ -40,6 +46,9 @@ categoria_alvo = "mista"; // Especifica que ataca alvos aéreos e terrestres
 
 // Para seguir (idêntico à infantaria)
 seguir_alvo = noone;
+
+// Modo de combate
+modo_ataque = true; // Por padrão, ataca automaticamente
 
 // === COR E VISUAL ===
 // Usar cor diferente para diferenciar do soldado normal

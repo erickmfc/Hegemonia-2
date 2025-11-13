@@ -139,37 +139,6 @@ if (instance_exists(global.construindo_edificio)) {
 // === OUTROS COMANDOS DE DEBUG E TESTE ===
 if (!instance_exists(global.construindo_edificio)) {
     
-    // === DEBUG: TECLA T PARA TESTAR SISTEMA DE PESQUISA ===
-    if (keyboard_check_pressed(ord("T"))) {
-        show_debug_message("========== TESTE DE DEBUG DO SISTEMA DE PESQUISA ==========");
-        show_debug_message("global.menu_pesquisa_aberto: " + string(global.menu_pesquisa_aberto));
-        
-        if (instance_exists(obj_research_center)) {
-            show_debug_message("obj_research_center existe: SIM");
-        } else if (instance_exists(obj_centro_pesquisa)) {
-            show_debug_message("obj_centro_pesquisa existe: SIM (fallback)");
-        } else {
-            show_debug_message("Nenhum objeto de pesquisa existe: NÃO");
-        }
-        
-        show_debug_message("global.dinheiro: $" + string(global.dinheiro));
-        show_debug_message("global.slots_pesquisa_usados/total: " + string(global.slots_pesquisa_usados) + "/" + string(global.slots_pesquisa_total));
-        
-        if (ds_exists(global.nacao_recursos, ds_type_map)) {
-            show_debug_message("global.nacao_recursos: OK (" + string(ds_map_size(global.nacao_recursos)) + " entradas)");
-        } else {
-            show_debug_message("global.nacao_recursos: ERRO - não é um ds_map válido");
-        }
-        
-        if (ds_exists(global.research_timers, ds_type_map)) {
-            show_debug_message("global.research_timers: OK (" + string(ds_map_size(global.research_timers)) + " entradas)");
-        } else {
-            show_debug_message("global.research_timers: ERRO - não é um ds_map válido");
-        }
-        
-        show_debug_message("==============================================================");
-    }
-    
     // === DEBUG: TECLA R PARA FORÇAR PESQUISA (BYPASS DO CLIQUE) ===
     if (keyboard_check_pressed(ord("R"))) {
         show_debug_message("=== TESTE FORÇADO: INICIANDO PESQUISA DE BORRACHA ===");
@@ -334,14 +303,6 @@ mouse_y_previous = window_mouse_get_y();
 // ✅ OTIMIZAÇÃO: Removida atualização duplicada da câmera (já atualizada acima com cache)
 // A câmera já é atualizada no início do Step com sistema de cache
 
-// === COMANDOS DE TESTE ===
-// Tecla T: Teste de sistema
-if (keyboard_check_pressed(ord("T"))) {
-    show_debug_message("=== TESTE DE SISTEMA ===");
-    show_debug_message("FPS: " + string(fps));
-    show_debug_message("Instâncias ativas: " + string(instance_count));
-    show_debug_message("Memória em uso: " + string(memory_get_usage() / 1024 / 1024) + " MB");
-}
 
 // Tecla Q: Teste específico do quartel
 if (keyboard_check_pressed(ord("Q"))) {

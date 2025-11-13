@@ -1,38 +1,12 @@
 // Explosão no solo (poeira + chamas)
-// ✅ CORREÇÃO: Tocar som apenas se a explosão estiver visível na câmera
-// Verificação inline (sem depender de script)
-var _cam = view_camera[0];
-var _visivel = true; // Fallback: considerar visível
-if (_cam != -1 && _cam != noone) {
-    var _cam_x = camera_get_view_x(_cam);
-    var _cam_y = camera_get_view_y(_cam);
-    var _cam_w = camera_get_view_width(_cam);
-    var _cam_h = camera_get_view_height(_cam);
-    if (_cam_w > 0 && _cam_h > 0) {
-        var _margin = 100;
-        var _view_left = _cam_x - _margin;
-        var _view_right = _cam_x + _cam_w + _margin;
-        var _view_top = _cam_y - _margin;
-        var _view_bottom = _cam_y + _cam_h + _margin;
-        _visivel = (x >= _view_left && x <= _view_right && y >= _view_top && y <= _view_bottom);
-    }
+// ✅ CORREÇÃO: Inicializar sem_som como false por padrão
+if (!variable_instance_exists(id, "sem_som")) {
+    sem_som = false; // Inicializar como false se não existir
 }
 
-// ✅ NOVO: Verificar se deve tocar som (removido para mísseis do F-5)
-var _sem_som = false;
-if (variable_instance_exists(id, "sem_som")) {
-    _sem_som = sem_som;
-}
-
-if (_visivel && !_sem_som) {
-    var _sound_index = asset_get_index("som_anti");
-    if (_sound_index != -1) {
-        audio_play_sound(som_anti, 1, false);
-        show_debug_message("🔊 Som de impacto terrestre: som_anti");
-    } else {
-        show_debug_message("❌ Som som_anti não encontrado!");
-    }
-}
+// ✅ CORREÇÃO: NÃO tocar som no Create - será verificado no Step Event
+// Isso permite que sem_som seja definido ANTES do som tocar
+som_tocado = false; // Flag para controlar se o som já foi tocado
 
 // Poeira
 for (var i = 0; i < 12; i++) {
@@ -64,4 +38,4 @@ else if (_lod_level == 0) _particle_count = 5; // Mínimo em zoom muito afastado
 
 part_particles_create(part_sys, x, y, part_type, _particle_count);
 
-alarm[0] = game_get_speed(gamespeed_fps) * 1.5; // 1.5 segundos
+alarm[0] = 36; // ✅ REDUZIDO: 0.6 segundos (era 90 frames = 1.5 segundos)

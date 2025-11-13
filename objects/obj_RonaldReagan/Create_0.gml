@@ -16,7 +16,7 @@ missil_alcance = 1000;
 missil_max_alcance = 1000;
 alcance_ataque = missil_alcance;
 alcance_visao = radar_alcance;
-dano_ataque = 50; // Menor dano, é navio de suporte
+dano_ataque = 70; // Dano aumentado
 reload_time = 300; // 5 segundos de cooldown
 
 // === SISTEMA DE MÍSSEIS (IGUAL CONSTELLATION) ===
@@ -74,6 +74,10 @@ menu_carga_aberto = false;
 raio_embarque = 80;                         // Raio de detecção aumentado
 desembarque_offset_angulo = 0;
 
+// === RETÂNGULO DE EMBARQUE (SOBRESCREVE O PAI) ===
+largura_embarque = 200; // Largura do retângulo de captura (cobre o navio)
+altura_embarque = 960; // ✅ AUMENTADO: 50% a mais na proa + 50% a mais na popa (era 480, agora 960 = 480 + 240 + 240)
+
 // === SISTEMA DE MENU DE DESEMBARQUE (COMPATIBILIDADE) ===
 menu_desembarque_aberto = false;
 menu_desembarque_selecionado = -1;
@@ -108,35 +112,45 @@ eh_embarcavel = function(unidade) {
     // Verificar se é terrestre/naval
     if (object_is_ancestor(unidade.object_index, obj_infantaria)) return true;
     if (object_is_ancestor(unidade.object_index, obj_tanque)) return true;
-    if (object_is_ancestor(unidade.object_index, obj_inimigo)) return true;
     if (object_is_ancestor(unidade.object_index, obj_soldado_antiaereo)) return true;
     if (object_is_ancestor(unidade.object_index, obj_blindado_antiaereo)) return true;
+    
+    // ✅ CORREÇÃO: Verificar explicitamente o M1A Abrams
+    var _obj_abrams = asset_get_index("obj_M1A_Abrams");
+    if (_obj_abrams != -1 && asset_get_type(_obj_abrams) == asset_object && unidade.object_index == _obj_abrams) return true;
     
     return false;
 }
 
 tipo_unidade = function(unidade) {
+    if (!instance_exists(unidade)) return "desconhecido";
+    
+    // ✅ CORREÇÃO: Usar object_get_name para comparação mais confiável (igual ao pai)
+    var _nome = object_get_name(unidade.object_index);
+    
     // Aeronaves
-    if (unidade.object_index == obj_caca_f5 ||
-        unidade.object_index == obj_f15 ||
-        unidade.object_index == obj_f6 ||
-        unidade.object_index == obj_helicoptero_militar ||
-        unidade.object_index == obj_c100) {
+    if (_nome == "obj_caca_f5" ||
+        _nome == "obj_f15" ||
+        _nome == "obj_f6" ||
+        _nome == "obj_helicoptero_militar" ||
+        _nome == "obj_c100") {
         return "aereo";
     }
     
-    // Soldados
-    if (unidade.object_index == obj_infantaria ||
-        unidade.object_index == obj_soldado_antiaereo) {
+    // Soldados (unidades de infantaria)
+    if (_nome == "obj_infantaria" ||
+        _nome == "obj_soldado_antiaereo") {
         return "soldado";
     }
     
-    // Veículos
-    if (unidade.object_index == obj_tanque ||
-        unidade.object_index == obj_blindado_antiaereo) {
+    // Veículos (tanques, blindados e Abrams)
+    if (_nome == "obj_tanque" ||
+        _nome == "obj_blindado_antiaereo" ||
+        _nome == "obj_M1A_Abrams") { // ✅ CORREÇÃO: Adicionado M1A Abrams
         return "unidade";
     }
     
+    show_debug_message("⚠️ [RONALD] tipo_unidade: Tipo desconhecido para " + _nome);
     return "desconhecido";
 }
 
@@ -172,6 +186,9 @@ embarcar_unidade = function(unidade) {
             _pode_embarcar = true;
             show_debug_message("✅ [RONALD] Capacidade SOLDADOS OK: " + string(soldados_count) + "/" + string(soldados_max));
             break;
+        default:
+            show_debug_message("❌ [RONALD] EMBARQUE FALHOU: Tipo desconhecido: " + _tipo);
+            return false;
     }
     
     if (!_pode_embarcar) {
@@ -183,6 +200,12 @@ embarcar_unidade = function(unidade) {
     var _lista_usar = avioes_embarcados;
     if (_tipo == "unidade") _lista_usar = unidades_embarcadas;
     else if (_tipo == "soldado") _lista_usar = soldados_embarcados;
+    
+    // ✅ CORREÇÃO: Verificar se já está embarcado antes de adicionar
+    if (ds_list_find_index(_lista_usar, unidade.id) != -1) {
+        show_debug_message("⚠️ [RONALD] EMBARQUE FALHOU: " + object_get_name(unidade.object_index) + " já está na lista!");
+        return false;
+    }
     
     show_debug_message(">>> [RONALD] PASSO FINAL: Adicionando à lista e escondendo...");
     
@@ -227,10 +250,23 @@ desembarcar_proxima = function() {
         var _tipo = tipo_unidade(_unidade);
         
         // Remover das listas
-        ds_list_delete_value(avioes_embarcados, _unidade_id);
-        ds_list_delete_value(unidades_embarcadas, _unidade_id);
-        ds_list_delete_value(soldados_embarcados, _unidade_id);
-        ds_list_delete_value(avioes_visiveis, _unidade_id);
+        // ✅ CORREÇÃO: Validar antes de deletar valores das listas
+        if (ds_exists(avioes_embarcados, ds_type_list)) {
+            var _idx = ds_list_find_index(avioes_embarcados, _unidade_id);
+            if (_idx >= 0) ds_list_delete(avioes_embarcados, _idx);
+        }
+        if (ds_exists(unidades_embarcadas, ds_type_list)) {
+            var _idx = ds_list_find_index(unidades_embarcadas, _unidade_id);
+            if (_idx >= 0) ds_list_delete(unidades_embarcadas, _idx);
+        }
+        if (ds_exists(soldados_embarcados, ds_type_list)) {
+            var _idx = ds_list_find_index(soldados_embarcados, _unidade_id);
+            if (_idx >= 0) ds_list_delete(soldados_embarcados, _idx);
+        }
+        if (ds_exists(avioes_visiveis, ds_type_list)) {
+            var _idx = ds_list_find_index(avioes_visiveis, _unidade_id);
+            if (_idx >= 0) ds_list_delete(avioes_visiveis, _idx);
+        }
         
         // Atualizar contadores
         if (_tipo == "aereo") avioes_count--;
@@ -302,7 +338,17 @@ funcao_desembarcar_aeronave = function() {
         // NÃO usar instance_activate_object() porque nunca foi desativado
         ds_list_delete(avioes_embarcados, 0);
         avioes_count--;
-        ds_list_delete_value(avioes_visiveis, _aeronave_id.id);
+        
+        // ✅ CORREÇÃO: Validar antes de deletar de avioes_visiveis
+        if (ds_exists(avioes_visiveis, ds_type_list)) {
+            var _id_para_deletar = _aeronave_id.id;
+            // Verificar se o valor existe na lista antes de deletar
+            var _indice = ds_list_find_index(avioes_visiveis, _id_para_deletar);
+            if (_indice >= 0) {
+                ds_list_delete(avioes_visiveis, _indice);
+            }
+        }
+        
         desembarque_offset_angulo += 30;
         if (desembarque_offset_angulo >= 360) desembarque_offset_angulo = 0;
     }

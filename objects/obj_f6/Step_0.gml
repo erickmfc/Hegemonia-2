@@ -80,12 +80,36 @@ switch (estado) {
         break;
 
     case "patrulhando":
-        // Se chegou ao ponto atual, vai para o próximo
+        // ✅ CORREÇÃO: Patrulha controlada pelo presidente - não continua automaticamente
+        // Se chegou ao ponto atual, vai para o próximo (apenas se presidente ordenou patrulha)
         if (point_distance(x, y, destino_x, destino_y) < 20) {
-            indice_patrulha_atual = (indice_patrulha_atual + 1) % ds_list_size(pontos_patrulha);
-            var _ponto = pontos_patrulha[| indice_patrulha_atual];
-            destino_x = _ponto[0];
-            destino_y = _ponto[1];
+            // Verificar se ainda há pontos de patrulha definidos pelo presidente
+            if (ds_list_size(pontos_patrulha) > 0) {
+                indice_patrulha_atual = (indice_patrulha_atual + 1) % ds_list_size(pontos_patrulha);
+                var _ponto = pontos_patrulha[| indice_patrulha_atual];
+                destino_x = _ponto[0];
+                destino_y = _ponto[1];
+            } else {
+                // Sem mais pontos de patrulha - voltar para pousado e aguardar ordem do presidente
+                estado = "pousando";
+                show_debug_message("🛬 F-6: Patrulha concluída. Aguardando nova ordem do presidente.");
+            }
+        }
+        break;
+    
+    case "atacando":
+        // ✅ NOVO: Estado "atacando" para responder aos comandos da IA (presidente)
+        // Se a IA definiu um alvo, usar esse alvo
+        if (variable_instance_exists(id, "alvo") && instance_exists(alvo)) {
+            // Converter estado "atacando" para "caçando" (sistema interno do F6)
+            if (estado_anterior != "caçando") {
+                estado_anterior = "movendo"; // Guardar estado anterior
+                estado = "caçando";
+                alvo_em_mira = alvo;
+                destino_x = alvo.x;
+                destino_y = alvo.y;
+                show_debug_message("🎯 F-6 recebeu ordem de ataque da IA! Alvo: " + object_get_name(alvo.object_index));
+            }
         }
         break;
         
@@ -99,7 +123,7 @@ switch (estado) {
 }
 
 // --- 3. LÓGICA DE MOVIMENTO E ALTITUDE ---
-var _is_flying = (estado == "movendo" || estado == "patrulhando" || estado == "decolando" || estado == "caçando");
+var _is_flying = (estado == "movendo" || estado == "patrulhando" || estado == "decolando" || estado == "caçando" || estado == "atacando");
 var _is_landing = (estado == "pousando");
 
 if (_is_flying) {
@@ -119,13 +143,31 @@ if (_is_flying) {
     }
 }
 
+// ✅ CORREÇÃO: Normalizar velocidade baseado no zoom para manter velocidade visual constante
+var _vel_normalizada = scr_normalize_unit_speed(velocidade_atual);
 // Aplica o movimento (só se move se tiver velocidade)
-x += lengthdir_x(velocidade_atual, image_angle);
-y += lengthdir_y(velocidade_atual, image_angle);
+x += lengthdir_x(_vel_normalizada, image_angle);
+y += lengthdir_y(_vel_normalizada, image_angle);
 
-// --- 4. SISTEMA DE CAÇA ATIVA (SIMILAR AO F-5) ---
-// Se está patrulhando ou movendo, pode entrar em modo de caça
-if (estado == "patrulhando" || estado == "movendo") {
+// --- 4. SISTEMA DE CAÇA ATIVA (CONTROLADO PELO PRESIDENTE) ---
+// ✅ CORREÇÃO: Apenas atacar quando está em movimento ordenado pelo presidente
+// Não procurar inimigos quando está pousado ou pousando (aguardando ordem)
+if (modo_ataque && estado == "movendo") {
+    // Usar scr_buscar_inimigo para encontrar alvos apenas quando está se movendo por ordem
+    var _alvo_encontrado = scr_buscar_inimigo(x, y, radar_alcance, nacao_proprietaria);
+    if (instance_exists(_alvo_encontrado)) {
+        estado_anterior = estado;
+        estado = "caçando";
+        alvo_em_mira = _alvo_encontrado;
+        destino_x = _alvo_encontrado.x;
+        destino_y = _alvo_encontrado.y;
+        show_debug_message("🎯 F-6 (presidente) encontrou alvo durante movimento: " + object_get_name(_alvo_encontrado.object_index));
+    }
+}
+
+// ✅ CORREÇÃO: Apenas quando está movendo (ordem do presidente) pode entrar em modo de caça
+// Removido "patrulhando" para evitar que F6 patrulhe sozinho
+if (estado == "movendo") {
     // Detectar inimigos aéreos primeiro (prioridade máxima)
     var _inimigo_aereo = noone;
     var _inimigo_terrestre = noone;
@@ -213,48 +255,72 @@ if (estado == "caçando") {
         destino_x = alvo_em_mira.x;
         destino_y = alvo_em_mira.y;
         
-        // Atacar se estiver no alcance e o timer permitir
-        if (point_distance(x, y, destino_x, destino_y) <= radar_alcance && timer_ataque <= 0) {
-            var _angulo = point_direction(x, y, alvo_em_mira.x, alvo_em_mira.y);
-            var _missil = scr_get_projectile_from_pool(obj_tiro_simples, x, y, "Instances");
+        // ✅ NOVO: Atacar usando mísseis SkyFury (ar-ar) e Ironclad (ar-terra)
+        // ✅ VALIDAÇÃO: Verificar se alvo é válido antes de disparar
+        var _alvo_valido = (instance_exists(alvo_em_mira) && 
+                            alvo_em_mira != noone && 
+                            !is_undefined(alvo_em_mira.x) && 
+                            !is_undefined(alvo_em_mira.y) &&
+                            point_distance(x, y, alvo_em_mira.x, alvo_em_mira.y) <= radar_alcance);
+        
+        if (_alvo_valido && timer_ataque <= 0) {
+            var _missil = noone;
+            var _tipo_missil = "";
+            
+            // Verificar tipo de alvo para usar míssil apropriado
+            var _eh_alvo_aereo = (alvo_em_mira.object_index == obj_helicoptero_militar || 
+                                  alvo_em_mira.object_index == obj_caca_f5 ||
+                                  alvo_em_mira.object_index == obj_f15 ||
+                                  alvo_em_mira.object_index == obj_f6 ||
+                                  alvo_em_mira.object_index == obj_su35 ||
+                                  alvo_em_mira.object_index == obj_c100);
+            
+            if (_eh_alvo_aereo) {
+                // ✅ Alvo aéreo - usar SkyFury (míssil ar-ar)
+                _missil = scr_get_projectile_from_pool(obj_SkyFury_ar, x, y, "Instances");
+                _tipo_missil = "SkyFury (ar-ar)";
+            } else {
+                // ✅ Alvo terrestre/naval - usar Ironclad (míssil ar-terra)
+                _missil = scr_get_projectile_from_pool(obj_Ironclad_terra, x, y, "Instances");
+                _tipo_missil = "Ironclad (ar-terra)";
+            }
             
             if (instance_exists(_missil)) {
-                _missil.alvo = alvo_em_mira;
-                _missil.dono = id;
-                if (variable_instance_exists(_missil, "timer_vida")) {
-                    _missil.timer_vida = 300;
-                }
-                
-                // Verificar tipo de alvo para usar míssil apropriado
-                if (alvo_em_mira.object_index == obj_helicoptero_militar || alvo_em_mira.object_index == obj_caca_f5) {
-                    // Alvo aéreo - míssil ar-ar
-                    _missil.dano = dano_missil_ar_ar;
-                    _missil.speed = 12;
-                    _missil.timer_vida = 120;
-                    _missil.image_xscale = 2.5;
-                    _missil.image_yscale = 2.5;
-                    _missil.image_blend = c_red;
-                    show_debug_message("🚀 F-6 lançou míssil ar-ar em alvo aéreo!");
+                // ✅ VALIDAÇÃO: Verificar se alvo ainda existe antes de atribuir
+                if (instance_exists(alvo_em_mira)) {
+                    _missil.target = alvo_em_mira;
+                    _missil.alvo = alvo_em_mira;
+                    _missil.dono = id;
+                    
+                    show_debug_message("🚀 F-6 lançou " + _tipo_missil + " em " + object_get_name(alvo_em_mira.object_index) + "!");
+                    timer_ataque = intervalo_ataque;
                 } else {
-                    // Alvo terrestre - míssil ar-terra
-                    _missil.dano = dano_missil_ar_terra;
-                    _missil.speed = 10;
-                    _missil.timer_vida = 150;
-                    _missil.image_xscale = 2.0;
-                    _missil.image_yscale = 2.0;
-                    _missil.image_blend = c_yellow;
-                    show_debug_message("🚀 F-6 lançou míssil ar-terra em alvo terrestre!");
+                    // Alvo desapareceu - destruir míssil
+                    scr_return_projectile_to_pool(_missil);
+                    show_debug_message("⚠️ F-6: Alvo desapareceu antes de configurar míssil");
                 }
-                
-                _missil.direction = _angulo;
-                timer_ataque = intervalo_ataque;
+            } else {
+                show_debug_message("⚠️ ERRO: F-6 falhou ao criar míssil " + _tipo_missil);
             }
         }
     } 
-    // Se o alvo foi destruído, retornar ao estado anterior
+    // Se o alvo foi destruído, retornar ao estado anterior ou aguardar ordem do presidente
     else {
         show_debug_message("✅ Alvo destruído! F-6 retornando para: " + estado_anterior);
-        estado = estado_anterior;
+        // ✅ CORREÇÃO: Se estava patrulhando, não voltar para patrulha automática
+        // Voltar para "movendo" se tinha destino, ou "pousando" se não tinha
+        if (estado_anterior == "patrulhando") {
+            // Se tinha destino definido pelo presidente, continuar para lá
+            if (point_distance(x, y, destino_x, destino_y) > 20) {
+                estado = "movendo";
+            } else {
+                // Sem destino - pousar e aguardar nova ordem
+                estado = "pousando";
+                show_debug_message("🛬 F-6: Aguardando nova ordem do presidente.");
+            }
+        } else {
+            estado = estado_anterior;
+        }
         alvo_em_mira = noone;
         // Reduzir altitude de volta ao normal
         altura_voo = max(0, altura_voo - 3);
@@ -282,5 +348,9 @@ if (modo_teste && (game_get_speed(gamespeed_fps) % 180 == 0)) { // 180 frames = 
 if (hp_atual <= 0) {
     show_debug_message("💥 F-6 DESTRUÍDO! HP: " + string(hp_atual) + "/" + string(hp_max));
     show_debug_message("🎯 Teste de sistema de combate concluído!");
+    
+    // ✅ NOVO: Criar avião morto antes de destruir
+    scr_criar_aviao_morto(x, y, image_angle, sprite_index);
+    
     instance_destroy();
 }

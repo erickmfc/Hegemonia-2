@@ -11,8 +11,8 @@ custo_dinheiro = 500;
 custo_minerio = 100;
 
 // === SISTEMA DE VIDA ===
-hp_max = 500;
-hp_atual = 500;
+hp_max = 1500; // ✅ AUMENTADO: Mais resistente (era 500)
+hp_atual = 1500; // ✅ AUMENTADO: Mais resistente (era 500)
 destrutivel = true; // ✅ Banco pode ser destruído
 
 // === SISTEMA FINANCEIRO ===
@@ -34,6 +34,9 @@ juros_por_ciclo = 0;               // Juros calculados por ciclo
 // === ATIVAR SISTEMA FINANCEIRO ===
 // Marcar que o banco foi construído
 global.banco_construido = true;
+
+// === TERRENO PERMITIDO ===
+terreno_permitido = TERRAIN.CAMPO; // Bancos só em terreno de campo
 
 show_debug_message("🏦 Banco construído - Sistema financeiro ativado!");
 show_debug_message("💰 Empréstimo disponível: $" + string(global.emprestimo_disponivel));

@@ -234,6 +234,28 @@ function scr_aplicar_dano(unidade, dano) {
         // Verificar se foi destruída
         if (unidade.hp_atual <= 0) {
             unidade.hp_atual = 0;
+            
+            // ✅ NOVO: Verificar se é um avião antes de destruir
+            var _eh_aviao = false;
+            var _sprite_aviao = noone;
+            var _angulo_aviao = 0;
+            var _pos_x = unidade.x;
+            var _pos_y = unidade.y;
+            
+            // Lista de objetos de avião
+            if (unidade.object_index == obj_f15 || 
+                unidade.object_index == obj_su35 || 
+                unidade.object_index == obj_c100 || 
+                unidade.object_index == obj_caca_f5 || 
+                unidade.object_index == obj_helicoptero_militar || 
+                unidade.object_index == obj_f6 ||
+                unidade.object_index == obj_SkyFury_ar) {
+                
+                _eh_aviao = true;
+                _sprite_aviao = unidade.sprite_index;
+                _angulo_aviao = unidade.image_angle;
+            }
+            
             if (variable_instance_exists(unidade, "estado")) {
                 unidade.estado = "destruida";
             }
@@ -246,6 +268,12 @@ function scr_aplicar_dano(unidade, dano) {
             }
             
             scr_debug_log("COMBATE", "Unidade destruída: " + string(unidade.object_index));
+            
+            // ✅ NOVO: Se for avião, criar objeto de avião morto antes de destruir
+            if (_eh_aviao) {
+                scr_criar_aviao_morto(_pos_x, _pos_y, _angulo_aviao, _sprite_aviao);
+            }
+            
             instance_destroy(unidade);
         } else {
             scr_debug_log("COMBATE", "Dano aplicado: " + string(dano) + " HP restante: " + string(unidade.hp_atual));

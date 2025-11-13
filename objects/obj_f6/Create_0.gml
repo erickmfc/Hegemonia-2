@@ -11,13 +11,13 @@ desaceleracao = 0.025;
 velocidade_rotacao = 1.5;
 
 // --- ATRIBUTOS DE COMBATE ---
-hp_atual = 450; // HP inicial igual ao máximo
-hp_max = 450;
-nacao_proprietaria = 2; // Nação inimiga para testes
+hp_atual = 650; // HP inicial igual ao máximo
+hp_max = 650;
+nacao_proprietaria = 2; // ✅ Nação da IA (presidente) - F6 controlado pelo presidente
 radar_alcance = 500; // Aumentado para melhor detecção
 timer_ataque = 0;
 intervalo_ataque = 90; // Reduzido para ataques mais frequentes
-modo_ataque = false;
+modo_ataque = true; // ✅ Ativar modo ataque para o presidente usar o F6
 dano_missil_ar_ar = 95; // Dano do míssil ar-ar
 dano_missil_ar_terra = 95; // Dano do míssil ar-terra
 alcance_missil_ar_ar = 300; // Alcance míssil ar-ar
@@ -35,9 +35,10 @@ pontos_patrulha = ds_list_create();
 indice_patrulha_atual = 0;
 
 // --- CONTROLE ---
-destino_x = x;
-destino_y = y;
+destino_x = x; // ✅ Garantir que destino inicial é a posição do mapa
+destino_y = y; // ✅ Garantir que destino inicial é a posição do mapa
 selecionado = false;
+visible = true; // ✅ Garantir que está visível
 
 // --- NOVAS VARIÁVEIS PARA ATAQUE AGRESSIVO ---
 estado_anterior = "pousado"; // Guarda o que o avião estava fazendo antes de atacar
@@ -52,10 +53,10 @@ patrulha_y_max = 960;
 patrulha_ativa = true;  // Sistema de patrulha retangular ativo
 
 // --- CONFIGURAÇÕES DE TESTE ---
-modo_teste = true; // Modo especial para testes
-timer_decolagem_automatica = 300; // Decola automaticamente após 5 segundos
-patrulha_automatica = true; // Inicia patrulha automática
-raio_patrulha_teste = 220; // Raio da patrulha aumentado em 10% (200 → 220)
+modo_teste = false; // ✅ DESABILITADO: Presidente tem controle total sobre o F6
+timer_decolagem_automatica = 0; // ✅ DESABILITADO: Não decola automaticamente
+patrulha_automatica = false; // ✅ DESABILITADO: Não inicia patrulha automática
+raio_patrulha_teste = 220; // Mantido para referência (não usado quando modo_teste = false)
 
 show_debug_message("✈️ Caça F-6 criado - ALVO DE TESTE para mísseis ar-ar");
 show_debug_message("🎯 Nação: " + string(nacao_proprietaria) + " | HP: " + string(hp_atual) + " | Modo: TESTE");

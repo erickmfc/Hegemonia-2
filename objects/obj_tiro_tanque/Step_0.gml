@@ -4,6 +4,12 @@
 // ================================================
 
 // === VERIFICAÇÃO DE SEGURANÇA ===
+// ✅ VERIFICAÇÃO DE SEGURANÇA: Se está invisível ou desativado, não processar
+if (!visible || image_alpha <= 0 || speed <= 0) {
+    // Projétil já foi acertado ou está sendo desativado
+    exit;
+}
+
 if (!instance_exists(alvo)) {
     scr_return_projectile_to_pool(id);
     exit;
@@ -74,15 +80,53 @@ if (_passou_pelo_alvo || _esta_muito_perto || _colisao_linha) {
         }
     }
     
-    // ✅ CRÍTICO: Destruir projétil imediatamente após acertar
-    scr_return_projectile_to_pool(id);
+    // ✅ CRÍTICO: Destruir projétil IMEDIATAMENTE após acertar
+    // ✅ FORÇAR: Tornar invisível e desativar ANTES de retornar ao pool
+    visible = false;
+    image_alpha = 0;
+    image_xscale = 0;
+    image_yscale = 0;
+    speed = 0;
+    
+    // ✅ DESATIVAR IMEDIATAMENTE
+    instance_deactivate_object(id);
+    
+    // ✅ TENTAR RETORNAR AO POOL, MAS SE FALHAR, DESTRUIR DIRETAMENTE
+    var _pool_mgr = instance_find(obj_projectile_pool_manager, 0);
+    if (!instance_exists(_pool_mgr) || !_pool_mgr.pool_enabled) {
+        // Pool não disponível - destruir diretamente
+        instance_destroy(id);
+    } else {
+        // Tentar retornar ao pool
+        scr_return_projectile_to_pool(id);
+    }
+    
     exit;
 }
 
 // === TIMER DE VIDA ===
 timer_vida--;
 if (timer_vida <= 0) {
-    scr_return_projectile_to_pool(id);
+    // ✅ CRÍTICO: Destruir projétil IMEDIATAMENTE quando timer expira
+    visible = false;
+    image_alpha = 0;
+    image_xscale = 0;
+    image_yscale = 0;
+    speed = 0;
+    
+    // ✅ DESATIVAR IMEDIATAMENTE
+    instance_deactivate_object(id);
+    
+    // ✅ TENTAR RETORNAR AO POOL, MAS SE FALHAR, DESTRUIR DIRETAMENTE
+    var _pool_mgr = instance_find(obj_projectile_pool_manager, 0);
+    if (!instance_exists(_pool_mgr) || !_pool_mgr.pool_enabled) {
+        // Pool não disponível - destruir diretamente
+        instance_destroy(id);
+    } else {
+        // Tentar retornar ao pool
+        scr_return_projectile_to_pool(id);
+    }
+    
     exit;
 }
 

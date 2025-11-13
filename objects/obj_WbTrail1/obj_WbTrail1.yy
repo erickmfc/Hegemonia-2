@@ -2,15 +2,17 @@
   "$GMObject":"",
   "%Name":"obj_WbTrail1",
   "eventList":[
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0"},
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0"},
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":8,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0"}],
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":8,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
+  ],
   "managed":true,
   "name":"obj_WbTrail1",
   "overriddenProperties":[],
   "parent":{
     "name":"equipamentos",
-    "path":"folders/Sprites/naval/equipamentos.yy"},
+    "path":"folders/Sprites/naval/equipamentos.yy",
+  },
   "parentObjectId":null,
   "persistent":false,
   "physicsAngularDamping":0.1,
@@ -31,6 +33,8 @@
   "solid":false,
   "spriteId":{
     "name":"WbTrail1",
-    "path":"sprites/WbTrail1/WbTrail1.yy"},
+    "path":"sprites/WbTrail1/WbTrail1.yy",
+  },
   "spriteMaskId":null,
-  "visible":true}
+  "visible":true,
+}

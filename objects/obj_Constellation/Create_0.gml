@@ -15,7 +15,7 @@ if (object_get_parent(object_index) != -1) {
 // Atributos únicos do Constellation
 hp_atual = 800;
 hp_max = 800;
-velocidade_movimento = 2.5;
+velocidade_movimento = 1.2;
 radar_alcance = 1000; // IGUAL aos outros navios
 missil_alcance = 1000; // IGUAL aos outros navios
 alcance_ataque = missil_alcance;

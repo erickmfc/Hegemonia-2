@@ -7,6 +7,11 @@
 // DRAW - Otimizado com verificação de visibilidade
 // =============================================
 
+// ✅ NÃO DESENHAR SE ESTÁ DESATIVADO OU INVISÍVEL
+if (!visible || image_alpha <= 0 || speed <= 0) {
+    exit;
+}
+
 // ✅ OTIMIZAÇÃO: Verificar se deve desenhar
 if (!scr_should_draw(id)) {
     if (instance_exists(obj_draw_optimizer)) {

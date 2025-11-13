@@ -21,10 +21,9 @@ if (!instance_exists(target)) {
     exit;
 }
 
-// Aquisição/Manutenção de alvo (fallback se não veio setado)
-if (target == noone && instance_exists(obj_inimigo)) {
-    target = instance_nearest(x, y, obj_inimigo);
-}
+// ✅ CORREÇÃO: Removida aquisição automática de alvos
+// Míssil só deve existir se tiver alvo válido definido pelo avião
+// Se target == noone, o míssil já foi destruído acima (linha 10-22)
 
 // Detectar se o alvo está parado para garantir 100% de acerto
 var alvo_parado = false;
@@ -44,7 +43,7 @@ if (instance_exists(target)) {
 // Guiamento pesado - só segue alvo se estiver próximo
 if (instance_exists(target)) {
     var _distancia_alvo = point_distance(x, y, target.x, target.y);
-    var _distancia_maxima_rastreamento = 400; // Só rastreia se estiver a menos de 400px
+    var _distancia_maxima_rastreamento = 600; // ✅ MELHORADO: Só rastreia se estiver a menos de 600px (era 400)
     
     // Só faz curva se estiver próximo do alvo
     if (_distancia_alvo <= _distancia_maxima_rastreamento) {

@@ -6,8 +6,8 @@ hp_max = 100;
 // Compatibilidade com código antigo
 vida = hp_atual;
 vida_max = hp_max;
-dano = 20;
-velocidade = 2;
+dano = 15;
+velocidade = 0.8;
 
 // Nação proprietária (1 = jogador, 2 = IA inimiga)
 nacao_proprietaria = 1;
@@ -19,15 +19,24 @@ estado = "parado";
 // Movimento
 destino_x = x;
 destino_y = y;
+destino_original_x = undefined; // Para sistema de desvio de obstáculos
+destino_original_y = undefined; // Para sistema de desvio de obstáculos
 
 // Patrulha (sistema melhorado)
 patrulha = ds_list_create();
 patrulha_indice = 0;
 modo_patrulha = false; // true quando está no modo de definir patrulha
 
+// ✅ NOVO: Sistema de patrulha igual navios/aviões
+pontos_patrulha = ds_list_create();
+indice_patrulha_atual = 0;
+
+// === TERRENOS PERMITIDOS ===
+terrenos_permitidos = [TERRAIN.CAMPO, TERRAIN.FLORESTA, TERRAIN.DESERTO]; // Terra, floresta, deserto
+
 // Ataque
-alcance_visao = 200; // Maior que o alcance de tiro para detectar inimigos
-alcance = 180; // Alcance de tiro padronizado
+alcance_visao = 300; // Maior que o alcance de tiro para detectar inimigos (aumentado proporcionalmente)
+alcance = 270; // Alcance de tiro padronizado - AUMENTADO 50% (era 180, agora 270)
 // Compatibilidade com código antigo
 alcance_tiro = alcance;
 atq_cooldown = 0;

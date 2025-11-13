@@ -84,11 +84,33 @@ if (estado_transporte == NavioTransporteEstado.EMBARQUE_ATIVO && modo_embarque) 
         // ✅ SISTEMA UNIFICADO: Detectar TODAS as unidades e embarcar automaticamente
         var _unidades_detectadas = ds_list_create();
         
+        // ✅ CORREÇÃO: Usar detecção por retângulo em vez de círculo (igual ao pai)
+        var _largura = variable_instance_exists(id, "largura_embarque") ? largura_embarque : 200;
+        var _altura = variable_instance_exists(id, "altura_embarque") ? altura_embarque : 960; // ✅ AUMENTADO: 50% proa + 50% popa (960 = 480 + 240 + 240)
+        var _half_w = _largura / 2;
+        var _half_h = _altura / 2;
+        
+        // Função auxiliar para verificar se ponto está dentro do retângulo rotacionado
+        var _ponto_no_retangulo = function(px, py, cx, cy, w, h, angulo) {
+            var _angulo_rad = degtorad(angulo);
+            var _cos_a = dcos(_angulo_rad);
+            var _sin_a = dsin(_angulo_rad);
+            
+            // Converter ponto para coordenadas locais do navio
+            var _dx = px - cx;
+            var _dy = py - cy;
+            var _local_x = _dx * _cos_a + _dy * _sin_a;
+            var _local_y = -_dx * _sin_a + _dy * _cos_a;
+            
+            // Verificar se está dentro do retângulo
+            return (abs(_local_x) <= w/2 && abs(_local_y) <= h/2);
+        };
+        
         // Coletar TODAS as unidades próximas (qualquer tipo que funciona com o porta-aviões)
         with (obj_infantaria) {
             if (variable_instance_exists(id, "nacao_proprietaria") && 
                 nacao_proprietaria == other.nacao_proprietaria && 
-                point_distance(other.x, other.y, x, y) < other.raio_embarque &&
+                _ponto_no_retangulo(x, y, other.x, other.y, _largura, _altura, other.image_angle) &&
                 visible) {
                 ds_list_add(_unidades_detectadas, id);
             }
@@ -97,84 +119,48 @@ if (estado_transporte == NavioTransporteEstado.EMBARQUE_ATIVO && modo_embarque) 
         with (obj_soldado_antiaereo) {
             if (variable_instance_exists(id, "nacao_proprietaria") && 
                 nacao_proprietaria == other.nacao_proprietaria && 
-                point_distance(other.x, other.y, x, y) < other.raio_embarque &&
+                _ponto_no_retangulo(x, y, other.x, other.y, _largura, _altura, other.image_angle) &&
                 visible) {
                 ds_list_add(_unidades_detectadas, id);
             }
         }
         
         with (obj_tanque) {
-            show_debug_message("--- [RONALD] Verificando Tanque ID: " + string(id) + " ---");
-            
-            var cond1_nacao_existe = variable_instance_exists(id, "nacao_proprietaria");
-            var cond2_nacao_ok = false;
-            var tanque_nacao_str = "N/A"; // Valor padrão caso a variável não exista
-            
-            // ✅ CORREÇÃO: Só lê 'nacao_proprietaria' DEPOIS de confirmar que existe
-            if (cond1_nacao_existe) {
-                cond2_nacao_ok = (nacao_proprietaria == other.nacao_proprietaria);
-                tanque_nacao_str = string(nacao_proprietaria); // Lê o valor de forma segura aqui
-            }
-            
-            var dist = point_distance(other.x, other.y, x, y);
-            var raio = other.raio_embarque;
-            var cond3_distancia_ok = (dist < raio);
-            var cond4_visivel_ok = visible;
-            
-            // <<< DEBUG: Mostrar o status de cada condição >>>
-            show_debug_message("  Condição 1 (Nação Existe): " + string(cond1_nacao_existe));
-            show_debug_message("  Condição 2 (Nação OK): " + string(cond2_nacao_ok) + " (Tanque: " + tanque_nacao_str + " | Navio: " + string(other.nacao_proprietaria) + ")");
-            show_debug_message("  Condição 3 (Distância OK): " + string(cond3_distancia_ok) + " (Dist: " + string(dist) + " < Raio: " + string(raio) + ")");
-            show_debug_message("  Condição 4 (Visível OK): " + string(cond4_visivel_ok));
-            
-            // Bloco original, mas agora sabemos por que falha se não entrar
-            if (cond1_nacao_existe && cond2_nacao_ok && cond3_distancia_ok && cond4_visivel_ok) {
+            if (variable_instance_exists(id, "nacao_proprietaria") && 
+                nacao_proprietaria == other.nacao_proprietaria && 
+                _ponto_no_retangulo(x, y, other.x, other.y, _largura, _altura, other.image_angle) &&
+                visible) {
                 ds_list_add(_unidades_detectadas, id);
-                show_debug_message("  >>> SUCESSO: Tanque adicionado à lista!");
-            } else {
-                show_debug_message("  >>> FALHA: Tanque não atende a todas as condições.");
             }
-            show_debug_message("------------------------------------");
         }
         
         with (obj_blindado_antiaereo) {
-            show_debug_message("--- [RONALD] Verificando Blindado ID: " + string(id) + " ---");
-            
-            var cond1_nacao_existe = variable_instance_exists(id, "nacao_proprietaria");
-            var cond2_nacao_ok = false;
-            var blindado_nacao_str = "N/A"; // Valor padrão caso a variável não exista
-            
-            // ✅ CORREÇÃO: Só lê 'nacao_proprietaria' DEPOIS de confirmar que existe
-            if (cond1_nacao_existe) {
-                cond2_nacao_ok = (nacao_proprietaria == other.nacao_proprietaria);
-                blindado_nacao_str = string(nacao_proprietaria); // Lê o valor de forma segura aqui
-            }
-            
-            var dist = point_distance(other.x, other.y, x, y);
-            var raio = other.raio_embarque;
-            var cond3_distancia_ok = (dist < raio);
-            var cond4_visivel_ok = visible;
-            
-            // <<< DEBUG: Mostrar o status de cada condição >>>
-            show_debug_message("  Condição 1 (Nação Existe): " + string(cond1_nacao_existe));
-            show_debug_message("  Condição 2 (Nação OK): " + string(cond2_nacao_ok) + " (Blindado: " + blindado_nacao_str + " | Navio: " + string(other.nacao_proprietaria) + ")");
-            show_debug_message("  Condição 3 (Distância OK): " + string(cond3_distancia_ok) + " (Dist: " + string(dist) + " < Raio: " + string(raio) + ")");
-            show_debug_message("  Condição 4 (Visível OK): " + string(cond4_visivel_ok));
-            
-            // Bloco original, mas agora sabemos por que falha se não entrar
-            if (cond1_nacao_existe && cond2_nacao_ok && cond3_distancia_ok && cond4_visivel_ok) {
+            if (variable_instance_exists(id, "nacao_proprietaria") && 
+                nacao_proprietaria == other.nacao_proprietaria && 
+                _ponto_no_retangulo(x, y, other.x, other.y, _largura, _altura, other.image_angle) &&
+                visible) {
                 ds_list_add(_unidades_detectadas, id);
-                show_debug_message("  >>> SUCESSO: Blindado adicionado à lista!");
-            } else {
-                show_debug_message("  >>> FALHA: Blindado não atende a todas as condições.");
             }
-            show_debug_message("------------------------------------");
+        }
+        
+        // ✅ CORREÇÃO: Verificar M1A Abrams também (garantir que está sendo detectado)
+        var _obj_abrams = asset_get_index("obj_M1A_Abrams");
+        if (_obj_abrams != -1 && asset_get_type(_obj_abrams) == asset_object) {
+            with (_obj_abrams) {
+                if (variable_instance_exists(id, "nacao_proprietaria") && 
+                    nacao_proprietaria == other.nacao_proprietaria && 
+                    _ponto_no_retangulo(x, y, other.x, other.y, _largura, _altura, other.image_angle) &&
+                    visible) {
+                    ds_list_add(_unidades_detectadas, id);
+                    show_debug_message("✅ [RONALD] M1A Abrams detectado e adicionado para embarque! ID: " + string(id));
+                }
+            }
         }
         
         with (obj_caca_f5) {
             if (variable_instance_exists(id, "nacao_proprietaria") && 
                 nacao_proprietaria == other.nacao_proprietaria && 
-                point_distance(other.x, other.y, x, y) < other.raio_embarque &&
+                _ponto_no_retangulo(x, y, other.x, other.y, _largura, _altura, other.image_angle) &&
                 visible) {
                 ds_list_add(_unidades_detectadas, id);
             }
@@ -183,7 +169,7 @@ if (estado_transporte == NavioTransporteEstado.EMBARQUE_ATIVO && modo_embarque) 
         with (obj_f15) {
             if (variable_instance_exists(id, "nacao_proprietaria") && 
                 nacao_proprietaria == other.nacao_proprietaria && 
-                point_distance(other.x, other.y, x, y) < other.raio_embarque &&
+                _ponto_no_retangulo(x, y, other.x, other.y, _largura, _altura, other.image_angle) &&
                 visible) {
                 ds_list_add(_unidades_detectadas, id);
             }
@@ -192,7 +178,7 @@ if (estado_transporte == NavioTransporteEstado.EMBARQUE_ATIVO && modo_embarque) 
         with (obj_helicoptero_militar) {
             if (variable_instance_exists(id, "nacao_proprietaria") && 
                 nacao_proprietaria == other.nacao_proprietaria && 
-                point_distance(other.x, other.y, x, y) < other.raio_embarque &&
+                _ponto_no_retangulo(x, y, other.x, other.y, _largura, _altura, other.image_angle) &&
                 visible) {
                 ds_list_add(_unidades_detectadas, id);
             }
@@ -201,7 +187,7 @@ if (estado_transporte == NavioTransporteEstado.EMBARQUE_ATIVO && modo_embarque) 
         with (obj_c100) {
             if (variable_instance_exists(id, "nacao_proprietaria") && 
                 nacao_proprietaria == other.nacao_proprietaria && 
-                point_distance(other.x, other.y, x, y) < other.raio_embarque &&
+                _ponto_no_retangulo(x, y, other.x, other.y, _largura, _altura, other.image_angle) &&
                 visible) {
                 ds_list_add(_unidades_detectadas, id);
             }
