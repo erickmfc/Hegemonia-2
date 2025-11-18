@@ -85,7 +85,7 @@ if (instance_exists(target)) {
         }
         
         // ✅ NOVO: DANO EM ÁREA - MATA TODOS OS SOLDADOS PRÓXIMOS
-        var _raio_dano_area = (variable_instance_exists(id, "raio_dano_area") ? raio_dano_area : 150);
+        var _raio_dano_area = (variable_instance_exists(id, "raio_dano_area") ? raio_dano_area : 450); // ✅ AUMENTADO de 150 para 450
         var _dano_area_valor = (variable_instance_exists(id, "dano_area") ? dano_area : 1000);
         
         // Lista de objetos terrestres para verificar

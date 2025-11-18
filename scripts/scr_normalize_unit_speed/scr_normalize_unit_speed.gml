@@ -10,9 +10,9 @@ function scr_normalize_unit_speed(base_speed) {
     }
     
     // Zoom de referência (zoom médio onde a velocidade visual é "correta")
-    // Use um valor médio entre min (3.5) e max (25.0) = ~14.0
+    // Use um valor médio entre min (3.5) e max (35.0) = ~19.25
     // Ajuste este valor conforme necessário para calibrar a velocidade
-    var zoom_reference = 10.0; // Ajuste este valor conforme necessário
+    var zoom_reference = 15.0; // Ajuste este valor conforme necessário
     
     // Normalizar: zoom alto = mover mais devagar no mundo, zoom baixo = mover mais rápido
     // Isso mantém a velocidade visual (pixels/segundo na tela) constante

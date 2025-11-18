@@ -51,17 +51,37 @@ funcao_desembarcar_soldado = function() {
     soldados_count--;
     
     if (instance_exists(_soldado_id)) {
+        // ✅ CORREÇÃO: Encontrar terra próxima antes de desembarcar
         var _dist = 80;
         var _angulo = image_angle + desembarque_offset_angulo;
+        var _x_tentativa = x + lengthdir_x(_dist, _angulo);
+        var _y_tentativa = y + lengthdir_y(_dist, _angulo);
         
-        _soldado_id.x = x + lengthdir_x(_dist, _angulo);
-        _soldado_id.y = y + lengthdir_y(_dist, _angulo);
+        // ✅ NOVO: Verificar se posição é terra válida
+        var _terra_valida = scr_encontrar_terra_proxima(_soldado_id, _x_tentativa, _y_tentativa, 300);
+        if (_terra_valida != noone && array_length(_terra_valida) >= 2) {
+            _soldado_id.x = _terra_valida[0];
+            _soldado_id.y = _terra_valida[1];
+        } else {
+            // Fallback: tentar outras direções
+            for (var _ang = 0; _ang < 360; _ang += 45) {
+                var _x_test = x + lengthdir_x(_dist, image_angle + _ang);
+                var _y_test = y + lengthdir_y(_dist, image_angle + _ang);
+                _terra_valida = scr_encontrar_terra_proxima(_soldado_id, _x_test, _y_test, 200);
+                if (_terra_valida != noone && array_length(_terra_valida) >= 2) {
+                    _soldado_id.x = _terra_valida[0];
+                    _soldado_id.y = _terra_valida[1];
+                    break;
+                }
+            }
+        }
+        
         _soldado_id.visible = true;
         
         desembarque_offset_angulo += 30;
         if (desembarque_offset_angulo >= 360) desembarque_offset_angulo = 0;
         
-        show_debug_message("👥 Soldado desembarcou!");
+        show_debug_message("👥 Soldado desembarcou em terra!");
     }
     return true;
 }
@@ -101,15 +121,34 @@ funcao_desembarcar_veiculo = function() {
     if (instance_exists(_veiculo_id)) {
         var _dist = 90;
         var _angulo = image_angle + desembarque_offset_angulo;
+        var _x_tentativa = x + lengthdir_x(_dist, _angulo);
+        var _y_tentativa = y + lengthdir_y(_dist, _angulo);
         
-        _veiculo_id.x = x + lengthdir_x(_dist, _angulo);
-        _veiculo_id.y = y + lengthdir_y(_dist, _angulo);
+        // ✅ NOVO: Verificar se posição é terra válida
+        var _terra_valida = scr_encontrar_terra_proxima(_veiculo_id, _x_tentativa, _y_tentativa, 300);
+        if (_terra_valida != noone && array_length(_terra_valida) >= 2) {
+            _veiculo_id.x = _terra_valida[0];
+            _veiculo_id.y = _terra_valida[1];
+        } else {
+            // Fallback: tentar outras direções
+            for (var _ang = 0; _ang < 360; _ang += 45) {
+                var _x_test = x + lengthdir_x(_dist, image_angle + _ang);
+                var _y_test = y + lengthdir_y(_dist, image_angle + _ang);
+                _terra_valida = scr_encontrar_terra_proxima(_veiculo_id, _x_test, _y_test, 200);
+                if (_terra_valida != noone && array_length(_terra_valida) >= 2) {
+                    _veiculo_id.x = _terra_valida[0];
+                    _veiculo_id.y = _terra_valida[1];
+                    break;
+                }
+            }
+        }
+        
         _veiculo_id.visible = true;
         
         desembarque_offset_angulo += 30;
         if (desembarque_offset_angulo >= 360) desembarque_offset_angulo = 0;
         
-        show_debug_message("🚛 Veículo desembarcou!");
+        show_debug_message("🚛 Veículo desembarcou em terra!");
     }
     return true;
 }

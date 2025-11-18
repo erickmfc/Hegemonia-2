@@ -184,7 +184,7 @@ function scr_corrigir_propriedades_objeto(objeto) {
         case obj_submarino:
         case obj_RonaldReagan:
             // Verificar se está em água
-            if (!scr_check_water_tile(objeto.x, objeto.y)) {
+            if (!scr_verificar_agua(objeto.x, objeto.y)) {
                 var pos_agua = scr_find_nearest_water(objeto.x, objeto.y, 500);
                 if (pos_agua[0] != -1) {
                     objeto.x = pos_agua[0];

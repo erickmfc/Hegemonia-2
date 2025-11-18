@@ -4,7 +4,7 @@
 // ===============================================
 
 // Duração do carregamento (5 segundos)
-tempo_total = 10.0; // segundos
+tempo_total = 5.0; // segundos
 tempo_atual = 0.0; // segundos decorridos
 
 // Progresso da barra (0.0 a 1.0)

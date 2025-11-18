@@ -283,8 +283,44 @@ if (_is_flying) {
 // Aplica o movimento (só se move se tiver velocidade)
 // ✅ CORREÇÃO: Normalizar velocidade baseado no zoom para manter velocidade visual constante
 var _vel_normalizada = scr_normalize_unit_speed(velocidade_atual);
-x += lengthdir_x(_vel_normalizada, image_angle);
-y += lengthdir_y(_vel_normalizada, image_angle);
+var _proxima_x = x + lengthdir_x(_vel_normalizada, image_angle);
+var _proxima_y = y + lengthdir_y(_vel_normalizada, image_angle);
+
+// ✅ NOVO: Validação de terreno para aviões
+// Se está pousado ou pousando (altura_voo == 0 ou muito baixa), deve estar em terra
+if (altura_voo <= 5 && (estado == "pousado" || estado == "pousando")) {
+    // Verificar se pode estar no terreno (deve ser terra, não água)
+    if (!scr_unidade_pode_terreno(id, _proxima_x, _proxima_y)) {
+        // Está tentando pousar em água - forçar decolagem
+        if (estado == "pousando") {
+            estado = "movendo";
+            altura_voo = 10; // Forçar altura mínima
+            if (variable_global_exists("debug_enabled") && global.debug_enabled) {
+                show_debug_message("⚠️ F-15: Tentativa de pouso em água bloqueada - decolando");
+            }
+        } else if (estado == "pousado") {
+            // Já está pousado em água - forçar decolagem imediata
+            estado = "decolando";
+            altura_voo = 5;
+            velocidade_atual = 2; // Velocidade mínima para decolar
+            // Tentar encontrar terra próxima
+            var _terra_proxima = scr_encontrar_terra_proxima(id, x, y, 1000);
+            if (_terra_proxima != noone && array_length(_terra_proxima) >= 2) {
+                destino_x = _terra_proxima[0];
+                destino_y = _terra_proxima[1];
+                if (variable_global_exists("debug_enabled") && global.debug_enabled) {
+                    show_debug_message("⚠️ F-15: Pousado em água - decolando para terra próxima");
+                }
+            }
+        }
+        // Não aplicar movimento se não pode estar no terreno
+        exit;
+    }
+}
+
+// Aplicar movimento se passou na validação
+x = _proxima_x;
+y = _proxima_y;
 
 // --- 5. LÓGICA DO TIMER DE ATAQUE ---
 if (timer_ataque > 0) {

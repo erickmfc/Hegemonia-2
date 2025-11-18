@@ -4,10 +4,18 @@
 // ===============================================
 
 // Incrementar contador global de frames
+if (!variable_global_exists("game_frame")) {
+    global.game_frame = 0;
+}
 global.game_frame++;
 
 // Resetar contador de debug a cada frame
-global.debug_reset_frame();
+// ✅ CORREÇÃO GM2043: Verificar se função existe antes de chamar
+if (variable_global_exists("debug_reset_frame")) {
+    if (is_function(global.debug_reset_frame)) {
+        global.debug_reset_frame();
+    }
+}
 
 // === SISTEMA DE LOD E OTIMIZAÇÃO PARA MAPAS GRANDES ===
 // Executar apenas a cada 5 frames para não sobrecarregar
@@ -19,9 +27,52 @@ if (global.game_frame mod 5 == 0) {
 }
 
 // ✅ OTIMIZAÇÃO: Reconstruir spatial grid a cada 60 frames (1 segundo a 60 FPS)
+// ✅ CORREÇÃO GM2043: Verificar se script existe antes de chamar
 if (variable_global_exists("spatial_grid_initialized") && global.spatial_grid_initialized) {
     if (global.game_frame mod 60 == 0) {
-        scr_rebuild_spatial_grid();
+        var _script_rebuild = asset_get_index("scr_rebuild_spatial_grid");
+        if (_script_rebuild != -1) {
+            scr_rebuild_spatial_grid();
+        }
+    }
+}
+
+// === SISTEMA DE DESTRUIÇÃO DE ESTRUTURAS ===
+// Verificar estruturas com HP <= 0 a cada 60 frames (1 segundo)
+// ✅ CORREÇÃO GM2043: Verificar se script existe antes de chamar
+if (global.game_frame mod 60 == 0) {
+    var _script_destruicao = asset_get_index("scr_verificar_destruicao_estruturas");
+    if (_script_destruicao != -1) {
+        scr_verificar_destruicao_estruturas();
+    }
+}
+
+// === ✅ NOVO: CORRIGIR UNIDADES EM TERRENO ERRADO ===
+// Verificar e corrigir unidades em terreno inválido a cada 5 segundos
+if (global.game_frame mod 300 == 0) {
+    var _script_corrigir = asset_get_index("scr_corrigir_unidades_terreno_errado");
+    if (_script_corrigir != -1) {
+        scr_corrigir_unidades_terreno_errado();
+    }
+}
+
+// === SISTEMA DE VALIDAÇÃO PERIÓDICA ===
+// ✅ NOVO: Validação automática a cada 5-10 segundos
+// Verifica variáveis globais, instâncias órfãs, data structures e corrige problemas
+// ✅ CORREÇÃO GM2043: Verificar se script existe antes de chamar
+var _script_validacao = asset_get_index("scr_validacao_periodica");
+if (_script_validacao != -1) {
+    scr_validacao_periodica();
+}
+
+// === SISTEMA DE LIMPEZA AUTOMÁTICA DE MEMÓRIA ===
+// ✅ NOVO: Limpeza automática a cada 10 segundos (600 frames)
+// Remove referências órfãs, projéteis inativos, partículas antigas
+// ✅ CORREÇÃO GM2043: Verificar se script existe antes de chamar
+if (global.game_frame mod 600 == 0) {
+    var _script_limpeza = asset_get_index("scr_limpeza_automatica_memoria");
+    if (_script_limpeza != -1) {
+        scr_limpeza_automatica_memoria();
     }
 }
 
@@ -96,22 +147,37 @@ if (global.taxa_inflacao > 0.6) {
 
     // === SISTEMA FINANCEIRO - PAGAMENTO DE JUROS ===
     // Pagamento automático de juros mensal (a cada 30 segundos)
-    if (global.divida_total > 0 && global.game_frame % (room_speed * 30) == 0) {
+    // ✅ CORREÇÃO GM2043: Verificar se variáveis existem antes de usar
+    if (variable_global_exists("divida_total") && variable_global_exists("game_frame") && 
+        variable_global_exists("room_speed") && global.divida_total > 0 && 
+        global.game_frame % (room_speed * 30) == 0) {
         // Verificar se tem dinheiro suficiente para pagar juros
-        if (global.dinheiro >= global.juros_mensais) {
+        // ✅ CORREÇÃO GM2043: Verificar se variáveis existem antes de usar
+        if (variable_global_exists("dinheiro") && variable_global_exists("juros_mensais") &&
+            global.dinheiro >= global.juros_mensais) {
             // Pagar juros
             global.dinheiro -= global.juros_mensais;
-            global.estoque_recursos[? "Dinheiro"] = global.dinheiro;
+            // ✅ CORREÇÃO GM2043: Verificar se estoque_recursos existe antes de atualizar
+            if (variable_global_exists("estoque_recursos") && ds_exists(global.estoque_recursos, ds_type_map)) {
+                ds_map_replace(global.estoque_recursos, "Dinheiro", global.dinheiro);
+            }
             
             show_debug_message("💸 JUROS PAGOS: $" + string(global.juros_mensais));
             show_debug_message("💰 Dinheiro restante: $" + string(global.dinheiro));
             show_debug_message("📊 Dívida restante: $" + string(global.divida_total));
         } else {
             // Não tem dinheiro suficiente - dívida aumenta
-            var _juros_nao_pagos = global.juros_mensais - global.dinheiro;
-            global.divida_total += _juros_nao_pagos;
-            global.dinheiro = 0;
-            global.estoque_recursos[? "Dinheiro"] = global.dinheiro;
+            // ✅ CORREÇÃO GM2043: Verificar se variáveis existem antes de usar
+            if (variable_global_exists("juros_mensais") && variable_global_exists("dinheiro") &&
+                variable_global_exists("divida_total")) {
+                var _juros_nao_pagos = global.juros_mensais - global.dinheiro;
+                global.divida_total += _juros_nao_pagos;
+                global.dinheiro = 0;
+                // ✅ CORREÇÃO GM2043: Verificar se estoque_recursos existe antes de atualizar
+                if (variable_global_exists("estoque_recursos") && ds_exists(global.estoque_recursos, ds_type_map)) {
+                    ds_map_replace(global.estoque_recursos, "Dinheiro", global.dinheiro);
+                }
+            }
             
             show_debug_message("⚠️ JUROS NÃO PAGOS!");
             show_debug_message("💸 Juros devidos: $" + string(global.juros_mensais));
@@ -123,43 +189,60 @@ if (global.taxa_inflacao > 0.6) {
 
 // === SISTEMA DE CONSUMO SIMPLIFICADO ===
 // Executa a cada ciclo (30 minutos)
-if (global.game_frame % (room_speed * 1800) == 0) {
+// ✅ CORREÇÃO GM2043: Verificar se variáveis existem antes de usar
+if (variable_global_exists("game_frame") && variable_global_exists("room_speed") &&
+    global.game_frame % (room_speed * 1800) == 0) {
     
     // === CONSUMO DE ALIMENTO ===
-    var consumo_total = global.populacao * 0.5; // 0.5 Alimento por pessoa por ciclo
-    
-    if (global.alimento >= consumo_total) {
-        // População bem alimentada
-        global.alimento -= consumo_total;
-        global.estoque_recursos[? "Alimento"] = global.alimento;
+    // ✅ CORREÇÃO GM2043: Verificar se variáveis existem antes de usar
+    if (variable_global_exists("populacao") && variable_global_exists("alimento")) {
+        var consumo_total = global.populacao * 0.5; // 0.5 Alimento por pessoa por ciclo
         
-        // Crescimento populacional (1% por ciclo se bem alimentada)
-        // MAS APENAS SE NÃO EXCEDER O LIMITE POPULACIONAL
-        var crescimento = floor(global.populacao * 0.01);
-        var _nova_populacao = global.populacao + crescimento;
-        
-        // Verificar se não excede o limite populacional
-        if (_nova_populacao <= global.limite_populacional) {
-            global.populacao = _nova_populacao;
-            global.estoque_recursos[? "População"] = global.populacao;
-            show_debug_message("📈 Crescimento: +" + string(crescimento) + " pessoas");
-        } else {
-            // Crescimento limitado pelo limite populacional
-            var _crescimento_limite = global.limite_populacional - global.populacao;
-            if (_crescimento_limite > 0) {
-                global.populacao += _crescimento_limite;
-                global.estoque_recursos[? "População"] = global.populacao;
-                show_debug_message("📈 Crescimento limitado: +" + string(_crescimento_limite) + " pessoas");
-            } else {
-                show_debug_message("🚫 Limite populacional atingido! Construa mais casas para crescer.");
+        if (global.alimento >= consumo_total) {
+            // População bem alimentada
+            global.alimento -= consumo_total;
+            // ✅ CORREÇÃO GM2043: Verificar se estoque_recursos existe antes de atualizar
+            if (variable_global_exists("estoque_recursos") && ds_exists(global.estoque_recursos, ds_type_map)) {
+                ds_map_replace(global.estoque_recursos, "Alimento", global.alimento);
             }
+        
+            // Crescimento populacional (1% por ciclo se bem alimentada)
+            // MAS APENAS SE NÃO EXCEDER O LIMITE POPULACIONAL
+            var crescimento = floor(global.populacao * 0.01);
+            var _nova_populacao = global.populacao + crescimento;
+            
+            // Verificar se não excede o limite populacional
+            // ✅ CORREÇÃO GM2043: Verificar se variáveis existem antes de usar
+            if (variable_global_exists("limite_populacional") && _nova_populacao <= global.limite_populacional) {
+                global.populacao = _nova_populacao;
+                // ✅ CORREÇÃO GM2043: Verificar se estoque_recursos existe antes de atualizar
+                if (variable_global_exists("estoque_recursos") && ds_exists(global.estoque_recursos, ds_type_map)) {
+                    ds_map_replace(global.estoque_recursos, "População", global.populacao);
+                }
+                show_debug_message("📈 Crescimento: +" + string(crescimento) + " pessoas");
+            } else {
+                // Crescimento limitado pelo limite populacional
+                // ✅ CORREÇÃO GM2043: Verificar se variáveis existem antes de usar
+                if (variable_global_exists("limite_populacional")) {
+                    var _crescimento_limite = global.limite_populacional - global.populacao;
+                    if (_crescimento_limite > 0) {
+                        global.populacao += _crescimento_limite;
+                        // ✅ CORREÇÃO GM2043: Verificar se estoque_recursos existe antes de atualizar
+                        if (variable_global_exists("estoque_recursos") && ds_exists(global.estoque_recursos, ds_type_map)) {
+                            ds_map_replace(global.estoque_recursos, "População", global.populacao);
+                        }
+                        show_debug_message("📈 Crescimento limitado: +" + string(_crescimento_limite) + " pessoas");
+                    } else {
+                        show_debug_message("🚫 Limite populacional atingido! Construa mais casas para crescer.");
+                    }
+                }
+            }
+            
+            show_debug_message("🍽️ Consumo: " + string(consumo_total) + " Alimento");
+            show_debug_message("👥 População total: " + string(global.populacao));
+        } else {
+            // População mal alimentada - sem crescimento
+            show_debug_message("⚠️ População mal alimentada - sem crescimento");
         }
-        
-        show_debug_message("🍽️ Consumo: " + string(consumo_total) + " Alimento");
-        show_debug_message("👥 População total: " + string(global.populacao));
-        
-    } else {
-        // População mal alimentada - sem crescimento
-        show_debug_message("⚠️ População mal alimentada - sem crescimento");
     }
 }

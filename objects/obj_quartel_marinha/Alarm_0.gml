@@ -42,6 +42,35 @@ if (produzindo && !ds_queue_empty(fila_producao)) {
             _unidade_criada.nacao_proprietaria = nacao_proprietaria;
             show_debug_message("✅ " + _unidade_data.nome + " #" + string(unidades_produzidas) + " criada!");
             
+            // ✅ NOVO - FASE 4: Comandar unidade criada se for da IA
+            if (nacao_proprietaria == 2) {
+                var _presidente = instance_find(obj_presidente_1, 0);
+                if (instance_exists(_presidente)) {
+                    // ✅ CORREÇÃO: Verificar se script existe antes de chamar
+                    var _script_id = asset_get_index("scr_ia_comando_unidades");
+                    if (_script_id != -1) {
+                        scr_ia_comando_unidade_criada(_unidade_criada, _presidente);
+                    } else {
+                        show_debug_message("⚠️ scr_ia_comando_unidades não encontrado!");
+                    }
+                    
+                    // ✅ NOVO - FASE 7: Registrar recrutamento
+                    // ✅ CORREÇÃO: Verificar se scripts existem antes de chamar
+                    var _script_classificar = asset_get_index("scr_ia_classificar_poder_unidades");
+                    var _script_monitorar = asset_get_index("scr_ia_monitorar_performance");
+                    
+                    if (_script_classificar != -1 && _script_monitorar != -1) {
+                        var _tier = classificar_poder_unidade(_unidade_criada.object_index);
+                        var _eh_elite = eh_tier_elite(_tier);
+                        scr_ia_registrar_recrutamento(_presidente, _unidade_criada.object_index, _eh_elite);
+                    } else {
+                        if (global.debug_enabled) {
+                            show_debug_message("⚠️ Scripts de classificação/monitoramento não encontrados!");
+                        }
+                    }
+                }
+            }
+            
             // Debug específico para Independence
             if (_unidade_data.nome == "Independence") {
                 show_debug_message("🚢 INDEPENDENCE CRIADA COM SUCESSO!");

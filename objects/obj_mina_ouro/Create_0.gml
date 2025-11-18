@@ -6,8 +6,24 @@
 // Executar o código do objeto pai primeiro
 event_inherited();
 
-// Configurar as propriedades específicas da Mina de Ouro
+// === CUSTOS DE CONSTRUÇÃO ===
+custo_dinheiro = 2500;
+custo_minerio = 500;
+
+// === SISTEMA DE VIDA ===
+hp_max = 600;
+hp_atual = 600;
+destrutivel = true;
+
+// === SISTEMA DE PRODUÇÃO ===
 producao_por_ciclo = 2;     // Produz 2 unidades de ouro por ciclo
 tipo_recurso = "ouro";     // Tipo de recurso produzido
 
-show_debug_message("Mina de Ouro criada - Produção: " + string(producao_por_ciclo) + " ouro a cada 10 segundos");
+// === VARIÁVEIS DE SELEÇÃO ===
+selecionado = false;
+timer_feedback = 0;
+
+// === TERRENO PERMITIDO ===
+terreno_permitido = TERRAIN.CAMPO; // Minas só em terreno de campo
+
+show_debug_message("⛏️ Mina de Ouro criada - Produção: " + string(producao_por_ciclo) + " ouro a cada 10 segundos");

@@ -30,11 +30,11 @@ var _menu_h = _gui_h * 0.9;
 var _menu_x = (_gui_w - _menu_w) / 2;
 var _menu_y = (_gui_h - _menu_h) / 2;
 
-// === BOTÃO FECHAR ===
-var _close_w = 140;
-var _close_h = 45;
+// === BOTÃO FECHAR (PADRONIZADO - SINCRONIZADO COM DRAW) ===
+var _close_w = 168; // Padronizado com menu de recrutamento
+var _close_h = 54;  // Padronizado com menu de recrutamento
 var _close_x = _menu_x + _menu_w - _close_w - 20;
-var _close_y = _menu_y + _menu_h - 60;
+var _close_y = _menu_y + _menu_h - 72; // Sincronizado com Draw_64.gml
 
 show_debug_message("🔍 Verificando botão FECHAR:");
 show_debug_message("   Mouse: (" + string(_mouse_gui_x) + ", " + string(_mouse_gui_y) + ")");
@@ -62,8 +62,11 @@ var _grid_h = _menu_h - _header_h - _recursos_h - 180;
 var _cols = 3;
 var _rows = 2;
 var _card_spacing = 20;
-var _card_w = (_menu_w - 40 - (_cols - 1) * _card_spacing) / _cols;
-var _card_h = (_grid_h - (_rows - 1) * _card_spacing) / _rows;
+// ✅ CORREÇÃO: Sincronizar cálculo com Draw_64.gml
+var _espaco_disponivel_w = _menu_w - 40 - (_cols - 1) * _card_spacing;
+var _espaco_disponivel_h = _grid_h - (_rows - 1) * _card_spacing;
+var _card_w = (_espaco_disponivel_w / _cols) * 0.85;
+var _card_h = (_espaco_disponivel_h / _rows) * 0.85 * 1.1; // ✅ Sincronizado com Draw
 
 if (meu_quartel_id == noone || !instance_exists(meu_quartel_id)) {
     instance_destroy();
@@ -82,13 +85,26 @@ for (var i = 0; i < min(_total_navios, 6); i++) {
     var _col = i mod _cols;
     var _row = floor(i / _cols);
     var _card_x = _menu_x + 20 + _col * (_card_w + _card_spacing);
+    // ✅ CORREÇÃO: Sincronizar cálculo de _card_y com Draw_64.gml
     var _card_y = _grid_start_y + _row * (_card_h + _card_spacing);
+    if (_row == 1) {
+        _card_y += _card_h * 0.2; // Mover segunda linha 20% para baixo (sincronizado com Draw)
+    }
+    
+    // ✅ CORREÇÃO: Calcular posição do botão PRODUZIR (sincronizado com Draw_64.gml)
+    var _btn_y = _card_y + _card_h - 35;
+    var _btn_h = 30;
+    var _btn_w = _card_w - 30;
+    var _btn_x = _card_x + 15;
     
     show_debug_message("   Card " + string(i) + " (" + _navio.nome + "): (" + string(_card_x) + ", " + string(_card_y) + ") até (" + string(_card_x + _card_w) + ", " + string(_card_y + _card_h) + ")");
+    show_debug_message("   Botão PRODUZIR: (" + string(_btn_x) + ", " + string(_btn_y) + ") até (" + string(_btn_x + _btn_w) + ", " + string(_btn_y + _btn_h) + ")");
     
-    // Verificar clique no card
-    if (_mouse_gui_x >= _card_x && _mouse_gui_x <= _card_x + _card_w &&
-        _mouse_gui_y >= _card_y && _mouse_gui_y <= _card_y + _card_h) {
+    // ✅ NOVO: Verificar clique especificamente no botão PRODUZIR
+    var _clique_no_botao = (_mouse_gui_x >= _btn_x && _mouse_gui_x <= _btn_x + _btn_w &&
+                            _mouse_gui_y >= _btn_y && _mouse_gui_y <= _btn_y + _btn_h);
+    
+    if (_clique_no_botao) {
         
         show_debug_message("🎯 CLIQUE NO CARD: " + _navio.nome);
         

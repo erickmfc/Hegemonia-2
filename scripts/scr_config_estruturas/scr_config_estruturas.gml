@@ -72,7 +72,7 @@ function scr_config_quartel(parametros) {
                 objeto: obj_soldado_antiaereo,
                 custo_dinheiro: 150,
                 custo_populacao: 1,
-                tempo_treino: 240, // 4 segundos
+                tempo_treino: 180, // ✅ MUDADO: 3 segundos (180 frames) - MÁXIMO
                 descricao: "Unidade especializada contra aeronaves"
             },
             {
@@ -80,7 +80,7 @@ function scr_config_quartel(parametros) {
                 objeto: obj_blindado,
                 custo_dinheiro: 300,
                 custo_populacao: 2,
-                tempo_treino: 240, // 4 segundos
+                tempo_treino: 180, // ✅ MUDADO: 3 segundos (180 frames) - MÁXIMO
                 descricao: "Veículo blindado de combate"
             },
             {
@@ -88,7 +88,7 @@ function scr_config_quartel(parametros) {
                 objeto: obj_tanque,
                 custo_dinheiro: 500,
                 custo_populacao: 3,
-                tempo_treino: 240, // 4 segundos
+                tempo_treino: 180, // ✅ MUDADO: 3 segundos (180 frames) - MÁXIMO
                 descricao: "Tanque pesado de combate"
             }
         ]
@@ -122,7 +122,7 @@ function scr_config_quartel_marinha(parametros) {
                 objeto: obj_lancha_patrulha,
                 custo_dinheiro: 200,
                 custo_populacao: 2,
-                tempo_treino: 240, // 4 segundos
+                tempo_treino: 180, // ✅ MUDADO: 3 segundos (180 frames) - MÁXIMO
                 descricao: "Unidade naval rápida para patrulhamento"
             },
             {

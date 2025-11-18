@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_validar_movimento_terreno",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_validar_movimento_terreno",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

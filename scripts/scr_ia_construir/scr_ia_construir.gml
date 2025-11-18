@@ -63,24 +63,24 @@ function scr_ia_construir(_ia_id, _objeto_tipo, _x, _y) {
         _custo_m = 0;
         _nome_edificio = "Fazenda";
     } else if (_objeto_tipo == obj_quartel) {
-        _custo_d = 400;
-        _custo_m = 250;
+        _custo_d = 250; // ✅ REDUZIDO de 400 para 250
+        _custo_m = 150; // ✅ REDUZIDO de 250 para 150
         _nome_edificio = "Quartel";
     } else if (_objeto_tipo == obj_mina) {
-        _custo_d = 300;
-        _custo_m = 100;
+        _custo_d = 150; // ✅ REDUZIDO de 300 para 150
+        _custo_m = 50;  // ✅ REDUZIDO de 100 para 50
         _nome_edificio = "Mina";
     } else if (_objeto_tipo == obj_quartel_marinha) {
-        _custo_d = 600;
-        _custo_m = 350;
+        _custo_d = 400; // ✅ REDUZIDO de 600 para 400
+        _custo_m = 250; // ✅ REDUZIDO de 350 para 250
         _nome_edificio = "Quartel Naval";
     } else if (_objeto_tipo == obj_aeroporto_militar) {
-        _custo_d = 800;
-        _custo_m = 500;
+        _custo_d = 600; // ✅ REDUZIDO de 800 para 600
+        _custo_m = 400; // ✅ REDUZIDO de 500 para 400
         _nome_edificio = "Aeroporto Militar";
     }
     
-    // 2. Verificar recursos
+    // === VALIDAÇÃO 1: VERIFICAR RECURSOS (PRIMEIRO) ===
     if (!variable_global_exists("ia_dinheiro") || !variable_global_exists("ia_minerio")) {
         show_debug_message("❌ ERRO: Variáveis globais de recursos da IA não existem!");
         return false;
@@ -93,11 +93,21 @@ function scr_ia_construir(_ia_id, _objeto_tipo, _x, _y) {
     
     show_debug_message("💰 IA tem recursos suficientes: $" + string(global.ia_dinheiro) + " >= $" + string(_custo_d) + " e " + string(global.ia_minerio) + " >= " + string(_custo_m));
     
-    // ✅ NOVO: Verificar terreno usando o sistema de validação
+    // === OBTER DIMENSÕES DA ESTRUTURA ===
+    var _largura = 64;
+    var _altura = 64;
+    
+    if (_objeto_tipo == obj_quartel_marinha) {
+        _largura = 96;
+        _altura = 96;
+    } else if (_objeto_tipo == obj_aeroporto_militar) {
+        _largura = 128;
+        _altura = 128;
+    }
+    
+    // === VALIDAÇÃO 2: VERIFICAR TERRENO VÁLIDO ===
     // Para edifícios terrestres, verificar se estão em terreno válido
-    if (_objeto_tipo == obj_fazenda || _objeto_tipo == obj_quartel || _objeto_tipo == obj_mina) {
-        var _largura = 64;
-        var _altura = 64;
+    if (_objeto_tipo == obj_fazenda || _objeto_tipo == obj_quartel || _objeto_tipo == obj_mina || _objeto_tipo == obj_aeroporto_militar) {
         if (!scr_validar_terreno_construcao(_objeto_tipo, _x, _y, _largura, _altura)) {
             show_debug_message("❌ IA: Terreno inválido para " + _nome_edificio + " em (" + string(_x) + ", " + string(_y) + ")");
             // Tentar encontrar terreno válido próximo
@@ -137,10 +147,7 @@ function scr_ia_construir(_ia_id, _objeto_tipo, _x, _y) {
     
     if (_objeto_tipo == obj_quartel_marinha) {
         // Quartel naval precisa estar em água
-        var _largura_naval = 96;
-        var _altura_naval = 96;
-        
-        if (!scr_validar_terreno_construcao(_objeto_tipo, _x, _y, _largura_naval, _altura_naval)) {
+        if (!scr_validar_terreno_construcao(_objeto_tipo, _x, _y, _largura, _altura)) {
             // ✅ NOVO: Primeiro tentar usar posições de costa conhecidas
             var _encontrou_agua = false;
             
@@ -205,63 +212,172 @@ function scr_ia_construir(_ia_id, _objeto_tipo, _x, _y) {
         }
     }
     
-    // 3. Verificar se há espaço (sem overlap) com variação aleatória
+    // === VALIDAÇÃO 3: VERIFICAR LIMITES DO MAPA ===
+    var _dentro_limites = true;
+    
+    // Verificação inline dos limites do mapa
+    if (variable_global_exists("map_width") && variable_global_exists("map_height") && variable_global_exists("tile_size")) {
+        var _tile_size = global.tile_size;
+        var _mapa_largura_pixels = global.map_width * _tile_size;
+        var _mapa_altura_pixels = global.map_height * _tile_size;
+        
+        var _area_x1 = _x - _largura / 2;
+        var _area_y1 = _y - _altura / 2;
+        var _area_x2 = _x + _largura / 2;
+        var _area_y2 = _y + _altura / 2;
+        
+        var _margem = 10;
+        if (_area_x1 < _margem || _area_x2 > _mapa_largura_pixels - _margem || 
+            _area_y1 < _margem || _area_y2 > _mapa_altura_pixels - _margem) {
+            _dentro_limites = false;
+        }
+    } else {
+        _dentro_limites = false;
+    }
+    
+    if (!_dentro_limites) {
+        show_debug_message("❌ IA: Estrutura fora dos limites do mapa!");
+        return false;
+    }
+    
+    // === VALIDAÇÃO 4: VERIFICAR SOBREPOSIÇÃO COM OUTRAS ESTRUTURAS ===
+    // Aplicar variação aleatória para evitar estruturas grudadas
     var _variacao_x = random_range(-50, 50); // Variação de ±50 pixels
     var _variacao_y = random_range(-50, 50); // Variação de ±50 pixels
     var _pos_x_final = _x + _variacao_x;
     var _pos_y_final = _y + _variacao_y;
     
-    // ✅ CORRIGIDO: Se for quartel naval, garantir que a variação ainda está em água
+    // Se a variação saiu do terreno válido, tentar ajustar
     if (_objeto_tipo == obj_quartel_marinha) {
-        var _largura_naval = 96;
-        var _altura_naval = 96;
-        
-        if (!scr_validar_terreno_construcao(_objeto_tipo, _pos_x_final, _pos_y_final, _largura_naval, _altura_naval)) {
+        if (!scr_validar_terreno_construcao(_objeto_tipo, _pos_x_final, _pos_y_final, _largura, _altura)) {
             // Se a variação saiu da água, usar posição original (já validada como água)
             _pos_x_final = _x;
             _pos_y_final = _y;
         }
     }
     
-    var _ja_existe = instance_position(_pos_x_final, _pos_y_final, _objeto_tipo);
-    if (_ja_existe != noone) {
-        // Tentar posição alternativa se ocupada
-        for (var _tentativa = 0; _tentativa < 5; _tentativa++) {
-        _variacao_x = random_range(-80, 80);
-        _variacao_y = random_range(-80, 80);
-        _pos_x_final = _x + _variacao_x;
-        _pos_y_final = _y + _variacao_y;
+    // Verificar sobreposição completa
+    var _tentativas_sobreposicao = 5;
+    var _posicao_valida = false;
+    
+    for (var _tentativa = 0; _tentativa < _tentativas_sobreposicao && !_posicao_valida; _tentativa++) {
+        if (_tentativa > 0) {
+            // Tentar nova variação
+            _variacao_x = random_range(-80, 80);
+            _variacao_y = random_range(-80, 80);
+            _pos_x_final = _x + _variacao_x;
+            _pos_y_final = _y + _variacao_y;
             
-            // ✅ Se for quartel naval, verificar água novamente usando validação de terreno
+            // Se for quartel naval, verificar água novamente
             if (_objeto_tipo == obj_quartel_marinha) {
-                var _largura_naval = 96;
-                var _altura_naval = 96;
-                
-                if (!scr_validar_terreno_construcao(_objeto_tipo, _pos_x_final, _pos_y_final, _largura_naval, _altura_naval)) {
+                if (!scr_validar_terreno_construcao(_objeto_tipo, _pos_x_final, _pos_y_final, _largura, _altura)) {
                     continue; // Tentar próxima variação
                 }
             }
-            
-        _ja_existe = instance_position(_pos_x_final, _pos_y_final, _objeto_tipo);
-            if (_ja_existe == noone) {
-                break; // Encontrou posição livre
-            }
         }
         
-        if (_ja_existe != noone) {
-            show_debug_message("❌ IA: Posição ocupada após tentativas");
-            return false;
+        // Verificar limites do mapa novamente com a nova posição
+        var _dentro_limites_final = true;
+        if (variable_global_exists("map_width") && variable_global_exists("map_height") && variable_global_exists("tile_size")) {
+            var _tile_size_f = global.tile_size;
+            var _mapa_largura_pixels_f = global.map_width * _tile_size_f;
+            var _mapa_altura_pixels_f = global.map_height * _tile_size_f;
+            
+            var _area_x1_f = _pos_x_final - _largura / 2;
+            var _area_y1_f = _pos_y_final - _altura / 2;
+            var _area_x2_f = _pos_x_final + _largura / 2;
+            var _area_y2_f = _pos_y_final + _altura / 2;
+            
+            var _margem_f = 10;
+            if (_area_x1_f < _margem_f || _area_x2_f > _mapa_largura_pixels_f - _margem_f || 
+                _area_y1_f < _margem_f || _area_y2_f > _mapa_altura_pixels_f - _margem_f) {
+                _dentro_limites_final = false;
+            }
+        } else {
+            _dentro_limites_final = false;
+        }
+        
+        if (!_dentro_limites_final) {
+            continue; // Tentar próxima variação
+        }
+        
+        // Verificar sobreposição completa
+        // ✅ CORREÇÃO: Verificação de sobreposição com fallback seguro
+        var _sem_sobreposicao = true;
+        
+        // Verificação básica: verificar se há instância na posição e áreas próximas
+        var _estruturas_verificar = [obj_fazenda, obj_quartel, obj_quartel_marinha, obj_aeroporto_militar, obj_mina, obj_banco, obj_casa];
+        var _casa_moeda = asset_get_index("obj_casa_da_moeda");
+        if (_casa_moeda != -1 && object_exists(_casa_moeda)) {
+            array_push(_estruturas_verificar, _casa_moeda);
+        }
+        
+        // Verificar múltiplos pontos na área para garantir detecção completa
+        var _area_x1 = _pos_x_final - _largura / 2;
+        var _area_y1 = _pos_y_final - _altura / 2;
+        var _area_x2 = _pos_x_final + _largura / 2;
+        var _area_y2 = _pos_y_final + _altura / 2;
+        
+        var _pontos_verificacao = [
+            [_pos_x_final, _pos_y_final],  // Centro
+            [_area_x1 + 10, _area_y1 + 10],  // Canto superior esquerdo
+            [_area_x2 - 10, _area_y1 + 10],  // Canto superior direito
+            [_area_x1 + 10, _area_y2 - 10],  // Canto inferior esquerdo
+            [_area_x2 - 10, _area_y2 - 10]   // Canto inferior direito
+        ];
+        
+        for (var _i = 0; _i < array_length(_estruturas_verificar); _i++) {
+            var _tipo_estr = _estruturas_verificar[_i];
+            if (!object_exists(_tipo_estr)) continue;
+            
+            // Se for o mesmo tipo de objeto, permitir (será substituído)
+            if (_tipo_estr == _objeto_tipo) continue;
+            
+            // Verificar cada ponto de verificação
+            for (var _j = 0; _j < array_length(_pontos_verificacao); _j++) {
+                var _check_x = _pontos_verificacao[_j][0];
+                var _check_y = _pontos_verificacao[_j][1];
+                
+                var _inst = instance_position(_check_x, _check_y, _tipo_estr);
+                if (_inst != noone) {
+                    _sem_sobreposicao = false;
+                    break;
+                }
+            }
+            
+            if (!_sem_sobreposicao) break;
+            
+            // Verificação adicional: distância mínima entre estruturas
+            var _distancia_minima = 50;
+            with (_tipo_estr) {
+                var _dist = point_distance(x, y, _pos_x_final, _pos_y_final);
+                if (_dist < _distancia_minima) {
+                    _sem_sobreposicao = false;
+                    break;
+                }
+            }
+            
+            if (!_sem_sobreposicao) break;
+        }
+        
+        if (_sem_sobreposicao) {
+            _posicao_valida = true;
         }
     }
     
-    // 4. Verificar se o objeto existe antes de criar
+    if (!_posicao_valida) {
+        show_debug_message("❌ IA: Não encontrou posição sem sobreposição após " + string(_tentativas_sobreposicao) + " tentativas");
+        return false;
+    }
+    
+    // === VALIDAÇÃO 5: VERIFICAR SE O OBJETO EXISTE ===
     if (!object_exists(_objeto_tipo)) {
         show_debug_message("❌ ERRO: Objeto " + string(_objeto_tipo) + " não existe!");
         return false;
     }
     
-    // 5. CRIAR a estrutura com posição variada
-    show_debug_message("🔨 IA tentando criar " + _nome_edificio + " em (" + string(_pos_x_final) + ", " + string(_pos_y_final) + ")");
+    // === TODAS AS VALIDAÇÕES PASSARAM - CRIAR ESTRUTURA ===
+    show_debug_message("🔨 IA criando " + _nome_edificio + " em (" + string(_pos_x_final) + ", " + string(_pos_y_final) + ")");
     
     var _nova_estrutura = noone;
     if (layer_exists("Instances")) {
@@ -271,22 +387,24 @@ function scr_ia_construir(_ia_id, _objeto_tipo, _x, _y) {
         _nova_estrutura = instance_create(_pos_x_final, _pos_y_final, _objeto_tipo);
     }
     
-    if (instance_exists(_nova_estrutura)) {
-        // IMPORTANTE: Definir nacao_proprietaria
-        if (variable_instance_exists(_nova_estrutura, "nacao_proprietaria")) {
-            _nova_estrutura.nacao_proprietaria = _ia.nacao_proprietaria;
-        }
-        
-        // 6. DEDUZIR recursos
-        global.ia_dinheiro -= _custo_d;
-        global.ia_minerio -= _custo_m;
-        
-        show_debug_message("✅ IA construiu " + _nome_edificio + " em (" + string(_pos_x_final) + ", " + string(_pos_y_final) + ") com variação de (" + string(_variacao_x) + ", " + string(_variacao_y) + ")");
-        show_debug_message("💰 IA recursos restantes: $" + string(global.ia_dinheiro) + " | Minério: " + string(global.ia_minerio));
-        
-        return true;
+    // === VALIDAÇÃO 6: VERIFICAR SE A INSTÂNCIA FOI CRIADA COM SUCESSO ===
+    if (!instance_exists(_nova_estrutura)) {
+        show_debug_message("❌ IA falhou ao criar " + _nome_edificio + " - instance_create retornou noone");
+        return false;
     }
     
-    show_debug_message("❌ IA falhou ao criar " + _nome_edificio + " - instance_create retornou noone");
-    return false;
+    // === SUCESSO: CONFIGURAR ESTRUTURA E DESCONTAR RECURSOS ===
+    // IMPORTANTE: Definir nacao_proprietaria
+    if (variable_instance_exists(_nova_estrutura, "nacao_proprietaria")) {
+        _nova_estrutura.nacao_proprietaria = _ia.nacao_proprietaria;
+    }
+    
+    // ✅ CRÍTICO: Descontar recursos APENAS DEPOIS de confirmar que a estrutura foi criada
+    global.ia_dinheiro -= _custo_d;
+    global.ia_minerio -= _custo_m;
+    
+    show_debug_message("✅ IA construiu " + _nome_edificio + " em (" + string(_pos_x_final) + ", " + string(_pos_y_final) + ")");
+    show_debug_message("💰 IA recursos restantes: $" + string(global.ia_dinheiro) + " | Minério: " + string(global.ia_minerio));
+    
+    return true;
 }

@@ -1,7 +1,16 @@
-/// @description Limpeza de memória
+/// @description Limpeza de memória - Navio Base
+// ===============================================
+// HEGEMONIA GLOBAL - NAVIO BASE - CLEANUP EVENT
+// Limpeza de memória e data structures
+// ===============================================
 
-// Libera ds_list
-if (ds_exists(pontos_patrulha, ds_type_list)) {
-    ds_list_destroy(pontos_patrulha);
-    show_debug_message("Lancha destruída - Memória liberada");
+// ✅ LIMPEZA: Destruir data structures de patrulha
+if (variable_instance_exists(id, "pontos_patrulha")) {
+    if (ds_exists(pontos_patrulha, ds_type_list)) {
+        ds_list_destroy(pontos_patrulha);
+    }
 }
+
+// ✅ LIMPEZA: Limpar referências
+alvo_unidade = noone;
+seguir_alvo = noone;

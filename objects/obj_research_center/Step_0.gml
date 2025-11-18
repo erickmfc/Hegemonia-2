@@ -46,6 +46,7 @@ if (mouse_check_button_pressed(mb_left)) {
     var container_y = (_gui_h - container_h) / 2;
     
     // === 1. VERIFICAR BOTÃO FECHAR (PRIORIDADE MÁXIMA) ===
+    // ✅ CORREÇÃO: Reativar minimapa quando fechar menu
     var close_btn_w = 140; // Mesmo do Draw_64.gml
     var close_btn_h = 45; // Mesmo do Draw_64.gml
     var close_btn_x = container_x + container_w - close_btn_w - 20;
@@ -53,6 +54,11 @@ if (mouse_check_button_pressed(mb_left)) {
     
     if (point_in_rectangle(mouse_gui_x, mouse_gui_y, close_btn_x, close_btn_y, close_btn_x + close_btn_w, close_btn_y + close_btn_h)) {
         global.menu_pesquisa_aberto = false;
+        // ✅ CORREÇÃO: Reativar minimapa quando fechar menu
+        var _minimap_instance = instance_find(obj_minimap, 0);
+        if (instance_exists(_minimap_instance)) {
+            _minimap_instance.minimap_visible = true;
+        }
         if (debug_enabled) show_debug_message("Research menu closed by close button.");
         return;
     }
@@ -62,6 +68,11 @@ if (mouse_check_button_pressed(mb_left)) {
         mouse_gui_y < container_y || mouse_gui_y > container_y + container_h) {
         
         global.menu_pesquisa_aberto = false;
+        // ✅ CORREÇÃO: Reativar minimapa quando fechar menu
+        var _minimap_instance = instance_find(obj_minimap, 0);
+        if (instance_exists(_minimap_instance)) {
+            _minimap_instance.minimap_visible = true;
+        }
         if (debug_enabled) show_debug_message("Research menu closed (clicked outside).");
         return;
     }
@@ -200,5 +211,10 @@ if (mouse_check_button_pressed(mb_left)) {
 // === TECLA ESC PARA FECHAR MENU ===
 if (keyboard_check_pressed(vk_escape)) {
     global.menu_pesquisa_aberto = false;
+    // ✅ CORREÇÃO: Reativar minimapa quando fechar menu
+    var _minimap_instance = instance_find(obj_minimap, 0);
+    if (instance_exists(_minimap_instance)) {
+        _minimap_instance.minimap_visible = true;
+    }
     if (debug_enabled) show_debug_message("Research menu closed (ESC key).");
 }

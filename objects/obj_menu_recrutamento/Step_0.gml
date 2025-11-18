@@ -118,6 +118,12 @@ for (var i = 0; i < min(6, _total_units); i++) {
 // === PROCESSAMENTO DE CLIQUES AQUI ===
 // ========================================
 
+// ✅ CORREÇÃO: Ignorar cliques durante o delay de abertura (previne recrutamento acidental)
+if (delay_abertura > 0) {
+    // Ainda está no período de delay - ignorar cliques
+    exit;
+}
+
 // Verificar se houve clique do mouse
 if (mouse_check_button_pressed(mb_left)) {
     show_debug_message("🖱️ === CLIQUE DETECTADO NO STEP ===");
@@ -143,15 +149,17 @@ if (mouse_check_button_pressed(mb_left)) {
         exit;
     }
     
-    // === CALCULAR POSIÇÕES DO GRID ===
+    // === CALCULAR POSIÇÕES DO GRID (SINCRONIZADO COM DRAW) ===
     var _header_h2 = 100;
     var _recursos_y2 = _menu_y + _header_h2 + 15;
     var _recursos_h2 = 72;
     var _grid_start_y2 = _recursos_y2 + _recursos_h2 + 25;
+    var _grid_h2 = _menu_h - _header_h2 - _recursos_h2 - 220;
     
-    var _card_spacing2 = 24;
+    var _card_spacing2 = 24; // Sincronizado com Draw
     var _card_w2 = (_menu_w - 40 - (_cols - 1) * _card_spacing2) / _cols;
-    var _card_h2 = ((_menu_h - _header_h2 - _recursos_h2 - 220 - (_rows - 1) * _card_spacing2) / _rows);
+    // ✅ CORREÇÃO: Sincronizar EXATAMENTE com Draw (incluindo aumento de 5%)
+    var _card_h2 = ((_grid_h2 - (_rows - 1) * _card_spacing2) / _rows) * 1.05;
     
     var _total_unidades = ds_list_size(_unidades);
     
@@ -179,10 +187,11 @@ if (mouse_check_button_pressed(mb_left)) {
             show_debug_message("📦 Custo unidade: $" + string(_unidade.custo_dinheiro) + " | Pop: " + string(_unidade.custo_populacao));
             
             // === VERIFICAR BOTÕES DE QUANTIDADE ===
+            // ✅ AJUSTE: Sincronizar com Draw (aumentado em 20%)
             var _btn_quant_y = _card_y + _card_h2 - 85;
-            var _btn_quant_h = 28;
-            var _btn_quant_w = (_card_w2 - 30) / 3 - 2;
-            var _btn_quant_spacing = 2;
+            var _btn_quant_h = 33.6; // ✅ AJUSTE: Aumentado em 20% (28 * 1.2)
+            var _btn_quant_w = ((_card_w2 - 30) / 3 - 2); // ✅ AJUSTE: Tamanho normal (não reduzido)
+            var _btn_quant_spacing = 3; // ✅ AJUSTE: Aumentado espaçamento
             
             var _quantidades = [1, 5, 10];
             var _quantidade_clicada = -1;
@@ -201,9 +210,10 @@ if (mouse_check_button_pressed(mb_left)) {
             }
             
             // === VERIFICAR BOTÃO TREINAR ===
+            // ✅ AJUSTE: Sincronizar com Draw (reduzido em 20%)
             var _btn_treinar_y = _card_y + _card_h2 - 50;
-            var _btn_treinar_h = 36;
-            var _btn_treinar_w = _card_w2 - 30;
+            var _btn_treinar_h = 28.8; // ✅ AJUSTE: Reduzido em 20% (36 * 0.8)
+            var _btn_treinar_w = (_card_w2 - 30) * 0.8; // ✅ AJUSTE: Reduzido em 20%
             var _btn_treinar_x = _card_x + 15;
             
             var _botao_treinar_clicado = (_mouse_gui_x >= _btn_treinar_x && _mouse_gui_x <= _btn_treinar_x + _btn_treinar_w &&

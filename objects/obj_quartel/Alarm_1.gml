@@ -51,7 +51,7 @@ if (ds_exists(fila_recrutamento, ds_type_queue) && !ds_queue_empty(fila_recrutam
             
             // ✅ SISTEMA DE LOTE: Se houver 5+ unidades, criar todas de uma vez
             if (_mesmo_tipo_count >= 5) {
-                var _tempo_lote = 240; // 4 segundos para lote
+                var _tempo_lote = 180; // ✅ MUDADO: 3 segundos (180 frames) para lote
                 
                 if (tempo_treinamento_restante >= _tempo_lote) {
                     show_debug_message("🚨 ALARM BACKUP - Criando " + string(_mesmo_tipo_count) + "x " + _unidade_data.nome + " em LOTE!");

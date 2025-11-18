@@ -10,6 +10,10 @@ alvo = noone;                      // Unidade alvo
 dono = noone;                      // Unidade que atirou
 timer_vida = 300;                  // Tempo de vida MAIOR (5 segundos)
 
+// ✅ NOVO: Dano em área para mísseis terrestres
+dano_area = 1000;                  // Dano em área para matar unidades próximas
+raio_dano_area = 300;              // ✅ Raio de dano em área de 300 pixels (para Constellation e outros navios)
+
 // === CONFIGURAÇÕES VISUAIS OTIMIZADAS ===
 image_xscale = 0.5;                // ESCALA OTIMIZADA (era 5.0 - muito grande)
 image_yscale = 0.5;                // ESCALA OTIMIZADA (era 5.0 - muito grande)

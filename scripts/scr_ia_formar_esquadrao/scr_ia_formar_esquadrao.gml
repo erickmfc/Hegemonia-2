@@ -15,7 +15,8 @@ function scr_ia_formar_esquadrao(_ia_id) {
     with (obj_infantaria) {
         if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _ia.nacao_proprietaria) {
             var _dist = point_distance(x, y, _ia.base_x, _ia.base_y);
-            if (_dist <= 400) { // Dentro de 400 pixels da base
+            // ✅ CORREÇÃO: Usar raio_expansao (3000 pixels) para incluir TODAS as unidades
+            if (_dist <= _ia.raio_expansao) {
                 ds_list_add(_unidades_disponiveis, {
                     id: id,
                     tipo: "infantaria",
@@ -29,7 +30,8 @@ function scr_ia_formar_esquadrao(_ia_id) {
     with (obj_tanque) {
         if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _ia.nacao_proprietaria) {
             var _dist = point_distance(x, y, _ia.base_x, _ia.base_y);
-            if (_dist <= 400) {
+            // ✅ CORREÇÃO: Usar raio_expansao (3000 pixels) para incluir TODAS as unidades
+            if (_dist <= _ia.raio_expansao) {
                 ds_list_add(_unidades_disponiveis, {
                     id: id,
                     tipo: "tanque",
@@ -43,7 +45,8 @@ function scr_ia_formar_esquadrao(_ia_id) {
     with (obj_soldado_antiaereo) {
         if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _ia.nacao_proprietaria) {
             var _dist = point_distance(x, y, _ia.base_x, _ia.base_y);
-            if (_dist <= 400) {
+            // ✅ CORREÇÃO: Usar raio_expansao (3000 pixels) para incluir TODAS as unidades
+            if (_dist <= _ia.raio_expansao) {
                 ds_list_add(_unidades_disponiveis, {
                     id: id,
                     tipo: "antiaereo",
@@ -65,7 +68,8 @@ function scr_ia_formar_esquadrao(_ia_id) {
         with (_tipos_navais[i]) {
             if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _ia.nacao_proprietaria) {
                 var _dist = point_distance(x, y, _ia.base_x, _ia.base_y);
-                if (_dist <= 800) { // Raio maior para navios
+                // ✅ CORREÇÃO: Usar raio_expansao (3000 pixels) para incluir TODAS as unidades
+                if (_dist <= _ia.raio_expansao) {
                     ds_list_add(_unidades_disponiveis, {
                         id: id,
                         tipo: "naval",
@@ -83,7 +87,8 @@ function scr_ia_formar_esquadrao(_ia_id) {
         with (_tipos_aereos[i]) {
             if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == _ia.nacao_proprietaria) {
                 var _dist = point_distance(x, y, _ia.base_x, _ia.base_y);
-                if (_dist <= 1000) { // Raio muito maior para aviões
+                // ✅ CORREÇÃO: Usar raio_expansao (3000 pixels) para incluir TODAS as unidades
+                if (_dist <= _ia.raio_expansao) {
                     ds_list_add(_unidades_disponiveis, {
                         id: id,
                         tipo: "aereo",

@@ -15,7 +15,9 @@ destino_x = x;
 destino_y = y;
 destino_original_x = undefined; // Para sistema de desvio de obstáculos
 destino_original_y = undefined; // Para sistema de desvio de obstáculos
-velocidade = 1.5; // M1A Abrams é mais rápido que tanque comum
+velocidade_movimento = 1.5; // M1A Abrams é mais rápido que tanque comum
+velocidade_atual = velocidade_movimento; // Velocidade atual (inicia igual à base)
+velocidade = velocidade_movimento; // Compatibilidade com código antigo
 
 // Patrulha
 patrulha = ds_list_create();
@@ -29,19 +31,26 @@ indice_patrulha_atual = 0;
 
 // Ataque
 alcance_visao = 700;  // Alcance de visão maior que tanque comum
-alcance_tiro  = 650;  // Alcance de tiro maior
+alcance_ataque = 650;  // Alcance de tiro maior
+alcance_tiro = alcance_ataque; // Compatibilidade com código antigo
 atq_cooldown = 0;
 atq_rate = 150; // 2.5 segundos (60 FPS * 2.5 = 150 frames) - mais rápido que tanque comum
+velocidade_ataque = atq_rate; // Compatibilidade com documentação
 
 // Alvo inimigo
 alvo = noone;
 
 // Vida
-hp = 450; // M1A Abrams é mais resistente que tanque comum
-hp_max = 450;
+hp_max = 450; // M1A Abrams é mais resistente que tanque comum
+hp_atual = hp_max; // Vida atual inicia cheia
+hp = hp_atual; // Compatibilidade com código antigo
 
 // Modo de combate
 modo_ataque = true; // Por padrão, ataca automaticamente
+
+// Dano
+dano_base = 75; // Dano base do M1A Abrams (maior que tanque comum)
+dano = dano_base; // Compatibilidade com código antigo
 
 // =============================================
 // SISTEMA DE TORRE MODULAR (NOVO)
@@ -84,4 +93,4 @@ skip_frames_enabled = true;
 // =============================================
 // Usar obj_tiro_tanque com sprite spr_projetil_sabot
 
-show_debug_message("🚀 M1A Abrams criado - HP: " + string(hp) + ", Velocidade: " + string(velocidade));
+show_debug_message("🚀 M1A Abrams criado - HP: " + string(hp_atual) + "/" + string(hp_max) + ", Dano: " + string(dano_base) + ", Velocidade: " + string(velocidade_movimento));

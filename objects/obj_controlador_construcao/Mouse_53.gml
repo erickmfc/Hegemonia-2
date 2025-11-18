@@ -51,6 +51,58 @@ if (global.construindo_agora == asset_get_index("obj_casa")) {
     _custo_d = 50000000; // $50.000.000 CG
     _custo_m = 10000;    // 10.000 minério
     _nome_edificio = "Casa da Moeda";
+} else if (global.construindo_agora == asset_get_index("obj_centro_pesquisa")) {
+    _custo_d = 5000;
+    _custo_m = 1000;
+    _nome_edificio = "Centro de Pesquisa";
+} else if (global.construindo_agora == asset_get_index("obj_research_center")) {
+    _custo_d = 5000;
+    _custo_m = 1000;
+    _nome_edificio = "Research Center";
+} else if (global.construindo_agora == asset_get_index("obj_mina")) {
+    _custo_d = 1000;
+    _custo_m = 200;
+    _nome_edificio = "Mina";
+} else if (global.construindo_agora == asset_get_index("obj_mina_ouro")) {
+    _custo_d = 2500;
+    _custo_m = 500;
+    _nome_edificio = "Mina de Ouro";
+} else if (global.construindo_agora == asset_get_index("obj_mina_aluminio")) {
+    _custo_d = 2000;
+    _custo_m = 400;
+    _nome_edificio = "Mina de Alumínio";
+} else if (global.construindo_agora == asset_get_index("obj_mina_cobre")) {
+    _custo_d = 1500;
+    _custo_m = 300;
+    _nome_edificio = "Mina de Cobre";
+} else if (global.construindo_agora == asset_get_index("obj_mina_titanio")) {
+    _custo_d = 4000;
+    _custo_m = 800;
+    _nome_edificio = "Mina de Titânio";
+} else if (global.construindo_agora == asset_get_index("obj_mina_uranio")) {
+    _custo_d = 6000;
+    _custo_m = 1200;
+    _nome_edificio = "Mina de Urânio";
+} else if (global.construindo_agora == asset_get_index("obj_mina_litio")) {
+    _custo_d = 3000;
+    _custo_m = 600;
+    _nome_edificio = "Mina de Lítio";
+} else if (global.construindo_agora == asset_get_index("obj_poco_petroleo")) {
+    _custo_d = 3000;
+    _custo_m = 500;
+    _nome_edificio = "Poço de Petróleo";
+} else if (global.construindo_agora == asset_get_index("obj_serraria")) {
+    _custo_d = 800;
+    _custo_m = 150;
+    _nome_edificio = "Serraria";
+} else if (global.construindo_agora == asset_get_index("obj_plantacao_borracha")) {
+    _custo_d = 1200;
+    _custo_m = 200;
+    _nome_edificio = "Plantação de Borracha";
+} else if (global.construindo_agora == asset_get_index("obj_extrator_silicio")) {
+    _custo_d = 2500;
+    _custo_m = 500;
+    _nome_edificio = "Extrator de Silício";
 }
 
 // DEBUG: Mostrar recursos atuais
@@ -118,6 +170,25 @@ if (global.dinheiro >= _custo_d_inflacionado && global.minerio >= _custo_m_infla
     } else if (global.construindo_agora == asset_get_index("obj_casa_da_moeda")) {
         _largura = 128;
         _altura = 128;
+    } else if (global.construindo_agora == asset_get_index("obj_centro_pesquisa")) {
+        _largura = 64;
+        _altura = 64;
+    } else if (global.construindo_agora == asset_get_index("obj_research_center")) {
+        _largura = 64;
+        _altura = 64;
+    } else if (global.construindo_agora == asset_get_index("obj_mina") ||
+               global.construindo_agora == asset_get_index("obj_mina_ouro") ||
+               global.construindo_agora == asset_get_index("obj_mina_aluminio") ||
+               global.construindo_agora == asset_get_index("obj_mina_cobre") ||
+               global.construindo_agora == asset_get_index("obj_mina_titanio") ||
+               global.construindo_agora == asset_get_index("obj_mina_uranio") ||
+               global.construindo_agora == asset_get_index("obj_mina_litio") ||
+               global.construindo_agora == asset_get_index("obj_poco_petroleo") ||
+               global.construindo_agora == asset_get_index("obj_serraria") ||
+               global.construindo_agora == asset_get_index("obj_plantacao_borracha") ||
+               global.construindo_agora == asset_get_index("obj_extrator_silicio")) {
+        _largura = 64;
+        _altura = 64;
     }
     
     // ✅ NOVO: VALIDAÇÃO DE TERRENO
@@ -163,11 +234,30 @@ if (global.dinheiro >= _custo_d_inflacionado && global.minerio >= _custo_m_infla
         array_push(_edificios, obj_research_center);
     }
     
+    // Centro de Pesquisa (se existir)
+    var _centro_pesquisa_index = asset_get_index("obj_centro_pesquisa");
+    if (_centro_pesquisa_index != -1) {
+        array_push(_edificios, obj_centro_pesquisa);
+    }
+    
     // Casa da Moeda (se existir)
     var _casa_moeda_index = asset_get_index("obj_casa_da_moeda");
     if (_casa_moeda_index != -1) {
         array_push(_edificios, obj_casa_da_moeda);
     }
+    
+    // Estruturas de produção (se existirem)
+    if (object_exists(obj_mina)) array_push(_edificios, obj_mina);
+    if (object_exists(obj_mina_ouro)) array_push(_edificios, obj_mina_ouro);
+    if (object_exists(obj_mina_aluminio)) array_push(_edificios, obj_mina_aluminio);
+    if (object_exists(obj_mina_cobre)) array_push(_edificios, obj_mina_cobre);
+    if (object_exists(obj_mina_titanio)) array_push(_edificios, obj_mina_titanio);
+    if (object_exists(obj_mina_uranio)) array_push(_edificios, obj_mina_uranio);
+    if (object_exists(obj_mina_litio)) array_push(_edificios, obj_mina_litio);
+    if (object_exists(obj_poco_petroleo)) array_push(_edificios, obj_poco_petroleo);
+    if (object_exists(obj_serraria)) array_push(_edificios, obj_serraria);
+    if (object_exists(obj_plantacao_borracha)) array_push(_edificios, obj_plantacao_borracha);
+    if (object_exists(obj_extrator_silicio)) array_push(_edificios, obj_extrator_silicio);
     
     // Verifica se há algum edifício ocupando a área
     for (var i = 0; i < array_length(_edificios); i++) {
@@ -248,6 +338,45 @@ if (global.dinheiro >= _custo_d_inflacionado && global.minerio >= _custo_m_infla
     } else if (global.construindo_agora == asset_get_index("obj_casa_da_moeda")) {
         _new_building = instance_create_layer(grid_x, grid_y, "Instances", obj_casa_da_moeda);
         show_debug_message("Criando Casa da Moeda...");
+    } else if (global.construindo_agora == asset_get_index("obj_centro_pesquisa")) {
+        _new_building = instance_create_layer(grid_x, grid_y, "Instances", obj_centro_pesquisa);
+        show_debug_message("Criando Centro de Pesquisa...");
+    } else if (global.construindo_agora == asset_get_index("obj_research_center")) {
+        _new_building = instance_create_layer(grid_x, grid_y, "Instances", obj_research_center);
+        show_debug_message("Criando Research Center...");
+    } else if (global.construindo_agora == asset_get_index("obj_mina")) {
+        _new_building = instance_create_layer(grid_x, grid_y, "Instances", obj_mina);
+        show_debug_message("Criando Mina...");
+    } else if (global.construindo_agora == asset_get_index("obj_mina_ouro")) {
+        _new_building = instance_create_layer(grid_x, grid_y, "Instances", obj_mina_ouro);
+        show_debug_message("Criando Mina de Ouro...");
+    } else if (global.construindo_agora == asset_get_index("obj_mina_aluminio")) {
+        _new_building = instance_create_layer(grid_x, grid_y, "Instances", obj_mina_aluminio);
+        show_debug_message("Criando Mina de Alumínio...");
+    } else if (global.construindo_agora == asset_get_index("obj_mina_cobre")) {
+        _new_building = instance_create_layer(grid_x, grid_y, "Instances", obj_mina_cobre);
+        show_debug_message("Criando Mina de Cobre...");
+    } else if (global.construindo_agora == asset_get_index("obj_mina_titanio")) {
+        _new_building = instance_create_layer(grid_x, grid_y, "Instances", obj_mina_titanio);
+        show_debug_message("Criando Mina de Titânio...");
+    } else if (global.construindo_agora == asset_get_index("obj_mina_uranio")) {
+        _new_building = instance_create_layer(grid_x, grid_y, "Instances", obj_mina_uranio);
+        show_debug_message("Criando Mina de Urânio...");
+    } else if (global.construindo_agora == asset_get_index("obj_mina_litio")) {
+        _new_building = instance_create_layer(grid_x, grid_y, "Instances", obj_mina_litio);
+        show_debug_message("Criando Mina de Lítio...");
+    } else if (global.construindo_agora == asset_get_index("obj_poco_petroleo")) {
+        _new_building = instance_create_layer(grid_x, grid_y, "Instances", obj_poco_petroleo);
+        show_debug_message("Criando Poço de Petróleo...");
+    } else if (global.construindo_agora == asset_get_index("obj_serraria")) {
+        _new_building = instance_create_layer(grid_x, grid_y, "Instances", obj_serraria);
+        show_debug_message("Criando Serraria...");
+    } else if (global.construindo_agora == asset_get_index("obj_plantacao_borracha")) {
+        _new_building = instance_create_layer(grid_x, grid_y, "Instances", obj_plantacao_borracha);
+        show_debug_message("Criando Plantação de Borracha...");
+    } else if (global.construindo_agora == asset_get_index("obj_extrator_silicio")) {
+        _new_building = instance_create_layer(grid_x, grid_y, "Instances", obj_extrator_silicio);
+        show_debug_message("Criando Extrator de Silício...");
     } else {
         show_debug_message("❌ TIPO DE EDIFÍCIO NÃO RECONHECIDO!");
     }
@@ -270,6 +399,32 @@ if (global.dinheiro >= _custo_d_inflacionado && global.minerio >= _custo_m_infla
             mp_grid_add_instances(global.pathfinding_grid, obj_aeroporto_militar, true);
         } else if (global.construindo_agora == asset_get_index("obj_casa_da_moeda")) {
             mp_grid_add_instances(global.pathfinding_grid, obj_casa_da_moeda, true);
+        } else if (global.construindo_agora == asset_get_index("obj_centro_pesquisa")) {
+            mp_grid_add_instances(global.pathfinding_grid, obj_centro_pesquisa, true);
+        } else if (global.construindo_agora == asset_get_index("obj_research_center")) {
+            mp_grid_add_instances(global.pathfinding_grid, obj_research_center, true);
+        } else if (global.construindo_agora == asset_get_index("obj_mina")) {
+            mp_grid_add_instances(global.pathfinding_grid, obj_mina, true);
+        } else if (global.construindo_agora == asset_get_index("obj_mina_ouro")) {
+            mp_grid_add_instances(global.pathfinding_grid, obj_mina_ouro, true);
+        } else if (global.construindo_agora == asset_get_index("obj_mina_aluminio")) {
+            mp_grid_add_instances(global.pathfinding_grid, obj_mina_aluminio, true);
+        } else if (global.construindo_agora == asset_get_index("obj_mina_cobre")) {
+            mp_grid_add_instances(global.pathfinding_grid, obj_mina_cobre, true);
+        } else if (global.construindo_agora == asset_get_index("obj_mina_titanio")) {
+            mp_grid_add_instances(global.pathfinding_grid, obj_mina_titanio, true);
+        } else if (global.construindo_agora == asset_get_index("obj_mina_uranio")) {
+            mp_grid_add_instances(global.pathfinding_grid, obj_mina_uranio, true);
+        } else if (global.construindo_agora == asset_get_index("obj_mina_litio")) {
+            mp_grid_add_instances(global.pathfinding_grid, obj_mina_litio, true);
+        } else if (global.construindo_agora == asset_get_index("obj_poco_petroleo")) {
+            mp_grid_add_instances(global.pathfinding_grid, obj_poco_petroleo, true);
+        } else if (global.construindo_agora == asset_get_index("obj_serraria")) {
+            mp_grid_add_instances(global.pathfinding_grid, obj_serraria, true);
+        } else if (global.construindo_agora == asset_get_index("obj_plantacao_borracha")) {
+            mp_grid_add_instances(global.pathfinding_grid, obj_plantacao_borracha, true);
+        } else if (global.construindo_agora == asset_get_index("obj_extrator_silicio")) {
+            mp_grid_add_instances(global.pathfinding_grid, obj_extrator_silicio, true);
         }
         
         // Limpa a seleção para finalizar o modo de construção.

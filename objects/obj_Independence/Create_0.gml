@@ -14,17 +14,72 @@ nome_unidade = "Independence";
 descricao = "Fragata com canhão e mísseis SkyFury/Ironclad";
 custo = 1000;
 
+// === VARIÁVEIS DE CONTROLE E NAVEGAÇÃO ===
+// ✅ CORREÇÃO: Inicializar variáveis de controle que faltavam
+if (!variable_instance_exists(id, "modo_combate")) {
+    modo_combate = LanchaMode.PASSIVO;
+}
+if (!variable_instance_exists(id, "pontos_patrulha")) {
+    pontos_patrulha = ds_list_create();
+}
+if (!variable_instance_exists(id, "indice_patrulha_atual")) {
+    indice_patrulha_atual = 0;
+}
+if (!variable_instance_exists(id, "direcao_patrulha")) {
+    direcao_patrulha = 1; // 1 = horário (avançar), -1 = anti-horário (retroceder)
+}
+if (!variable_instance_exists(id, "timer_verificacao_inimigos")) {
+    timer_verificacao_inimigos = 0;
+}
+if (!variable_instance_exists(id, "intervalo_verificacao_inimigos")) {
+    intervalo_verificacao_inimigos = 30; // Verificar inimigos a cada 30 frames
+}
+if (!variable_instance_exists(id, "estado_anterior")) {
+    estado_anterior = LanchaState.PARADO;
+}
+if (!variable_instance_exists(id, "selecionado")) {
+    selecionado = false;
+}
+
+// === VARIÁVEIS DE MOVIMENTO E DESTINO ===
+// ✅ CORREÇÃO: Inicializar variáveis de destino que faltavam
+if (!variable_instance_exists(id, "destino_x")) {
+    destino_x = x;
+}
+if (!variable_instance_exists(id, "destino_y")) {
+    destino_y = y;
+}
+if (!variable_instance_exists(id, "alvo_x")) {
+    alvo_x = x;
+}
+if (!variable_instance_exists(id, "alvo_y")) {
+    alvo_y = y;
+}
+if (!variable_instance_exists(id, "alvo_unidade")) {
+    alvo_unidade = noone;
+}
+if (!variable_instance_exists(id, "estado")) {
+    estado = LanchaState.PARADO;
+}
+if (!variable_instance_exists(id, "velocidade_rotacao")) {
+    velocidade_rotacao = 0.8; // Velocidade de rotação em graus por frame
+}
+if (!variable_instance_exists(id, "reload_timer")) {
+    reload_timer = 0;
+}
+
 // === CONFIGURAÇÕES DE COMBATE ===
+// ✅ CORREÇÃO: Copiar stats de ataque do Constellation
 hp_atual = 1600; // Dobro da Constellation (800 * 2)
 hp_max = 1600;
-velocidade_movimento = 1.95; // Mais lento que Constellation (2.5 * 0.78)
-radar_alcance = 1000; // IGUAL aos outros navios
-missil_alcance = 1000; // IGUAL aos outros navios
+velocidade_movimento = 1.2; // IGUAL ao Constellation
+radar_alcance = 1000; // IGUAL ao Constellation
+missil_alcance = 1000; // IGUAL ao Constellation
 missil_max_alcance = 1000; // Alcance máximo de mísseis
 alcance_ataque = missil_alcance;
 alcance_visao = radar_alcance; // Alcance de visão igual ao radar
-dano_ataque = 100;
-reload_time = 120;
+dano_ataque = 1000; // ✅ CORREÇÃO: IGUAL ao Constellation (1000)
+reload_time = 120; // ✅ CORREÇÃO: IGUAL ao Constellation (120)
 
 // Variáveis de mísseis
 missil_timer = 0;
@@ -50,38 +105,14 @@ metralhadora_max_tiros = 60; // 60 tiros × 3 frames = 180 frames = 3 segundos
 metralhadora_cooldown_timer = 0; // Timer de pausa
 metralhadora_cooldown_duration = 180; // 3 segundos de pausa (180 frames)
 
-// === SISTEMA DE MÍSSEIS PERSONALIZADO ===
-pode_disparar_missil = false; // Independence usa sistema próprio de mísseis múltiplos (Step_1.gml)
-missil_timer_multi = 0; // Timer de mísseis para sistema múltiplo
-missil_cooldown_multi = 90; // Cooldown de mísseis
-missil_timer_hash = 0; // Timer para míssil Hash (pesado)
-missil_timer_iron = 0; // Timer para míssil Ironclad
+// === SISTEMA DE MÍSSEIS ===
+// ✅ CORREÇÃO: Habilitar sistema padrão do obj_navio_base (igual ao Constellation)
+pode_disparar_missil = true; // Independence usa sistema padrão do obj_navio_base (órbita inteligente)
+// Sistema de múltiplos alvos (Step_1.gml) foi desabilitado para usar sistema padrão
 
-// === SOBRESCREVER func_atacar_alvo PARA NÃO USAR TIRO_SIMPLES ===
-// A Independence USA MÍSSEIS (SkyFury/Ironclad) e Canhão com obj_tiro_canhao
-// O sistema de ataque está no Step_1.gml
-func_atacar_alvo = function() {
-    // Mísseis e canhão gerenciados no Step_1.gml
-    if (!instance_exists(alvo_unidade)) {
-        alvo_unidade = noone;
-        estado = LanchaState.PARADO;
-        metralhadora_ativa = false; // Garantir que o canhão pare
-        return;
-    }
-    
-    // Apenas definir estado de ataque, sem criar NENHUM projétil aqui
-    var d = point_distance(x, y, alvo_unidade.x, alvo_unidade.y);
-    if (d <= missil_alcance) {
-        estado = LanchaState.ATACANDO;
-        // Todo o sistema de ataque está no Step_1.gml
-        // - Mísseis SkyFury para alvos aéreos
-        // - Mísseis Ironclad para alvos terrestres
-        // - Canhão com obj_tiro_canhao para alvos terrestres/navais
-    } else {
-        ordem_mover(alvo_unidade.x, alvo_unidade.y);
-        metralhadora_ativa = false; // Desativar canhão se fora de alcance
-    }
-}
+// ✅ CORREÇÃO: Usar sistema padrão do obj_navio_base (igual ao Constellation)
+// O sistema de ataque padrão já está implementado no obj_navio_base com órbita inteligente
+// Não precisa sobrescrever func_atacar_alvo - o sistema padrão funciona perfeitamente
 
 // === SISTEMA DE DEBUG ===
 debug_timer = 0;
@@ -93,3 +124,27 @@ lod_level = 2;
 force_always_active = false;
 lod_process_index = irandom(99);
 skip_frames_enabled = true;
+
+// === GARANTIR VISIBILIDADE E APARÊNCIA ===
+// ✅ CORREÇÃO: Garantir que o navio seja visível e tenha sprite
+visible = true;
+image_alpha = 1.0;
+if (sprite_index == -1 || !sprite_exists(sprite_index)) {
+    var _spr_independence = asset_get_index("spr_Independence");
+    if (_spr_independence != -1 && sprite_exists(_spr_independence)) {
+        sprite_index = _spr_independence;
+    }
+}
+
+// === GARANTIR NAÇÃO ===
+if (!variable_instance_exists(id, "nacao_proprietaria")) {
+    nacao_proprietaria = 1; // Jogador por padrão
+}
+
+// === GARANTIR TERRAIN ===
+if (!variable_instance_exists(id, "terrenos_permitidos")) {
+    terrenos_permitidos = [TERRAIN.AGUA]; // Só água
+}
+
+// === DEBUG DE CRIAÇÃO ===
+show_debug_message("🚢 Independence criado - HP: " + string(hp_atual) + "/" + string(hp_max) + " | Velocidade: " + string(velocidade_movimento) + " | Posição: (" + string(x) + ", " + string(y) + ")");

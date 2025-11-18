@@ -24,9 +24,9 @@ function scr_config_ui_global() {
     draw_set_alpha(1);
     
     // === CONFIGURAÇÕES DE ESCALA MELHORADAS ===
-    // Escala aumentada para melhor legibilidade
+    // ✅ CORREÇÃO: Escala reduzida para tamanho normal
     if (!variable_global_exists("ui_scale")) {
-        global.ui_scale = 1.2; // Escala aumentada para melhor legibilidade
+        global.ui_scale = 1.0; // Escala normal
     }
     
     // === CONFIGURAÇÕES DE QUALIDADE DE TEXTO ===

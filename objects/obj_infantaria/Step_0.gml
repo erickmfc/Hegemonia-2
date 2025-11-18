@@ -248,21 +248,68 @@ switch (estado) {
                 // ✅ CORREÇÃO: Normalizar velocidade baseado no zoom para manter velocidade visual constante
                 var _vel_normalizada = scr_normalize_unit_speed(_vel_efetiva);
                 
-                // Mover na direção final (com desvio se necessário)
-                x += lengthdir_x(_vel_normalizada, _direcao_final);
-                y += lengthdir_y(_vel_normalizada, _direcao_final);
-                image_angle = _direcao_final;
+                // ✅ NOVO: Verificar terreno antes de mover
+                var _proxima_x = x + lengthdir_x(_vel_normalizada, _direcao_final);
+                var _proxima_y = y + lengthdir_y(_vel_normalizada, _direcao_final);
+                
+                // ✅ VERIFICAÇÃO DE TERRENO: Verificar se pode mover para a próxima posição
+                if (scr_unidade_pode_terreno(id, _proxima_x, _proxima_y)) {
+                    // Terreno permitido - pode mover
+                    x = _proxima_x;
+                    y = _proxima_y;
+                    image_angle = _direcao_final;
+                } else {
+                    // Terreno proibido - parar e tentar encontrar terra próxima
+                    var _terra_proxima = scr_encontrar_terra_proxima(id, x, y, 500);
+                    if (_terra_proxima != noone && array_length(_terra_proxima) >= 2) {
+                        destino_x = _terra_proxima[0];
+                        destino_y = _terra_proxima[1];
+                        estado = "movendo";
+                    } else {
+                        // Sem terra próxima - parar
+                        estado = "parado";
+                        if (variable_global_exists("debug_enabled") && global.debug_enabled) {
+                            show_debug_message("⚠️ Infantaria parou: terreno proibido em (" + string(floor(_proxima_x)) + ", " + string(floor(_proxima_y)) + ")");
+                        }
+                    }
+                }
                 
                 // ✅ VERIFICAÇÃO: Se está travado (não se moveu muito)
                 var _dist_movida = point_distance(x, y, _x_antes, _y_antes);
                 if (_dist_movida < _vel_efetiva * 0.5) {
                     // Está travado - tentar desvio maior e atualizar destino
                     _direcao_final = _direcao_original + 90; // Virar 90 graus
-                    destino_x = x + lengthdir_x(100, _direcao_final);
-                    destino_y = y + lengthdir_y(100, _direcao_final);
-                    x += lengthdir_x(_vel_efetiva, _direcao_final);
-                    y += lengthdir_y(_vel_efetiva, _direcao_final);
-                    image_angle = _direcao_final;
+                    var _nova_x = x + lengthdir_x(_vel_normalizada, _direcao_final);
+                    var _nova_y = y + lengthdir_y(_vel_normalizada, _direcao_final);
+                    
+                    // ✅ CORREÇÃO CRÍTICA: Verificar terreno ANTES de mover
+                    if (scr_unidade_pode_terreno(id, _nova_x, _nova_y)) {
+                        // Terreno permitido - pode mover
+                        destino_x = x + lengthdir_x(100, _direcao_final);
+                        destino_y = y + lengthdir_y(100, _direcao_final);
+                        x = _nova_x;
+                        y = _nova_y;
+                        image_angle = _direcao_final;
+                    } else {
+                        // Terreno proibido - tentar outra direção ou parar
+                        _direcao_final = _direcao_original - 90; // Tentar direção oposta
+                        _nova_x = x + lengthdir_x(_vel_normalizada, _direcao_final);
+                        _nova_y = y + lengthdir_y(_vel_normalizada, _direcao_final);
+                        
+                        if (scr_unidade_pode_terreno(id, _nova_x, _nova_y)) {
+                            destino_x = x + lengthdir_x(100, _direcao_final);
+                            destino_y = y + lengthdir_y(100, _direcao_final);
+                            x = _nova_x;
+                            y = _nova_y;
+                            image_angle = _direcao_final;
+                        } else {
+                            // Sem terreno válido - parar
+                            estado = "parado";
+                            if (variable_global_exists("debug_enabled") && global.debug_enabled) {
+                                show_debug_message("⚠️ Infantaria parou: travado e sem terreno válido");
+                            }
+                        }
+                    }
                 }
             }
         } else {
@@ -411,8 +458,33 @@ switch (estado) {
                             var dist_ideal = alcance - 20;
                             var target_x = x + (dir_x / dist_norm) * (dist_alvo - dist_ideal);
                             var target_y = y + (dir_y / dist_norm) * (dist_alvo - dist_ideal);
-                            mp_potential_step(target_x, target_y, velocidade, false);
-                            image_angle = point_direction(0, 0, dir_x, dir_y);
+                            
+                            // ✅ CORREÇÃO: Verificar terreno antes de usar mp_potential_step
+                            if (scr_unidade_pode_terreno(id, target_x, target_y)) {
+                                var _x_antes_mp = x;
+                                var _y_antes_mp = y;
+                                mp_potential_step(target_x, target_y, velocidade, false);
+                                
+                                // ✅ CORREÇÃO: Verificar se realmente moveu para terreno válido
+                                if (!scr_unidade_pode_terreno(id, x, y)) {
+                                    // Moveu para água - voltar para posição anterior
+                                    x = _x_antes_mp;
+                                    y = _y_antes_mp;
+                                    // Tentar encontrar terra próxima
+                                    var _script_id = asset_get_index("scr_encontrar_terra_proxima");
+                                    if (_script_id != -1) {
+                                        var _terra_proxima = scr_encontrar_terra_proxima(id, x, y, 200);
+                                        if (_terra_proxima != noone && array_length(_terra_proxima) >= 2) {
+                                            x = _terra_proxima[0];
+                                            y = _terra_proxima[1];
+                                        }
+                                    }
+                                }
+                                image_angle = point_direction(0, 0, dir_x, dir_y);
+                            } else {
+                                // Terreno proibido - não mover
+                                image_angle = point_direction(x, y, alvo.x, alvo.y);
+                            }
                         }
                     }
                 }
@@ -425,8 +497,33 @@ switch (estado) {
                     var dist_ideal = alcance - 20;
                     var target_x = x + (dir_x / dist_norm) * (dist_norm - dist_ideal);
                     var target_y = y + (dir_y / dist_norm) * (dist_norm - dist_ideal);
-                    mp_potential_step(target_x, target_y, velocidade, false);
-                    image_angle = point_direction(0, 0, dir_x, dir_y);
+                    
+                    // ✅ CORREÇÃO: Verificar terreno antes de usar mp_potential_step
+                    if (scr_unidade_pode_terreno(id, target_x, target_y)) {
+                        var _x_antes_mp = x;
+                        var _y_antes_mp = y;
+                        mp_potential_step(target_x, target_y, velocidade, false);
+                        
+                        // ✅ CORREÇÃO: Verificar se realmente moveu para terreno válido
+                        if (!scr_unidade_pode_terreno(id, x, y)) {
+                            // Moveu para água - voltar para posição anterior
+                            x = _x_antes_mp;
+                            y = _y_antes_mp;
+                            // Tentar encontrar terra próxima
+                            var _script_id = asset_get_index("scr_encontrar_terra_proxima");
+                            if (_script_id != -1) {
+                                var _terra_proxima = scr_encontrar_terra_proxima(id, x, y, 200);
+                                if (_terra_proxima != noone && array_length(_terra_proxima) >= 2) {
+                                    x = _terra_proxima[0];
+                                    y = _terra_proxima[1];
+                                }
+                            }
+                        }
+                        image_angle = point_direction(0, 0, dir_x, dir_y);
+                    } else {
+                        // Terreno proibido - não mover
+                        image_angle = point_direction(x, y, alvo.x, alvo.y);
+                    }
                 }
             } else {
                 // Inimigo muito longe, volta para patrulha
@@ -452,4 +549,18 @@ switch (estado) {
             seguir_alvo = noone;
         }
     break;
+}
+
+// =============================================
+// ✅ SISTEMA DE COLISÃO FÍSICA
+// =============================================
+// Verificar colisões apenas a cada 3 frames para melhorar performance
+// ✅ CORREÇÃO: Verificar se a função existe antes de chamar para evitar erro
+if (variable_global_exists("game_frame") && global.game_frame % 3 == 0) {
+    var _script_index = asset_get_index("scr_colisao_fisica_unidades");
+    if (_script_index != -1 && asset_get_type(_script_index) == asset_script) {
+        // Função existe e é um script válido - chamar normalmente
+        scr_colisao_fisica_unidades(id, 30, 0.8);
+    }
+    // Se a função não existir, simplesmente não fazer nada (não causar erro)
 }

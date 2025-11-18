@@ -163,7 +163,7 @@ if (modo_ataque && voando && velocidade_atual > 0) {
                 if (instance_exists(_alvo_encontrado)) {
                     _missil.alvo = _alvo_encontrado;
                     _missil.dono = id;
-                    _missil.dano = 30;
+                    _missil.dano = 100; // ✅ AUMENTADO de 30 para 100 - muito mais letal
                     if (variable_instance_exists(_missil, "timer_vida")) {
                         _missil.timer_vida = 300;
                     }

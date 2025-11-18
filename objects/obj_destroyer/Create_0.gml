@@ -5,14 +5,19 @@
 
 // === CONFIGURACOES BASICAS ===
 hp_max = 300;
-hp_atual = 300;
-velocidade = 1.5;
-dano = 50;
-alcance = 400;
-alcance_tiro = 350;
+hp_atual = hp_max; // Vida atual inicia cheia
+velocidade_movimento = 1.5;
+velocidade_atual = velocidade_movimento; // Velocidade atual (inicia igual à base)
+velocidade = velocidade_movimento; // Compatibilidade com código antigo
+dano_base = 50;
+dano = dano_base; // Compatibilidade com código antigo
+alcance_visao = 400; // Alcance de detecção
+alcance_ataque = 350; // Alcance de ataque
+alcance = alcance_ataque; // Compatibilidade com código antigo
+alcance_tiro = alcance_ataque; // Compatibilidade com código antigo
 nacao_proprietaria = 1;
 
-show_debug_message("🚢 Destroyer criado - Velocidade: " + string(velocidade));
+show_debug_message("🚢 Destroyer criado - HP: " + string(hp_atual) + "/" + string(hp_max) + ", Velocidade: " + string(velocidade_movimento));
 
 // === SISTEMA DE SELECAO ===
 selecionado = false;

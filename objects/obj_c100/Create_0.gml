@@ -149,7 +149,7 @@ embarcar_unidade = function(unidade, peso) {
     return true;
 }
 
-// ✅ Desembarcar com validação de existência
+// ✅ CORREÇÃO: Desembarcar com validação de terreno
 desembarcar_tropas = function() {
     var _count = ds_list_size(lista_carga);
     if (_count == 0) return;
@@ -165,11 +165,26 @@ desembarcar_tropas = function() {
             _unidade.visible = true;
             if (variable_instance_exists(_unidade, "active")) _unidade.active = true;
             
-            // Posicionar em anel ao redor do C-100
+            // ✅ NOVO: Encontrar terra próxima antes de posicionar
             var _ang = (i * 360 / _count) + random(30);
             var _raio = 80 + random(40);
-            _unidade.x = x + lengthdir_x(_raio, _ang);
-            _unidade.y = y + lengthdir_y(_raio, _ang);
+            var _x_tentativa = x + lengthdir_x(_raio, _ang);
+            var _y_tentativa = y + lengthdir_y(_raio, _ang);
+            
+            // Verificar se posição é terra válida
+            var _terra_valida = scr_encontrar_terra_proxima(_unidade, _x_tentativa, _y_tentativa, 300);
+            if (_terra_valida != noone && array_length(_terra_valida) >= 2) {
+                _unidade.x = _terra_valida[0];
+                _unidade.y = _terra_valida[1];
+            } else {
+                // Fallback: usar posição original se não encontrar terra
+                _unidade.x = _x_tentativa;
+                _unidade.y = _y_tentativa;
+                // Forçar verificação de terreno no próximo step
+                if (variable_instance_exists(_unidade, "estado")) {
+                    _unidade.estado = "parado";
+                }
+            }
         }
     }
     

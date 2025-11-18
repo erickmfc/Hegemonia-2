@@ -77,7 +77,14 @@
 
 ## 📁 **ESTRUTURA DO PROJETO:**
 - `objects/` - 680 arquivos (560 .gml, 118 .yy)
-- `scripts/` - 384 arquivos (243 .gml, 141 .yy)
+- `scripts/` - Scripts de produção (243 .gml, 141 .yy)
+- `tests/scripts/` - Scripts de teste e diagnóstico
+- `docs/` - Documentação organizada por categoria
+  - `correcoes/` - Correções de bugs
+  - `implementacoes/` - Implementações de features
+  - `guias/` - Guias e tutoriais
+  - `relatorios/` - Relatórios e análises
+  - `changelogs/` - Histórico de mudanças
 - `sprites/` - 371 arquivos (224 .png, 105 .yy)
 - `rooms/` - 10 arquivos
 - `sounds/` - 16 arquivos
@@ -101,13 +108,14 @@
 4. Use os controles para construir, recrutar e comandar
 
 ## 📚 **DOCUMENTAÇÃO:**
-- `RELATORIO_COMPLETO_ESTADO_JOGO.txt` - Estado atual do jogo
-- `REVISAO_FINAL_DO_JOGO.md` - Revisão completa
-- `RELATORIO_FINAL_IA.md` - Sistema de IA
-- `SISTEMA_UNIFICADO_QUARTEIS_IMPLEMENTACAO_COMPLETA.md` - Quartéis
-- `IMPLEMENTACAO_F5_SISTEMA_GLOBAL_COMPLETA.md` - Sistema F-5
-- `LANCHA_PATRULHA_v6_SISTEMA_COMPLETO.md` - Navios
-- `RESUMO_IMPLEMENTACAO_IA.md` - IA Presidente 1
+- `docs/GUIA_MANUTENIBILIDADE.md` - Guia de manutenibilidade do projeto
+- `docs/GUIA_CODIGO_DEFENSIVO.md` - Quando usar verificações defensivas
+- `docs/GUIA_OTIMIZACAO_PERFORMANCE.md` - Guia de otimização de performance
+- `docs/ESTRUTURA_PROJETO.md` - Estrutura completa do projeto
+- `docs/relatorios/` - Relatórios e análises
+- `docs/implementacoes/` - Implementações de features
+- `docs/correcoes/` - Correções de bugs
+- `docs/guias/` - Guias e tutoriais
 
 ## 🔧 **TECNOLOGIAS:**
 - **Engine:** GameMaker Studio 2 (2024.8.1.171)
@@ -115,9 +123,22 @@
 - **Plataforma:** Desktop/Windows
 - **Tipo:** Estratégia Militar/Construção de Base
 
+## 🛠️ **MANUTENIBILIDADE:**
+- ✅ Scripts de teste organizados em `tests/scripts/`
+- ✅ Documentação organizada em `docs/` por categoria
+- ✅ Guias de boas práticas disponíveis
+- ✅ Estrutura de projeto padronizada
+
+## ⚡ **PERFORMANCE:**
+- ✅ Sistema de debug otimizado (zero overhead quando desabilitado)
+- ✅ Sistema de frame skip otimizado
+- ✅ Redução de verificações excessivas (80-90% menos verificações)
+- ✅ Script de análise de performance disponível
+
 ## ⚠️ **NOTAS:**
 - ✅ Todos os sistemas principais funcionais
 - ✅ Jogo otimizado e estável
 - ✅ Pronto para testes de gameplay
 - ✅ Base sólida para expansão
 - ✅ Código limpo e documentado
+- ✅ Projeto organizado para fácil manutenção

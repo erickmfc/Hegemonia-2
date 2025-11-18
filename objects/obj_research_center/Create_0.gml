@@ -1,5 +1,23 @@
-/// Research Center - Create Event
-/// Centro de Pesquisa Industrial - Inicialização
+// ===============================================
+// HEGEMONIA GLOBAL - RESEARCH CENTER
+// Centro de Pesquisa Industrial
+// ===============================================
+
+// === CUSTOS DE CONSTRUÇÃO ===
+custo_dinheiro = 5000;
+custo_minerio = 1000;
+
+// === SISTEMA DE VIDA ===
+hp_max = 1200;
+hp_atual = 1200;
+destrutivel = true;
+
+// === VARIÁVEIS DE SELEÇÃO ===
+selecionado = false;
+timer_feedback = 0;
+
+// === TERRENO PERMITIDO ===
+terreno_permitido = TERRAIN.CAMPO; // Research Center só em terreno de campo
 
 show_debug_message("Research Center (obj_research_center) initialized.");
 

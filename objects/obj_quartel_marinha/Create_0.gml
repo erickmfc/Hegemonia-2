@@ -29,7 +29,7 @@ ds_list_add(unidades_disponiveis, {
     sprite: spr_lancha_patrulha,
     custo_dinheiro: 50,
     custo_populacao: 1,
-    tempo_treino: 240,    // ✅ MUDADO: 4 SEGUNDOS (240 frames) - MÁXIMO
+    tempo_treino: 180,    // ✅ MUDADO: 3 SEGUNDOS (180 frames) - MÁXIMO
     descricao: "Unidade naval rápida para patrulhamento"
 });
 
@@ -41,7 +41,7 @@ if (object_exists(obj_Constellation)) {
         sprite: spr_Constellation,
         custo_dinheiro: 2500,
         custo_populacao: 12,
-        tempo_treino: 240,    // ✅ MUDADO: 4 SEGUNDOS (240 frames) - MÁXIMO
+        tempo_treino: 180,    // ✅ MUDADO: 3 SEGUNDOS (180 frames) - MÁXIMO
         descricao: "Navio de guerra avançado com sistema de mísseis"
     });
     show_debug_message("✅ Constellation adicionado à lista de unidades!");
@@ -57,7 +57,7 @@ if (object_exists(obj_Independence)) {
         sprite: spr_Independence,
         custo_dinheiro: 5000,
         custo_populacao: 20,
-        tempo_treino: 240,    // ✅ MUDADO: 4 SEGUNDOS (240 frames) - MÁXIMO
+        tempo_treino: 180,    // ✅ MUDADO: 3 SEGUNDOS (180 frames) - MÁXIMO
         descricao: "Fragata pesada com canhão e sistema de metralhadora"
     });
     show_debug_message("✅ Independence adicionado à lista de unidades!");
@@ -73,7 +73,7 @@ if (object_exists(obj_wwhendrick)) {
         sprite: spr_wwhendrick,
         custo_dinheiro: 2500,
         custo_populacao: 12,
-        tempo_treino: 240,    // ✅ MUDADO: 4 SEGUNDOS (240 frames) - MÁXIMO
+        tempo_treino: 180,    // ✅ MUDADO: 3 SEGUNDOS (180 frames) - MÁXIMO
         descricao: "Submarino furtivo com sistema de submersão. Controles: O/P/K/L | Clique para submergir/emergir"
     });
     show_debug_message("✅ Ww-Hendrick adicionado à lista de unidades!");
@@ -89,7 +89,7 @@ if (object_exists(obj_RonaldReagan)) {
         sprite: spr_RonaldReagan,
         custo_dinheiro: 12000,
         custo_populacao: 60,
-        tempo_treino: 240,    // ✅ MUDADO: 4 SEGUNDOS (240 frames) - MÁXIMO
+        tempo_treino: 180,    // ✅ MUDADO: 3 SEGUNDOS (180 frames) - MÁXIMO
         descricao: "Porta-Aviões nuclear. Transporta 35 aviões, 20 veículos e 100 soldados (155 unidades). HP: 4000."
     });
     show_debug_message("✅ Porta-Aviões Ronald Reagan adicionado à lista de unidades!");

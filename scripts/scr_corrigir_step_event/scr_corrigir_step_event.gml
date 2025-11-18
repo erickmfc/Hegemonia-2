@@ -130,7 +130,7 @@ function scr_corrigir_step_navios(objeto, resultado) {
     }
     
     // Verificar se está em água
-    if (!scr_check_water_tile(objeto.x, objeto.y)) {
+    if (!scr_verificar_agua(objeto.x, objeto.y)) {
         resultado.avisos[array_length(resultado.avisos)] = "Navio não está em água - verificar posição";
     }
     

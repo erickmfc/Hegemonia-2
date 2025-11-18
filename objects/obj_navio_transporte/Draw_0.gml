@@ -19,16 +19,38 @@ if (selecionado) {
     draw_set_alpha(0.2);
     draw_circle(x, _draw_y, radar_alcance, false);
     
-    // Linha para o destino
-    if (estado != LanchaState.PARADO) {
-        if (estado == LanchaState.ATACANDO) {
+    // ✅ CORREÇÃO: Removida linha amarela direta - usa apenas caminho A*
+    // Desenhar linha do caminho A* quando em movimento (APENAS UMA LINHA)
+    if (estado == LanchaState.MOVENDO) {
+        // ✅ CORREÇÃO: Desenhar apenas o caminho A* completo (removida linha direta duplicada)
+        if (variable_instance_exists(id, "meu_caminho") && meu_caminho != noone) {
+            draw_set_color(c_aqua);
+            draw_set_alpha(0.6);
+            var _num_segments = 30; // Número de segmentos para desenhar o caminho
+            var _prev_x = x;
+            var _prev_y = _draw_y;
+            
+            // ✅ CORREÇÃO: path_get_x/y usa posição (0.0 a 1.0), não pixels
+            for (var i = 1; i <= _num_segments; i++) {
+                var _pos = i / _num_segments; // Posição de 0.0 a 1.0
+                var _seg_x = path_get_x(meu_caminho, _pos);
+                var _seg_y = path_get_y(meu_caminho, _pos);
+                if (!is_undefined(_seg_x) && !is_undefined(_seg_y)) {
+                    draw_line(_prev_x, _prev_y, _seg_x, _seg_y);
+                    _prev_x = _seg_x;
+                    _prev_y = _seg_y;
+                }
+            }
+        }
+    }
+    
+    // Desenhar linha quando atacando
+    if (estado == LanchaState.ATACANDO) {
+        if (variable_instance_exists(id, "alvo_unidade") && instance_exists(alvo_unidade)) {
             draw_set_color(c_red);
             draw_set_alpha(0.7);
-        } else {
-            draw_set_color(c_yellow);
-            draw_set_alpha(0.5);
+            draw_line(x, _draw_y, alvo_unidade.x, alvo_unidade.y);
         }
-        draw_line(x, _draw_y, destino_x, destino_y);
     }
     
     // --- INFORMAÇÕES DE STATUS ---

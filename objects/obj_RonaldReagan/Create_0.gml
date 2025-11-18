@@ -10,7 +10,7 @@ nome_unidade = "Ronald Reagan";
 // === CONFIGURAÇÕES DE COMBATE ===
 hp_atual = 4000; // MAIOR VIDA ATÉ AGORA
 hp_max = 4000;
-velocidade_movimento = 1.5; // Lento (é navio de transporte)
+velocidade_movimento = 0.9; // Lento (é navio de transporte)
 radar_alcance = 1000;
 missil_alcance = 1000;
 missil_max_alcance = 1000;

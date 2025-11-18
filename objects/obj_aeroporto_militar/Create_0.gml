@@ -30,7 +30,7 @@ ds_list_add(unidades_disponiveis, {
     objeto: obj_caca_f5,
     custo_dinheiro: 800,
     custo_populacao: 3,
-    tempo_treino: 240, // ✅ MUDADO: 4 segundos (240 frames) - MÁXIMO
+    tempo_treino: 180, // ✅ MUDADO: 3 segundos (180 frames) - MÁXIMO
     descricao: "Caça-bombardeiro de alta velocidade"
 });
 
@@ -40,7 +40,7 @@ ds_list_add(unidades_disponiveis, {
     objeto: obj_helicoptero_militar,
     custo_dinheiro: 600,
     custo_populacao: 2,
-    tempo_treino: 240, // ✅ MUDADO: 4 segundos (240 frames) - MÁXIMO
+    tempo_treino: 180, // ✅ MUDADO: 3 segundos (180 frames) - MÁXIMO
     descricao: "Helicóptero de ataque e transporte"
 });
 
@@ -50,7 +50,7 @@ ds_list_add(unidades_disponiveis, {
     objeto: obj_c100,
     custo_dinheiro: 1200,
     custo_populacao: 4,
-    tempo_treino: 240, // ✅ MUDADO: 4 segundos (240 frames) - MÁXIMO
+    tempo_treino: 180, // ✅ MUDADO: 3 segundos (180 frames) - MÁXIMO
     descricao: "Avião de transporte com embarque de tropas e flares defensivos"
 });
 
@@ -60,7 +60,7 @@ ds_list_add(unidades_disponiveis, {
     objeto: obj_f15,
     custo_dinheiro: 1500,
     custo_populacao: 5,
-    tempo_treino: 240, // ✅ MUDADO: 4 segundos (240 frames) - MÁXIMO
+    tempo_treino: 180, // ✅ MUDADO: 3 segundos (180 frames) - MÁXIMO
     descricao: "Caça superior com HP 800 e sistema de mísseis avançado"
 });
 
@@ -70,7 +70,7 @@ ds_list_add(unidades_disponiveis, {
     objeto: obj_su35,
     custo_dinheiro: 5900,
     custo_populacao: 5,
-    tempo_treino: 240, // ✅ MUDADO: 4 segundos (240 frames) - MÁXIMO
+    tempo_treino: 180, // ✅ MUDADO: 3 segundos (180 frames) - MÁXIMO
     descricao: "Caça superior com HP 800 e sistema de mísseis avançado"
 });
 
@@ -78,14 +78,25 @@ ds_list_add(unidades_disponiveis, {
 selecionado = false;
 menu_recrutamento = noone;
 
+// === CONFIGURAÇÕES DE TAMANHO DE IMAGEM ===
+// Dimensões originais do sprite do aeroporto
+sprite_largura_original = 1290; // Largura original do sprite (bbox_right - bbox_left)
+sprite_altura_original = 672;   // Altura original do sprite (height)
+sprite_escala = 0.3;            // Escala aplicada ao sprite
+
+// Tamanho final da imagem renderizada
+imagem_largura = sprite_largura_original * sprite_escala;  // ~3483 pixels
+imagem_altura = sprite_altura_original * sprite_escala;    // ~1814 pixels
+
 // === CONFIGURAÇÕES VISUAIS CORRIGIDAS ===
-image_blend = make_color_rgb(80, 100, 120); // Azul militar
-image_xscale = 2.7; // ✅ ESCALA REDUZIDA 10% (64x64 -> 172x172)
-image_yscale = 2.7; // ✅ ESCALA REDUZIDA 10% (64x64 -> 172x172)
+// ✅ CORREÇÃO: Remover image_blend para deixar o sprite original sem sombra
+image_blend = c_white; // ✅ CORREÇÃO: Cor neutra (branco) para manter sprite original sem modificações
+image_xscale = sprite_escala; // ✅ ESCALA APLICADA (1290x672 -> ~3483x1814)
+image_yscale = sprite_escala; // ✅ ESCALA APLICADA (1290x672 -> ~3483x1814)
 image_alpha = 1.0; // ✅ VISÍVEL
 
 // === CONFIGURAÇÕES DE INTERAÇÃO ===
-raio_interacao = 90; // Raio ajustado para sprite reduzido (172x172)
+raio_interacao = 90; // Raio de interação ajustado para o tamanho da imagem
 pode_interagir = true;
 
 // === TERRENO PERMITIDO ===
@@ -94,3 +105,4 @@ terreno_permitido = TERRAIN.CAMPO; // Aeroportos só em terreno de campo
 show_debug_message("🏢 Aeroporto Militar criado - Sistema aéreo ativo");
 show_debug_message("💰 Custo: $" + string(custo_dinheiro) + " dinheiro, " + string(custo_minerio) + " minério");
 show_debug_message("✈️ Unidades disponíveis: " + string(ds_list_size(unidades_disponiveis)));
+show_debug_message("📐 Tamanho da imagem: " + string(imagem_largura) + "x" + string(imagem_altura) + " pixels (escala: " + string(sprite_escala) + "x)");

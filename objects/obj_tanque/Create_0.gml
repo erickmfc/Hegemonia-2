@@ -10,7 +10,9 @@ destino_x = x;
 destino_y = y;
 destino_original_x = undefined; // Para sistema de desvio de obstáculos
 destino_original_y = undefined; // Para sistema de desvio de obstáculos
-velocidade = 1.2; // mais lento que a infantaria
+velocidade_movimento = 1.2; // mais lento que a infantaria
+velocidade_atual = velocidade_movimento; // Velocidade atual (inicia igual à base)
+velocidade = velocidade_movimento; // ✅ CORREÇÃO: Compatibilidade com código que usa velocidade diretamente
 
 // Patrulha
 patrulha = ds_list_create();
@@ -27,18 +29,26 @@ terrenos_permitidos = [TERRAIN.CAMPO, TERRAIN.DESERTO]; // Terra e deserto (não
 
 // Ataque
 alcance_visao = 600;  // bem maior
-alcance_tiro  = 540;  // ~3x infantaria (180 * 3)
+alcance_ataque = 540;  // ~3x infantaria (180 * 3)
+alcance_tiro = alcance_ataque; // Compatibilidade com código antigo
 atq_cooldown = 0;
 atq_rate = 180; // 3 segundos (60 FPS * 3 = 180 frames)
+velocidade_ataque = atq_rate; // Compatibilidade com documentação
 
 // Alvo inimigo
 alvo = noone;
 
 // Vida
-hp = 100; // bem mais resistente
+hp_max = 100; // bem mais resistente
+hp_atual = hp_max; // Vida atual inicia cheia
+hp = hp_atual; // Compatibilidade com código antigo
 
 // Modo de combate
 modo_ataque = true; // Por padrão, ataca automaticamente
+
+// Dano
+dano_base = 50; // Dano base do tanque
+dano = dano_base; // Compatibilidade com código antigo
 
 // =============================================
 // SISTEMA DE FRAME SKIP COM LOD

@@ -13,12 +13,12 @@ if (current_time mod 10000 < 17 && global.debug_enabled) { // ✅ Alterado de 30
 var _wheel = mouse_wheel_down() - mouse_wheel_up();
 if (_wheel != 0) {
     // ✅ CORREÇÃO: Zoom mais suave e responsivo
-    var _zoom_factor = 0.25; // ✅ Aumentado para zoom mais responsivo com range maior
+    var _zoom_factor = 0.35; // Incremento por rolagem
     
     zoom_level -= _wheel * _zoom_factor;
-    // ✅ LIMITE MÍNIMO: 3.5 (não pode diminuir mais - jogo fica lento)
-    // ✅ LIMITE MÁXIMO: 25.0 (pode ampliar bastante)
-    zoom_level = clamp(zoom_level, 3.5, 25.0);
+    // ✅ LIMITE MÍNIMO: 3.5 (zoom mais longe)
+    // ✅ LIMITE MÁXIMO: 35.0 (zoom mais perto)
+    zoom_level = clamp(zoom_level, 3.5, 35.0);
 }
 
 // === SISTEMA DE MOVIMENTO DE CÂMERA ROBUSTO ===

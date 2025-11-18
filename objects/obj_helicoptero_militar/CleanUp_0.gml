@@ -1,6 +1,14 @@
 // ===============================================
-// HEGEMONIA GLOBAL - HELICÓPTERO (Clean Up)
+// HEGEMONIA GLOBAL - HELICÓPTERO MILITAR - CLEANUP EVENT
+// Limpeza de memória e data structures
 // ===============================================
 
-// Limpa a lista da memória quando o helicóptero é destruído
-ds_list_destroy(pontos_patrulha);
+// ✅ LIMPEZA: Destruir data structures de patrulha
+if (variable_instance_exists(id, "pontos_patrulha")) {
+    if (ds_exists(pontos_patrulha, ds_type_list)) {
+        ds_list_destroy(pontos_patrulha);
+    }
+}
+
+// ✅ LIMPEZA: Limpar referências
+alvo_em_mira = noone;

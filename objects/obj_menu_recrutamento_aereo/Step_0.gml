@@ -26,5 +26,17 @@ if (keyboard_check_pressed(vk_escape)) {
 // === VERIFICAR SE AEROPORTO AINDA EXISTE ===
 if (id_do_aeroporto == noone || !instance_exists(id_do_aeroporto)) {
     show_debug_message("⚠️ Aeroporto não existe mais - Destruindo menu");
+    
+    // ✅ NOVO: Mostrar menu suspenso e minimapa ao fechar
+    var _menu_suspenso = instance_find(obj_menu_recursos_suspenso, 0);
+    if (instance_exists(_menu_suspenso)) {
+        _menu_suspenso.menu_visible = true;
+    }
+    
+    var _minimap_instance = instance_find(obj_minimap, 0);
+    if (instance_exists(_minimap_instance)) {
+        _minimap_instance.minimap_visible = true;
+    }
+    
     instance_destroy();
 }

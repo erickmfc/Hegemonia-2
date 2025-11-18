@@ -53,14 +53,74 @@ function scr_rebuild_spatial_grid() {
         }
         
         // Reconstruir adicionando todas as unidades
+        // ✅ EXPANDIDO: Incluir TODOS os tipos de unidades para otimização completa
         with (all) {
-            // Adicionar apenas unidades móveis (infantaria, tanques, navios, etc.)
+            // Unidades terrestres
             if (object_index == obj_infantaria || 
                 object_index == obj_tanque || 
+                object_index == obj_soldado_antiaereo ||
+                object_index == obj_blindado_antiaereo) {
+                var cell = scr_get_grid_cell(x, y);
+                if (cell >= 0 && cell < array_length(global.spatial_grid)) {
+                    ds_list_add(global.spatial_grid[cell], id);
+                }
+            }
+            
+            // Unidades aéreas
+            if (object_index == obj_helicoptero_militar ||
+                object_index == obj_caca_f5 ||
+                object_index == obj_f6 ||
                 object_index == obj_f15 ||
-                object_index == obj_helicoptero_militar ||
-                object_index == obj_lancha_patrulha ||
-                object_index == obj_fragata) {
+                object_index == obj_su35 ||
+                object_index == obj_c100) {
+                var cell = scr_get_grid_cell(x, y);
+                if (cell >= 0 && cell < array_length(global.spatial_grid)) {
+                    ds_list_add(global.spatial_grid[cell], id);
+                }
+            }
+            
+            // Unidades navais
+            if (object_index == obj_lancha_patrulha ||
+                object_index == obj_navio_base ||
+                object_index == obj_submarino_base ||
+                object_index == obj_navio_transporte ||
+                object_index == obj_Constellation ||
+                object_index == obj_Independence ||
+                object_index == obj_RonaldReagan ||
+                object_index == obj_wwhendrick) {
+                var cell = scr_get_grid_cell(x, y);
+                if (cell >= 0 && cell < array_length(global.spatial_grid)) {
+                    ds_list_add(global.spatial_grid[cell], id);
+                }
+            }
+            
+            // ✅ NOVO: Verificar unidades opcionais
+            var _obj_abrams = asset_get_index("obj_M1A_Abrams");
+            if (_obj_abrams != -1 && object_index == _obj_abrams) {
+                var cell = scr_get_grid_cell(x, y);
+                if (cell >= 0 && cell < array_length(global.spatial_grid)) {
+                    ds_list_add(global.spatial_grid[cell], id);
+                }
+            }
+            
+            var _obj_gepard = asset_get_index("obj_gepard");
+            if (_obj_gepard != -1 && object_index == _obj_gepard) {
+                var cell = scr_get_grid_cell(x, y);
+                if (cell >= 0 && cell < array_length(global.spatial_grid)) {
+                    ds_list_add(global.spatial_grid[cell], id);
+                }
+            }
+            
+            var _obj_fragata = asset_get_index("obj_fragata");
+            if (_obj_fragata != -1 && object_index == _obj_fragata) {
+                var cell = scr_get_grid_cell(x, y);
+                if (cell >= 0 && cell < array_length(global.spatial_grid)) {
+                    ds_list_add(global.spatial_grid[cell], id);
+                }
+            }
+            
+            var _obj_destroyer = asset_get_index("obj_destroyer");
+            if (_obj_destroyer != -1 && object_index == _obj_destroyer) {
                 var cell = scr_get_grid_cell(x, y);
                 if (cell >= 0 && cell < array_length(global.spatial_grid)) {
                     ds_list_add(global.spatial_grid[cell], id);

@@ -165,7 +165,7 @@ function scr_debug_quartel_marinha_completo(quartel) {
     // Verificar se está em água (se houver instância)
     var _instancia_quartel = instance_find(obj_quartel_marinha, 0);
     if (instance_exists(_instancia_quartel)) {
-        if (!scr_check_water_tile(_instancia_quartel.x, _instancia_quartel.y)) {
+        if (!scr_verificar_agua(_instancia_quartel.x, _instancia_quartel.y)) {
             resultado.avisos[array_length(resultado.avisos)] = "Quartel da marinha não está em água";
         }
     }

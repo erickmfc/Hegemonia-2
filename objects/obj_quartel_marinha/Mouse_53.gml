@@ -57,7 +57,12 @@ if (_click_detected) {
         if (nacao_proprietaria != _minha_nacao) {
             // Quartel não é do jogador - BLOQUEAR
             show_debug_message("🚫 Este quartel de marinha pertence à nação " + string(nacao_proprietaria) + " - Você não pode controlá-lo!");
-            exit;
+            // ✅ NOVO: Tocar som de erro
+            var _som_erro = asset_get_index("som_erro");
+            if (_som_erro != -1) {
+                audio_play_sound(_som_erro, 1, false);
+            }
+            exit; // ✅ CRÍTICO: Sair imediatamente
         }
     }
     

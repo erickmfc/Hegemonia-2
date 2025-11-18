@@ -342,3 +342,15 @@ switch (estado) {
         }
     break;
 }
+
+// =============================================
+// ✅ SISTEMA DE COLISÃO FÍSICA
+// =============================================
+// Verificar colisões apenas a cada 3 frames para melhorar performance
+// ✅ CORREÇÃO: Verificar se a função existe antes de chamar para evitar erro
+if (variable_global_exists("game_frame") && global.game_frame % 3 == 0) {
+    var _script_index = asset_get_index("scr_colisao_fisica_unidades");
+    if (_script_index != -1 && asset_get_type(_script_index) == asset_script) {
+        scr_colisao_fisica_unidades(id, 30, 0.8); // Raio padrão para soldados
+    }
+}

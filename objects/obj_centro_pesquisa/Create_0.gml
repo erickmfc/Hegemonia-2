@@ -1,5 +1,25 @@
-// Evento Create de obj_centro_pesquisa
+// ===============================================
+// HEGEMONIA GLOBAL - CENTRO DE PESQUISA
+// Sistema de Pesquisa Tecnológica
+// ===============================================
 
+// === CUSTOS DE CONSTRUÇÃO ===
+custo_dinheiro = 5000;
+custo_minerio = 1000;
+
+// === SISTEMA DE VIDA ===
+hp_max = 1200;
+hp_atual = 1200;
+destrutivel = true;
+
+// === VARIÁVEIS DE SELEÇÃO ===
+selecionado = false;
+timer_feedback = 0;
+
+// === TERRENO PERMITIDO ===
+terreno_permitido = TERRAIN.CAMPO; // Centro de Pesquisa só em terreno de campo
+
+// === SISTEMA DE PESQUISA TECNOLÓGICA ===
 // Sistema de pesquisa tecnológica
 global.menu_pesquisa_aberto = false;
 global.slots_pesquisa_total = 3; // Máximo de 3 pesquisas simultâneas

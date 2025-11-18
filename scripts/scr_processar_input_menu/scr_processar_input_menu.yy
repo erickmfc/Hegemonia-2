@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_processar_input_menu",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_processar_input_menu",
+  "parent":{
+    "name":"menu_teste",
+    "path":"folders/Scripts/menu_teste.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

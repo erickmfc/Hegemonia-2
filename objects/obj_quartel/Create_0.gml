@@ -55,7 +55,7 @@ ds_list_add(unidades_disponiveis, {
     objeto: obj_infantaria,
     custo_dinheiro: 100,
     custo_populacao: 1,
-    tempo_treino: 240, // ✅ MUDADO: 4 segundos (240 frames) - MÁXIMO
+    tempo_treino: 180, // ✅ MUDADO: 3 segundos (180 frames) - MÁXIMO
     descricao: "Unidade de combate básica com rifle",
     sprite: spr_infantaria
 });
@@ -65,7 +65,7 @@ ds_list_add(unidades_disponiveis, {
     objeto: obj_soldado_antiaereo,
     custo_dinheiro: 200,
     custo_populacao: 1,
-    tempo_treino: 240, // ✅ MUDADO: 4 segundos (240 frames) - MÁXIMO
+    tempo_treino: 180, // ✅ MUDADO: 3 segundos (180 frames) - MÁXIMO
     descricao: "Especialista com mísseis de longo alcance",
     sprite: spr_soldado_antiaereo,
     categoria: "terrestre"
@@ -76,7 +76,7 @@ ds_list_add(unidades_disponiveis, {
     objeto: obj_tanque,
     custo_dinheiro: 500,
     custo_populacao: 3,
-    tempo_treino: 240, // ✅ MUDADO: 4 segundos (240 frames) - MÁXIMO
+    tempo_treino: 180, // ✅ MUDADO: 3 segundos (180 frames) - MÁXIMO
     descricao: "Unidade blindada pesada com canhão",
     sprite: spr_tanque
 });
@@ -86,7 +86,7 @@ ds_list_add(unidades_disponiveis, {
     objeto: obj_blindado_antiaereo,
     custo_dinheiro: 800,
     custo_populacao: 4,
-    tempo_treino: 240, // ✅ MUDADO: 4 segundos (240 frames) - MÁXIMO
+    tempo_treino: 180, // ✅ MUDADO: 3 segundos (180 frames) - MÁXIMO
     descricao: "Veículo especializado em defesa aérea",
     sprite: spr_blindado_antiaereo,
     categoria: "terrestre"
@@ -101,7 +101,7 @@ if (_obj_abrams != -1 && asset_get_type(_obj_abrams) == asset_object) {
         objeto: _obj_abrams,
         custo_dinheiro: 1200, // Mais caro que tanque comum (500) - unidade de elite
         custo_populacao: 5, // Mais população que tanque comum (3)
-        tempo_treino: 300, // 5 segundos (300 frames) - mais tempo para unidade de elite
+        tempo_treino: 180, // ✅ MUDADO: 3 segundos (180 frames) - MÁXIMO
         descricao: "Tanque de elite com torre modular e projétil SABOT",
         sprite: (_spr_abrams != -1 && sprite_exists(_spr_abrams)) ? _spr_abrams : spr_tanque, // Fallback para spr_tanque se não encontrar
         categoria: "terrestre"
@@ -109,7 +109,11 @@ if (_obj_abrams != -1 && asset_get_type(_obj_abrams) == asset_object) {
 }
 
 // ✅ NOVO: Gepard Anti-Aéreo - Tanque Anti-Aéreo
-var _obj_gepard = asset_get_index("obj_gepard");
+// ✅ CORREÇÃO: Verificar nome correto do objeto (pode ser obj_Gepard_Anti_Aereo)
+var _obj_gepard = asset_get_index("obj_Gepard_Anti_Aereo");
+if (_obj_gepard == -1) {
+    _obj_gepard = asset_get_index("obj_gepard"); // Fallback para nome alternativo
+}
 var _spr_gepard_casco = asset_get_index("TYPE_39_SAM_HULL");
 if (_obj_gepard != -1 && asset_get_type(_obj_gepard) == asset_object) {
     ds_list_add(unidades_disponiveis, {
@@ -117,7 +121,7 @@ if (_obj_gepard != -1 && asset_get_type(_obj_gepard) == asset_object) {
         objeto: _obj_gepard,
         custo_dinheiro: 1500, // Mais caro que Abrams - unidade especializada anti-aérea
         custo_populacao: 6, // Mais população que Abrams
-        tempo_treino: 360, // 6 segundos (360 frames) - mais tempo para unidade especializada
+        tempo_treino: 180, // ✅ MUDADO: 3 segundos (180 frames) - MÁXIMO
         descricao: "Tanque anti-aéreo com mísseis SAM e projéteis SABOT",
         sprite: (_spr_gepard_casco != -1 && sprite_exists(_spr_gepard_casco)) ? _spr_gepard_casco : spr_tanque, // Fallback para spr_tanque se não encontrar
         categoria: "terrestre"

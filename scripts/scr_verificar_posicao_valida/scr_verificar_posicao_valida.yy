@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_verificar_posicao_valida",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_verificar_posicao_valida",
+  "parent":{
+    "name":"menu_teste",
+    "path":"folders/Scripts/menu_teste.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

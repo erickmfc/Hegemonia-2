@@ -137,6 +137,26 @@ switch (estado) {
     break;
     
     case "movendo":
+        // ✅ NOVO: Verificar destino ANTES de começar a mover
+        if (!scr_unidade_pode_terreno(id, destino_x, destino_y)) {
+            // Destino está em água - encontrar terra próxima
+            var _terra_proxima = scr_encontrar_terra_proxima(id, destino_x, destino_y, 1000);
+            if (_terra_proxima != noone && array_length(_terra_proxima) >= 2) {
+                destino_x = _terra_proxima[0];
+                destino_y = _terra_proxima[1];
+                if (variable_global_exists("debug_enabled") && global.debug_enabled) {
+                    show_debug_message("⚠️ Tanque: Destino em água - redirecionando para terra próxima");
+                }
+            } else {
+                // Sem terra próxima - parar
+                estado = "parado";
+                if (variable_global_exists("debug_enabled") && global.debug_enabled) {
+                    show_debug_message("⚠️ Tanque: Destino em água e sem terra próxima - parando");
+                }
+                break;
+            }
+        }
+        
         if (point_distance(x, y, destino_x, destino_y) > 6) {
             // Calcular direção para o destino
             var dir = point_direction(x, y, destino_x, destino_y);
@@ -164,12 +184,32 @@ switch (estado) {
             
             // ✅ CORREÇÃO: Normalizar velocidade baseado no zoom
             var _vel_normalizada = scr_normalize_unit_speed(velocidade);
-            // Movimento com desvio se necessário
-            var dx = lengthdir_x(_vel_normalizada, _direcao_final);
-            var dy = lengthdir_y(_vel_normalizada, _direcao_final);
-            x += dx;
-            y += dy;
-            image_angle = _direcao_final;
+            // ✅ NOVO: Verificar terreno antes de mover
+            var _proxima_x = x + lengthdir_x(_vel_normalizada, _direcao_final);
+            var _proxima_y = y + lengthdir_y(_vel_normalizada, _direcao_final);
+            
+            // ✅ VERIFICAÇÃO DE TERRENO: Verificar se pode mover para a próxima posição
+            if (scr_unidade_pode_terreno(id, _proxima_x, _proxima_y)) {
+                // Terreno permitido - pode mover
+                x = _proxima_x;
+                y = _proxima_y;
+                image_angle = _direcao_final;
+            } else {
+                // Terreno proibido - parar e tentar encontrar terra próxima
+                var _terra_proxima = scr_encontrar_terra_proxima(id, x, y, 500);
+                if (_terra_proxima != noone && array_length(_terra_proxima) >= 2) {
+                    destino_x = _terra_proxima[0];
+                    destino_y = _terra_proxima[1];
+                    estado = "movendo";
+                    image_angle = point_direction(x, y, destino_x, destino_y);
+                } else {
+                    // Sem terra próxima - parar
+                    estado = "parado";
+                    if (variable_global_exists("debug_enabled") && global.debug_enabled) {
+                        show_debug_message("⚠️ Tanque parou: terreno proibido em (" + string(floor(_proxima_x)) + ", " + string(floor(_proxima_y)) + ")");
+                    }
+                }
+            }
         } else {
             // Chegou ao destino temporário ou final
             // ✅ NOVO: Se estava usando destino temporário, voltar ao destino original
@@ -225,9 +265,21 @@ switch (estado) {
                 // ✅ CORREÇÃO: Normalizar velocidade baseado no zoom
                 var _vel_normalizada = scr_normalize_unit_speed(velocidade);
                 var dir = point_direction(x, y, destino_x, destino_y);
-                x += lengthdir_x(_vel_normalizada, dir);
-                y += lengthdir_y(_vel_normalizada, dir);
-                image_angle = dir;
+                var _proxima_x = x + lengthdir_x(_vel_normalizada, dir);
+                var _proxima_y = y + lengthdir_y(_vel_normalizada, dir);
+                
+                // ✅ NOVO: Verificar terreno antes de mover (patrulhando)
+                if (scr_unidade_pode_terreno(id, _proxima_x, _proxima_y)) {
+                    x = _proxima_x;
+                    y = _proxima_y;
+                    image_angle = dir;
+                } else {
+                    // Terreno proibido - parar patrulha
+                    estado = "parado";
+                    if (variable_global_exists("debug_enabled") && global.debug_enabled) {
+                        show_debug_message("⚠️ Tanque parou patrulha: terreno proibido");
+                    }
+                }
             }
         } else {
             // Sem pontos de patrulha - voltar para parado
@@ -328,9 +380,21 @@ switch (estado) {
                     var dir = point_direction(x, y, target_x, target_y);
                     // ✅ CORREÇÃO: Normalizar velocidade baseado no zoom
                     var _vel_normalizada = scr_normalize_unit_speed(velocidade);
-                    x += lengthdir_x(_vel_normalizada, dir);
-                    y += lengthdir_y(_vel_normalizada, dir);
-                    image_angle = dir;
+                    var _proxima_x = x + lengthdir_x(_vel_normalizada, dir);
+                    var _proxima_y = y + lengthdir_y(_vel_normalizada, dir);
+                    
+                    // ✅ NOVO: Verificar terreno antes de mover (atacando)
+                    if (scr_unidade_pode_terreno(id, _proxima_x, _proxima_y)) {
+                        x = _proxima_x;
+                        y = _proxima_y;
+                        image_angle = dir;
+                    } else {
+                        // Terreno proibido - parar e atirar de longe
+                        image_angle = point_direction(x, y, alvo.x, alvo.y);
+                        if (variable_global_exists("debug_enabled") && global.debug_enabled) {
+                            show_debug_message("⚠️ Tanque bloqueado por terreno ao atacar");
+                        }
+                    }
                 }
             } else {
                 // Inimigo muito longe, volta para patrulha
@@ -363,4 +427,16 @@ switch (estado) {
             }
         }
     break;
+}
+
+// =============================================
+// ✅ SISTEMA DE COLISÃO FÍSICA
+// =============================================
+// Verificar colisões apenas a cada 3 frames para melhorar performance
+// ✅ CORREÇÃO: Verificar se a função existe antes de chamar para evitar erro
+if (variable_global_exists("game_frame") && global.game_frame % 3 == 0) {
+    var _script_index = asset_get_index("scr_colisao_fisica_unidades");
+    if (_script_index != -1 && asset_get_type(_script_index) == asset_script) {
+        scr_colisao_fisica_unidades(id, 40, 1.0); // Raio maior para tanques (são maiores)
+    }
 }

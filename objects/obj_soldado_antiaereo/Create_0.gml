@@ -10,10 +10,20 @@
 // Nação proprietária (1 = jogador, 2 = IA inimiga)
 nacao_proprietaria = 1;
 
-vida = 100;
-vida_max = 100;
-dano = 100; // Dano aumentado contra alvos aéreos
-velocidade = 2; // Mesma velocidade da infantaria
+// Vida (padronizado)
+hp_max = 100;
+hp_atual = hp_max; // Vida atual inicia cheia
+vida = hp_atual; // Compatibilidade com código antigo
+vida_max = hp_max; // Compatibilidade com código antigo
+
+// Dano (padronizado)
+dano_base = 100; // Dano aumentado contra alvos aéreos
+dano = dano_base; // Compatibilidade com código antigo
+
+// Velocidade (padronizado)
+velocidade_movimento = 2; // Mesma velocidade da infantaria
+velocidade_atual = velocidade_movimento; // Velocidade atual (inicia igual à base)
+velocidade = velocidade_movimento; // Compatibilidade com código antigo
 
 // Estado inicial
 selecionado = false;
@@ -36,9 +46,11 @@ indice_patrulha_atual = 0;
 
 // Ataque especializado contra alvos aéreos e terrestres
 alcance_visao = 500; // Maior alcance para detectar alvos
-alcance_tiro = 400; // Alcance maior que infantaria normal
+alcance_ataque = 400; // Alcance maior que infantaria normal
+alcance_tiro = alcance_ataque; // Compatibilidade com código antigo
 atq_cooldown = 0;
 atq_rate = 60; // Mais lento que infantaria (míssil demora mais para carregar)
+velocidade_ataque = atq_rate; // Compatibilidade com documentação
 
 // Alvo inimigo (aéreos e terrestres)
 alvo = noone;

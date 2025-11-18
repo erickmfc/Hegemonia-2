@@ -24,13 +24,21 @@ function scr_debug_log(categoria, mensagem, nivel = "info", dados = {}) {
     }
     
     // Criar entrada de log
+    // ✅ CORREÇÃO: game_get_frame_count() não existe no GameMaker
+    var _frame_count = 0;
+    if (variable_global_exists("game_frame")) {
+        _frame_count = global.game_frame;
+    } else if (variable_global_exists("frame_count")) {
+        _frame_count = global.frame_count;
+    }
+    
     var entrada_log = {
         timestamp: current_time,
         categoria: categoria,
         mensagem: mensagem,
         nivel: nivel,
         dados: dados,
-        frame: game_get_frame_count()
+        frame: _frame_count
     };
     
     // Adicionar ao sistema de logs
@@ -41,8 +49,11 @@ function scr_debug_log(categoria, mensagem, nivel = "info", dados = {}) {
         array_delete(debug_system.logs, 0, 1);
     }
     
+    // ✅ CORREÇÃO: Verificar se debug está habilitado globalmente
+    var _debug_habilitado = (variable_global_exists("debug_enabled") && global.debug_enabled);
+    
     // Exibir no console se debug estiver ativo
-    if (global.debug_system.categorias_ativas[array_length(global.debug_system.categorias_ativas) - 1] == "DEBUG") {
+    if (_debug_habilitado) {
         var timestamp_str = string(entrada_log.timestamp);
         var frame_str = string(entrada_log.frame);
         var log_str = "[" + timestamp_str + "] [" + frame_str + "] [" + categoria + "] " + mensagem;

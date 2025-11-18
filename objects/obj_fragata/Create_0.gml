@@ -5,16 +5,22 @@
 
 // === CONFIGURAÇÕES BÁSICAS ===
 hp_max = 200;
-hp_atual = 200;
-velocidade = 1.8;
-dano = 40;
-alcance = 400;                 // Alcance de detecção
-alcance_tiro = 300;            // Alcance de ataque
+hp_atual = hp_max; // Vida atual inicia cheia
+velocidade_movimento = 1.8;
+velocidade_atual = velocidade_movimento; // Velocidade atual (inicia igual à base)
+velocidade = velocidade_movimento; // Compatibilidade com código antigo
+dano_base = 40;
+dano = dano_base; // Compatibilidade com código antigo
+alcance_visao = 400;                 // Alcance de detecção
+alcance_ataque = 300;            // Alcance de ataque
+alcance = alcance_ataque; // Compatibilidade com código antigo
+alcance_tiro = alcance_ataque; // Compatibilidade com código antigo
 nacao_proprietaria = 1;
 
 // === SISTEMA DE ATAQUE OTIMIZADO ===
 atq_cooldown = 0;
 atq_rate = 180;                // 3 segundos entre mísseis
+velocidade_ataque = atq_rate; // Compatibilidade com documentação
 
 // === SISTEMA DE SELEÇÃO ===
 selecionado = false;
@@ -40,4 +46,4 @@ velocidade_rotacao = 0.8; // Velocidade de rotação em graus por frame
 // === CONFIGURAÇÕES VISUAIS ===
 image_blend = make_color_rgb(90, 130, 180); // Azul médio
 
-show_debug_message("🚢 Fragata criada - Sistema de ataque direto ativo");
+show_debug_message("🚢 Fragata criada - HP: " + string(hp_atual) + "/" + string(hp_max) + ", Sistema de ataque direto ativo");

@@ -50,14 +50,38 @@ if (selecionado) {
     else if (estado == "pousando") _status_color = c_yellow;
     else if (estado == "movendo") _status_color = make_color_rgb(0, 255, 255); // c_aqua
     
-    // Desenha o status acima do avião
-    draw_set_color(_status_color);
-    draw_text(x, _draw_y - 60, "SU-35 - " + _status_text);
+    // ✅ CORREÇÃO: Definir fonte padrão antes de desenhar (evita fonte gigante)
+    draw_set_font(-1);
     
-    // Desenha os controles disponíveis
+    // Desenha o status acima do avião (com fundo escuro para legibilidade)
+    var _status_x = x;
+    var _status_y = _draw_y - 65;
+    var _status_w = string_width("SU-35 - " + _status_text) + 20;
+    var _status_h = 25;
+    
+    draw_set_color(c_black);
+    draw_set_alpha(0.8);
+    draw_rectangle(_status_x - _status_w/2, _status_y - _status_h/2, 
+                    _status_x + _status_w/2, _status_y + _status_h/2, false);
+    draw_set_alpha(1.0);
+    
+    // Borda do status
+    draw_set_color(_status_color);
+    draw_set_alpha(0.6);
+    draw_rectangle(_status_x - _status_w/2, _status_y - _status_h/2, 
+                    _status_x + _status_w/2, _status_y + _status_h/2, true);
+    draw_set_alpha(1.0);
+    
+    // Desenhar status PRINCIPAL
+    draw_set_color(_status_color);
+    draw_text(_status_x, _status_y, "SU-35 - " + _status_text);
+    
+    // Desenha os controles disponíveis (menor, abaixo do status)
     draw_set_color(c_white);
-    draw_text(x, _draw_y - 45, "[K] Patrulha | [L] Pousar");
-    draw_text(x, _draw_y - 30, "[P] Passivo | [O] Ataque Agressivo");
+    draw_set_alpha(0.9);
+    draw_text(x, _draw_y - 35, "[K] Patrulha | [L] Pousar");
+    draw_text(x, _draw_y - 20, "[P] Passivo | [O] Ataque Agressivo");
+    draw_set_alpha(1.0);
 
     draw_set_halign(fa_left);
 }

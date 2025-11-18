@@ -191,9 +191,10 @@ function scr_ia_decisao_economia(_ia_id) {
     // AVALIAÇÃO DE RECURSOS
     // ==========================================
     
-    var _dinheiro_suficiente = global.ia_dinheiro >= 600; // REDUZIDO de 800
-    var _minerio_suficiente = global.ia_minerio >= 300; // REDUZIDO de 400
-    var _recursos_criticos = global.ia_dinheiro < 200 || global.ia_minerio < 150; // Mais leniente
+    // ✅ AUMENTADO: Requisitos muito menores para construir mais cedo
+    var _dinheiro_suficiente = global.ia_dinheiro >= 300; // ✅ REDUZIDO para 300 - construir muito mais cedo
+    var _minerio_suficiente = global.ia_minerio >= 150; // ✅ REDUZIDO para 150 - construir muito mais cedo
+    var _recursos_criticos = global.ia_dinheiro < 100 || global.ia_minerio < 50; // ✅ Muito mais leniente
     
     // ==========================================
     // ✅ NOVO: DETECTAR QUARTÉIS DO JOGADOR
@@ -229,7 +230,7 @@ function scr_ia_decisao_economia(_ia_id) {
     }
     
     // Se jogador tem quartel naval, IA deve ter também
-    if (_quartel_naval_jogador > _num_quartel_marinha && _unidades_terrestres >= 2 && _dinheiro_suficiente && _minerio_suficiente) {
+    if (_quartel_naval_jogador > _num_quartel_marinha && _dinheiro_suficiente && _minerio_suficiente) { // ✅ REMOVIDO: _unidades_terrestres >= 2
         if (variable_global_exists("debug_enabled") && global.debug_enabled) {
             show_debug_message("🌊 ALERTA NAVAL! Jogador tem quartel naval - CONSTRUINDO DEFESA NAVAL!");
         }
@@ -487,16 +488,25 @@ function scr_ia_decisao_economia(_ia_id) {
     }
     // ✅ PRIORIDADE 4: MILITAR PRIMEIRO - Construir quartel ANTES de economia
     // ✅ CORREÇÃO CRÍTICA: Se não tem quartel, SEMPRE construir primeiro (prioridade absoluta)
-    else if (_num_quartel < 1 && _dinheiro_suficiente && _minerio_suficiente) {
-        _decisao = "construir_militar";
-        _prioridade = 10; // PRIORIDADE MÁXIMA se não tem quartel
+    else if (_num_quartel < 1) {
+        // Se tem recursos, construir normalmente
+        if (_dinheiro_suficiente && _minerio_suficiente) {
+            _decisao = "construir_militar";
+            _prioridade = 15; // ✅ AUMENTADO para 15 - PRIORIDADE MÁXIMA ABSOLUTA
+        } else {
+            // Se não tem recursos suficientes, ainda tentar construir (pode ter recursos mínimos)
+            if (global.ia_dinheiro >= 400 && global.ia_minerio >= 200) {
+                _decisao = "construir_militar";
+                _prioridade = 14; // ✅ PRIORIDADE MUITO ALTA mesmo com recursos mínimos
+            }
+        }
     }
     else if (_num_quartel < 2 && _dinheiro_suficiente && _minerio_suficiente) {
         _decisao = "construir_militar";
-        _prioridade = 6;
+        _prioridade = 7; // ✅ AUMENTADO de 6 para 7
     }
     // ✅ PRIORIDADE 5: INFRAESTRUTURA NAVAL - Mais cedo e mais agressivo (ANTES de recrutar)
-    else if (_num_quartel_marinha < 1 && _unidades_terrestres >= 2 && _dinheiro_suficiente && _minerio_suficiente) { // REDUZIDO de 4 para 2 - construir naval mais cedo
+    else if (_num_quartel_marinha < 1 && _dinheiro_suficiente && _minerio_suficiente) { // ✅ REMOVIDO: _unidades_terrestres >= 2
         _decisao = "construir_naval";
         _prioridade = 5.5; // Prioridade maior que recrutar - construir infraestrutura primeiro
     }

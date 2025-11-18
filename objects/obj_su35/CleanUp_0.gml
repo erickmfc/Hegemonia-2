@@ -1,10 +1,14 @@
 // ===============================================
-// HEGEMONIA GLOBAL - CAÇA SU-35 (Clean Up)
+// HEGEMONIA GLOBAL - CAÇA SU-35 - CLEANUP EVENT
+// Limpeza de memória e data structures
 // ===============================================
 
-// Limpar lista de patrulha
+// ✅ LIMPEZA: Destruir data structures de patrulha
 if (variable_instance_exists(id, "pontos_patrulha")) {
-    ds_list_destroy(pontos_patrulha);
+    if (ds_exists(pontos_patrulha, ds_type_list)) {
+        ds_list_destroy(pontos_patrulha);
+    }
 }
 
-show_debug_message("✈️ SU-35 destruído - Memória limpa");
+// ✅ LIMPEZA: Limpar referências
+alvo_em_mira = noone;

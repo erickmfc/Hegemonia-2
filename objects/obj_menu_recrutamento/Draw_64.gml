@@ -13,6 +13,11 @@ if (id_do_quartel == noone || !instance_exists(id_do_quartel)) {
 // Incrementar timer de animação
 animation_timer++;
 
+// === ESCALA DE RESOLUÇÃO ===
+// ✅ CORREÇÃO: Desabilitar escala de resolução para evitar desproporção
+// Usar escala fixa de 1.0 para manter proporções corretas
+var _escala_resolucao = 1.0;
+
 // === DIMENSÕES E POSICIONAMENTO ===
 var _gui_w = display_get_gui_width();
 var _gui_h = display_get_gui_height();
@@ -57,27 +62,30 @@ var _header_h = 100;
 draw_set_halign(fa_center);
 draw_set_valign(fa_middle);
 
-// Título principal - AUMENTADO 20% (1.8 * 1.2 = 2.16)
-    draw_set_color(make_color_rgb(255, 255, 255));
-draw_text_transformed(_menu_x + _menu_w/2, _menu_y + 35, "QUARTEL MILITAR", 2.16, 2.16, 0);
+// Título principal
+// ✅ CORREÇÃO: Reduzido 15% (1.0 → 0.85)
+draw_set_color(make_color_rgb(255, 255, 255));
+draw_text_transformed(_menu_x + _menu_w/2, _menu_y + 35, "QUARTEL MILITAR", 0.85, 0.85, 0);
 
-// Subtítulo - AUMENTADO 20% (1.0 * 1.2 = 1.2)
+// Subtítulo
+// ✅ CORREÇÃO: Reduzido 15% (0.8 → 0.68)
 draw_set_color(make_color_rgb(150, 255, 200));
-draw_text_transformed(_menu_x + _menu_w/2, _menu_y + 75, "Central de Produção Terrestre - Exército Disponível", 1.2, 1.2, 0);
+draw_text_transformed(_menu_x + _menu_w/2, _menu_y + 75, "Central de Produção Terrestre - Exército Disponível", 0.68, 0.68, 0);
 
-// === PAINEL DE RECURSOS - ALTURA AUMENTADA 20% ===
-var _recursos_y = _menu_y + _header_h + 15; // +20% de espaçamento (12 + 3)
-var _recursos_h = 72; // Aumentado 20% (60 * 1.2 = 72)
+// === PAINEL DE RECURSOS ===
+var _recursos_y = _menu_y + _header_h + 15;
+var _recursos_h = 72;
 
 draw_set_color(make_color_rgb(25, 60, 40));
 draw_set_alpha(0.9);
 draw_roundrect_ext(_menu_x + 20, _recursos_y, _menu_x + _menu_w - 20, _recursos_y + _recursos_h, 15, 15, false);
 draw_set_alpha(1.0);
 
-// Recursos - AUMENTADO 20% (1.2 * 1.2 = 1.44)
+// Recursos
+// ✅ CORREÇÃO: Reduzido 15% (0.9 → 0.765)
 draw_set_halign(fa_left);
 draw_set_color(make_color_rgb(255, 215, 0));
-draw_text_transformed(_menu_x + 40, _recursos_y + 20, "DINHEIRO: $" + string(global.dinheiro), 1.44, 1.44, 0);
+draw_text_transformed(_menu_x + 40, _recursos_y + 20, "DINHEIRO: $" + string(global.dinheiro), 0.765, 0.765, 0);
 
 // Verificar se população existe, senão usar valor padrão
 var _populacao = 50;
@@ -85,25 +93,28 @@ if (variable_global_exists("populacao")) {
     _populacao = global.populacao;
 }
 
+// ✅ CORREÇÃO: Reduzido 15% (0.8 → 0.68)
 draw_set_color(make_color_rgb(150, 255, 200));
-draw_text_transformed(_menu_x + 40, _recursos_y + 50, "População Disponível: " + string(_populacao), 1.08, 1.08, 0); // 0.9 * 1.2
+draw_text_transformed(_menu_x + 40, _recursos_y + 50, "População Disponível: " + string(_populacao), 0.68, 0.68, 0);
 
-// Status do quartel - AUMENTADO 20% (1.0 * 1.2 = 1.2)
+// Status do quartel
+// ✅ CORREÇÃO: Reduzido 15% (0.9 → 0.765)
 draw_set_halign(fa_right);
 var _status_text = id_do_quartel.esta_treinando ? "TREINANDO" : "OCIOSO";
 var _status_color = id_do_quartel.esta_treinando ? make_color_rgb(255, 200, 50) : make_color_rgb(100, 255, 100);
 draw_set_color(_status_color);
-draw_text_transformed(_menu_x + _menu_w - 40, _recursos_y + 30, "STATUS: " + _status_text, 1.2, 1.2, 0);
+draw_text_transformed(_menu_x + _menu_w - 40, _recursos_y + 30, "STATUS: " + _status_text, 0.765, 0.765, 0);
 
 // === GRID DE UNIDADES (3 colunas x 2 linhas) ===
-var _grid_start_y = _recursos_y + _recursos_h + 25; // AUMENTADO 20% de espaçamento (20 + 5)
-var _grid_h = _menu_h - _header_h - _recursos_h - 220; // AUMENTADO 20% de espaço para footer (180 * 1.2 = 216, ajustado para 220)
+var _grid_start_y = _recursos_y + _recursos_h + 25;
+var _grid_h = _menu_h - _header_h - _recursos_h - 220;
 
 var _cols = 3;
 var _rows = 2;
-var _card_spacing = 24; // AUMENTADO 20% (20 * 1.2 = 24)
+var _card_spacing = 24;
 var _card_w = (_menu_w - 40 - (_cols - 1) * _card_spacing) / _cols;
-var _card_h = ((_grid_h - (_rows - 1) * _card_spacing) / _rows); // REMOVIDO o fator de 0.8 para dar mais altura
+// ✅ AJUSTE: Aumentar cards em 5% para baixo (altura)
+var _card_h = ((_grid_h - (_rows - 1) * _card_spacing) / _rows) * 1.05;
 
 // Obter lista de unidades
 var _unidades;
@@ -184,38 +195,44 @@ for (var i = 0; i < min(_total_unidades, 6); i++) {
     var _content_x = _card_x + 15;
     var _content_y = _card_y + 15;
     
-    // Nome da unidade - AUMENTADO 20% (1.1 * 1.2 = 1.32)
+    // Nome da unidade
+    // ✅ AJUSTE: Reduzir fonte em 10% adicional (0.7225 * 0.9 = 0.65025)
     draw_set_halign(fa_left);
     draw_set_valign(fa_top);
     draw_set_color(_can_produce ? make_color_rgb(255, 255, 255) : make_color_rgb(150, 150, 150));
-    draw_text_transformed(_content_x, _content_y, string_upper(_unidade.nome), 1.32, 1.32, 0);
+    draw_text_transformed(_content_x, _content_y, string_upper(_unidade.nome), 0.65025, 0.65025, 0);
     
-    // Ícone/Sprite da unidade - POSIÇÃO AJUSTADA
-    var _icon_y = _content_y + 42; // AUMENTADO 20% (35 * 1.2 = 42)
-    var _icon_x = _content_x + (_card_w * 0.6);
+    // Ícone/Sprite da unidade - POSIÇÃO CENTRALIZADA E VISÍVEL
+    var _icon_y = _content_y + 45; // Posição abaixo do nome
+    var _icon_x = _card_x + _card_w * 0.5; // Centralizado no card (não relativo ao content_x)
     draw_set_color(_can_produce ? make_color_rgb(80, 220, 140) : make_color_rgb(100, 100, 100));
     draw_set_alpha(0.3);
-    draw_circle(_icon_x, _icon_y, 25, false);
+    draw_circle(_icon_x, _icon_y, 35, false); // Círculo maior para sprites ficarem visíveis
     draw_set_alpha(1.0);
+    
+    // === CALCULAR ESCALA FINAL PARA SPRITES ===
+    // ✅ AJUSTE: Diminuir imagens em 10% (2.025 * 0.9 = 1.8225)
+    var _escala_base = 1.8225; // Escala base reduzida em 10% adicional
+    var _escala_final = _escala_base; // Sem escala de resolução
     
     // Desenhar sprite se existir
     var _sprite_desenhado = false;
     if (_unidade.nome == "Infantaria" && sprite_exists(spr_infantaria)) {
-        draw_sprite_ext(spr_infantaria, 0, _icon_x, _icon_y, 1.5, 1.5, 0, c_white, _anim.alpha);
+        draw_sprite_ext(spr_infantaria, 0, _icon_x, _icon_y, _escala_final, _escala_final, 0, c_white, _anim.alpha);
         _sprite_desenhado = true;
     } else if (_unidade.nome == "Soldado Anti-Aéreo" && sprite_exists(spr_soldado_antiaereo)) {
-        draw_sprite_ext(spr_soldado_antiaereo, 0, _icon_x, _icon_y, 1.5, 1.5, 0, c_white, _anim.alpha);
+        draw_sprite_ext(spr_soldado_antiaereo, 0, _icon_x, _icon_y, _escala_final, _escala_final, 0, c_white, _anim.alpha);
         _sprite_desenhado = true;
     } else if (_unidade.nome == "Tanque" && sprite_exists(spr_tanque)) {
-        draw_sprite_ext(spr_tanque, 0, _icon_x, _icon_y, 1.5, 1.5, 0, c_white, _anim.alpha);
+        draw_sprite_ext(spr_tanque, 0, _icon_x, _icon_y, _escala_final, _escala_final, 0, c_white, _anim.alpha);
         _sprite_desenhado = true;
     } else if (_unidade.nome == "Blindado Anti-Aéreo" && sprite_exists(spr_blindado_antiaereo)) {
-        draw_sprite_ext(spr_blindado_antiaereo, 0, _icon_x, _icon_y, 1.5, 1.5, 0, c_white, _anim.alpha);
+        draw_sprite_ext(spr_blindado_antiaereo, 0, _icon_x, _icon_y, _escala_final, _escala_final, 0, c_white, _anim.alpha);
         _sprite_desenhado = true;
     } else if (_unidade.nome == "M1A Abrams") {
         // ✅ NOVO: M1A Abrams - Desenhar casco + torre (igual no jogo)
-        // Escala: Tanque aumentado 15% (1.5 * 1.15 = 1.725)
-        var _escala_tanque = 1.725;
+        // ✅ AJUSTE: Diminuir em 10% (2.025 * 0.9 = 1.8225)
+        var _escala_tanque = 1.8225;
         
         var _spr_casco = asset_get_index("spr_abrams_casco");
         var _spr_torre = asset_get_index("spr_abrams_torre");
@@ -238,8 +255,8 @@ for (var i = 0; i < min(_total_unidades, 6); i++) {
         }
     } else if (_unidade.nome == "Gepard Anti-Aéreo") {
         // ✅ NOVO: Gepard Anti-Aéreo - Desenhar casco + torre/lançador + Type_39_4 (míssil) em cima (igual no jogo)
-        // Escala: Tanque aumentado 15% (1.5 * 1.15 = 1.725)
-        var _escala_tanque = 1.725;
+        // ✅ AJUSTE: Diminuir em 10% (2.025 * 0.9 = 1.8225)
+        var _escala_tanque = 1.8225;
         
         var _spr_casco = asset_get_index("TYPE_39_SAM_HULL");
         var _spr_torre = asset_get_index("Type_39_SAM");
@@ -270,31 +287,32 @@ for (var i = 0; i < min(_total_unidades, 6); i++) {
         }
     }
     
-    // Descrição - AUMENTADO 20% (0.75 * 1.2 = 0.9)
-    var _desc_y = _icon_y + 48; // AUMENTADO 20% (40 * 1.2 = 48)
+    // Descrição
+    // ✅ CORREÇÃO: Reduzido 15% (0.7 → 0.595)
+    var _desc_y = _icon_y + 60; // Posição abaixo do sprite
     draw_set_color(_can_produce ? make_color_rgb(180, 230, 200) : make_color_rgb(120, 120, 120));
-    draw_text_ext_transformed(_content_x, _desc_y, _unidade.descricao, 18, _card_w - 30, 0.9, 0.9, 0);
+    draw_text_ext_transformed(_content_x, _desc_y, _unidade.descricao, 18, _card_w - 30, 0.595, 0.595, 0);
     
-    // Informações - POSIÇÃO AJUSTADA
-    var _info_y = _card_y + _card_h - 75; // AUMENTADO de 65 para 75
+    // Informações - POSIÇÃO AJUSTADA (sincronizada com Step)
+    // ✅ AJUSTE: Subir informações em 10% (diminuir offset de 120 para 108)
+    var _info_y = _card_y + _card_h - 108; // Posição acima dos botões (subiu 10%)
     
-    // Custo - AUMENTADO 20% (0.99 * 1.2 = 1.188)
+    // Custo (Valor)
+    // ✅ AJUSTE: Subir valor em 10% (diminuir Y em 10% do offset atual)
+    // ✅ AJUSTE: Diminuir fonte em 10% adicional (0.68 * 0.9 = 0.612)
     draw_set_color(_can_produce ? make_color_rgb(255, 215, 0) : make_color_rgb(150, 150, 100));
-    draw_text_transformed(_content_x, _info_y, "$ " + string(_unidade.custo_dinheiro), 1.188, 1.188, 0);
+    var _valor_y = _info_y - 2; // Subir 10% (diminuir Y em ~2 pixels)
+    draw_text_transformed(_content_x, _valor_y, "$ " + string(_unidade.custo_dinheiro), 0.612, 0.612, 0);
     
-    // População - AUMENTADO 20% (0.8 * 1.2 = 0.96) E ESPAÇAMENTO AJUSTADO
-    draw_set_color(_can_produce ? make_color_rgb(150, 255, 200) : make_color_rgb(120, 120, 120));
-    draw_text_transformed(_content_x, _info_y + 24, "Pop: " + string(_unidade.custo_populacao), 0.96, 0.96, 0); // 20 * 1.2 = 24
+    // ✅ REMOVIDO: População e Tempo (solicitado pelo usuário)
     
-    // Tempo - AUMENTADO 20% (0.8 * 1.2 = 0.96) E ESPAÇAMENTO AJUSTADO
-    var _tempo_seg = _unidade.tempo_treino / 60;
-    draw_text_transformed(_content_x, _info_y + 48, "Tempo: " + string(_tempo_seg) + "s", 0.96, 0.96, 0); // 35 * 1.37 ≈ 48
-    
-    // === BOTÕES DE QUANTIDADE (1, 5, 10) ===
-    var _btn_quant_y = _card_y + _card_h - 85;
-    var _btn_quant_h = 28;
-    var _btn_quant_w = (_card_w - 30) / 3 - 2;
-    var _btn_quant_spacing = 2;
+    // === BOTÕES DE QUANTIDADE (1, 5, 10) - MELHORADOS ===
+    var _btn_quant_y = _card_y + _card_h - 85; // Sincronizado com Step
+    // ✅ MELHORIA: Aumentar botões (28 * 1.2 = 33.6)
+    var _btn_quant_h = 33.6;
+    // ✅ MELHORIA: Aumentar largura (não reduzir)
+    var _btn_quant_w = ((_card_w - 30) / 3 - 2);
+    var _btn_quant_spacing = 3; // ✅ MELHORIA: Aumentar espaçamento
     
     var _quantidades = [1, 5, 10];
     var _btn_textos = ["1", "5", "10"];
@@ -315,27 +333,35 @@ for (var i = 0; i < min(_total_unidades, 6); i++) {
                                 _populacao >= _custo_q_populacao &&
                                 !id_do_quartel.esta_treinando);
         
-        // Cor do botão
-        var _qbtn_color = _can_afford_quant ? make_color_rgb(60, 140, 60) : make_color_rgb(80, 80, 80);
-        if (_mouse_over_qbtn && _can_afford_quant) _qbtn_color = make_color_rgb(80, 180, 80);
+        // ✅ MELHORIA: Cores mais vibrantes e feedback visual melhorado
+        var _qbtn_color = _can_afford_quant ? make_color_rgb(60, 160, 80) : make_color_rgb(80, 80, 80);
+        if (_mouse_over_qbtn && _can_afford_quant) {
+            _qbtn_color = make_color_rgb(100, 220, 120); // Verde mais claro no hover
+        }
         
+        // ✅ MELHORIA: Borda mais visível
         draw_set_color(_qbtn_color);
-        draw_roundrect_ext(_btn_q_x, _btn_q_y, _btn_q_x + _btn_quant_w, _btn_q_y + _btn_quant_h, 6, 6, false);
+        draw_roundrect_ext(_btn_q_x, _btn_q_y, _btn_q_x + _btn_quant_w, _btn_q_y + _btn_quant_h, 8, 8, false);
         
+        // ✅ MELHORIA: Borda branca mais espessa
         draw_set_color(make_color_rgb(255, 255, 255));
-        draw_set_alpha(0.9);
-        draw_roundrect_ext(_btn_q_x, _btn_q_y, _btn_q_x + _btn_quant_w, _btn_q_y + _btn_quant_h, 6, 6, true);
+        draw_set_alpha(1.0);
+        draw_roundrect_ext(_btn_q_x, _btn_q_y, _btn_q_x + _btn_quant_w, _btn_q_y + _btn_quant_h, 8, 8, true);
         draw_set_alpha(1.0);
         
         draw_set_halign(fa_center);
+        draw_set_valign(fa_middle);
         draw_set_color(_can_afford_quant ? make_color_rgb(255, 255, 255) : make_color_rgb(150, 150, 150));
-        draw_text_transformed(_btn_q_x + _btn_quant_w/2, _btn_q_y + _btn_quant_h/2 - 2, _btn_textos[_q], 0.9, 0.9, 0);
+        // ✅ MELHORIA: Fonte maior para melhor legibilidade
+        draw_text_transformed(_btn_q_x + _btn_quant_w/2, _btn_q_y + _btn_quant_h/2, _btn_textos[_q], 0.75, 0.75, 0);
     }
     
-    // Botão TREINAR - POSIÇÃO AJUSTADA (mais acima)
-    var _btn_y = _card_y + _card_h - 50;
-    var _btn_h = 36;
-    var _btn_w = _card_w - 30;
+    // Botão TREINAR - SINCRONIZADO COM STEP
+    var _btn_y = _card_y + _card_h - 50; // Sincronizado com Step
+    // ✅ AJUSTE: Reduzir botão em 20% (36 * 0.8 = 28.8)
+    var _btn_h = 28.8;
+    // ✅ AJUSTE: Reduzir largura em 20%
+    var _btn_w = (_card_w - 30) * 0.8;
     var _btn_x = _card_x + 15;
     
     var _btn_color = _can_produce ? make_color_rgb(60, 140, 60) : make_color_rgb(80, 80, 80);
@@ -350,8 +376,10 @@ for (var i = 0; i < min(_total_unidades, 6); i++) {
     draw_set_alpha(1.0);
         
     draw_set_halign(fa_center);
+    draw_set_valign(fa_middle);
     draw_set_color(_can_produce ? make_color_rgb(255, 255, 255) : make_color_rgb(150, 150, 150));
-    draw_text_transformed(_btn_x + _btn_w/2, _btn_y + _btn_h/2 - 4, _can_produce ? "TREINAR" : "BLOQUEADO", 1.02, 1.02, 0);
+    // ✅ CORREÇÃO: Reduzido 15% (0.85 → 0.7225)
+    draw_text_transformed(_btn_x + _btn_w/2, _btn_y + _btn_h/2, _can_produce ? "TREINAR" : "BLOQUEADO", 0.7225, 0.7225, 0);
 }
 
 // === FILA DE PRODUÇÃO ===
@@ -366,21 +394,24 @@ draw_set_alpha(1.0);
 draw_set_halign(fa_left);
 draw_set_valign(fa_middle);
 draw_set_color(make_color_rgb(200, 255, 220));
-draw_text_transformed(_menu_x + 40, _fila_y + 20, "FILA DE RECRUTAMENTO", 1.2, 1.2, 0); // AUMENTADO 20%
+// ✅ CORREÇÃO: Reduzido 15% (0.9 → 0.765)
+draw_text_transformed(_menu_x + 40, _fila_y + 20, "FILA DE RECRUTAMENTO", 0.765, 0.765, 0);
 
 var _fila_size = ds_queue_size(id_do_quartel.fila_recrutamento);
 draw_set_color(make_color_rgb(255, 255, 255));
-draw_text_transformed(_menu_x + 40, _fila_y + 54, "Unidades na fila: " + string(_fila_size), 1.08, 1.08, 0); // 0.9 * 1.2 e posição ajustada
+// ✅ CORREÇÃO: Reduzido 15% (0.8 → 0.68)
+draw_text_transformed(_menu_x + 40, _fila_y + 54, "Unidades na fila: " + string(_fila_size), 0.68, 0.68, 0);
 
 draw_set_halign(fa_right);
 draw_set_color(make_color_rgb(150, 255, 200));
-draw_text_transformed(_menu_x + _menu_w - 40, _fila_y + 54, "Total treinado: " + string(id_do_quartel.unidades_criadas), 1.08, 1.08, 0);
+// ✅ CORREÇÃO: Reduzido 15% (0.8 → 0.68)
+draw_text_transformed(_menu_x + _menu_w - 40, _fila_y + 54, "Total treinado: " + string(id_do_quartel.unidades_criadas), 0.68, 0.68, 0);
 
-// === BOTÃO FECHAR - AUMENTADO 20% ===
-var _close_w = 168; // AUMENTADO 20% (140 * 1.2 = 168)
-var _close_h = 54; // AUMENTADO 20% (45 * 1.2 = 54)
+// === BOTÃO FECHAR - SINCRONIZADO COM STEP ===
+var _close_w = 168; // Sincronizado com Step
+var _close_h = 54; // Sincronizado com Step
 var _close_x = _menu_x + _menu_w - _close_w - 20;
-var _close_y = _menu_y + _menu_h - 72; // AUMENTADO (60 * 1.2 = 72)
+var _close_y = _menu_y + _menu_h - 72; // Sincronizado com Step
 
 draw_set_color(make_color_rgb(180, 60, 60));
 draw_roundrect_ext(_close_x, _close_y, _close_x + _close_w, _close_y + _close_h, 10, 10, false);
@@ -392,22 +423,9 @@ draw_roundrect_ext(_close_x, _close_y, _close_x + _close_w, _close_y + _close_h,
 draw_set_halign(fa_center);
 draw_set_valign(fa_middle);
 draw_set_color(make_color_rgb(255, 255, 255));
-draw_text_transformed(_close_x + _close_w/2, _close_y + _close_h/2, "FECHAR", 1.2, 1.2, 0); // AUMENTADO 20%
+// ✅ CORREÇÃO: Reduzido 15% (0.9 → 0.765)
+draw_text_transformed(_close_x + _close_w/2, _close_y + _close_h/2, "FECHAR", 0.765, 0.765, 0);
 draw_set_alpha(1.0);
-
-// === CONTROLES DE QUANTIDADE ===
-var _controls_y = _close_y - 96; // AUMENTADO (80 * 1.2 = 96)
-var _controls_x = _menu_x + 20;
-
-draw_set_halign(fa_left);
-draw_set_valign(fa_top);
-draw_set_color(make_color_rgb(100, 200, 150));
-draw_text_transformed(_controls_x, _controls_y, "CONTROLES DE QUANTIDADE:", 0.96, 0.96, 0); // 0.8 * 1.2
-
-draw_set_color(make_color_rgb(255, 255, 255));
-draw_text_transformed(_controls_x, _controls_y + 24, "• Clique normal: 1 unidade", 0.84, 0.84, 0); // 0.7 * 1.2
-draw_text_transformed(_controls_x, _controls_y + 42, "• Shift + Clique: 5 unidades", 0.84, 0.84, 0); // 0.7 * 1.2
-draw_text_transformed(_controls_x, _controls_y + 60, "• Ctrl + Clique: 10 unidades", 0.84, 0.84, 0); // 0.7 * 1.2
 
 // Reset
 draw_set_halign(fa_left);

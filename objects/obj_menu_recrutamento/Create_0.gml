@@ -10,8 +10,8 @@ unidade_hover = -1; // Índice da unidade com hover
 // === GARANTIR QUE O MENU ESTEJA NA FRENTE ===
 depth = -10000; // Menu sempre visível e interativo
 
-// Variável para evitar fechamento imediato (previne bug de duplo clique)
-delay_abertura = 10; // 10 frames de delay antes de permitir fechamento
+// Variável para evitar fechamento imediato e recrutamento acidental (previne bug de duplo clique)
+delay_abertura = 15; // ✅ AUMENTADO: 15 frames de delay antes de permitir cliques (previne recrutamento acidental ao abrir menu)
 
 // === SISTEMA DE DEBOUNCE PARA NAVEGAÇÃO ===
 // Evita cliques múltiplos nas setas de navegação

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_criar_botao_menu",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_criar_botao_menu",
+  "parent":{
+    "name":"menu_teste",
+    "path":"folders/Scripts/menu_teste.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

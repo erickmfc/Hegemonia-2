@@ -42,29 +42,22 @@ if (selecionado) {
     draw_circle(x, y, 1000, false);
     draw_set_alpha(1.0);
     
-    // Linha para o destino e marcador visual
-    if (variable_instance_exists(id, "estado") && estado != LanchaState.PARADO) {
-        if (variable_instance_exists(id, "destino_x") && variable_instance_exists(id, "destino_y")) {
-            if (estado == LanchaState.ATACANDO) {
-                draw_set_color(c_red); // Linha vermelha quando atacando
-                draw_set_alpha(0.7);
-            } else {
-                draw_set_color(c_yellow); // Linha amarela para movimento normal
-                draw_set_alpha(0.5);
-            }
-            // Desenhar linha do navio até o destino
-            draw_line_width(x, y, destino_x, destino_y, 2);
-            
-            // Desenhar círculo marcador no destino
-            draw_set_alpha(0.8);
-            draw_circle(destino_x, destino_y, 15, false);
-            draw_circle(destino_x, destino_y, 8, true);
+    // ✅ CORREÇÃO: Removida linha amarela direta - usa apenas caminho A* do objeto pai
+    // A linha do caminho A* já é desenhada pelo obj_navio_base (objeto pai)
+    
+    // Desenhar linha quando atacando (apenas para alvo)
+    if (variable_instance_exists(id, "estado") && estado == LanchaState.ATACANDO) {
+        if (variable_instance_exists(id, "alvo_unidade") && instance_exists(alvo_unidade)) {
+            draw_set_color(c_red);
+            draw_set_alpha(0.7);
+            draw_line(x, y, alvo_unidade.x, alvo_unidade.y);
         }
     }
     
-    // Indicador de nome específico
+    // ✅ CORREÇÃO: Usar fonte padrão como no navio de transporte
+    draw_set_font(-1);
     draw_set_alpha(1.0);
     draw_set_halign(fa_center);
     draw_set_color(c_yellow);
-    draw_text_transformed(x, y - 100, "CONSTELLATION", 0.9, 0.9, 0);
+    draw_text(x, y - 65, "CONSTELLATION");
 }

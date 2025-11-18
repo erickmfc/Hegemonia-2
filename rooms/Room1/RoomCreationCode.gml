@@ -34,11 +34,19 @@ if (object_exists(obj_research_center)) {
     }
 }
 
-// Menu de construção
+// Menu de construção (antigo - tecla C)
 if (object_exists(obj_menu_construcao)) {
     var _menu_construcao_instance = instance_create_layer(0, 0, "rm_mapa_principal", obj_menu_construcao);
     if (global.debug_enabled && instance_exists(_menu_construcao_instance)) {
         show_debug_message("✅ Menu de Construção criado - ID: " + string(_menu_construcao_instance));
+    }
+}
+
+// Menu de construção moderno (novo - tecla V)
+if (object_exists(obj_ui_menu_construcao)) {
+    var _menu_ui_construcao_instance = instance_create_layer(0, 0, "rm_mapa_principal", obj_ui_menu_construcao);
+    if (global.debug_enabled && instance_exists(_menu_ui_construcao_instance)) {
+        show_debug_message("✅ Menu de Construção Moderno criado - ID: " + string(_menu_ui_construcao_instance));
     }
 }
 

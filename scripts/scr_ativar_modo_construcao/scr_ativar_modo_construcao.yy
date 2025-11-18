@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_ativar_modo_construcao",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_ativar_modo_construcao",
+  "parent":{
+    "name":"menu_teste",
+    "path":"folders/Scripts/menu_teste.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

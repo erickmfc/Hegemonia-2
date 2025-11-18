@@ -1,13 +1,20 @@
 // ====================
 // ATRIBUTOS DO SOLDADO
 // ====================
-hp_atual = 100;
 hp_max = 100;
+hp_atual = hp_max; // Vida atual inicia cheia
 // Compatibilidade com código antigo
 vida = hp_atual;
 vida_max = hp_max;
-dano = 15;
-velocidade = 0.8;
+
+// Dano (padronizado)
+dano_base = 15;
+dano = dano_base; // Compatibilidade com código antigo
+
+// Velocidade (padronizado)
+velocidade_movimento = 0.8;
+velocidade_atual = velocidade_movimento; // Velocidade atual (inicia igual à base)
+velocidade = velocidade_movimento; // Compatibilidade com código antigo
 
 // Nação proprietária (1 = jogador, 2 = IA inimiga)
 nacao_proprietaria = 1;
@@ -36,11 +43,13 @@ terrenos_permitidos = [TERRAIN.CAMPO, TERRAIN.FLORESTA, TERRAIN.DESERTO]; // Ter
 
 // Ataque
 alcance_visao = 300; // Maior que o alcance de tiro para detectar inimigos (aumentado proporcionalmente)
-alcance = 270; // Alcance de tiro padronizado - AUMENTADO 50% (era 180, agora 270)
+alcance_ataque = 270; // Alcance de tiro padronizado - AUMENTADO 50% (era 180, agora 270)
 // Compatibilidade com código antigo
-alcance_tiro = alcance;
+alcance = alcance_ataque;
+alcance_tiro = alcance_ataque;
 atq_cooldown = 0;
 atq_rate = 30; // frames (meio segundo se FPS=60)
+velocidade_ataque = atq_rate; // Compatibilidade com documentação
 
 // Alvo inimigo
 alvo = noone;

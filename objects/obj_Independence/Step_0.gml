@@ -1,13 +1,21 @@
 /// @description Step Event 0 - Sistema Base da Independence
 // ===============================================
 // HEGEMONIA GLOBAL - INDEPENDENCE
-// Desabilita sistema de mísseis do obj_navio_base
-// Independence usa sistema próprio de mísseis múltiplos no Step_1
+// ✅ CORREÇÃO: Usa sistema padrão do obj_navio_base (igual ao Constellation)
+// Sistema de múltiplos alvos (Step_1.gml) foi desabilitado
 // ===============================================
+
+// ✅ CORREÇÃO: Chamar o Step do objeto pai PRIMEIRO para garantir que controles funcionem
+// Os controles (P, O, L, K) estão no obj_navio_base e precisam ser processados ANTES do frame skip
+if (object_get_parent(object_index) != -1) {
+    event_inherited();
+}
 
 // =============================================
 // SISTEMA DE FRAME SKIP COM LOD (OTIMIZADO)
 // =============================================
+// ✅ CORREÇÃO: Frame skip DEPOIS de processar controles
+// Se o navio está selecionado, sempre processar (para garantir que controles funcionem)
 
 var should_always_process = (selecionado || 
                               (variable_instance_exists(id, "force_always_active") && force_always_active) ||
@@ -32,14 +40,8 @@ if (!should_always_process && skip_frames_enabled) {
     lod_level = current_lod;
 }
 
-// DESABILITAR sistema de mísseis do obj_navio_base ANTES de herdar
-// Isso evita que obj_navio_base dispare mísseis, pois o Step_1.gml gerencia isso de forma múltipla
-pode_disparar_missil = false;
-
-// ✅ CORREÇÃO GM2040: Chamar o Step do objeto pai com verificação
-if (object_get_parent(object_index) != -1) {
-    event_inherited();
-}
+// ✅ CORREÇÃO: Sistema de mísseis está habilitado no Create_0.gml (pode_disparar_missil = true)
+// O sistema padrão do obj_navio_base gerencia os mísseis com órbita inteligente
 
 // ✅ EFEITO DE ESPUMA DO MAR (Rastro de água) - Independence
 // Adicionar após herdar para garantir que o movimento já foi processado

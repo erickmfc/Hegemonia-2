@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_ia_classificar_unidades_poder",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_ia_classificar_unidades_poder",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

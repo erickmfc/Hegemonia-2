@@ -15,7 +15,9 @@ destino_x = x;
 destino_y = y;
 destino_original_x = undefined; // Para sistema de desvio de obstáculos
 destino_original_y = undefined; // Para sistema de desvio de obstáculos
-velocidade = 1.5; // Velocidade especificada: 1.5
+velocidade_movimento = 1.5; // Velocidade especificada: 1.5
+velocidade_atual = velocidade_movimento; // Velocidade atual (inicia igual à base)
+velocidade = velocidade_movimento; // Compatibilidade com código antigo
 
 // === PATRULHA ===
 patrulha = ds_list_create();
@@ -29,25 +31,30 @@ indice_patrulha_atual = 0;
 
 // === ATAQUE ANTI-AÉREO ===
 alcance_visao = 700;  // Alcance de detecção amplo
-alcance_tiro  = 600;  // Alcance de tiro longo para defesa aérea
+alcance_ataque = 600;  // Alcance de tiro longo para defesa aérea
+alcance_tiro = alcance_ataque; // Compatibilidade com código antigo
 atq_cooldown = 0;
 atq_rate = 180; // 3 segundos (60 FPS * 3 = 180 frames)
+velocidade_ataque = atq_rate; // Compatibilidade com documentação
 
 // === ALVO E VIDA ===
 alvo = noone;
-hp = 200; // Vida especificada: 200 HP
+hp_max = 200; // Vida especificada: 200 HP
+hp_atual = hp_max; // Vida atual inicia cheia
+hp = hp_atual; // Compatibilidade com código antigo
 
 // Modo de combate
 modo_ataque = true; // Por padrão, ataca automaticamente
 
 // === ESPECIALIZAÇÃO ANTI-AÉREA ===
-dano = 150; // Dano aumentado
+dano_base = 150; // Dano aumentado
+dano = dano_base; // Compatibilidade com código antigo
 especializacao = "antiaerea"; // Tipo de especialização
 
 // === OBJETOS ESPECÍFICOS DO BLINDADO ===
 // Voltando ao sistema de tiro original
 
-show_debug_message("Blindado Anti-Aéreo criado - HP: " + string(hp) + ", Dano: " + string(dano) + ", Velocidade: " + string(velocidade));
+show_debug_message("Blindado Anti-Aéreo criado - HP: " + string(hp_atual) + "/" + string(hp_max) + ", Dano: " + string(dano_base) + ", Velocidade: " + string(velocidade_movimento));
 
 // =============================================
 // SISTEMA DE FRAME SKIP COM LOD

@@ -24,7 +24,7 @@ function scr_check_water_area(center_x, center_y, ship_width, ship_height) {
     
     // Verifica se todos os pontos são água
     for (var i = 0; i < array_length(check_points); i++) {
-        if (!scr_check_water_tile(check_points[i][0], check_points[i][1])) {
+        if (!scr_verificar_agua(check_points[i][0], check_points[i][1])) {
             return false;
         }
     }

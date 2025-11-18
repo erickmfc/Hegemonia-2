@@ -17,6 +17,15 @@ alarm[0] = game_get_speed(gamespeed_fps) * 1800; // 30 minutos
 // === TERRENO PERMITIDO ===
 terreno_permitido = TERRAIN.CAMPO; // Fazendas só em terreno de campo
 
+// ✅ NOVO: Triplicar produção se for da IA
+if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 2) {
+    // ✅ IA produz 3x mais
+    producao_base = producao_base * 3;
+    if (variable_global_exists("debug_enabled") && global.debug_enabled) {
+        show_debug_message("🌾 Fazenda da IA - Produção triplicada: " + string(producao_base));
+    }
+}
+
 // === DEBUG ===
 show_debug_message("🌾 Fazenda criada - Custo: $" + string(custo_fazenda) + " CG");
 show_debug_message("🌾 Produção base: " + string(producao_base) + " Alimento/ciclo");

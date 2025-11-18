@@ -197,32 +197,30 @@ if (estado_transporte == NavioTransporteEstado.EMBARQUE_ATIVO && modo_embarque) 
             }
         }
         
-        // ✅ CORREÇÃO: Verificar Abrams também (garantir que está sendo detectado)
+        // ✅ CORREÇÃO: Adicionar M1A Abrams explicitamente
         var _obj_abrams = asset_get_index("obj_M1A_Abrams");
         if (_obj_abrams != -1 && asset_get_type(_obj_abrams) == asset_object) {
             with (_obj_abrams) {
-                var _abrams_dentro_retangulo = _ponto_no_retangulo(x, y, other.x, other.y, _largura, _altura, other.image_angle);
-                var _abrams_nacao_ok = false;
-                var _abrams_visivel = visible;
-                
-                if (variable_instance_exists(id, "nacao_proprietaria")) {
-                    _abrams_nacao_ok = (nacao_proprietaria == other.nacao_proprietaria);
-                }
-                
-                show_debug_message("🔍 [NAVIO] Verificando Abrams ID: " + string(id));
-                show_debug_message("  Dentro retângulo: " + string(_abrams_dentro_retangulo));
-                show_debug_message("  Nação OK: " + string(_abrams_nacao_ok) + " (Abrams: " + string(nacao_proprietaria) + " | Navio: " + string(other.nacao_proprietaria) + ")");
-                show_debug_message("  Visível: " + string(_abrams_visivel));
-                
-                if (_abrams_nacao_ok && _abrams_dentro_retangulo && _abrams_visivel) {
+                if (variable_instance_exists(id, "nacao_proprietaria") && 
+                    nacao_proprietaria == other.nacao_proprietaria && 
+                    _ponto_no_retangulo(x, y, other.x, other.y, _largura, _altura, other.image_angle) &&
+                    visible) {
                     ds_list_add(_unidades_detectadas, id);
-                    show_debug_message("✅ Abrams detectado e adicionado para embarque!");
-                } else {
-                    show_debug_message("❌ Abrams NÃO pode embarcar - condições não atendidas");
                 }
             }
-        } else {
-            show_debug_message("⚠️ [NAVIO] obj_M1A_Abrams não encontrado!");
+        }
+        
+        // ✅ NOVO: Adicionar Gepard Anti-Aéreo
+        var _obj_gepard = asset_get_index("obj_gepard");
+        if (_obj_gepard != -1 && asset_get_type(_obj_gepard) == asset_object) {
+            with (_obj_gepard) {
+                if (variable_instance_exists(id, "nacao_proprietaria") && 
+                    nacao_proprietaria == other.nacao_proprietaria && 
+                    _ponto_no_retangulo(x, y, other.x, other.y, _largura, _altura, other.image_angle) &&
+                    visible) {
+                    ds_list_add(_unidades_detectadas, id);
+                }
+            }
         }
         
         with (obj_caca_f5) {
@@ -252,10 +250,11 @@ if (estado_transporte == NavioTransporteEstado.EMBARQUE_ATIVO && modo_embarque) 
             }
         }
         
+        // ✅ CORREÇÃO: C-100 deve usar detecção por retângulo, não distância
         with (obj_c100) {
             if (variable_instance_exists(id, "nacao_proprietaria") && 
                 nacao_proprietaria == other.nacao_proprietaria && 
-                point_distance(other.x, other.y, x, y) < other.raio_embarque &&
+                _ponto_no_retangulo(x, y, other.x, other.y, _largura, _altura, other.image_angle) &&
                 visible) {
                 ds_list_add(_unidades_detectadas, id);
             }

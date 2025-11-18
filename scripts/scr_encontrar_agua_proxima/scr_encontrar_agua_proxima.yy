@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_encontrar_agua_proxima",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_encontrar_agua_proxima",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

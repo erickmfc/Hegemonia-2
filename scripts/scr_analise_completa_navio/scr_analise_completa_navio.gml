@@ -94,7 +94,7 @@ function scr_analise_completa_navio(navio_id) {
     
     // Verificar se está em água
     if (variable_instance_exists(navio, "x") && variable_instance_exists(navio, "y")) {
-        var em_agua = scr_check_water_tile(navio.x, navio.y);
+        var em_agua = scr_verificar_agua(navio.x, navio.y);
         relatorio.estatisticas.em_agua = em_agua;
         if (!em_agua) {
             relatorio.problemas[array_length(relatorio.problemas)] = "Navio não está em água";

@@ -6,7 +6,7 @@
 // Atributos básicos (adaptados para o jogo)
 hp_atual = 150;  // HP da lancha conforme documentação
 hp_max = 150;
-velocidade_movimento = 1.4; // velocidade conforme documentação
+velocidade_movimento = 1.8; // velocidade conforme documentação
 nacao_proprietaria = 1; // 1 = jogador (conforme obj_inimigo usa 2)
 
 
@@ -22,6 +22,20 @@ alcance_ataque = missil_alcance;
 // Alvo e movimento
 alvo_x = x;
 alvo_y = y;
+
+// ✅ NOVO: Sistema de pathfinding A* (GPS)
+meu_caminho = noone; // Path do GameMaker para seguir
+velocidade_max = velocidade_movimento; // Velocidade para seguir o path
+destino_final_x = x; // Destino final (para referência)
+destino_final_y = y;
+distancia_minima_costa = 150; // Distância mínima da terra em pixels (usado no pathfinding)
+
+// ✅ COMPATIBILIDADE: Manter variáveis antigas para compatibilidade
+waypoints = []; // Array vazio (não usado mais, mas mantido para compatibilidade)
+waypoint_atual = 0;
+timer_pathfinding = 0;
+timer_progresso = 0;
+distancia_anterior_progresso = 0;
 
 // Patrulha
 modo_definicao_patrulha = false;
@@ -66,17 +80,80 @@ estado_string = "parado"; // Estado em string para compatibilidade
 
 // Funções da lancha
 ordem_mover = function(dest_x, dest_y) {
-    alvo_x = dest_x;
-    alvo_y = dest_y;
-    destino_x = dest_x; // Sincronizar
-    destino_y = dest_y; // Sincronizar
+    // Clamp destino para dentro da sala
+    var _dx = clamp(dest_x, 8, room_width - 8);
+    var _dy = clamp(dest_y, 8, room_height - 8);
+    
+    // ✅ NOVO: Verificar caminho ANTES de iniciar movimento
+    destino_final_x = _dx;
+    destino_final_y = _dy;
+    
+    // Limpar waypoints anteriores
+    waypoints = [];
+    waypoint_atual = 0;
+    timer_progresso = 0;
+    distancia_anterior_progresso = 0;
+    
+    // Verificar se caminho direto está livre (com zona de segurança)
+    var _funcao_caminho_seguranca_existe = script_exists(asset_get_index("scr_validar_caminho_terreno_com_seguranca"));
+    var _caminho_livre = false;
+    if (_funcao_caminho_seguranca_existe) {
+        _caminho_livre = scr_validar_caminho_terreno_com_seguranca(id, x, y, _dx, _dy, 20, distancia_minima_costa);
+    } else {
+        _caminho_livre = scr_validar_caminho_terreno(id, x, y, _dx, _dy, 20);
+    }
+    
+    if (_caminho_livre) {
+        // Caminho direto está livre - usar destino direto
+        alvo_x = _dx;
+        alvo_y = _dy;
+        destino_x = _dx;
+        destino_y = _dy;
+        show_debug_message("🚢 " + nome_unidade + " - Caminho direto livre para (" + string(_dx) + ", " + string(_dy) + ")");
+    } else {
+        // Caminho bloqueado - calcular contorno
+        show_debug_message("🚢 " + nome_unidade + " - Caminho bloqueado, calculando contorno...");
+        var _caminho_contorno = scr_calcular_contorno_massa_terreno(id, x, y, _dx, _dy, 1000);
+        
+        if (array_length(_caminho_contorno) > 0) {
+            // Usar waypoints do contorno
+            waypoints = _caminho_contorno;
+            waypoint_atual = 0;
+            
+            // Definir primeiro waypoint como destino imediato
+            if (array_length(waypoints) > 0) {
+                alvo_x = waypoints[0][0];
+                alvo_y = waypoints[0][1];
+                destino_x = alvo_x;
+                destino_y = alvo_y;
+                show_debug_message("🚢 " + nome_unidade + " - " + string(array_length(waypoints)) + " waypoints calculados. Primeiro: (" + string(round(destino_x)) + ", " + string(round(destino_y)) + ")");
+            }
+        } else {
+            // Não conseguiu calcular contorno - tentar encontrar água próxima
+            var _agua_proxima = scr_encontrar_agua_proxima(_dx, _dy, 1000);
+            if (_agua_proxima != noone && array_length(_agua_proxima) >= 2) {
+                alvo_x = _agua_proxima[0];
+                alvo_y = _agua_proxima[1];
+                destino_x = alvo_x;
+                destino_y = alvo_y;
+                show_debug_message("🚢 " + nome_unidade + " - Usando água próxima: (" + string(round(destino_x)) + ", " + string(round(destino_y)) + ")");
+            } else {
+                // Sem caminho possível - parar
+                estado = LanchaState.PARADO;
+                estado_string = "parado";
+                show_debug_message("⚠️ " + nome_unidade + " - Sem caminho possível para (" + string(_dx) + ", " + string(_dy) + ")");
+                return;
+            }
+        }
+    }
+    
     estado = LanchaState.MOVENDO;
-    estado_string = "movendo"; // Sincronizar
+    estado_string = "movendo";
     modo_definicao_patrulha = false;
     
     // ✅ DEBUG: Mostrar apenas se debug estiver ativo
     if (variable_global_exists("debug_enabled") && global.debug_enabled) {
-        show_debug_message("🚢 Ordem de movimento: (" + string(dest_x) + ", " + string(dest_y) + ")");
+        show_debug_message("🚢 Ordem de movimento: (" + string(_dx) + ", " + string(_dy) + ")");
     }
 }
 

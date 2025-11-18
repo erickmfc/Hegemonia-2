@@ -20,8 +20,8 @@ camera = camera_create_view(0, 0, room_width, room_height);
 view_set_camera(0, camera);
 camera_x = room_width / 2;
 camera_y = room_height / 2;
-// ✅ Zoom inicial fixo em 3.5 (muito próximo)
-zoom_level = 3.5;
+// ✅ Zoom inicial fixo em 4.0
+zoom_level = 4.0;
 camera_speed = 50; // ✅ Aumentado drasticamente para resposta muito mais rápida
 
 // Variáveis de controle

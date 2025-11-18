@@ -34,4 +34,19 @@ for (var i = 0; i < 6; i++) {
 scroll_offset = 0;
 scroll_max = 0;
 
+// === ✅ NOVO: ESCONDER MENU SUSPENSO E MINIMAPA ===
+// Esconder menu de recursos suspenso
+var _menu_suspenso = instance_find(obj_menu_recursos_suspenso, 0);
+if (instance_exists(_menu_suspenso)) {
+    _menu_suspenso.menu_visible = false;
+    show_debug_message("📊 Menu suspenso escondido");
+}
+
+// Esconder minimapa
+var _minimap_instance = instance_find(obj_minimap, 0);
+if (instance_exists(_minimap_instance)) {
+    _minimap_instance.minimap_visible = false;
+    show_debug_message("🗺️ Minimapa escondido");
+}
+
 show_debug_message("✅ Menu Aéreo Moderno criado!");

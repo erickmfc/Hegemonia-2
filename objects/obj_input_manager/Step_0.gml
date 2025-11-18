@@ -131,6 +131,8 @@ if (instance_exists(global.definindo_patrulha_unidade)) {
                                       object_get_name(_unidade.object_index) == "obj_lancha_patrulha" ||
                                       object_get_name(_unidade.object_index) == "obj_Constellation" ||
                                       object_get_name(_unidade.object_index) == "obj_Independence" ||
+                                      object_get_name(_unidade.object_index) == "obj_RonaldReagan" ||
+                                      object_get_name(_unidade.object_index) == "obj_navio_transporte" ||
                                       object_get_name(_unidade.object_index) == "obj_wwhendrick" ||
                                       object_get_name(_unidade.object_index) == "obj_submarino_base");
             
@@ -138,13 +140,13 @@ if (instance_exists(global.definindo_patrulha_unidade)) {
                 // ✅ LÓGICA ORIGINAL: Para aviões e navios, usar a lógica original (apenas a unidade principal)
                 if (object_get_name(_unidade.object_index) == "obj_caca_f5" || object_get_name(_unidade.object_index) == "obj_f15" || object_get_name(_unidade.object_index) == "obj_su35" || object_get_name(_unidade.object_index) == "obj_f6" || object_get_name(_unidade.object_index) == "obj_c100") {
                     _unidade.estado = "patrulhando";
-                } else if (object_get_name(_unidade.object_index) == "obj_lancha_patrulha") {
-                    _unidade.estado = LanchaState.PATRULHANDO;
-                } else if (object_get_name(_unidade.object_index) == "obj_Constellation") {
-                    _unidade.estado = LanchaState.PATRULHANDO;
-                } else if (object_get_name(_unidade.object_index) == "obj_Independence") {
-                    _unidade.estado = LanchaState.PATRULHANDO;
-                } else if (object_get_name(_unidade.object_index) == "obj_wwhendrick" || object_get_name(_unidade.object_index) == "obj_submarino_base") {
+                } else if (object_get_name(_unidade.object_index) == "obj_lancha_patrulha" ||
+                           object_get_name(_unidade.object_index) == "obj_Constellation" ||
+                           object_get_name(_unidade.object_index) == "obj_Independence" ||
+                           object_get_name(_unidade.object_index) == "obj_RonaldReagan" ||
+                           object_get_name(_unidade.object_index) == "obj_navio_transporte" ||
+                           object_get_name(_unidade.object_index) == "obj_wwhendrick" ||
+                           object_get_name(_unidade.object_index) == "obj_submarino_base") {
                     _unidade.estado = LanchaState.PATRULHANDO;
                 }
                 
@@ -1144,18 +1146,6 @@ else {
                 } else {
                     _unidade.estado = "movendo";
                 }
-            } else if (object_get_name(_unidade.object_index) == "obj_navio_transporte") {
-                _unidade.estado = LanchaState.MOVENDO;
-            } else if (object_get_name(_unidade.object_index) == "obj_RonaldReagan") {
-                _unidade.estado = LanchaState.MOVENDO;
-            } else if (object_get_name(_unidade.object_index) == "obj_lancha_patrulha") {
-                _unidade.estado = LanchaState.MOVENDO;
-            } else if (object_get_name(_unidade.object_index) == "obj_Constellation") {
-                _unidade.estado = LanchaState.MOVENDO;
-            } else if (object_get_name(_unidade.object_index) == "obj_Independence") {
-                _unidade.estado = LanchaState.MOVENDO;
-            } else if (object_get_name(_unidade.object_index) == "obj_wwhendrick" || object_get_name(_unidade.object_index) == "obj_submarino_base") {
-                _unidade.estado = LanchaState.MOVENDO;
             } else if (object_get_name(_unidade.object_index) == "obj_c100") {
                 // ✅ CORREÇÃO: Bloquear movimento do C-100 quando em modo de embarque
                 if (variable_instance_exists(_unidade, "modo_receber_carga") && _unidade.modo_receber_carga) {
@@ -1165,17 +1155,142 @@ else {
                 _unidade.estado = "movendo";
             }
             
-            _unidade.destino_x = _tx;
-            _unidade.destino_y = _ty;
-
-            // ======================================================================
-            // ✅ NOVA LÓGICA: CANCELAR E LIMPAR A PATRULHA ANTERIOR
-            // ======================================================================
-            if (variable_instance_exists(_unidade, "pontos_patrulha") && ds_exists(_unidade.pontos_patrulha, ds_type_list) && ds_list_size(_unidade.pontos_patrulha) > 0) {
-                ds_list_clear(_unidade.pontos_patrulha);
-                show_debug_message("🔄 Patrulha cancelada por nova ordem de movimento.");
+            // ✅ NOVO: Sistema A* para unidades navais
+            var _obj_name = object_get_name(_unidade.object_index);
+            var _eh_naval = (_obj_name == "obj_lancha_patrulha" || 
+                            _obj_name == "obj_Constellation" || 
+                            _obj_name == "obj_Independence" || 
+                            _obj_name == "obj_RonaldReagan" ||
+                            _obj_name == "obj_navio_transporte" ||
+                            _obj_name == "obj_wwhendrick" ||
+                            _obj_name == "obj_submarino_base");
+            
+            if (_eh_naval) {
+                // É UM NAVIO - Usar sistema A* (GPS)
+                show_debug_message("🚢 NAVIO: Recebida ordem de movimento para (" + string(_tx) + ", " + string(_ty) + ")");
+                
+                // 1. Limpar patrulha antiga COMPLETAMENTE
+                if (variable_instance_exists(_unidade, "pontos_patrulha") && ds_exists(_unidade.pontos_patrulha, ds_type_list)) {
+                    ds_list_clear(_unidade.pontos_patrulha);
+                    show_debug_message("🔄 NAVIO: Patrulha cancelada por nova ordem.");
+                }
+                
+                // ✅ NOVO: Garantir que o navio NÃO está em modo patrulha
+                if (_unidade.estado == LanchaState.PATRULHANDO) {
+                    _unidade.estado = LanchaState.MOVENDO;
+                    if (variable_instance_exists(_unidade, "estado_string")) {
+                        _unidade.estado_string = "movendo";
+                    }
+                    show_debug_message("🔄 NAVIO: Estado alterado de PATRULHANDO para MOVENDO.");
+                }
+                
+                // 2. Limpar qualquer caminho (path) antigo que o navio possa ter
+                if (variable_instance_exists(_unidade, "meu_caminho") && _unidade.meu_caminho != noone) {
+                    path_delete(_unidade.meu_caminho);
+                    _unidade.meu_caminho = noone;
+                }
+                
+                // Parar qualquer movimento atual
+                if (_unidade.path_index != noone) {
+                    path_end();
+                    // ✅ NOTA: path_index é resetado automaticamente quando path_end() é chamado
+                }
+                
+                // 3. CHAMAR O "GPS" (A* Pathfinding)
+                var _novo_caminho = scr_encontrar_caminho_naval(_unidade.x, _unidade.y, _tx, _ty, _unidade);
+                
+                // 4. Verificar se o GPS encontrou uma rota
+                if (_novo_caminho != noone) {
+                    // SUCESSO!
+                    _unidade.meu_caminho = _novo_caminho; // Salva o novo caminho no navio
+                    _unidade.destino_final_x = _tx; // Guarda destino final para referência
+                    _unidade.destino_final_y = _ty;
+                    
+                    // Inicia o movimento do navio ao longo do caminho
+                    var _velocidade = _unidade.velocidade_movimento;
+                    if (variable_instance_exists(_unidade, "velocidade_max")) {
+                        _velocidade = _unidade.velocidade_max;
+                    }
+                    
+                    // ✅ CORREÇÃO: Definir estado ANTES de iniciar o path
+                    _unidade.estado = LanchaState.MOVENDO;
+                    if (variable_instance_exists(_unidade, "estado_string")) {
+                        _unidade.estado_string = "movendo";
+                    }
+                    
+                    // Limpa o destino antigo para não haver conflito
+                    _unidade.destino_x = -1;
+                    _unidade.destino_y = -1;
+                    
+                    // ✅ CORREÇÃO: Iniciar o path no contexto da unidade
+                    with (_unidade) {
+                        path_start(_novo_caminho, _velocidade, path_action_stop, false);
+                    }
+                    
+                    // ✅ NOTA: path_index é definido automaticamente pelo path_start()
+                    
+                    show_debug_message("✅ NAVIO: Caminho A* iniciado com sucesso! Velocidade: " + string(_velocidade) + ", Path: " + string(_novo_caminho));
+                    
+                } else {
+                    // FALHA (Nenhum caminho encontrado)
+                    show_debug_message("❌ NAVIO: Ordem ignorada, destino inalcançável.");
+                    // Tentar encontrar água próxima como fallback
+                    var _agua_proxima = scr_encontrar_agua_proxima(_tx, _ty, 1000);
+                    if (_agua_proxima != noone && array_length(_agua_proxima) >= 2) {
+                        var _caminho_fallback = scr_encontrar_caminho_naval(_unidade.x, _unidade.y, _agua_proxima[0], _agua_proxima[1], _unidade);
+                        if (_caminho_fallback != noone) {
+                            _unidade.meu_caminho = _caminho_fallback;
+                            _unidade.destino_final_x = _agua_proxima[0];
+                            _unidade.destino_final_y = _agua_proxima[1];
+                            var _velocidade = _unidade.velocidade_movimento;
+                            if (variable_instance_exists(_unidade, "velocidade_max")) {
+                                _velocidade = _unidade.velocidade_max;
+                            }
+                            _unidade.estado = LanchaState.MOVENDO;
+                            if (variable_instance_exists(_unidade, "estado_string")) {
+                                _unidade.estado_string = "movendo";
+                            }
+                            // ✅ CORREÇÃO: Iniciar o path no contexto da unidade
+                            with (_unidade) {
+                                path_start(_caminho_fallback, _velocidade, path_action_stop, false);
+                            }
+                            // ✅ NOTA: path_index é definido automaticamente pelo path_start()
+                            show_debug_message("⚠️ NAVIO: Usando água próxima como destino alternativo");
+                        }
+                    }
+                }
+            } else {
+                // NÃO É UM NAVIO (Tanques, infantaria, aviões, etc.)
+                // Usa a lógica antiga de definir destino_x e destino_y
+                
+                // ✅ NOVO: Validar destino antes de definir
+                var _validacao = scr_validar_destino_unidade(_unidade, _tx, _ty);
+                if (_validacao.valido) {
+                    _unidade.destino_x = _tx;
+                    _unidade.destino_y = _ty;
+                } else if (_validacao.posicao_alternativa != noone) {
+                    // Usar posição alternativa se disponível
+                    _unidade.destino_x = _validacao.destino_x_alternativo;
+                    _unidade.destino_y = _validacao.destino_y_alternativo;
+                    if (variable_global_exists("debug_enabled") && global.debug_enabled) {
+                        show_debug_message("⚠️ Destino ajustado para terreno válido: (" + string(_unidade.destino_x) + ", " + string(_unidade.destino_y) + ")");
+                    }
+                } else {
+                    // Destino inválido - não mover
+                    if (variable_global_exists("debug_enabled") && global.debug_enabled) {
+                        show_debug_message("❌ Destino inválido para " + object_get_name(_unidade.object_index) + ": " + _validacao.motivo);
+                    }
+                }
+                
+                // ======================================================================
+                // ✅ NOVA LÓGICA: CANCELAR E LIMPAR A PATRULHA ANTERIOR
+                // ======================================================================
+                if (variable_instance_exists(_unidade, "pontos_patrulha") && ds_exists(_unidade.pontos_patrulha, ds_type_list) && ds_list_size(_unidade.pontos_patrulha) > 0) {
+                    ds_list_clear(_unidade.pontos_patrulha);
+                    show_debug_message("🔄 Patrulha cancelada por nova ordem de movimento.");
+                }
+                // ======================================================================
             }
-            // ======================================================================
             
             // Mensagem adaptada ao tipo de unidade
             if (object_get_name(_unidade.object_index) == "obj_caca_f5") {
@@ -1564,6 +1679,13 @@ if (keyboard_check_pressed(ord("B"))) {
     show_debug_message("🔬 TECLA B PRESSIONADA! Room: " + room_get_name(room));
     global.menu_pesquisa_aberto = !global.menu_pesquisa_aberto;
     show_debug_message("🔬 Menu pesquisa agora: " + string(global.menu_pesquisa_aberto));
+    
+    // ✅ CORREÇÃO: Desativar/ativar minimapa quando abrir/fechar menu de pesquisa
+    var _minimap_instance = instance_find(obj_minimap, 0);
+    if (instance_exists(_minimap_instance)) {
+        _minimap_instance.minimap_visible = !global.menu_pesquisa_aberto; // Desativar quando menu aberto
+        show_debug_message("✅ Minimapa " + (global.menu_pesquisa_aberto ? "desativado" : "ativado"));
+    }
     
     // Debug: Verificar se o centro de pesquisa existe
     var _research_instance = instance_find(obj_research_center, 0);

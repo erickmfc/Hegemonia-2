@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_desenhar_menu_construcao",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_desenhar_menu_construcao",
+  "parent":{
+    "name":"menu_teste",
+    "path":"folders/Scripts/menu_teste.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

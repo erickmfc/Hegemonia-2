@@ -20,16 +20,37 @@ if (selecionado) {
     draw_set_alpha(0.2);
     draw_circle(x, _draw_y, radar_alcance, false);
     
-    // Linha para o destino (CORRIGIDO: usar destino_x/destino_y em vez de alvo_x/alvo_y)
-    if (estado != LanchaState.PARADO) {
-        if (estado == LanchaState.ATACANDO) {
-            draw_set_color(c_red); // Linha vermelha quando atacando
-            draw_set_alpha(0.7);
-        } else {
-            draw_set_color(c_yellow); // Linha amarela para movimento normal
-            draw_set_alpha(0.5);
+    // ✅ NOVO: Desenhar linha do caminho A* quando em movimento (APENAS UMA LINHA)
+    if (estado == LanchaState.MOVENDO) {
+        // ✅ CORREÇÃO: Desenhar apenas o caminho A* completo (removida linha direta duplicada)
+        if (variable_instance_exists(id, "meu_caminho") && meu_caminho != noone) {
+            draw_set_color(c_aqua);
+            draw_set_alpha(0.6);
+            var _num_segments = 30; // Número de segmentos para desenhar o caminho
+            var _prev_x = x;
+            var _prev_y = _draw_y;
+            
+            // ✅ CORREÇÃO: path_get_x/y usa posição (0.0 a 1.0), não pixels
+            for (var i = 1; i <= _num_segments; i++) {
+                var _pos = i / _num_segments; // Posição de 0.0 a 1.0
+                var _seg_x = path_get_x(meu_caminho, _pos);
+                var _seg_y = path_get_y(meu_caminho, _pos);
+                if (!is_undefined(_seg_x) && !is_undefined(_seg_y)) {
+                    draw_line(_prev_x, _prev_y, _seg_x, _seg_y);
+                    _prev_x = _seg_x;
+                    _prev_y = _seg_y;
+                }
+            }
         }
-        draw_line(x, _draw_y, destino_x, destino_y);
+    }
+    
+    // Desenhar linha quando atacando
+    if (estado == LanchaState.ATACANDO) {
+        if (variable_instance_exists(id, "alvo_unidade") && instance_exists(alvo_unidade)) {
+            draw_set_color(c_red);
+            draw_set_alpha(0.7);
+            draw_line(x, _draw_y, alvo_unidade.x, alvo_unidade.y);
+        }
     }
     
     // --- INFORMAÇÕES DE STATUS E CONTROLES ---
@@ -48,15 +69,38 @@ if (selecionado) {
     else if (estado == LanchaState.MOVENDO) _status_color = make_color_rgb(0, 255, 255); // c_aqua
     else if (estado == LanchaState.DEFININDO_PATRULHA) _status_color = c_lime;
     
-    // Desenha o status acima da lancha
+    // ✅ CORREÇÃO: Usar fonte padrão como no navio de transporte
+    draw_set_font(-1);
+    
+    // Desenha o status acima do submarino (com fundo escuro para legibilidade)
+    var _status_x = x;
+    var _status_y = _draw_y - 65;
+    var _status_w = string_width(_status_text) + 20;
+    var _status_h = 25;
+    
+    draw_set_color(c_black);
+    draw_set_alpha(0.8);
+    draw_rectangle(_status_x - _status_w/2, _status_y - _status_h/2, 
+                    _status_x + _status_w/2, _status_y + _status_h/2, false);
+    draw_set_alpha(1.0);
+    
+    // Borda do status
     draw_set_color(_status_color);
-    draw_text(x, _draw_y - 60, _status_text);
+    draw_set_alpha(0.6);
+    draw_rectangle(_status_x - _status_w/2, _status_y - _status_h/2, 
+                    _status_x + _status_w/2, _status_y + _status_h/2, true);
+    draw_set_alpha(1.0);
+    
+    // Desenhar status PRINCIPAL
+    draw_set_color(_status_color);
+    draw_text(_status_x, _status_y, _status_text);
     
     // Desenha os controles disponíveis (adaptados para submarino)
     draw_set_color(c_white);
-    draw_text(x, _draw_y - 50, "[K] Patrulha");
-    draw_text(x, _draw_y - 35, "[I] Subm/Emerg | [L] Parar");
-    draw_text(x, _draw_y - 20, "[P] Passivo | [O] Ataque");
+    draw_set_alpha(0.9);
+    draw_text(x, _draw_y - 35, "[K] Patrulha | [L] Parar");
+    draw_text(x, _draw_y - 20, "[I] Subm/Emerg | [P] Passivo | [O] Ataque");
+    draw_set_alpha(1.0);
 
     draw_set_halign(fa_left);
 }

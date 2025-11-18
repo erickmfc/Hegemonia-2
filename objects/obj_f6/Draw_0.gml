@@ -63,22 +63,47 @@ if (selecionado) {
     else if (estado == "movendo") _status_color = c_aqua;
     else if (estado == "decolando") _status_color = c_blue;
     
-    // Desenha o status acima do avião
+    // ✅ CORREÇÃO: Definir fonte padrão antes de desenhar (evita fonte gigante)
+    draw_set_font(-1);
+    
+    // Desenha o status acima do avião (com fundo escuro para legibilidade)
+    var _status_x = x;
+    var _status_y = _draw_y - 65;
+    var _status_w = string_width(_status_text) + 20;
+    var _status_h = 25;
+    
+    draw_set_color(c_black);
+    draw_set_alpha(0.8);
+    draw_rectangle(_status_x - _status_w/2, _status_y - _status_h/2, 
+                    _status_x + _status_w/2, _status_y + _status_h/2, false);
+    draw_set_alpha(1.0);
+    
+    // Borda do status
     draw_set_color(_status_color);
-    draw_text(x, _draw_y - 60, _status_text);
+    draw_set_alpha(0.6);
+    draw_rectangle(_status_x - _status_w/2, _status_y - _status_h/2, 
+                    _status_x + _status_w/2, _status_y + _status_h/2, true);
+    draw_set_alpha(1.0);
     
-    // Desenha informações de teste
+    // Desenhar status PRINCIPAL
+    draw_set_color(_status_color);
+    draw_text(_status_x, _status_y, _status_text);
+    
+    // Desenha informações de teste (menor)
     draw_set_color(c_red);
-    draw_text(x, _draw_y - 75, "F-6 ALVO DE TESTE");
+    draw_set_alpha(0.9);
+    draw_text(x, _draw_y - 40, "F-6 ALVO DE TESTE");
     
-    // Desenha HP
+    // Desenha HP (menor)
     draw_set_color(c_white);
-    draw_text(x, _draw_y - 45, "HP: " + string(hp_atual) + "/" + string(hp_max));
+    draw_set_alpha(0.9);
+    draw_text(x, _draw_y - 25, "HP: " + string(hp_atual) + "/" + string(hp_max));
     
-    // Desenha informações de patrulha
+    // Desenha informações de patrulha (menor)
     if (estado == "patrulhando") {
-        draw_text(x, _draw_y - 30, "Patrulha: " + string(indice_patrulha_atual + 1) + "/" + string(ds_list_size(pontos_patrulha)));
+        draw_text(x, _draw_y - 10, "Patrulha: " + string(indice_patrulha_atual + 1) + "/" + string(ds_list_size(pontos_patrulha)));
     }
+    draw_set_alpha(1.0);
 
     draw_set_halign(fa_left);
 }

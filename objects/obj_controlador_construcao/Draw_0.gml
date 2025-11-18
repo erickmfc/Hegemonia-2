@@ -30,7 +30,7 @@ if (global.construindo_agora != noone) {
         // Escala específica para aeroporto (ajustada para tamanho normal)
         var _escala = 1.0;
         if (global.construindo_agora == asset_get_index("obj_aeroporto_militar")) {
-            _escala = 2.7; // ✅ ESCALA REDUZIDA 10% PARA SPRITE PEQUENO (64x64 -> 172x172)
+            _escala = 0.135; // ✅ CORREÇÃO: 95% menor que o tamanho anterior (2.7 * 0.05 = 0.135)
         }
         
         // ✅ CORREÇÃO: Ajustar posição considerando offset do sprite para alinhar com o mouse

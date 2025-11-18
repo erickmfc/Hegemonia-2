@@ -47,26 +47,6 @@ function scr_criar_objeto_seguro(objeto_tipo, pos_x, pos_y, layer = "Instances",
     return objeto_id;
 }
 
-/// @description Verificar se a posição é válida para o tipo de objeto
-function scr_verificar_posicao_valida(objeto_tipo, pos_x, pos_y) {
-    // Verificar limites da sala
-    if (pos_x < 0 || pos_y < 0 || pos_x >= room_width || pos_y >= room_height) {
-        return false;
-    }
-    
-    // Verificar se navios precisam estar em água
-    switch (objeto_tipo) {
-        case obj_lancha_patrulha:
-        case obj_fragata:
-        case obj_destroyer:
-        case obj_submarino:
-        case obj_RonaldReagan:
-            return scr_check_water_tile(pos_x, pos_y);
-        default:
-            return true;
-    }
-}
-
 /// @description Aplicar propriedades ao objeto
 function scr_aplicar_propriedades_objeto(objeto_id, propriedades) {
     if (!instance_exists(objeto_id)) {

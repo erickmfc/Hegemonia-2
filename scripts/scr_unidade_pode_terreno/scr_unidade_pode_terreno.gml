@@ -31,33 +31,24 @@ function scr_unidade_pode_terreno(_unidade_id, _pos_x, _pos_y) {
     
     var _terreno_no_tile = _tile_data.terreno;
     
-    // Obter terrenos permitidos da unidade
+    // ✅ CORREÇÃO: Usar função centralizada para identificar terrenos permitidos
+    // ✅ SEGURANÇA: Verificar se script existe antes de chamar
+    var _script_id = asset_get_index("scr_identificar_tipo_unidade_terreno");
     var _terrenos_permitidos = [];
     
-    if (variable_instance_exists(_unidade_id, "terrenos_permitidos")) {
-        _terrenos_permitidos = _unidade_id.terrenos_permitidos;
+    if (_script_id != -1) {
+        _terrenos_permitidos = scr_identificar_tipo_unidade_terreno(_unidade_id);
     } else {
-        // Valores padrão baseados no tipo de unidade
+        // ✅ FALLBACK: Se script não existe, usar lógica básica
         var _obj_name = object_get_name(_unidade_id.object_index);
-        
-        // Navios e submarinos: só água
-        if (string_pos("lancha", _obj_name) > 0 || 
-            string_pos("navio", _obj_name) > 0 || 
-            string_pos("submarino", _obj_name) > 0 ||
-            string_pos("Constellation", _obj_name) > 0 ||
-            string_pos("Independence", _obj_name) > 0 ||
-            string_pos("RonaldReagan", _obj_name) > 0 ||
-            string_pos("Hendrick", _obj_name) > 0) {
+        if (string_pos("lancha", _obj_name) > 0 || string_pos("navio", _obj_name) > 0 || 
+            string_pos("submarino", _obj_name) > 0 || string_pos("Constellation", _obj_name) > 0 ||
+            string_pos("Independence", _obj_name) > 0 || string_pos("RonaldReagan", _obj_name) > 0) {
             _terrenos_permitidos = [TERRAIN.AGUA];
-        }
-        // Tanques: terra, deserto (não floresta)
-        else if (string_pos("tanque", _obj_name) > 0 || 
-                 string_pos("M1A", _obj_name) > 0 ||
-                 string_pos("blindado", _obj_name) > 0) {
+        } else if (string_pos("tanque", _obj_name) > 0 || string_pos("M1A", _obj_name) > 0 ||
+                   string_pos("blindado", _obj_name) > 0 || string_pos("Gepard", _obj_name) > 0) {
             _terrenos_permitidos = [TERRAIN.CAMPO, TERRAIN.DESERTO];
-        }
-        // Outras unidades terrestres: terra, deserto, floresta
-        else {
+        } else {
             _terrenos_permitidos = [TERRAIN.CAMPO, TERRAIN.FLORESTA, TERRAIN.DESERTO];
         }
     }

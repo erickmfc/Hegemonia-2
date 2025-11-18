@@ -96,8 +96,9 @@ draw_set_color(make_color_rgb(150, 200, 255));
 draw_text_transformed(_menu_x + 40, _recursos_y + 45, "SLOTS: " + string(global.slots_pesquisa_usados) + "/" + string(global.slots_pesquisa_total), 0.9, 0.9, 0);
 
 // Barra de progresso dos slots
+// ✅ CORREÇÃO: Barra desceu 10% (de 30 para 40)
 var _slot_bar_x = _menu_x + 200;
-var _slot_bar_y = _recursos_y + 30;
+var _slot_bar_y = _recursos_y + 40; // Desceu 10% (de 30 para 40)
 var _slot_bar_w = 200;
 var _slot_bar_h = 12;
 
@@ -431,17 +432,7 @@ draw_set_alpha(1.0);
 draw_set_color(make_color_rgb(255, 255, 255));
 draw_text_transformed(_close_x + _close_w/2, _close_y + _close_h/2, "FECHAR", 1.0, 1.0, 0);
 
-// === INSTRUÇÕES ===
-draw_set_halign(fa_left);
-draw_set_valign(fa_top);
-draw_set_alpha(1.0);
-draw_set_color(make_color_rgb(100, 150, 200));
-draw_text_transformed(_menu_x + 20, _slot_y - 50, "INSTRUÇÕES:", 0.8, 0.8, 0);
-
-draw_set_alpha(1.0);
-draw_set_color(make_color_rgb(255, 255, 255));
-draw_text_transformed(_menu_x + 20, _slot_y - 35, "• Clique nos recursos para iniciar a pesquisa", 0.7, 0.7, 0);
-draw_text_transformed(_menu_x + 20, _slot_y - 20, "• Máximo " + string(global.slots_pesquisa_total) + " pesquisas simultâneas", 0.7, 0.7, 0);
+// ✅ CORREÇÃO: Instruções removidas conforme solicitado
 
 // === RESET DAS CONFIGURAÇÕES ===
 draw_set_halign(fa_left);

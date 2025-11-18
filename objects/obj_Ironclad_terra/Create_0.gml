@@ -3,7 +3,7 @@ speed = 7; // um pouco mais rápido ajuda a convergir
 gravity = 0.04; // menos arco para aumentar precisão
 dano = 1000; // ✅ AUMENTADO: Dano suficiente para matar 10 soldados (10 x 100 HP)
 dano_area = 1000; // ✅ NOVO: Dano em área para matar todos os soldados próximos
-raio_dano_area = 150; // ✅ NOVO: Raio de dano em área (pixels)
+raio_dano_area = 450; // ✅ AUMENTADO: Raio de dano em área de 150 para 450 pixels (+300)
 dono = noone; // Quem disparou
 // audio_play_sound(snd_foguete_voando, 0, true); // Temporariamente desabilitado para debug
 target = noone;

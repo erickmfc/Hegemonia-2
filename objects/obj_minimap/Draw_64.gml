@@ -148,209 +148,291 @@ minimap_draw_scale_y = _scale_y;
 minimap_unit_size = 2;
 minimap_structure_size = 2.5; // Estruturas são um pouco maiores
 
-// === NAVIOS (Pontos azuis claros) ===
-draw_set_color(make_color_rgb(100, 200, 255));
-draw_set_alpha(1);
+// === FUNÇÃO AUXILIAR: Obter cor baseada na nação ===
+function _get_nation_color(_nacao) {
+    if (_nacao == 1) {
+        // Jogador (Azul)
+        return make_color_rgb(50, 150, 255);
+    } else if (_nacao == 2) {
+        // Presidente 1 / IA Inimiga (Vermelho)
+        return make_color_rgb(255, 50, 50);
+    } else if (_nacao == 3) {
+        // Outra nação (Laranja)
+        return make_color_rgb(255, 150, 50);
+    } else {
+        // Neutro/Outros (Cinza)
+        return make_color_rgb(150, 150, 150);
+    }
+}
 
+// === NAVIOS ===
 with (obj_lancha_patrulha) {
-    if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) {
+    if (variable_instance_exists(id, "nacao_proprietaria")) {
         var _unit_minimap_x = other.minimap_draw_x + (x * other.minimap_draw_scale_x);
         var _unit_minimap_y = other.minimap_draw_y + (y * other.minimap_draw_scale_y);
+        draw_set_color(_get_nation_color(nacao_proprietaria));
+        draw_set_alpha(1);
         draw_circle(_unit_minimap_x, _unit_minimap_y, other.minimap_unit_size, false);
     }
 }
 
 with (obj_Constellation) {
-    if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) {
+    if (variable_instance_exists(id, "nacao_proprietaria")) {
         var _unit_minimap_x = other.minimap_draw_x + (x * other.minimap_draw_scale_x);
         var _unit_minimap_y = other.minimap_draw_y + (y * other.minimap_draw_scale_y);
+        draw_set_color(_get_nation_color(nacao_proprietaria));
+        draw_set_alpha(1);
         draw_circle(_unit_minimap_x, _unit_minimap_y, other.minimap_unit_size, false);
     }
 }
 
 with (obj_Independence) {
-    if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) {
+    if (variable_instance_exists(id, "nacao_proprietaria")) {
         var _unit_minimap_x = other.minimap_draw_x + (x * other.minimap_draw_scale_x);
         var _unit_minimap_y = other.minimap_draw_y + (y * other.minimap_draw_scale_y);
+        draw_set_color(_get_nation_color(nacao_proprietaria));
+        draw_set_alpha(1);
         draw_circle(_unit_minimap_x, _unit_minimap_y, other.minimap_unit_size, false);
     }
 }
 
 with (obj_RonaldReagan) {
-    if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) {
+    if (variable_instance_exists(id, "nacao_proprietaria")) {
         var _unit_minimap_x = other.minimap_draw_x + (x * other.minimap_draw_scale_x);
         var _unit_minimap_y = other.minimap_draw_y + (y * other.minimap_draw_scale_y);
+        draw_set_color(_get_nation_color(nacao_proprietaria));
+        draw_set_alpha(1);
         draw_circle(_unit_minimap_x, _unit_minimap_y, other.minimap_unit_size, false);
     }
 }
 
 with (obj_navio_base) {
-    if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) {
+    if (variable_instance_exists(id, "nacao_proprietaria")) {
         var _unit_minimap_x = other.minimap_draw_x + (x * other.minimap_draw_scale_x);
         var _unit_minimap_y = other.minimap_draw_y + (y * other.minimap_draw_scale_y);
+        draw_set_color(_get_nation_color(nacao_proprietaria));
+        draw_set_alpha(1);
         draw_circle(_unit_minimap_x, _unit_minimap_y, other.minimap_unit_size, false);
     }
 }
 
 with (obj_navio_transporte) {
-    if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) {
+    if (variable_instance_exists(id, "nacao_proprietaria")) {
         var _unit_minimap_x = other.minimap_draw_x + (x * other.minimap_draw_scale_x);
         var _unit_minimap_y = other.minimap_draw_y + (y * other.minimap_draw_scale_y);
+        draw_set_color(_get_nation_color(nacao_proprietaria));
+        draw_set_alpha(1);
         draw_circle(_unit_minimap_x, _unit_minimap_y, other.minimap_unit_size, false);
     }
 }
 
 with (obj_submarino_base) {
-    if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) {
+    if (variable_instance_exists(id, "nacao_proprietaria")) {
         var _unit_minimap_x = other.minimap_draw_x + (x * other.minimap_draw_scale_x);
         var _unit_minimap_y = other.minimap_draw_y + (y * other.minimap_draw_scale_y);
+        draw_set_color(_get_nation_color(nacao_proprietaria));
+        draw_set_alpha(1);
         draw_circle(_unit_minimap_x, _unit_minimap_y, other.minimap_unit_size, false);
     }
 }
 
-// === VEÍCULOS TERRESTRES (Pontos verdes) ===
-draw_set_color(c_lime);
-draw_set_alpha(1);
-
+// === VEÍCULOS TERRESTRES ===
 with (obj_tanque) {
-    if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1 && visible) {
+    if (variable_instance_exists(id, "nacao_proprietaria") && visible) {
         var _unit_minimap_x = other.minimap_draw_x + (x * other.minimap_draw_scale_x);
         var _unit_minimap_y = other.minimap_draw_y + (y * other.minimap_draw_scale_y);
+        draw_set_color(_get_nation_color(nacao_proprietaria));
+        draw_set_alpha(1);
         draw_circle(_unit_minimap_x, _unit_minimap_y, other.minimap_unit_size, false);
     }
 }
 
 with (obj_blindado_antiaereo) {
-    if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1 && visible) {
+    if (variable_instance_exists(id, "nacao_proprietaria") && visible) {
         var _unit_minimap_x = other.minimap_draw_x + (x * other.minimap_draw_scale_x);
         var _unit_minimap_y = other.minimap_draw_y + (y * other.minimap_draw_scale_y);
+        draw_set_color(_get_nation_color(nacao_proprietaria));
+        draw_set_alpha(1);
         draw_circle(_unit_minimap_x, _unit_minimap_y, other.minimap_unit_size, false);
     }
 }
 
-// === INFANTARIA (Pontos amarelos pequenos) ===
-draw_set_color(c_yellow);
-draw_set_alpha(1);
+// === M1A ABRAMS ===
+var _obj_abrams = asset_get_index("obj_M1A_Abrams");
+if (_obj_abrams != -1 && asset_get_type(_obj_abrams) == asset_object && object_exists(_obj_abrams)) {
+    with (_obj_abrams) {
+        if (variable_instance_exists(id, "nacao_proprietaria") && visible) {
+            var _unit_minimap_x = other.minimap_draw_x + (x * other.minimap_draw_scale_x);
+            var _unit_minimap_y = other.minimap_draw_y + (y * other.minimap_draw_scale_y);
+            draw_set_color(_get_nation_color(nacao_proprietaria));
+            draw_set_alpha(1);
+            draw_circle(_unit_minimap_x, _unit_minimap_y, other.minimap_unit_size, false);
+        }
+    }
+}
 
+// === GEPARD ANTI-AÉREO ===
+var _obj_gepard = asset_get_index("obj_gepard");
+if (_obj_gepard != -1 && asset_get_type(_obj_gepard) == asset_object && object_exists(_obj_gepard)) {
+    with (_obj_gepard) {
+        if (variable_instance_exists(id, "nacao_proprietaria") && visible) {
+            var _unit_minimap_x = other.minimap_draw_x + (x * other.minimap_draw_scale_x);
+            var _unit_minimap_y = other.minimap_draw_y + (y * other.minimap_draw_scale_y);
+            draw_set_color(_get_nation_color(nacao_proprietaria));
+            draw_set_alpha(1);
+            draw_circle(_unit_minimap_x, _unit_minimap_y, other.minimap_unit_size, false);
+        }
+    }
+}
+
+// === INFANTARIA ===
 with (obj_infantaria) {
-    if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1 && visible) {
+    if (variable_instance_exists(id, "nacao_proprietaria") && visible) {
         var _unit_minimap_x = other.minimap_draw_x + (x * other.minimap_draw_scale_x);
         var _unit_minimap_y = other.minimap_draw_y + (y * other.minimap_draw_scale_y);
+        draw_set_color(_get_nation_color(nacao_proprietaria));
+        draw_set_alpha(1);
         draw_circle(_unit_minimap_x, _unit_minimap_y, other.minimap_unit_size - 1, false);
     }
 }
 
 with (obj_soldado_antiaereo) {
-    if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1 && visible) {
+    if (variable_instance_exists(id, "nacao_proprietaria") && visible) {
         var _unit_minimap_x = other.minimap_draw_x + (x * other.minimap_draw_scale_x);
         var _unit_minimap_y = other.minimap_draw_y + (y * other.minimap_draw_scale_y);
+        draw_set_color(_get_nation_color(nacao_proprietaria));
+        draw_set_alpha(1);
         draw_circle(_unit_minimap_x, _unit_minimap_y, other.minimap_unit_size - 1, false);
     }
 }
 
-// === AVIÕES E HELICÓPTEROS (Pontos brancos) ===
-draw_set_color(c_white);
-draw_set_alpha(1);
-
+// === AVIÕES E HELICÓPTEROS ===
 with (obj_caca_f5) {
-    if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) {
+    if (variable_instance_exists(id, "nacao_proprietaria")) {
         var _unit_minimap_x = other.minimap_draw_x + (x * other.minimap_draw_scale_x);
         var _unit_minimap_y = other.minimap_draw_y + (y * other.minimap_draw_scale_y);
+        draw_set_color(_get_nation_color(nacao_proprietaria));
+        draw_set_alpha(1);
         draw_circle(_unit_minimap_x, _unit_minimap_y, other.minimap_unit_size, false);
     }
 }
 
 with (obj_helicoptero_militar) {
-    if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) {
+    if (variable_instance_exists(id, "nacao_proprietaria")) {
         var _unit_minimap_x = other.minimap_draw_x + (x * other.minimap_draw_scale_x);
         var _unit_minimap_y = other.minimap_draw_y + (y * other.minimap_draw_scale_y);
+        draw_set_color(_get_nation_color(nacao_proprietaria));
+        draw_set_alpha(1);
         draw_circle(_unit_minimap_x, _unit_minimap_y, other.minimap_unit_size, false);
     }
 }
 
 with (obj_c100) {
-    if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) {
+    if (variable_instance_exists(id, "nacao_proprietaria")) {
         var _unit_minimap_x = other.minimap_draw_x + (x * other.minimap_draw_scale_x);
         var _unit_minimap_y = other.minimap_draw_y + (y * other.minimap_draw_scale_y);
+        draw_set_color(_get_nation_color(nacao_proprietaria));
+        draw_set_alpha(1);
         draw_circle(_unit_minimap_x, _unit_minimap_y, other.minimap_unit_size, false);
     }
 }
 
 with (obj_f15) {
-    if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) {
+    if (variable_instance_exists(id, "nacao_proprietaria")) {
         var _unit_minimap_x = other.minimap_draw_x + (x * other.minimap_draw_scale_x);
         var _unit_minimap_y = other.minimap_draw_y + (y * other.minimap_draw_scale_y);
+        draw_set_color(_get_nation_color(nacao_proprietaria));
+        draw_set_alpha(1);
         draw_circle(_unit_minimap_x, _unit_minimap_y, other.minimap_unit_size, false);
     }
 }
 
 with (obj_su35) {
-    if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) {
+    if (variable_instance_exists(id, "nacao_proprietaria")) {
         var _unit_minimap_x = other.minimap_draw_x + (x * other.minimap_draw_scale_x);
         var _unit_minimap_y = other.minimap_draw_y + (y * other.minimap_draw_scale_y);
+        draw_set_color(_get_nation_color(nacao_proprietaria));
+        draw_set_alpha(1);
         draw_circle(_unit_minimap_x, _unit_minimap_y, other.minimap_unit_size, false);
     }
 }
 
-// === ESTRUTURAS MILITARES (Pontos laranja) ===
-draw_set_color(make_color_rgb(255, 150, 50));
-draw_set_alpha(1);
+// === F6 (se existir) ===
+var _obj_f6 = asset_get_index("obj_f6");
+if (_obj_f6 != -1 && asset_get_type(_obj_f6) == asset_object && object_exists(_obj_f6)) {
+    with (_obj_f6) {
+        if (variable_instance_exists(id, "nacao_proprietaria")) {
+            var _unit_minimap_x = other.minimap_draw_x + (x * other.minimap_draw_scale_x);
+            var _unit_minimap_y = other.minimap_draw_y + (y * other.minimap_draw_scale_y);
+            draw_set_color(_get_nation_color(nacao_proprietaria));
+            draw_set_alpha(1);
+            draw_circle(_unit_minimap_x, _unit_minimap_y, other.minimap_unit_size, false);
+        }
+    }
+}
 
+// === ESTRUTURAS MILITARES ===
 with (obj_quartel) {
-    if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) {
+    if (variable_instance_exists(id, "nacao_proprietaria")) {
         var _unit_minimap_x = other.minimap_draw_x + (x * other.minimap_draw_scale_x);
         var _unit_minimap_y = other.minimap_draw_y + (y * other.minimap_draw_scale_y);
+        draw_set_color(_get_nation_color(nacao_proprietaria));
+        draw_set_alpha(1);
         draw_circle(_unit_minimap_x, _unit_minimap_y, other.minimap_structure_size, true);
     }
 }
 
 with (obj_quartel_marinha) {
-    if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) {
+    if (variable_instance_exists(id, "nacao_proprietaria")) {
         var _unit_minimap_x = other.minimap_draw_x + (x * other.minimap_draw_scale_x);
         var _unit_minimap_y = other.minimap_draw_y + (y * other.minimap_draw_scale_y);
+        draw_set_color(_get_nation_color(nacao_proprietaria));
+        draw_set_alpha(1);
         draw_circle(_unit_minimap_x, _unit_minimap_y, other.minimap_structure_size, true);
     }
 }
 
 with (obj_aeroporto_militar) {
-    if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) {
+    if (variable_instance_exists(id, "nacao_proprietaria")) {
         var _unit_minimap_x = other.minimap_draw_x + (x * other.minimap_draw_scale_x);
         var _unit_minimap_y = other.minimap_draw_y + (y * other.minimap_draw_scale_y);
+        draw_set_color(_get_nation_color(nacao_proprietaria));
+        draw_set_alpha(1);
         draw_circle(_unit_minimap_x, _unit_minimap_y, other.minimap_structure_size, true);
     }
 }
 
-// === ESTRUTURAS CIVIS (Pontos ciano) ===
-draw_set_color(make_color_rgb(0, 255, 255));
-draw_set_alpha(1);
-
+// === ESTRUTURAS CIVIS ===
 with (obj_casa) {
-    if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) {
+    if (variable_instance_exists(id, "nacao_proprietaria")) {
         var _unit_minimap_x = other.minimap_draw_x + (x * other.minimap_draw_scale_x);
         var _unit_minimap_y = other.minimap_draw_y + (y * other.minimap_draw_scale_y);
+        draw_set_color(_get_nation_color(nacao_proprietaria));
+        draw_set_alpha(1);
         draw_circle(_unit_minimap_x, _unit_minimap_y, other.minimap_structure_size - 0.5, true);
     }
 }
 
 with (obj_banco) {
-    if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) {
+    if (variable_instance_exists(id, "nacao_proprietaria")) {
         var _unit_minimap_x = other.minimap_draw_x + (x * other.minimap_draw_scale_x);
         var _unit_minimap_y = other.minimap_draw_y + (y * other.minimap_draw_scale_y);
+        draw_set_color(_get_nation_color(nacao_proprietaria));
+        draw_set_alpha(1);
         draw_circle(_unit_minimap_x, _unit_minimap_y, other.minimap_structure_size - 0.5, true);
     }
 }
 
-// === CENTRO DE PESQUISA (Pontos roxos) ===
-draw_set_color(make_color_rgb(200, 100, 255));
-draw_set_alpha(1);
-
+// === CENTRO DE PESQUISA ===
 // ✅ CORREÇÃO: Verificar se obj_centro_pesquisa existe antes de usar
 var _obj_centro_pesquisa = asset_get_index("obj_centro_pesquisa");
 if (_obj_centro_pesquisa != -1 && asset_get_type(_obj_centro_pesquisa) == asset_object && object_exists(_obj_centro_pesquisa)) {
     with (_obj_centro_pesquisa) {
-        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) {
+        if (variable_instance_exists(id, "nacao_proprietaria")) {
             var _unit_minimap_x = other.minimap_draw_x + (x * other.minimap_draw_scale_x);
             var _unit_minimap_y = other.minimap_draw_y + (y * other.minimap_draw_scale_y);
+            draw_set_color(_get_nation_color(nacao_proprietaria));
+            draw_set_alpha(1);
             draw_circle(_unit_minimap_x, _unit_minimap_y, other.minimap_structure_size, true);
         }
     }
@@ -359,11 +441,26 @@ if (_obj_centro_pesquisa != -1 && asset_get_type(_obj_centro_pesquisa) == asset_
 // Verificar também obj_research_center (nome alternativo)
 if (object_exists(obj_research_center)) {
     with (obj_research_center) {
-        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) {
+        if (variable_instance_exists(id, "nacao_proprietaria")) {
             var _unit_minimap_x = other.minimap_draw_x + (x * other.minimap_draw_scale_x);
             var _unit_minimap_y = other.minimap_draw_y + (y * other.minimap_draw_scale_y);
+            draw_set_color(_get_nation_color(nacao_proprietaria));
+            draw_set_alpha(1);
             draw_circle(_unit_minimap_x, _unit_minimap_y, other.minimap_structure_size, true);
         }
+    }
+}
+
+// === PRESIDENTE 1 (Marcador da IA) ===
+var _obj_presidente_1 = asset_get_index("obj_presidente_1");
+if (_obj_presidente_1 != -1 && asset_get_type(_obj_presidente_1) == asset_object && object_exists(_obj_presidente_1)) {
+    with (_obj_presidente_1) {
+        var _unit_minimap_x = other.minimap_draw_x + (x * other.minimap_draw_scale_x);
+        var _unit_minimap_y = other.minimap_draw_y + (y * other.minimap_draw_scale_y);
+        // Presidente aparece como um quadrado vermelho maior
+        draw_set_color(make_color_rgb(255, 0, 0)); // Vermelho brilhante
+        draw_set_alpha(1);
+        draw_rectangle(_unit_minimap_x - 3, _unit_minimap_y - 3, _unit_minimap_x + 3, _unit_minimap_y + 3, false);
     }
 }
 

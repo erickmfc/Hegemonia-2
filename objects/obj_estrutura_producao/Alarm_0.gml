@@ -13,7 +13,17 @@ if (variable_global_exists("penalidade_producao")) {
 
 switch (tipo_recurso) {
     case "dinheiro":
-        global.dinheiro += _producao_final;
+        // ✅ CORREÇÃO CRÍTICA: Verificar se é da IA e produzir para recursos da IA
+        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 2) {
+            // É da IA - produzir para recursos da IA
+            global.ia_dinheiro += _producao_final;
+            if (variable_global_exists("debug_enabled") && global.debug_enabled) {
+                show_debug_message("💰 IA produziu $" + string(_producao_final) + " | Total: $" + string(global.ia_dinheiro));
+            }
+        } else {
+            // É do jogador - produzir normalmente
+            global.dinheiro += _producao_final;
+        }
         // Atualizar também o mapa consolidado
         if (ds_exists(global.estoque_recursos, ds_type_map)) {
             global.estoque_recursos[? "Dinheiro"] += _producao_final;
@@ -21,7 +31,17 @@ switch (tipo_recurso) {
         break;
         
     case "minerio":
-        global.minerio += _producao_final;
+        // ✅ CORREÇÃO CRÍTICA: Verificar se é da IA e produzir para recursos da IA
+        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 2) {
+            // É da IA - produzir para recursos da IA
+            global.ia_minerio += _producao_final;
+            if (variable_global_exists("debug_enabled") && global.debug_enabled) {
+                show_debug_message("⛏️ IA produziu " + string(_producao_final) + " minério | Total: " + string(global.ia_minerio));
+            }
+        } else {
+            // É do jogador - produzir normalmente
+            global.minerio += _producao_final;
+        }
         // Atualizar também o mapa consolidado
         if (ds_exists(global.estoque_recursos, ds_type_map)) {
             global.estoque_recursos[? "Minério"] += _producao_final;
@@ -29,7 +49,17 @@ switch (tipo_recurso) {
         break;
     
     case "petroleo":
-        global.petroleo += _producao_final;
+        // ✅ CORREÇÃO CRÍTICA: Verificar se é da IA e produzir para recursos da IA
+        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 2) {
+            // É da IA - produzir para recursos da IA
+            global.ia_petroleo += _producao_final;
+            if (variable_global_exists("debug_enabled") && global.debug_enabled) {
+                show_debug_message("🛢️ IA produziu " + string(_producao_final) + " petróleo | Total: " + string(global.ia_petroleo));
+            }
+        } else {
+            // É do jogador - produzir normalmente
+            global.petroleo += _producao_final;
+        }
         // Atualizar também o mapa consolidado
         if (ds_exists(global.estoque_recursos, ds_type_map)) {
             global.estoque_recursos[? "Petróleo"] += _producao_final;

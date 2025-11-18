@@ -13,12 +13,14 @@ nacao_proprietaria = 2; // 2 = IA Inimiga
 nome_ia = "Presidente 1";
 
 // === SISTEMA DE DECISÃO ===
-intervalo_decisao = 60; // REDUZIDO de 90 para 60 - DECISÃO A CADA 1 SEGUNDO (ULTRA RÁPIDA)
-timer_decisao = 10; // REDUZIDO de 30 para 10 - COMEÇAR QUASE IMEDIATAMENTE
+// ✅ AUMENTADO: Decisões ainda mais rápidas para maior agressividade
+intervalo_decisao = 30; // ✅ REDUZIDO para 30 - DECISÃO A CADA 0.5 SEGUNDOS (ULTRA RÁPIDA)
+timer_decisao = 5; // ✅ REDUZIDO para 5 - COMEÇAR QUASE IMEDIATAMENTE
 
 // === PRIORIDADES DA IA ===
-prioridade_economia = 0.2;  // REDUZIDO de 0.4 para 0.2 - MENOS ECONOMIA
-prioridade_militar = 0.8;   // AUMENTADO de 0.6 para 0.8 - MAIS AGRESSIVA
+// ✅ AUMENTADO: Máxima agressividade militar
+prioridade_economia = 0.1;  // ✅ REDUZIDO para 0.1 - MÍNIMA ECONOMIA
+prioridade_militar = 0.9;   // ✅ AUMENTADO para 0.9 - MÁXIMA AGRESSIVIDADE
 
 // === ESTADO ATUAL ===
 objetivo_atual = "expandir"; // expandir, atacar, defender
@@ -47,12 +49,32 @@ lista_inimigas_visiveis = ds_list_create();
 
 // === COMANDOS MILITARES ===
 esquadrao_formando = false;
-esquadrao_tamanho_minimo = 2; // REDUZIDO de 5 para 2 - ATACAR COM MENOS UNIDADES
+esquadrao_tamanho_minimo = 1; // ✅ REDUZIDO para 1 - usar TODAS as unidades disponíveis
 unidades_em_esquadrao = ds_list_create();
 alvo_atual = noone;
 
 // === CONTADOR DE ATUALIZAÇÃO ===
 counter_update = 0;
+
+// === TIMERS DE OTIMIZAÇÃO ===
+// ✅ NOVO: Timers para verificações pesadas (não a cada frame)
+timer_verificacao_estruturas = 0;
+intervalo_verificacao_estruturas = 60; // Verificar estruturas a cada 1 segundo (60 frames)
+
+timer_verificacao_unidades = 0;
+intervalo_verificacao_unidades = 30; // Verificar unidades a cada 0.5 segundos (30 frames)
+
+timer_verificacao_inimigos = 0;
+intervalo_verificacao_inimigos = 20; // Verificar inimigos a cada ~0.33 segundos (20 frames)
+
+// === CACHE DE VERIFICAÇÕES ===
+// ✅ NOVO: Cache de resultados de verificações pesadas
+cache_estruturas_valido = false;
+cache_unidades_valido = false;
+cache_inimigos_valido = false;
+cache_timestamp_estruturas = 0;
+cache_timestamp_unidades = 0;
+cache_timestamp_inimigos = 0;
 
 // === VISUAL ===
 visible = true; // Visível no mapa
@@ -112,3 +134,8 @@ territorio_identificado = false;
 // Identificar território e costa (será feito no Step se o script não estiver disponível)
 // ✅ ADIADO: Identificação será feita no Step_0 para garantir que o script está carregado
 territorio_identificado = false;
+
+// === ✅ CORREÇÃO GM2043: Variáveis compartilhadas como variáveis de instância ===
+// Declarar como variáveis de instância para garantir escopo global no objeto
+_pos_estrategica = noone;
+_sucesso = false;
