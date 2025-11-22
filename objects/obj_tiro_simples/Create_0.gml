@@ -4,11 +4,17 @@
 // ================================================
 
 // === PROPRIEDADES DO TIRO ===
-speed = 5;                         // Velocidade do projétil
+speed = 5;                         // Velocidade padrão (será ajustada pelo atirador)
 dano = 100; // ✅ AUMENTADO: Dano suficiente para matar soldados (era 70)
 alvo = noone;                      // Unidade alvo
 dono = noone;                      // Unidade que atirou
 timer_vida = 300;                  // Tempo de vida MAIOR (5 segundos)
+
+// ✅ CORREÇÃO: Ajustar timer de vida baseado na distância do alvo (se disponível)
+if (variable_instance_exists(id, "alvo") && instance_exists(alvo)) {
+    var _distancia_alvo = point_distance(x, y, alvo.x, alvo.y);
+    timer_vida = max(300, (_distancia_alvo / speed) * 1.5); // 50% de margem
+}
 
 // ✅ NOVO: Dano em área para mísseis terrestres
 dano_area = 1000;                  // Dano em área para matar unidades próximas

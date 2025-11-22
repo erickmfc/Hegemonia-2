@@ -284,6 +284,10 @@ if (timer_comando_unidades >= 300) { // 5 segundos
     }
 }
 
+// ✅ NOVO: COMANDANTE TÁTICO AGRESSIVO (executa constantemente)
+// Este script obriga unidades paradas a atacar - é o "segredo da agressividade"
+scr_ia_comandante_agressivo(id);
+
 // === TIMER DE DECISÃO ===
 timer_decisao--;
 if (timer_decisao <= 0) {
@@ -299,14 +303,20 @@ if (timer_decisao <= 0) {
     } else {
         // ✅ CORREÇÃO GM2043 DEFINITIVA: Variáveis compartilhadas como variáveis de instância
         var _decisao = "";
+        var _sucesso_local = false; // ✅ CORREÇÃO GM2044: Declarar UMA VEZ antes do switch
+        // ✅ NOVO: Declarar variáveis do switch aqui para evitar redeclaração
+        var _tem_aeroporto = false;
+        var _tem_porto = false;
+        var _tem_quartel = false;
+        
         // ✅ _pos_estrategica e _sucesso são variáveis de instância (declaradas no Create_0.gml)
         _pos_estrategica = noone; // Resetar valor
         _sucesso = false; // Resetar valor
-        var _sucesso_local = false; // ✅ CORREÇÃO GM2044: Declarar UMA VEZ antes do switch
         
         // 1. VERIFICAR ESTADO DO JOGO E TOMAR DECISÃO
-        _decisao = scr_ia_decisao_economia(id);
-        show_debug_message("🤖 IA DECISÃO: " + _decisao);
+        // ✅ NOVO: Usar Cérebro de Guerra (focado em ataque, ignora economia)
+        _decisao = scr_ia_decisao_guerra(id);
+        show_debug_message("⚔️ IA CÉREBRO DE GUERRA: " + _decisao);
     
         // 2. EXECUTAR DECISÃO
         switch (_decisao) {
@@ -447,7 +457,8 @@ if (timer_decisao <= 0) {
             }
             
             // ✅ CORREÇÃO GM2043: Declarar antes do if para escopo correto
-            var _tem_aeroporto = false;
+            // ✅ CORREÇÃO GM2044: _tem_aeroporto já declarada no início do switch (linha 308)
+            _tem_aeroporto = false;
             var _aeroporto_ia = noone;
             
             // FALLBACK: Se seleção inteligente falhar, usar lógica antiga
@@ -532,7 +543,9 @@ if (timer_decisao <= 0) {
             with (obj_quartel_marinha) {
                 if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 2) {
                     _tem_quartel_naval = true;
-                    _quartel_naval_ia = id;
+                    if (_quartel_naval_ia == noone) {
+                        _quartel_naval_ia = id; // ✅ Guardar apenas o primeiro encontrado
+                    }
                     _num_quartel_marinha++; // ✅ Contar quartéis marinhos da IA
                 }
             }
@@ -543,52 +556,82 @@ if (timer_decisao <= 0) {
                 var _quantidade_naval = 1;
                 _sucesso = false; // ✅ CORREÇÃO GM2043: Resetar valor (já declarada no início do case)
                 
-                // ✅ MELHORADO: Priorizar unidades premium navais
-                // Escolher tipo de navio baseado em recursos disponíveis
+                // ✅ FUNÇÃO AUXILIAR: Verificar se unidade está disponível no quartel
+                function _unidade_disponivel(_tipo_unidade, _quartel_id) {
+                    if (_quartel_id == noone || !instance_exists(_quartel_id)) return false;
+                    if (!variable_instance_exists(_quartel_id, "unidades_disponiveis")) return false;
+                    if (!ds_exists(_quartel_id.unidades_disponiveis, ds_type_list)) return false;
+                    
+                    for (var i = 0; i < ds_list_size(_quartel_id.unidades_disponiveis); i++) {
+                        var _data = ds_list_find_value(_quartel_id.unidades_disponiveis, i);
+                        if (is_struct(_data) && variable_struct_exists(_data, "objeto")) {
+                            if (_data.objeto == _tipo_unidade) {
+                                return true;
+                            }
+                        }
+                    }
+                    return false;
+                }
+                
+                // ✅ MELHORADO: Priorizar unidades premium navais (apenas as disponíveis)
                 var _obj_ronald_reagan = asset_get_index("obj_RonaldReagan");
                 var _obj_fragata = asset_get_index("obj_fragata");
                 var _obj_destroyer = asset_get_index("obj_destroyer");
                 
                 // PRIORIDADE 1: Ronald Reagan (porta-aviões nuclear - unidade premium máxima)
                 if (_obj_ronald_reagan != -1 && asset_get_type(_obj_ronald_reagan) == asset_object &&
+                    _unidade_disponivel(_obj_ronald_reagan, _quartel_naval_ia) &&
                     global.ia_dinheiro >= 12000 && global.ia_minerio >= 6000) {
                     _tipo_naval = _obj_ronald_reagan;
                     _quantidade_naval = 1;
                 }
                 // PRIORIDADE 2: Independence (porta-aviões)
-                else if (global.ia_dinheiro >= 5000 && global.ia_minerio >= 2500 && object_exists(obj_Independence)) {
+                else if (object_exists(obj_Independence) && _unidade_disponivel(obj_Independence, _quartel_naval_ia) &&
+                         global.ia_dinheiro >= 5000 && global.ia_minerio >= 2500) {
                     _tipo_naval = obj_Independence;
                     _quantidade_naval = 1;
                 }
                 // PRIORIDADE 3: Constellation (cruzador avançado)
-                else if (global.ia_dinheiro >= 2500 && global.ia_minerio >= 1200 && object_exists(obj_Constellation)) {
+                else if (object_exists(obj_Constellation) && _unidade_disponivel(obj_Constellation, _quartel_naval_ia) &&
+                         global.ia_dinheiro >= 2500 && global.ia_minerio >= 1200) {
                     _tipo_naval = obj_Constellation;
                     _quantidade_naval = 1;
                 }
-                // PRIORIDADE 4: Destroyer (navio de guerra)
-                else if (_obj_destroyer != -1 && asset_get_type(_obj_destroyer) == asset_object && 
+                // PRIORIDADE 4: Ww-Hendrick (submarino furtivo) - se disponível
+                else if (object_exists(obj_wwhendrick) && _unidade_disponivel(obj_wwhendrick, _quartel_naval_ia) &&
+                         global.ia_dinheiro >= 2500 && global.ia_minerio >= 1200) {
+                    _tipo_naval = obj_wwhendrick;
+                    _quantidade_naval = 1;
+                }
+                // PRIORIDADE 5: Destroyer (navio de guerra)
+                else if (_obj_destroyer != -1 && asset_get_type(_obj_destroyer) == asset_object &&
+                         _unidade_disponivel(_obj_destroyer, _quartel_naval_ia) &&
                          global.ia_dinheiro >= 1500 && global.ia_minerio >= 750) {
                     _tipo_naval = _obj_destroyer;
                     _quantidade_naval = 1;
                 }
-                // PRIORIDADE 5: Submarino (furtivo)
-                else if (global.ia_dinheiro >= 2000 && global.ia_minerio >= 1000 && object_exists(obj_submarino_base)) {
+                // PRIORIDADE 6: Submarino (furtivo) - se disponível
+                else if (object_exists(obj_submarino_base) && _unidade_disponivel(obj_submarino_base, _quartel_naval_ia) &&
+                         global.ia_dinheiro >= 2000 && global.ia_minerio >= 1000) {
                     _tipo_naval = obj_submarino_base;
                     _quantidade_naval = 1;
                 }
-                // PRIORIDADE 6: Fragata
-                else if (_obj_fragata != -1 && asset_get_type(_obj_fragata) == asset_object && 
+                // PRIORIDADE 7: Fragata
+                else if (_obj_fragata != -1 && asset_get_type(_obj_fragata) == asset_object &&
+                         _unidade_disponivel(_obj_fragata, _quartel_naval_ia) &&
                          global.ia_dinheiro >= 800 && global.ia_minerio >= 400) {
                     _tipo_naval = _obj_fragata;
                     _quantidade_naval = 2;
                 }
-                // PRIORIDADE 7: Navio Base
-                else if (global.ia_dinheiro >= 1000 && global.ia_minerio >= 500 && object_exists(obj_navio_base)) {
+                // PRIORIDADE 8: Navio Base - se disponível
+                else if (object_exists(obj_navio_base) && _unidade_disponivel(obj_navio_base, _quartel_naval_ia) &&
+                         global.ia_dinheiro >= 1000 && global.ia_minerio >= 500) {
                     _tipo_naval = obj_navio_base;
                     _quantidade_naval = 1;
                 }
-                // FALLBACK: Lancha Patrulha (mais barata)
-                else if (global.ia_dinheiro >= 50 && object_exists(obj_lancha_patrulha)) {
+                // FALLBACK: Lancha Patrulha (sempre disponível e mais barata)
+                else if (object_exists(obj_lancha_patrulha) && _unidade_disponivel(obj_lancha_patrulha, _quartel_naval_ia) &&
+                         global.ia_dinheiro >= 50) {
                     _tipo_naval = obj_lancha_patrulha;
                     _quantidade_naval = 5; // ✅ AUMENTADO de 3 para 5 - recrutar mais navios
                 }
@@ -600,6 +643,8 @@ if (timer_decisao <= 0) {
                     } else {
                         show_debug_message("⚠️ IA não pode recrutar unidades navais (sem recursos ou quartel ocupado)");
                     }
+                } else {
+                    show_debug_message("⚠️ IA não encontrou unidade naval disponível para recrutar");
                 }
                 
                 // Se recrutou naval, sair
@@ -609,8 +654,9 @@ if (timer_decisao <= 0) {
                     }
                     break;
                 } else {
-                    // ✅ NOVO: Se falhou, tentar recrutar lancha (mais barata)
-                    if (_num_quartel_marinha >= 1 && global.ia_dinheiro >= 50 && object_exists(obj_lancha_patrulha)) {
+                    // ✅ NOVO: Se falhou, tentar recrutar lancha (mais barata e sempre disponível)
+                    if (_num_quartel_marinha >= 1 && global.ia_dinheiro >= 50 && 
+                        object_exists(obj_lancha_patrulha) && _unidade_disponivel(obj_lancha_patrulha, _quartel_naval_ia)) {
                         _sucesso = scr_ia_recrutar_unidade(id, obj_lancha_patrulha, 3);
                         if (_sucesso) {
                             show_debug_message("🌊 IA recrutou lanchas de fallback!");
@@ -778,6 +824,193 @@ if (timer_decisao <= 0) {
             // Apenas confirmar
             if (variable_global_exists("debug_enabled") && global.debug_enabled) {
                 show_debug_message("✅ IA em modo defesa - contra-ataque em curso");
+            }
+            break;
+            
+        // ✅ NOVO: CASES DO CÉREBRO DE GUERRA (Sistema Agressivo)
+        case "recrutar_transporte_aereo":
+            // Recrutar C-100 para transporte aéreo
+            _tem_aeroporto = false;
+            with (obj_aeroporto_militar) {
+                if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 2) {
+                    _tem_aeroporto = true;
+                    break;
+                }
+            }
+            if (_tem_aeroporto && object_exists(obj_c100) && global.ia_dinheiro >= 800) {
+                _sucesso = scr_ia_recrutar_unidade(id, obj_c100, 1);
+                if (_sucesso) show_debug_message("✈️ IA recrutou transporte aéreo (C-100)!");
+            }
+            break;
+            
+        case "recrutar_transporte_naval":
+            // Recrutar Navio Base para transporte naval
+            _tem_porto = false;
+            with (obj_quartel_marinha) {
+                if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 2) {
+                    _tem_porto = true;
+                    break;
+                }
+            }
+            if (_tem_porto && object_exists(obj_navio_transporte) && global.ia_dinheiro >= 1000) {
+                _sucesso = scr_ia_recrutar_unidade(id, obj_navio_transporte, 1);
+                if (_sucesso) show_debug_message("🌊 IA recrutou transporte naval!");
+            }
+            break;
+            
+        case "recrutar_antiaereo":
+            // Recrutar unidades anti-aéreas (Gepard ou Soldado AA)
+            _tem_quartel = false;
+            with (obj_quartel) {
+                if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 2) {
+                    _tem_quartel = true;
+                    break;
+                }
+            }
+            if (_tem_quartel) {
+                var _obj_gepard = asset_get_index("obj_Gepard_Anti_Aereo");
+                if (_obj_gepard != -1 && global.ia_dinheiro >= 1800 && global.ia_minerio >= 900) {
+                    _sucesso = scr_ia_recrutar_unidade(id, _obj_gepard, 2);
+                } else if (object_exists(obj_soldado_antiaereo) && global.ia_dinheiro >= 150) {
+                    _sucesso = scr_ia_recrutar_unidade(id, obj_soldado_antiaereo, 3);
+                }
+                if (_sucesso) show_debug_message("🛡️ IA recrutou unidades anti-aéreas!");
+            }
+            break;
+            
+        case "recrutar_caca":
+            // Recrutar caças (F-15, Su-35, F-5)
+            _tem_aeroporto = false; // ✅ Sem 'var' - já declarada acima
+            with (obj_aeroporto_militar) {
+                if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 2) {
+                    _tem_aeroporto = true;
+                    break;
+                }
+            }
+            if (_tem_aeroporto) {
+                if (object_exists(obj_f15) && global.ia_dinheiro >= 4000) {
+                    _sucesso = scr_ia_recrutar_unidade(id, obj_f15, 1);
+                } else if (object_exists(obj_su35) && global.ia_dinheiro >= 3500) {
+                    _sucesso = scr_ia_recrutar_unidade(id, obj_su35, 1);
+                } else if (object_exists(obj_caca_f5) && global.ia_dinheiro >= 1500) {
+                    _sucesso = scr_ia_recrutar_unidade(id, obj_caca_f5, 2);
+                }
+                if (_sucesso) show_debug_message("✈️ IA recrutou caças!");
+            }
+            break;
+            
+        case "recrutar_submarino":
+            // Recrutar submarinos (barato e letal contra navios)
+            _tem_porto = false; // ✅ Sem 'var' - já declarada acima
+            with (obj_quartel_marinha) {
+                if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 2) {
+                    _tem_porto = true;
+                    break;
+                }
+            }
+            if (_tem_porto && object_exists(obj_submarino_base) && global.ia_dinheiro >= 2000) {
+                _sucesso = scr_ia_recrutar_unidade(id, obj_submarino_base, 2);
+                if (_sucesso) show_debug_message("🌊 IA recrutou submarinos!");
+            }
+            break;
+            
+        case "recrutar_bombardeiro":
+            // Recrutar bombardeiros (F-15 ou Su-35 para ataque ao solo)
+            _tem_aeroporto = false; // ✅ Sem 'var' - já declarada acima
+            with (obj_aeroporto_militar) {
+                if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 2) {
+                    _tem_aeroporto = true;
+                    break;
+                }
+            }
+            if (_tem_aeroporto) {
+                if (object_exists(obj_f15) && global.ia_dinheiro >= 4000) {
+                    _sucesso = scr_ia_recrutar_unidade(id, obj_f15, 1);
+                } else if (object_exists(obj_su35) && global.ia_dinheiro >= 3500) {
+                    _sucesso = scr_ia_recrutar_unidade(id, obj_su35, 1);
+                }
+                if (_sucesso) show_debug_message("💣 IA recrutou bombardeiros!");
+            }
+            break;
+            
+        case "recrutar_tanque_pesado":
+            // Recrutar tanques pesados (M1A Abrams)
+            _tem_quartel = false; // ✅ Sem 'var' - já declarada acima
+            with (obj_quartel) {
+                if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 2) {
+                    _tem_quartel = true;
+                    break;
+                }
+            }
+            if (_tem_quartel) {
+                var _obj_abrams = asset_get_index("obj_M1A_Abrams");
+                if (_obj_abrams != -1 && global.ia_dinheiro >= 1000 && global.ia_minerio >= 500) {
+                    _sucesso = scr_ia_recrutar_unidade(id, _obj_abrams, 1);
+                    if (_sucesso) show_debug_message("⚔️ IA recrutou tanque pesado (M1A Abrams)!");
+                }
+            }
+            break;
+            
+        case "recrutar_destroyer":
+            // Recrutar destroyers (bombardeio costeiro)
+            _tem_porto = false; // ✅ Sem 'var' - já declarada acima
+            with (obj_quartel_marinha) {
+                if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 2) {
+                    _tem_porto = true;
+                    break;
+                }
+            }
+            if (_tem_porto) {
+                var _obj_destroyer = asset_get_index("obj_destroyer");
+                if (_obj_destroyer != -1 && global.ia_dinheiro >= 1500 && global.ia_minerio >= 750) {
+                    _sucesso = scr_ia_recrutar_unidade(id, _obj_destroyer, 1);
+                    if (_sucesso) show_debug_message("🌊 IA recrutou destroyer!");
+                }
+            }
+            break;
+            
+        case "recrutar_helicoptero":
+            // Recrutar helicópteros (rápido e versátil)
+            _tem_aeroporto = false; // ✅ Sem 'var' - já declarada acima
+            with (obj_aeroporto_militar) {
+                if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 2) {
+                    _tem_aeroporto = true;
+                    break;
+                }
+            }
+            if (_tem_aeroporto && object_exists(obj_helicoptero_militar) && global.ia_dinheiro >= 800) {
+                _sucesso = scr_ia_recrutar_unidade(id, obj_helicoptero_militar, 2);
+                if (_sucesso) show_debug_message("🚁 IA recrutou helicópteros!");
+            }
+            break;
+            
+        case "recrutar_tanque":
+            // Recrutar tanques padrão
+            _tem_quartel = false; // ✅ Sem 'var' - já declarada acima
+            with (obj_quartel) {
+                if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 2) {
+                    _tem_quartel = true;
+                    break;
+                }
+            }
+            if (_tem_quartel && object_exists(obj_tanque) && global.ia_dinheiro >= 500 && global.ia_minerio >= 250) {
+                _sucesso = scr_ia_recrutar_unidade(id, obj_tanque, 2);
+                if (_sucesso) show_debug_message("⚔️ IA recrutou tanques!");
+            }
+            break;
+            
+        case "recrutar_infantaria":
+            // Recrutar infantaria (fallback - sempre disponível)
+            _tem_quartel = false; // ✅ Sem 'var' - já declarada acima
+            with (obj_quartel) {
+                if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 2) {
+                    _tem_quartel = true;
+                    break;
+                }
+            }
+            if (_tem_quartel && object_exists(obj_infantaria) && global.ia_dinheiro >= 100) {
+                _sucesso = scr_ia_recrutar_unidade(id, obj_infantaria, 4);
+                if (_sucesso) show_debug_message("👥 IA recrutou infantaria!");
             }
             break;
             

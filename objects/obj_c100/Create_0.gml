@@ -2,8 +2,10 @@
 // HEGEMONIA GLOBAL - C-100 Transporte (Create)
 // ===============================================
 
-// Herdar a configuração do F-5
-event_inherited();
+// ✅ CORREÇÃO: Verificar se o objeto tem parent antes de chamar event_inherited
+if (object_get_parent(object_index) != -1) {
+    event_inherited();
+}
 
 // Identidade
 nome_unidade = "C-100";
@@ -35,6 +37,7 @@ PESO_ANTIAEREO = 2;
 PESO_TANQUE = 4;
 PESO_BLINDADO = 3;
 PESO_ABRAMS = 5; // ✅ NOVO: Abrams é mais pesado que tanque normal
+PESO_GEPARD = 4; // ✅ NOVO: Gepard tem peso similar ao tanque
 
 // Estados/flags
 modo_receber_carga = false;
@@ -73,6 +76,8 @@ calcular_peso_unidade = function(unidade) {
         case "obj_tanque": return PESO_TANQUE;
         case "obj_blindado_antiaereo": return PESO_BLINDADO;
         case "obj_M1A_Abrams": return PESO_ABRAMS; // ✅ NOVO: Abrams pode embarcar
+        case "obj_Gepard_Anti_Aereo": return PESO_GEPARD; // ✅ NOVO: Gepard pode embarcar
+        case "obj_gepard": return PESO_GEPARD; // ✅ NOVO: Fallback para nome alternativo
         default: return 1; // Unidades desconhecidas = 1 slot
     }
 }

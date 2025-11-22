@@ -203,7 +203,12 @@ if (mouse_check_button_pressed(mb_left)) {
                 show_debug_message("🚢 Selecionado: " + string(_instancia_selecionada.selecionado));
                 show_debug_message("🚢 HP: " + string(_instancia_selecionada.hp_atual) + "/" + string(_instancia_selecionada.hp_max));
                 show_debug_message("🚢 Velocidade: " + string(_instancia_selecionada.velocidade_movimento));
-                show_debug_message("🚢 Tem canhão: " + string(instance_exists(_instancia_selecionada.canhao_instancia)));
+                // ✅ CORREÇÃO: Verificar se variável existe antes de acessar
+                if (variable_instance_exists(_instancia_selecionada, "canhao_instancia")) {
+                    show_debug_message("🚢 Tem canhão: " + string(instance_exists(_instancia_selecionada.canhao_instancia)));
+                } else {
+                    show_debug_message("🚢 Canhão: não inicializado ainda");
+                }
             }
             
             // ======================================================================
@@ -242,36 +247,39 @@ if (mouse_check_button_pressed(mb_left)) {
     }
     
     // === LÓGICA DE ADICIONAR PONTOS DE PATRULHA ===
-    if (instance_exists(global.definindo_patrulha)) {
+    // ✅ CORREÇÃO: Verificar tanto global.definindo_patrulha quanto global.definindo_patrulha_unidade
+    var _unidade_patrulha = noone;
+    if (variable_global_exists("definindo_patrulha") && instance_exists(global.definindo_patrulha)) {
+        _unidade_patrulha = global.definindo_patrulha;
+    } else if (variable_global_exists("definindo_patrulha_unidade") && instance_exists(global.definindo_patrulha_unidade)) {
+        _unidade_patrulha = global.definindo_patrulha_unidade;
+    }
+    
+    if (instance_exists(_unidade_patrulha)) {
         // Adicionar ponto de patrulha no local clicado
-        // Verificar qual variável de patrulha usar baseado no tipo de objeto
-        var _unidade = global.definindo_patrulha;
         var _lista_patrulha = noone;
         
         // Determinar qual lista de patrulha usar baseado no objeto
-        if (variable_instance_exists(_unidade, "pontos_patrulha")) {
-             _lista_patrulha = _unidade.pontos_patrulha;
+        if (variable_instance_exists(_unidade_patrulha, "pontos_patrulha")) {
+             _lista_patrulha = _unidade_patrulha.pontos_patrulha;
         } else { // Fallback para sistemas mais antigos
             // Para outros objetos, tentar 'patrol_points' ou 'pontos_patrulha'
-            if (variable_instance_exists(_unidade, "patrol_points")) {
-                _lista_patrulha = _unidade.patrol_points;
-            } else if (variable_instance_exists(_unidade, "pontos_patrulha")) {
-                _lista_patrulha = _unidade.pontos_patrulha;
-            } else if (variable_instance_exists(_unidade, "patrulha")) {
-                _lista_patrulha = _unidade.patrulha;
+            if (variable_instance_exists(_unidade_patrulha, "patrol_points")) {
+                _lista_patrulha = _unidade_patrulha.patrol_points;
+            } else if (variable_instance_exists(_unidade_patrulha, "patrulha")) {
+                _lista_patrulha = _unidade_patrulha.patrulha;
             }
         }
         
         // Adicionar ponto se a lista foi encontrada
-        // ✅ CORREÇÃO GM1041: Verificar que _lista_patrulha é uma ds_list válida antes de adicionar
+        // ✅ CORREÇÃO: Usar array [x, y] em vez de coordenadas separadas
         if (_lista_patrulha != noone && is_real(_lista_patrulha) && ds_exists(_lista_patrulha, ds_type_list)) {
-            // Adicionar coordenadas separadamente à ds_list
-            ds_list_add(_lista_patrulha, _mouse_world_x);
-            ds_list_add(_lista_patrulha, _mouse_world_y);
+            // ✅ CORREÇÃO: Adicionar como array [x, y] para compatibilidade com Draw
+            ds_list_add(_lista_patrulha, [_mouse_world_x, _mouse_world_y]);
             show_debug_message("📍 Ponto de patrulha adicionado: (" + string(_mouse_world_x) + ", " + string(_mouse_world_y) + ")");
-            show_debug_message("📊 Total de pontos: " + string(ds_list_size(_lista_patrulha) / 2));
+            show_debug_message("📊 Total de pontos: " + string(ds_list_size(_lista_patrulha)));
         } else {
-            show_debug_message("❌ ERRO: Lista de patrulha não encontrada para " + object_get_name(_unidade.object_index));
+            show_debug_message("❌ ERRO: Lista de patrulha não encontrada para " + object_get_name(_unidade_patrulha.object_index));
         }
     }
 }

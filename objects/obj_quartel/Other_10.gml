@@ -33,22 +33,30 @@ if (global.dinheiro >= _custo_total_d && global.populacao >= _custo_total_p) {
     global.populacao -= _custo_total_p;
     
     // === SISTEMA NOVO: ADICIONAR À FILA DE RECRUTAMENTO ===
-    // Garantir que a fila existe
-    if (!ds_exists(fila_recrutamento, ds_type_queue)) {
+    // ✅ CORREÇÃO CRÍTICA: Garantir que estamos usando a fila DESTE quartel específico
+    // Se a fila não existe, criar uma nova (não deve acontecer, mas por segurança)
+    if (!variable_instance_exists(id, "fila_recrutamento") || !ds_exists(fila_recrutamento, ds_type_queue)) {
         fila_recrutamento = ds_queue_create();
-        show_debug_message("⚠️ Fila de recrutamento criada");
+        show_debug_message("⚠️ Quartel ID: " + string(id) + " - Fila de recrutamento recriada (não existia)");
     }
+    
+    // ✅ VALIDAÇÃO: Confirmar que estamos usando a fila correta deste quartel
+    var _fila_id_antes = ds_queue_size(fila_recrutamento);
     
     // Adicionar múltiplas unidades à fila (uma por vez)
     for (var i = 0; i < quantidade_recrutar; i++) {
         ds_queue_enqueue(fila_recrutamento, unidade_selecionada);
     }
     
+    var _fila_id_depois = ds_queue_size(fila_recrutamento);
+    
     show_debug_message("==== UNIDADES ADICIONADAS À FILA ====");
-    show_debug_message("Quartel ID: " + string(id));
+    show_debug_message("Quartel ID: " + string(id) + " (ID da instância)");
+    show_debug_message("Fila ID: " + string(fila_recrutamento) + " (ID da estrutura de dados)");
     show_debug_message("Unidade: " + _unidade_data.nome);
     show_debug_message("Quantidade: " + string(quantidade_recrutar));
-    show_debug_message("Tamanho da fila: " + string(ds_queue_size(fila_recrutamento)));
+    show_debug_message("Tamanho da fila ANTES: " + string(_fila_id_antes));
+    show_debug_message("Tamanho da fila DEPOIS: " + string(_fila_id_depois));
     show_debug_message("Custo total deduzido: $" + string(_custo_total_d) + " dinheiro, " + string(_custo_total_p) + " população");
     show_debug_message("Recursos restantes: $" + string(global.dinheiro) + " dinheiro, " + string(global.populacao) + " população");
     

@@ -206,14 +206,24 @@ if (_can_produce) {
     // Tentar desenhar sprite se existir
     // ✅ AJUSTE: Diminuir imagens em 10% (multiplicar todas as escalas por 0.9)
     var _sprite_desenhado = false;
-    if (_navio.nome == "Lancha Patrulha" && sprite_exists(spr_lancha_patrulha)) {
-        draw_sprite_ext(spr_lancha_patrulha, 0, _icon_x, _icon_y, 1.5 * 0.9, 1.5 * 0.9, 0, c_white, _anim.alpha);
-        _sprite_desenhado = true;
+    if (_navio.nome == "Lancha Patrulha") {
+        var _sprite_lancha = asset_get_index("spr_lancha_patrulha");
+        if (_sprite_lancha != -1 && sprite_exists(_sprite_lancha)) {
+            draw_sprite_ext(_sprite_lancha, 0, _icon_x, _icon_y, 1.5 * 0.9, 1.5 * 0.9, 0, c_white, _anim.alpha);
+            _sprite_desenhado = true;
+        } else {
+            // Fallback: tentar spr_lancha
+            var _sprite_alt = asset_get_index("spr_lancha");
+            if (_sprite_alt != -1 && sprite_exists(_sprite_alt)) {
+                draw_sprite_ext(_sprite_alt, 0, _icon_x, _icon_y, 1.5 * 0.9, 1.5 * 0.9, 0, c_white, _anim.alpha);
+                _sprite_desenhado = true;
+            }
+        }
     } else if (_navio.nome == "Constellation" && sprite_exists(spr_Constellation)) {
         draw_sprite_ext(spr_Constellation, 0, _icon_x, _icon_y, 0.975 * 0.9, 0.975 * 0.9, 0, c_white, _anim.alpha);
         _sprite_desenhado = true;
     } else if (_navio.nome == "Independence" && sprite_exists(spr_Independence)) {
-        draw_sprite_ext(spr_Independence, 0, _icon_x, _icon_y, 0.975 * 0.9, 0.975 * 0.9, 0, c_white, _anim.alpha);
+        draw_sprite_ext(spr_Independence, 0, _icon_x, _icon_y, 0.975 * 0.9 * 0.6, 0.975 * 0.9 * 0.6, 0, c_white, _anim.alpha);
         _sprite_desenhado = true;
     } else if (_navio.nome == "Ww-Hendrick" && sprite_exists(spr_wwhendrick)) {
         draw_sprite_ext(spr_wwhendrick, 0, _icon_x, _icon_y, 1.3 * 0.9, 1.3 * 0.9, 0, c_white, _anim.alpha);
@@ -222,7 +232,7 @@ if (_can_produce) {
             show_debug_message("🌊 Sprite Ww-Hendrick desenhado! Pos: (" + string(_icon_x) + ", " + string(_icon_y) + ")");
         }
     } else if (_navio.nome == "Ronald Reagan" && sprite_exists(spr_RonaldReagan)) {
-        draw_sprite_ext(spr_RonaldReagan, 0, _icon_x, _icon_y, 0.975 * 0.9, 0.975 * 0.9, 0, c_white, _anim.alpha);
+        draw_sprite_ext(spr_RonaldReagan, 0, _icon_x, _icon_y, 0.975 * 0.9 * 0.7, 0.975 * 0.9 * 0.7, 0, c_white, _anim.alpha);
         _sprite_desenhado = true;
     }
     
@@ -232,26 +242,39 @@ if (_can_produce) {
     }
     
     // Descrição
-    // ✅ CORREÇÃO: Tamanho de fonte reduzido
-    var _desc_y = _icon_y + 40;
+    // ✅ AJUSTE: Limitar descrição a 2 linhas e mover 5% para baixo
+    var _desc_y_base = _icon_y + 40;
+    var _desc_y = _desc_y_base + (_desc_y_base * 0.05); // Mover 5% para baixo
     draw_set_color(_can_produce ? make_color_rgb(180, 200, 230) : make_color_rgb(120, 120, 120));
-    draw_text_ext_transformed(_content_x, _desc_y, _navio.descricao, 18, _card_w - 30, 0.7, 0.7, 0);
     
-    // ✅ AJUSTE: Informações simplificadas - apenas tipo (Aéreo/Terrestre/Submerso)
-    var _info_y = _card_y + _card_h - 65;
+    // Calcular largura disponível
+    var _largura_max = _card_w - 30;
     
-    // Determinar tipo da unidade
-    var _tipo = "TERRESTRE"; // Padrão
-    if (_navio.nome == "Lancha Patrulha" || _navio.nome == "Constellation" || 
-        _navio.nome == "Independence" || _navio.nome == "Ronald Reagan") {
-        _tipo = "NAVAL"; // Navios de superfície
-    } else if (_navio.nome == "Ww-Hendrick") {
-        _tipo = "SUBMERSO"; // Submarino
+    // Estimar caracteres por linha (aproximação: ~50-60 caracteres por linha com fonte 0.7)
+    // Com largura de card ~200-250px, cada linha comporta ~35-45 caracteres
+    var _caracteres_por_linha = floor(_largura_max / (8 * 0.7)); // ~35-40 caracteres por linha
+    var _max_caracteres = _caracteres_por_linha * 2; // Máximo para 2 linhas
+    
+    // Truncar descrição se necessário
+    var _descricao_final = _navio.descricao;
+    if (string_length(_navio.descricao) > _max_caracteres) {
+        // Encontrar último espaço antes do limite para não cortar palavras
+        var _pos_corte = _max_caracteres - 3; // Deixar espaço para "..."
+        while (_pos_corte > 0 && string_char_at(_navio.descricao, _pos_corte + 1) != " ") {
+            _pos_corte--;
+        }
+        if (_pos_corte > 0) {
+            _descricao_final = string_copy(_navio.descricao, 1, _pos_corte) + "...";
+        } else {
+            _descricao_final = string_copy(_navio.descricao, 1, _max_caracteres - 3) + "...";
+        }
     }
     
-    // Tipo da unidade
-    draw_set_color(_can_produce ? make_color_rgb(150, 200, 255) : make_color_rgb(120, 120, 120));
-    draw_text_transformed(_content_x, _info_y, "Tipo: " + _tipo, 0.75, 0.75, 0);
+    // Desenhar com altura máxima limitada a 2 linhas
+    // Altura de 2 linhas: (altura linha * 2) + espaçamento = (16 * 2) + 24 = 56 pixels
+    draw_text_ext_transformed(_content_x, _desc_y, _descricao_final, 24, _largura_max, 0.7, 0.7, 0);
+    
+    // ✅ REMOVIDO: Tipo da unidade dos cards (solicitado pelo usuário)
     
     // Botão PRODUZIR
     var _btn_y = _card_y + _card_h - 35;

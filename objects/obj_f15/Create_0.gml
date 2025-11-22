@@ -1,22 +1,40 @@
 // ===============================================
-// HEGEMONIA GLOBAL - CAÇA F-15
+// HEGEMONIA GLOBAL - F-15 EAGLE
+// 4ª GERAÇÃO (anos 70-80) - Superioridade aérea
 // ===============================================
+
+// === SISTEMA DE GERAÇÕES ===
+geracao_caca = FighterGeneration.GEN_4;
 
 // --- ATRIBUTOS DE VOO ---
 velocidade_atual = 0;
-velocidade_maxima = 5.1; // Velocidade aumentada
+velocidade_maxima = 4.2;  // ✅ 4ª geração - velocidade superior
 aceleracao = 0.06;
 desaceleracao = 0.03;
 velocidade_rotacao = 3.5;
 
 // --- ATRIBUTOS DE COMBATE ---
-hp_atual = 800; // Vida dobrada do F-5
-hp_max = 800;
+hp_atual = 400;  // ✅ 4ª geração - HP robusto
+hp_max = 400;
 nacao_proprietaria = 1;
-radar_alcance = 550; // Alcance maior
+radar_alcance = 700;  // ✅ 4ª geração - radar avançado
+alcance_ataque = 650;  // ✅ Alcance de ataque superior
 timer_ataque = 0;
-intervalo_ataque = 85; // Recarga mais rápida
+intervalo_ataque = 85;
 modo_ataque = true; // Modo ataque ativo por padrão
+
+// --- SISTEMA DE MÍSSEIS MÚLTIPLOS ---
+timer_sky = 0;
+intervalo_sky = 300;  // ✅ 5 segundos
+timer_iron = 0;
+intervalo_iron = 420;  // ✅ 7 segundos
+timer_hash = 0;
+intervalo_hash = 540;  // ✅ 9 segundos
+dano_multiplier = 1.0;  // ✅ Dano padrão
+
+// --- TECNOLOGIA ---
+stealth_ativo = false;  // ✅ Sem stealth
+sensores_avancados = true;  // ✅ Radar avançado
 
 // --- MÁQUINA DE ESTADOS ---
 estado = "pousado"; // Estados: "pousado", "decolando", "pousando", "movendo", "patrulhando", "definindo_patrulha", "atacando"

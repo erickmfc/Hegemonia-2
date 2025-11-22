@@ -61,7 +61,14 @@ if (selecionado) {
 }
 
 // ======================================================================
-// --- 2. NOVA LÓGICA: AQUISIÇÃO DE ALVO (PRIORIDADE MÁXIMA) ---
+// --- 2. DECREMENTAR TIMERS DE MÍSSEIS (4ª GERAÇÃO) ---
+// ======================================================================
+if (variable_instance_exists(id, "timer_sky") && timer_sky > 0) timer_sky--;
+if (variable_instance_exists(id, "timer_iron") && timer_iron > 0) timer_iron--;
+if (variable_instance_exists(id, "timer_hash") && timer_hash > 0) timer_hash--;
+
+// ======================================================================
+// --- 3. NOVA LÓGICA: AQUISIÇÃO DE ALVO (PRIORIDADE MÁXIMA) ---
 // ======================================================================
 // Se o modo ataque está ativo E o avião não está pousando/decolando E não está já atacando...
 if (modo_ataque && estado != "pousando" && estado != "decolando" && estado != "atacando") {
@@ -152,63 +159,56 @@ switch (estado) {
                 
                 var _missois_lancados = 0;
                 
-                // ✅ AÉREO → SKY via pool
-                if (_alvo_aereo && instance_exists(alvo_em_mira)) {
+                // ✅ AÉREO → SKY (5 segundos - 4ª geração)
+                if (_alvo_aereo && instance_exists(alvo_em_mira) && timer_sky <= 0) {
                     var _missil_ar = scr_get_projectile_from_pool(obj_SkyFury_ar, x, y, "Instances");
                     if (instance_exists(_missil_ar)) {
-                        // ✅ VALIDAÇÃO: Verificar se alvo ainda existe antes de atribuir
                         if (instance_exists(alvo_em_mira)) {
                             _missil_ar.alvo = alvo_em_mira;
                             _missil_ar.target = alvo_em_mira;
                             _missil_ar.dono = id;
+                            timer_sky = intervalo_sky;  // ✅ 5 segundos (300 frames)
                             _missois_lancados++;
-                            show_debug_message("✈️ F-15 lançou Sky contra alvo aéreo");
+                            if (variable_global_exists("debug_enabled") && global.debug_enabled) {
+                                show_debug_message("✈️ F-15 lançou Sky contra alvo aéreo");
+                            }
                         } else {
                             scr_return_projectile_to_pool(_missil_ar);
                         }
                     }
                 }
                 
-                // ✅ TERRESTRE → HASH + IRONCLAD
-                if (_alvo_terrestre && instance_exists(alvo_em_mira)) {
-                    // Hash (70% de chance)
-                    if (random(1) < 0.7) {
-                        var _missil_hash = instance_create_layer(x, y, "Instances", obj_hash);
-                        if (instance_exists(_missil_hash) && instance_exists(alvo_em_mira)) {
-                            _missil_hash.alvo = alvo_em_mira;
-                            _missil_hash.target = alvo_em_mira;
-                            _missil_hash.dono = id;
+                // ✅ TERRESTRE → IRON (7 segundos - 4ª geração)
+                if (_alvo_terrestre && instance_exists(alvo_em_mira) && timer_iron <= 0) {
+                    var _missil_iron = scr_get_projectile_from_pool(obj_Ironclad_terra, x, y, "Instances");
+                    if (instance_exists(_missil_iron)) {
+                        if (instance_exists(alvo_em_mira)) {
+                            _missil_iron.alvo = alvo_em_mira;
+                            _missil_iron.target = alvo_em_mira;
+                            _missil_iron.dono = id;
+                            timer_iron = intervalo_iron;  // ✅ 7 segundos (420 frames)
                             _missois_lancados++;
-                            show_debug_message("💥 F-15 lançou Hash contra alvo terrestre");
-                        }
-                    }
-                    
-                    // Ironclad (70% de chance) via pool
-                    if (random(1) < 0.7) {
-                        var _missil_iron = scr_get_projectile_from_pool(obj_Ironclad_terra, x, y, "Instances");
-                        if (instance_exists(_missil_iron)) {
-                            if (instance_exists(alvo_em_mira)) {
-                                _missil_iron.alvo = alvo_em_mira;
-                                _missil_iron.target = alvo_em_mira;
-                                _missil_iron.dono = id;
-                                _missois_lancados++;
-                                show_debug_message("💥 F-15 lançou Ironclad contra alvo terrestre");
-                            } else {
-                                scr_return_projectile_to_pool(_missil_iron);
+                            if (variable_global_exists("debug_enabled") && global.debug_enabled) {
+                                show_debug_message("💥 F-15 lançou Iron contra alvo terrestre");
                             }
+                        } else {
+                            scr_return_projectile_to_pool(_missil_iron);
                         }
                     }
                 }
                 
-                // ✅ SUBMARINO → HASH
-                if (_alvo_submarino && instance_exists(alvo_em_mira)) {
-                    var _missil_sub = instance_create_layer(x, y, "Instances", obj_hash);
-                    if (instance_exists(_missil_sub) && instance_exists(alvo_em_mira)) {
-                        _missil_sub.alvo = alvo_em_mira;
-                        _missil_sub.target = alvo_em_mira;
-                        _missil_sub.dono = id;
+                // ✅ TERRESTRE/SUBMARINO → HASH (9 segundos - 4ª geração)
+                if ((_alvo_terrestre || _alvo_submarino) && instance_exists(alvo_em_mira) && timer_hash <= 0) {
+                    var _missil_hash = instance_create_layer(x, y, "Instances", obj_hash);
+                    if (instance_exists(_missil_hash) && instance_exists(alvo_em_mira)) {
+                        _missil_hash.alvo = alvo_em_mira;
+                        _missil_hash.target = alvo_em_mira;
+                        _missil_hash.dono = id;
+                        timer_hash = intervalo_hash;  // ✅ 9 segundos (540 frames)
                         _missois_lancados++;
-                        show_debug_message("🌊 F-15 lançou Hash contra submarino");
+                        if (variable_global_exists("debug_enabled") && global.debug_enabled) {
+                            show_debug_message("💣 F-15 lançou Hash contra alvo");
+                        }
                     }
                 }
                 

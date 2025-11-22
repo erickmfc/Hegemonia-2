@@ -1,27 +1,40 @@
 // ===============================================
-// HEGEMONIA GLOBAL - CAÇA F-6 (ALVO DE TESTE)
-// Create Event - Baseado no F-5 para testes de mísseis ar-ar
+// HEGEMONIA GLOBAL - F-6
+// 2ª/3ª GERAÇÃO (anos 70) - Tecnologia básica melhorada
 // ===============================================
+
+// === SISTEMA DE GERAÇÕES ===
+geracao_caca = FighterGeneration.GEN_2;  // 2ª/3ª geração
 
 // --- ATRIBUTOS DE VOO ---
 velocidade_atual = 0;
-velocidade_maxima = 3.5; // Ligeiramente mais lento que o F-5
+velocidade_maxima = 3.0;  // ✅ 2ª/3ª geração - ligeiramente melhor que F-5
 aceleracao = 0.04;
 desaceleracao = 0.025;
 velocidade_rotacao = 1.5;
 
 // --- ATRIBUTOS DE COMBATE ---
-hp_atual = 650; // HP inicial igual ao máximo
-hp_max = 650;
+hp_atual = 200;  // ✅ 2ª/3ª geração - HP melhorado
+hp_max = 200;
 nacao_proprietaria = 2; // ✅ Nação da IA (presidente) - F6 controlado pelo presidente
-radar_alcance = 500; // Aumentado para melhor detecção
+radar_alcance = 500;  // ✅ 2ª/3ª geração - radar melhorado
+alcance_ataque = 450;  // ✅ Alcance de ataque
 timer_ataque = 0;
-intervalo_ataque = 90; // Reduzido para ataques mais frequentes
+intervalo_ataque = 90;
 modo_ataque = true; // ✅ Ativar modo ataque para o presidente usar o F6
-dano_missil_ar_ar = 95; // Dano do míssil ar-ar
-dano_missil_ar_terra = 95; // Dano do míssil ar-terra
-alcance_missil_ar_ar = 300; // Alcance míssil ar-ar
-alcance_missil_ar_terra = 250; // Alcance míssil ar-terra
+dano_missil_ar_ar = 95;
+dano_missil_ar_terra = 95;
+alcance_missil_ar_ar = 300;
+alcance_missil_ar_terra = 250;
+
+// --- SISTEMA DE MÍSSEIS (APENAS LIT) ---
+timer_lit = 0;
+intervalo_lit = 420;  // ✅ 7 segundos (um pouco mais rápido que F-5)
+dano_multiplier = 0.8;  // ✅ 20% menos dano (melhor que F-5)
+
+// --- TECNOLOGIA ---
+stealth_ativo = false;  // ✅ Sem stealth
+sensores_avancados = false;  // ✅ Sensores básicos
 
 // --- MÁQUINA DE ESTADOS ---
 estado = "pousado"; // Estados: "pousado", "decolando", "pousando", "movendo", "patrulhando", "definindo_patrulha"

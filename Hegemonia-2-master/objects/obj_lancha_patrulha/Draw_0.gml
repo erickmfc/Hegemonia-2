@@ -38,6 +38,13 @@ if (selecionado) {
         draw_set_color(c_lime);
         draw_line_width(x, y, destino_x, destino_y, 3);
         draw_circle(destino_x, destino_y, 8, true);
+        
+        // ✅ DEBUG VISUAL DO NOVO SISTEMA
+        // Mostra a direção real do movimento em MAGENTA
+        var _dir_debug = point_direction(x, y, destino_x, destino_y);
+        draw_set_color(c_fuchsia);
+        draw_line_width(x, y, x + lengthdir_x(100, _dir_debug), y + lengthdir_y(100, _dir_debug), 4);
+        draw_text(x, y - 60, "SISTEMA NOVO ATIVO");
     }
     
     // LINHA DE PATRULHA (se estiver patrulhando)

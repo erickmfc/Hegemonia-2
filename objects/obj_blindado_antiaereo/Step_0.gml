@@ -244,7 +244,14 @@ switch (estado) {
             }
             
             // Movimento para o ponto atual
-            if (point_distance(x, y, destino_x, destino_y) > 6) {
+            // ✅ CORREÇÃO: Se está indo embarcar, não parar mesmo perto do destino
+            var _dist_destino = point_distance(x, y, destino_x, destino_y);
+            var _tolerancia_chegada = 6;
+            if (variable_instance_exists(id, "indo_embarcar") && indo_embarcar) {
+                _tolerancia_chegada = 2; // ✅ Tolerância menor quando indo embarcar (para chegar mais perto)
+            }
+            
+            if (_dist_destino > _tolerancia_chegada) {
                 // ✅ CORREÇÃO: Normalizar velocidade baseado no zoom
                 var _vel_normalizada = scr_normalize_unit_speed(velocidade);
                 var dir = point_direction(x, y, destino_x, destino_y);

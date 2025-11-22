@@ -80,8 +80,8 @@ if (variable_instance_exists(id, "modo_combate")) {
 if (variable_instance_exists(id, "menu_carga_aberto") && menu_carga_aberto) {
     var _menu_x = 100;
     var _menu_y = 100;
-    var _menu_w = 350;
-    var _menu_h = 280;
+    var _menu_w = 450;
+    var _menu_h = 500;
 
     // Fundo do menu
     draw_set_alpha(0.95);
@@ -96,34 +96,101 @@ if (variable_instance_exists(id, "menu_carga_aberto") && menu_carga_aberto) {
     // Título
     draw_set_halign(fa_left);
     draw_set_color(c_yellow);
-    // ✅ CORREÇÃO GM1044: fa_center não é válido para valign, usar fa_middle
     draw_set_valign(fa_middle);
     draw_text(_menu_x + 15, _menu_y + 15, "📦 CARGA DO NAVIO");
-
-    var _line_y = _menu_y + 45;
+    
+    // ✅ NOVO: Mostrar todas as informações de status do navio no menu
+    var _line_y = _menu_y + 40;
+    
+    // Status de Transporte (modo P)
+    draw_set_color(c_white);
+    var _modo_texto = "MODO TRANSPORTE: ";
+    var _modo_cor = c_gray;
+    if (variable_instance_exists(id, "estado_transporte")) {
+        if (estado_transporte == NavioTransporteEstado.EMBARQUE_ATIVO) {
+            _modo_texto = "MODO TRANSPORTE: 🚚 EMBARQUE ATIVO";
+            _modo_cor = c_yellow;
+        } else if (estado_transporte == NavioTransporteEstado.DESEMBARCANDO) {
+            _modo_texto = "MODO TRANSPORTE: 📦 DESEMBARCANDO";
+            _modo_cor = c_orange;
+        } else if (estado_transporte == NavioTransporteEstado.EMBARQUE_OFF) {
+            _modo_texto = "MODO TRANSPORTE: ✅ EMBARCADO (Fechado)";
+            _modo_cor = c_lime;
+        } else if (estado_transporte == NavioTransporteEstado.NAVEGANDO) {
+            _modo_texto = "MODO TRANSPORTE: ⚓ NAVEGANDO";
+            _modo_cor = make_color_rgb(0, 255, 255); // c_aqua
+        } else {
+            _modo_texto = "MODO TRANSPORTE: ⏹️ PARADO";
+            _modo_cor = c_gray;
+        }
+    }
+    draw_set_color(_modo_cor);
+    draw_text(_menu_x + 15, _line_y, _modo_texto);
+    _line_y += 25;
+    
+    // Estado de Movimento
+    draw_set_color(c_white);
+    var _estado_texto = "Estado: ";
+    var _estado_cor = c_gray;
+    if (variable_instance_exists(id, "estado")) {
+        if (estado == LanchaState.ATACANDO) {
+            _estado_texto = "Estado: ⚔️ ATACANDO";
+            _estado_cor = c_red;
+        } else if (estado == LanchaState.PATRULHANDO) {
+            _estado_texto = "Estado: 🔄 PATRULHANDO";
+            _estado_cor = c_orange;
+        } else if (estado == LanchaState.MOVENDO) {
+            _estado_texto = "Estado: ⚓ NAVEGANDO";
+            _estado_cor = make_color_rgb(0, 255, 255); // c_aqua
+        } else if (estado == LanchaState.DEFININDO_PATRULHA) {
+            _estado_texto = "Estado: 🗺️ DEFININDO ROTA";
+            _estado_cor = c_yellow;
+        } else {
+            _estado_texto = "Estado: ⏹️ PARADO";
+            _estado_cor = c_gray;
+        }
+    }
+    draw_set_color(_estado_cor);
+    draw_text(_menu_x + 15, _line_y, _estado_texto);
+    _line_y += 25;
+    
+    // Modo de Combate
+    draw_set_color(c_white);
+    var _modo_combate_texto = "Modo Combate: ";
+    var _modo_combate_cor = c_gray;
+    if (variable_instance_exists(id, "modo_combate")) {
+        if (modo_combate == LanchaMode.ATAQUE) {
+            _modo_combate_texto = "Modo Combate: ⚔️ ATAQUE";
+            _modo_combate_cor = c_red;
+        } else {
+            _modo_combate_texto = "Modo Combate: 🛡️ PASSIVO";
+            _modo_combate_cor = c_gray;
+        }
+    }
+    draw_set_color(_modo_combate_cor);
+    draw_text(_menu_x + 15, _line_y, _modo_combate_texto);
+    _line_y += 30;
     var _col1_x = _menu_x + 20;
     var _col2_x = _menu_x + 200;
 
-    // ✈️ Aeronaves
+    // Resumo de carga
     draw_set_color(c_white);
     draw_text(_col1_x, _line_y, "✈️ Aeronaves:");
     draw_set_color(make_color_rgb(0, 255, 255));
     draw_text(_col2_x, _line_y, string(avioes_count) + "/" + string(avioes_max));
-    _line_y += 30;
+    _line_y += 25;
 
-    // 🚛 Veículos
     draw_set_color(c_white);
     draw_text(_col1_x, _line_y, "🚛 Veículos:");
     draw_set_color(make_color_rgb(0, 255, 255));
     draw_text(_col2_x, _line_y, string(unidades_count) + "/" + string(unidades_max));
-    _line_y += 30;
+    _line_y += 25;
 
-    // 👥 Soldados
     draw_set_color(c_white);
     draw_text(_col1_x, _line_y, "👥 Soldados:");
     draw_set_color(make_color_rgb(0, 255, 255));
     draw_text(_col2_x, _line_y, string(soldados_count) + "/" + string(soldados_max));
-    _line_y += 40;
+    _line_y += 30;
 
     // Barra de carga
     var _percent = ((avioes_count + unidades_count + soldados_count) / (avioes_max + unidades_max + soldados_max)) * 100;
@@ -141,32 +208,137 @@ if (variable_instance_exists(id, "menu_carga_aberto") && menu_carga_aberto) {
     draw_set_halign(fa_center);
     draw_text(_menu_x + _menu_w/2, _line_y + 2, string(round(_percent)) + "%");
 
-    _line_y += 35;
+    _line_y += 40;
 
-    // Botão DESEMBARCAR TODOS
-    draw_set_halign(fa_center);
-    // ✅ CORREÇÃO GM1044: fa_center não é válido para valign, usar fa_middle
-    draw_set_valign(fa_middle);
-    var _btn1_x = _menu_x + 80;
-    var _btn1_y = _line_y + 20;
-    var _btn1_w = 120;
-    var _btn1_h = 40;
-
+    // === LISTA DE UNIDADES PARA SELEÇÃO ===
+    draw_set_halign(fa_left);
     draw_set_color(c_yellow);
+    draw_text(_col1_x, _line_y, "Selecione uma unidade para desembarcar:");
+    _line_y += 25;
+
+    var _item_height = 25;
+    var _scroll_y = _line_y;
+    var _item_index = 0;
+
+    // Listar Aeronaves
+    if (avioes_count > 0) {
+        for (var i = 0; i < ds_list_size(avioes_embarcados); i++) {
+            var _unidade_id = avioes_embarcados[| i];
+            if (!instance_exists(_unidade_id)) continue;
+
+            var _item_y = _scroll_y + (_item_index * _item_height);
+            var _is_selected = (unidade_selecionada_desembarque == _unidade_id && tipo_unidade_selecionada == "aeronave");
+
+            // Fundo do item (selecionado ou não)
+            if (_is_selected) {
+                draw_set_color(c_yellow);
+                draw_set_alpha(0.3);
+                draw_rectangle(_col1_x - 5, _item_y - 2, _menu_x + _menu_w - 20, _item_y + _item_height - 2, false);
+                draw_set_alpha(1.0);
+            }
+
+            draw_set_color(_is_selected ? c_yellow : c_white);
+            var _nome_unidade = "Aeronave #" + string(i + 1);
+            if (variable_instance_exists(_unidade_id, "nome_unidade")) {
+                _nome_unidade = _unidade_id.nome_unidade;
+            }
+            draw_text(_col1_x, _item_y, "✈️ " + _nome_unidade);
+            _item_index++;
+        }
+    }
+
+    // Listar Veículos
+    if (unidades_count > 0) {
+        for (var i = 0; i < ds_list_size(unidades_embarcadas); i++) {
+            var _unidade_id = unidades_embarcadas[| i];
+            if (!instance_exists(_unidade_id)) continue;
+
+            var _item_y = _scroll_y + (_item_index * _item_height);
+            var _is_selected = (unidade_selecionada_desembarque == _unidade_id && tipo_unidade_selecionada == "veiculo");
+
+            if (_is_selected) {
+                draw_set_color(c_yellow);
+                draw_set_alpha(0.3);
+                draw_rectangle(_col1_x - 5, _item_y - 2, _menu_x + _menu_w - 20, _item_y + _item_height - 2, false);
+                draw_set_alpha(1.0);
+            }
+
+            draw_set_color(_is_selected ? c_yellow : c_white);
+            var _nome_unidade = "Veículo #" + string(i + 1);
+            if (variable_instance_exists(_unidade_id, "nome_unidade")) {
+                _nome_unidade = _unidade_id.nome_unidade;
+            }
+            draw_text(_col1_x, _item_y, "🚛 " + _nome_unidade);
+            _item_index++;
+        }
+    }
+
+    // Listar Soldados
+    if (soldados_count > 0) {
+        for (var i = 0; i < ds_list_size(soldados_embarcados); i++) {
+            var _unidade_id = soldados_embarcados[| i];
+            if (!instance_exists(_unidade_id)) continue;
+
+            var _item_y = _scroll_y + (_item_index * _item_height);
+            var _is_selected = (unidade_selecionada_desembarque == _unidade_id && tipo_unidade_selecionada == "soldado");
+
+            if (_is_selected) {
+                draw_set_color(c_yellow);
+                draw_set_alpha(0.3);
+                draw_rectangle(_col1_x - 5, _item_y - 2, _menu_x + _menu_w - 20, _item_y + _item_height - 2, false);
+                draw_set_alpha(1.0);
+            }
+
+            draw_set_color(_is_selected ? c_yellow : c_white);
+            var _nome_unidade = "Soldado #" + string(i + 1);
+            if (variable_instance_exists(_unidade_id, "nome_unidade")) {
+                _nome_unidade = _unidade_id.nome_unidade;
+            }
+            draw_text(_col1_x, _item_y, "👥 " + _nome_unidade);
+            _item_index++;
+        }
+    }
+
+    _line_y = _menu_y + _menu_h - 120;
+
+    // === BOTÕES DE CONTROLE ===
+    draw_set_halign(fa_center);
+    draw_set_valign(fa_middle);
+
+    // Botão DESEMBARCAR SELECIONADA
+    var _btn1_x = _menu_x + 100;
+    var _btn1_y = _line_y;
+    var _btn1_w = 140;
+    var _btn1_h = 35;
+
+    var _tem_selecao = (unidade_selecionada_desembarque != -1);
+    draw_set_color(_tem_selecao ? c_yellow : c_gray);
     draw_rectangle(_btn1_x - _btn1_w/2, _btn1_y - _btn1_h/2, _btn1_x + _btn1_w/2, _btn1_y + _btn1_h/2, false);
     draw_set_color(c_black);
-    draw_text(_btn1_x, _btn1_y, "DESEMBARCAR");
+    draw_text(_btn1_x, _btn1_y, "DESEMBARCAR 1");
+
+    // Botão DESEMBARCAR TODAS
+    var _btn2_x = _menu_x + 250;
+    var _btn2_y = _line_y;
+    var _btn2_w = 140;
+    var _btn2_h = 35;
+
+    var _tem_unidades = (soldados_count + unidades_count + avioes_count > 0);
+    draw_set_color(_tem_unidades ? c_orange : c_gray);
+    draw_rectangle(_btn2_x - _btn2_w/2, _btn2_y - _btn2_h/2, _btn2_x + _btn2_w/2, _btn2_y + _btn2_h/2, false);
+    draw_set_color(c_black);
+    draw_text(_btn2_x, _btn2_y, desembarcando_todas ? "PAUSAR" : "DESEMB. TODAS");
 
     // Botão FECHAR
-    var _btn2_x = _menu_x + 270;
-    var _btn2_y = _line_y + 20;
-    var _btn2_w = 60;
-    var _btn2_h = 40;
+    var _btn3_x = _menu_x + 400;
+    var _btn3_y = _line_y;
+    var _btn3_w = 60;
+    var _btn3_h = 35;
 
     draw_set_color(c_red);
-    draw_rectangle(_btn2_x - _btn2_w/2, _btn2_y - _btn2_h/2, _btn2_x + _btn2_w/2, _btn2_y + _btn2_h/2, false);
+    draw_rectangle(_btn3_x - _btn3_w/2, _btn3_y - _btn3_h/2, _btn3_x + _btn3_w/2, _btn3_y + _btn3_h/2, false);
     draw_set_color(c_white);
-    draw_text(_btn2_x, _btn2_y, "FECHAR");
+    draw_text(_btn3_x, _btn3_y, "FECHAR");
 
     draw_set_halign(fa_left);
     draw_set_valign(fa_top);

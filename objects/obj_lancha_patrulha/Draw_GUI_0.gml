@@ -9,20 +9,13 @@ if (selecionado) {
     switch(estado) {
         case LanchaState.MOVENDO: _estado_texto = "MOVENDO"; break;
         case LanchaState.ATACANDO: _estado_texto = "ATACANDO"; break;
-        case LanchaState.PATRULHANDO: _estado_texto = "PATRULHANDO"; break;
     }
-    if (modo_definicao_patrulha) _estado_texto = "DEFININDO ROTA";
 
     var _modo_texto = (modo_combate == LanchaMode.ATAQUE) ? "ATAQUE" : "PASSIVO";
     var _modo_cor = (modo_combate == LanchaMode.ATAQUE) ? c_red : c_gray;
     var _hp_texto = string(hp_atual) + "/" + string(hp_max);
 
     var _patrulha_texto = "";
-    if (estado == LanchaState.PATRULHANDO && ds_list_size(pontos_patrulha) > 0) {
-        var _ponto_atual = indice_patrulha_atual + 1;
-        var _total_pontos = ds_list_size(pontos_patrulha);
-        _patrulha_texto = "Patrulha: Ponto " + string(_ponto_atual) + "/" + string(_total_pontos);
-    }
 
     draw_set_font(fnt_ui_main);
     draw_set_halign(fa_left);

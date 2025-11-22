@@ -6,8 +6,8 @@
 // === CONFIGURAÇÕES BÁSICAS ===
 custo_dinheiro = 1000;
 custo_minerio = 500;
-hp_max = 2000; // ✅ AUMENTADO: Mais resistente (era 800)
-hp_atual = 2000; // ✅ AUMENTADO: Mais resistente (era 800)
+hp_max = 120; // ✅ ATUALIZADO: Todos os quarteis têm 120 HP
+hp_atual = 120; // ✅ ATUALIZADO: Todos os quarteis têm 120 HP
 destrutivel = true; // ✅ Aeroporto pode ser destruído
 nacao_proprietaria = 1;
 
@@ -72,6 +72,16 @@ ds_list_add(unidades_disponiveis, {
     custo_populacao: 5,
     tempo_treino: 180, // ✅ MUDADO: 3 segundos (180 frames) - MÁXIMO
     descricao: "Caça superior com HP 800 e sistema de mísseis avançado"
+});
+
+// Caça F-35 Lightning II
+ds_list_add(unidades_disponiveis, {
+    nome: "F-35 Lightning II",
+    objeto: obj_caca_f35,
+    custo_dinheiro: 2000,
+    custo_populacao: 5,
+    tempo_treino: 180, // 3 segundos (180 frames)
+    descricao: "Caça de 5ª geração com sistema de mísseis múltiplos (Sky, Iron, Hash, Lit)"
 });
 
 // === SISTEMA DE SELEÇÃO ===

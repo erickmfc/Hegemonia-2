@@ -152,6 +152,16 @@ if (global.barras_vida_ativas) {
         
         if (_hp_atual <= 0) return;
         
+        // ✅ NOVO: Mostrar vida apenas se foi atingida (hp_atual < hp_max) ou se mostrar_vida está ativo
+        var _deve_mostrar = false;
+        if (_hp_atual < _hp_max) {
+            _deve_mostrar = true; // Sempre mostrar se não está com vida cheia
+        } else if (variable_instance_exists(_obj, "mostrar_vida") && _obj.mostrar_vida) {
+            _deve_mostrar = true; // Mostrar se flag está ativa
+        }
+        
+        if (!_deve_mostrar) return; // Não mostrar se vida está cheia e não foi atingida
+        
         var _barra_w = 50;
         var _barra_h = 6;
         var _barra_x = _obj.x - _barra_w/2;
@@ -179,11 +189,12 @@ if (global.barras_vida_ativas) {
         draw_set_alpha(1.0);
         draw_rectangle(_barra_x, _barra_y, _barra_x + _barra_w, _barra_y + _barra_h, true);
         
-        // Texto HP
+        // ✅ NOVO: Texto HP com porcentagem
         draw_set_halign(fa_center);
         draw_set_valign(fa_middle);
         draw_set_color(c_white);
-        draw_text(_barra_x + _barra_w/2, _barra_y - 8, string(_hp_atual) + "/" + string(_hp_max));
+        var _porcentagem = round((_hp_atual / _hp_max) * 100);
+        draw_text(_barra_x + _barra_w/2, _barra_y - 8, string(_hp_atual) + "/" + string(_hp_max) + " (" + string(_porcentagem) + "%)");
         
         draw_set_halign(fa_left);
         draw_set_valign(fa_top);
@@ -210,6 +221,18 @@ if (global.barras_vida_ativas) {
         }
         
         if (_hp_atual <= 0) return;
+        
+        // ✅ CORREÇÃO: Mostrar vida se foi atingida OU se modo_ataque estiver ativo (para aviões)
+        var _deve_mostrar = false;
+        if (_hp_atual < _hp_max) {
+            _deve_mostrar = true; // Sempre mostrar se não está com vida cheia
+        } else if (variable_instance_exists(_obj, "mostrar_vida") && _obj.mostrar_vida) {
+            _deve_mostrar = true; // Mostrar se flag está ativa
+        } else if (variable_instance_exists(_obj, "modo_ataque") && _obj.modo_ataque) {
+            _deve_mostrar = true; // ✅ NOVO: Mostrar se modo_ataque estiver ativo (para aviões)
+        }
+        
+        if (!_deve_mostrar) return; // Não mostrar se vida está cheia e não foi atingida
         
         var _barra_w = 60;
         var _barra_h = 8;
@@ -238,11 +261,12 @@ if (global.barras_vida_ativas) {
         draw_set_alpha(1.0);
         draw_rectangle(_barra_x, _barra_y, _barra_x + _barra_w, _barra_y + _barra_h, true);
         
-        // Texto HP
+        // ✅ NOVO: Texto HP com porcentagem
         draw_set_halign(fa_center);
         draw_set_valign(fa_middle);
         draw_set_color(c_white);
-        draw_text(_barra_x + _barra_w/2, _barra_y - 12, string(_hp_atual) + "/" + string(_hp_max));
+        var _porcentagem = round((_hp_atual / _hp_max) * 100);
+        draw_text(_barra_x + _barra_w/2, _barra_y - 12, string(_hp_atual) + "/" + string(_hp_max) + " (" + string(_porcentagem) + "%)");
         
         // Estado (se existir)
         if (variable_instance_exists(_obj, "estado")) {
@@ -269,61 +293,144 @@ if (global.barras_vida_ativas) {
         draw_set_alpha(1.0);
     }
     
-    // === DESENHAR BARRAS PARA TODAS AS UNIDADES ===
+    // === DESENHAR BARRAS PARA TODAS AS UNIDADES (QUANDO ATINGIDAS) ===
+    // ✅ NOVO: Sistema genérico que mostra vida para TODAS as unidades quando foram atingidas
     
-    // F-5 CAÇA
-    with (obj_caca_f5) {
-        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) {
-            desenhar_barra_avancada(id, -30);
+    // Lista de todos os tipos de unidades (aéreas e terrestres)
+    var _tipos_unidades_aereas = [
+        obj_caca_f5,
+        obj_helicoptero_militar,
+        obj_c100,
+        obj_f6,
+        obj_f15,
+        obj_su35,
+        obj_caca_f35  // ✅ NOVO: F-35
+    ];
+    
+    var _tipos_unidades_terrestres = [
+        obj_infantaria,
+        obj_tanque,
+        obj_blindado_antiaereo,
+        obj_soldado_antiaereo
+    ];
+    
+    var _tipos_unidades_navais = [
+        obj_lancha_patrulha,
+        obj_Constellation,
+        obj_Independence,
+        obj_RonaldReagan,
+        obj_navio_transporte,
+        obj_submarino_base,
+        obj_navio_base,
+        obj_wwhendrick
+    ];
+    
+    // Verificar obj_M1A_Abrams
+    var _obj_abrams = asset_get_index("obj_M1A_Abrams");
+    if (_obj_abrams != -1 && asset_get_type(_obj_abrams) == asset_object) {
+        array_push(_tipos_unidades_terrestres, _obj_abrams);
+    }
+    
+    // Verificar obj_Gepard_Anti_Aereo
+    var _obj_gepard = asset_get_index("obj_Gepard_Anti_Aereo");
+    if (_obj_gepard != -1 && asset_get_type(_obj_gepard) == asset_object) {
+        array_push(_tipos_unidades_terrestres, _obj_gepard);
+    }
+    
+    // Verificar obj_destroyer e obj_fragata
+    var _obj_destroyer = asset_get_index("obj_destroyer");
+    if (_obj_destroyer != -1 && asset_get_type(_obj_destroyer) == asset_object) {
+        array_push(_tipos_unidades_navais, _obj_destroyer);
+    }
+    var _obj_fragata = asset_get_index("obj_fragata");
+    if (_obj_fragata != -1 && asset_get_type(_obj_fragata) == asset_object) {
+        array_push(_tipos_unidades_navais, _obj_fragata);
+    }
+    
+    // ✅ DESENHAR BARRAS PARA UNIDADES AÉREAS (quando atingidas)
+    for (var _i = 0; _i < array_length(_tipos_unidades_aereas); _i++) {
+        var _tipo = _tipos_unidades_aereas[_i];
+        if (!object_exists(_tipo)) continue;
+        
+        with (_tipo) {
+            // Verificar se tem vida e se foi atingida
+            var _hp_atual = 0;
+            var _hp_max = 1;
+            if (variable_instance_exists(id, "hp_atual") && variable_instance_exists(id, "hp_max")) {
+                _hp_atual = hp_atual;
+                _hp_max = hp_max;
+            } else if (variable_instance_exists(id, "vida") && variable_instance_exists(id, "vida_max")) {
+                _hp_atual = vida;
+                _hp_max = vida_max;
+            } else {
+                continue; // Não tem sistema de vida
+            }
+            
+            // ✅ CORREÇÃO: Mostrar barra se foi atingida OU se modo_ataque estiver ativo
+            var _deve_mostrar = false;
+            if (_hp_atual < _hp_max && _hp_atual > 0) {
+                _deve_mostrar = true; // Sempre mostrar se foi atingido
+            } else if (variable_instance_exists(id, "modo_ataque") && modo_ataque) {
+                _deve_mostrar = true; // Mostrar se modo_ataque estiver ativo
+            }
+            
+            if (_deve_mostrar && visible) {
+                desenhar_barra_avancada(id, -30);
+            }
         }
     }
-
-    // HELICÓPTERO MILITAR
-    with (obj_helicoptero_militar) {
-        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) {
-            desenhar_barra_avancada(id, -25);
+    
+    // ✅ DESENHAR BARRAS PARA UNIDADES TERRESTRES (quando atingidas)
+    for (var _i = 0; _i < array_length(_tipos_unidades_terrestres); _i++) {
+        var _tipo = _tipos_unidades_terrestres[_i];
+        if (!object_exists(_tipo)) continue;
+        
+        with (_tipo) {
+            // Verificar se tem vida e se foi atingida
+            var _hp_atual = 0;
+            var _hp_max = 1;
+            if (variable_instance_exists(id, "hp_atual") && variable_instance_exists(id, "hp_max")) {
+                _hp_atual = hp_atual;
+                _hp_max = hp_max;
+            } else if (variable_instance_exists(id, "vida") && variable_instance_exists(id, "vida_max")) {
+                _hp_atual = vida;
+                _hp_max = vida_max;
+            } else {
+                continue; // Não tem sistema de vida
+            }
+            
+            // Mostrar apenas se foi atingida (hp_atual < hp_max) e está visível
+            if (_hp_atual < _hp_max && _hp_atual > 0 && visible) {
+                desenhar_barra_basica(id, -25);
+            }
         }
     }
-
-    // C-100 TRANSPORTE
-    with (obj_c100) {
-        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1) {
-            desenhar_barra_avancada(id, -30);
+    
+    // ✅ DESENHAR BARRAS PARA UNIDADES NAVALS (quando atingidas)
+    for (var _i = 0; _i < array_length(_tipos_unidades_navais); _i++) {
+        var _tipo = _tipos_unidades_navais[_i];
+        if (!object_exists(_tipo)) continue;
+        
+        with (_tipo) {
+            // Verificar se tem vida e se foi atingida
+            var _hp_atual = 0;
+            var _hp_max = 1;
+            if (variable_instance_exists(id, "hp_atual") && variable_instance_exists(id, "hp_max")) {
+                _hp_atual = hp_atual;
+                _hp_max = hp_max;
+            } else if (variable_instance_exists(id, "vida") && variable_instance_exists(id, "vida_max")) {
+                _hp_atual = vida;
+                _hp_max = vida_max;
+            } else {
+                continue; // Não tem sistema de vida
+            }
+            
+            // Mostrar apenas se foi atingida (hp_atual < hp_max)
+            if (_hp_atual < _hp_max && _hp_atual > 0 && visible) {
+                desenhar_barra_basica(id, -30);
+            }
         }
     }
-
-    // F-6 INIMIGO
-    with (obj_f6) {
-        desenhar_barra_avancada(id, -30);
-    }
-
-    // UNIDADES TERRESTRES - NÃO MOSTRAR STATUS SE ESTIVEREM DENTRO DO AVIÃO
-    with (obj_infantaria) {
-        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1 && visible) { // Só mostrar se estiver visível (não embarcada)
-            desenhar_barra_basica(id, -20);
-        }
-    }
-
-    with (obj_tanque) {
-        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1 && visible) { // Só mostrar se estiver visível (não embarcada)
-            desenhar_barra_basica(id, -25);
-        }
-    }
-
-    with (obj_blindado_antiaereo) {
-        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1 && visible) { // Só mostrar se estiver visível (não embarcada)
-            desenhar_barra_basica(id, -25);
-        }
-    }
-
-    with (obj_soldado_antiaereo) {
-        if (variable_instance_exists(id, "nacao_proprietaria") && nacao_proprietaria == 1 && visible) { // Só mostrar se estiver visível (não embarcada)
-            desenhar_barra_basica(id, -20);
-        }
-    }
-
-    // UNIDADES INIMIGAS
-    // ✅ CORREÇÃO: obj_inimigo removido - não há mais unidades inimigas específicas
 }
 
 // === DEBUG DE CULLING (Tecla F3) ===

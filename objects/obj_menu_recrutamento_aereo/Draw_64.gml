@@ -215,6 +215,11 @@ for (var i = 0; i < min(_total_aeronaves, 6); i++) {
         draw_sprite_ext(spr_f15, 0, _icon_x, _icon_y, 0.75, 0.75, 0, c_white, _anim.alpha); // ✅ Reduzido 50%
     } else if (_aeronave.nome == "SU-35 Flanker" && sprite_exists(spr_su35)) {
         draw_sprite_ext(spr_su35, 0, _icon_x, _icon_y, 0.48, 0.48, 0, c_white, _anim.alpha); // ✅ Sprite SU-35 - Reduzido 20% (0.6 * 0.8 = 0.48)
+    } else if (_aeronave.nome == "F-35 Lightning II" && sprite_exists(spr_f35)) {
+        // ✅ AJUSTE: Diminuir tamanho em 3% e mover 15% para a direita
+        var _escala_f35 = 0.1875 * 0.97; // Reduzir 3% (0.181875)
+        var _icon_x_f35 = _icon_x + (_card_w * 0.15); // Mover 15% para a direita
+        draw_sprite_ext(spr_f35, 0, _icon_x_f35, _icon_y, _escala_f35, _escala_f35, 0, c_white, _anim.alpha);
     } else if (_aeronave.nome == "Helicóptero Militar" && sprite_exists(spr_helicoptero_militar)) {
         draw_sprite_ext(spr_helicoptero_militar, 0, _icon_x, _icon_y, 1.5, 1.5, 0, c_white, _anim.alpha);
     } else if (_aeronave.nome == "C-100 Transporte" && sprite_exists(spr_c100)) {
@@ -223,24 +228,12 @@ for (var i = 0; i < min(_total_aeronaves, 6); i++) {
     
     // Descrição
     // ✅ CORREÇÃO: Tamanho de fonte reduzido
+    // ✅ AJUSTE: Aumentar espaçamento entre linhas (de 18 para 24 para dar mais distância)
     var _desc_y = _icon_y + 40;
     draw_set_color(_can_produce ? make_color_rgb(200, 220, 240) : make_color_rgb(120, 120, 120));
-    draw_text_ext_transformed(_content_x, _desc_y, _aeronave.descricao, 18, _card_w - 30, 0.7, 0.7, 0);
+    draw_text_ext_transformed(_content_x, _desc_y, _aeronave.descricao, 24, _card_w - 30, 0.7, 0.7, 0);
     
-    // Informações - usar altura ajustada
-    var _info_y = _card_y + _card_h_ajustado - 65;
-    
-    // ✅ AJUSTE: Melhor espaçamento entre informações
-    var _espacamento_info = 25; // Espaçamento entre informações
-    
-    // Custo
-    // ✅ CORREÇÃO: Tamanho de fonte reduzido
-    draw_set_color(_can_produce ? make_color_rgb(255, 215, 0) : make_color_rgb(150, 150, 100));
-    draw_text_transformed(_content_x, _info_y, "$ " + string(_aeronave.custo_dinheiro), 0.8, 0.8, 0);
-    
-    // População
-    draw_set_color(_can_produce ? make_color_rgb(180, 210, 255) : make_color_rgb(120, 120, 120));
-    draw_text_transformed(_content_x, _info_y + _espacamento_info, "Pop: " + string(_aeronave.custo_populacao), 0.75, 0.75, 0);
+    // ✅ REMOVIDO: Informações de custo e população dos cards (solicitado pelo usuário)
     
     // ✅ AJUSTE: Botão PRODUZIR subir 10% em cada card
     var _btn_y_base = _card_y + _card_h_ajustado - 35;

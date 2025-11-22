@@ -111,7 +111,7 @@ if (estado == "movendo" || movendo) {
                     } else {
                         _espuma.depth = -100;
                     }
-                    _espuma.image_angle = image_angle + random_range(-5, 5);
+                    _espuma.image_angle = image_angle; // ✅ Rastro sempre virado para a proa
                 }
             }
             
@@ -140,7 +140,7 @@ if (estado == "movendo" || movendo) {
                     } else {
                         _trail_popa.depth = -100;
                     }
-                    _trail_popa.image_angle = image_angle + random_range(-5, 5);
+                    _trail_popa.image_angle = image_angle; // ✅ Rastro sempre virado para a proa
                 }
             }
         }
@@ -208,7 +208,7 @@ if (estado == "atacando" && alvo != noone && instance_exists(alvo)) {
                     } else {
                         _espuma.depth = -100;
                     }
-                    _espuma.image_angle = image_angle + random_range(-5, 5);
+                    _espuma.image_angle = image_angle; // ✅ Rastro sempre virado para a proa
                 }
             }
             
@@ -237,7 +237,7 @@ if (estado == "atacando" && alvo != noone && instance_exists(alvo)) {
                     } else {
                         _trail_popa.depth = -100;
                     }
-                    _trail_popa.image_angle = image_angle + random_range(-5, 5);
+                    _trail_popa.image_angle = image_angle; // ✅ Rastro sempre virado para a proa
                 }
             }
         }

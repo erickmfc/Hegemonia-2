@@ -1,22 +1,38 @@
 // ===============================================
-// HEGEMONIA GLOBAL - CAÇA F-5 (Create Refatorado)
+// HEGEMONIA GLOBAL - F-5 TIGER
+// 2ª GERAÇÃO (anos 60-70) - Tecnologia básica
 // ===============================================
+
+// === SISTEMA DE GERAÇÕES ===
+geracao_caca = FighterGeneration.GEN_2;
 
 // --- ATRIBUTOS DE VOO ---
 velocidade_atual = 0;
-velocidade_maxima = 4.0;
+velocidade_maxima = 2.8;  // ✅ 2ª geração - velocidade básica
 aceleracao = 0.05;
 desaceleracao = 0.03;
 velocidade_rotacao = 3;
 
 // --- ATRIBUTOS DE COMBATE ---
-hp_atual = 200;
-hp_max = 200;
+hp_atual = 150;  // ✅ 2ª geração - HP básico
+hp_max = 150;
 nacao_proprietaria = 1;
-radar_alcance = 450;
+radar_alcance = 450;  // ✅ 2ª geração - radar limitado
+alcance_ataque = 400;  // ✅ Alcance de ataque menor
 timer_ataque = 0;
-intervalo_ataque = 90;
+intervalo_ataque = 60;
 modo_ataque = false;
+timer_busca_alvo = 0;
+intervalo_busca_alvo = 15;
+
+// --- SISTEMA DE MÍSSEIS (APENAS LIT - tecnologia antiga) ---
+timer_lit = 0;
+intervalo_lit = 480;  // ✅ 8 segundos (lento - tecnologia antiga)
+dano_multiplier = 0.7;  // ✅ 30% menos dano
+
+// --- TECNOLOGIA ---
+stealth_ativo = false;  // ✅ Sem stealth
+sensores_avancados = false;  // ✅ Sensores básicos
 
 // --- MÁQUINA DE ESTADOS ---
 estado = "pousado"; // Estados: "pousado", "decolando", "pousando", "movendo", "patrulhando", "definindo_patrulha"

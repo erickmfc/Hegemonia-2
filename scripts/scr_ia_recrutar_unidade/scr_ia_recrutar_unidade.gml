@@ -210,9 +210,9 @@ function scr_ia_recrutar_unidade(_ia_id, _tipo_unidade, _quantidade) {
         return false;
     }
     
-    // ✅ MELHORADO: 4. Adicionar unidades à FILA (quintal/aeroporto)
+        // ✅ MELHORADO: 4. Adicionar unidades à FILA (quintal/aeroporto)
     with (_quartel_da_ia) {
-        // ✅ NOVO: Aeroporto usa fila_producao, quartéis usam fila_recrutamento
+        // ✅ CORREÇÃO: Quartel naval também usa fila_recrutamento (igual ao quartel militar)
         var _fila_usar = noone;
         var _nome_fila = "";
         
@@ -229,14 +229,21 @@ function scr_ia_recrutar_unidade(_ia_id, _tipo_unidade, _quantidade) {
             _fila_usar = fila_producao;
             _nome_fila = "fila_producao";
         } else {
-            // Quartéis usam fila_recrutamento
+            // ✅ CORREÇÃO: Quartéis (terrestres E navais) usam fila_recrutamento
+        // ✅ CORREÇÃO CRÍTICA: Garantir que cada quartel tenha sua própria fila independente
             if (!variable_instance_exists(id, "fila_recrutamento")) {
                 fila_recrutamento = ds_queue_create();
-                show_debug_message("⚠️ Fila de recrutamento criada (variável não existia)");
-            }
-            if (!ds_exists(fila_recrutamento, ds_type_queue)) {
+                show_debug_message("⚠️ IA - Quartel ID: " + string(id) + " - Fila de recrutamento criada (variável não existia)");
+            } else if (ds_exists(fila_recrutamento, ds_type_queue)) {
+                // ✅ VALIDAÇÃO: Confirmar que a fila existe e é válida
+                show_debug_message("✅ IA - Quartel ID: " + string(id) + " - Usando fila existente (ID: " + string(fila_recrutamento) + ")");
+            } else {
+                // Se a fila existe mas é inválida, destruir e recriar
+                if (ds_exists(fila_recrutamento, ds_type_queue)) {
+                    ds_queue_destroy(fila_recrutamento);
+                }
                 fila_recrutamento = ds_queue_create();
-                show_debug_message("⚠️ Fila de recrutamento recriada (estrutura inválida)");
+                show_debug_message("⚠️ IA - Quartel ID: " + string(id) + " - Fila de recrutamento recriada (estrutura inválida)");
             }
             _fila_usar = fila_recrutamento;
             _nome_fila = "fila_recrutamento";
@@ -257,18 +264,27 @@ function scr_ia_recrutar_unidade(_ia_id, _tipo_unidade, _quantidade) {
         }
         
         if (_idx_unidade == -1) {
-            show_debug_message("⚠️ IA: Tipo " + _nome_unidade + " não encontrado em unidades_disponiveis, tentando adicionar mesmo assim");
-            // Para aeroporto, pode não ter todas as unidades na lista, então usar índice 0 como fallback
-            _idx_unidade = 0;
+            show_debug_message("❌ ERRO: Tipo " + _nome_unidade + " não encontrado em unidades_disponiveis do " + (_eh_unidade_aerea ? "aeroporto" : "quartel"));
+            // ✅ CORREÇÃO: Não adicionar à fila se não encontrou a unidade
+            // Retornar false para indicar falha
+            return false;
         }
         
         // ✅ ADICIONAR MÚLTIPLAS UNIDADES À FILA
+        // ✅ VALIDAÇÃO: Confirmar que estamos usando a fila do quartel correto
+        var _quartel_id_ia = id; // ID do quartel da IA
+        var _fila_id_ia = _fila_usar; // ID da fila
+        var _tamanho_antes_ia = ds_queue_size(_fila_usar);
+        
         for (var j = 0; j < _quantidade; j++) {
             ds_queue_enqueue(_fila_usar, _idx_unidade);
         }
         
+        var _tamanho_depois_ia = ds_queue_size(_fila_usar);
+        
         show_debug_message("✅ IA adicionou " + string(_quantidade) + "x " + _nome_unidade + " à " + _nome_fila + " (índice " + string(_idx_unidade) + ")");
-        show_debug_message("📊 Tamanho da fila: " + string(ds_queue_size(_fila_usar)));
+        show_debug_message("📊 Quartel ID: " + string(_quartel_id_ia) + " | Fila ID: " + string(_fila_id_ia));
+        show_debug_message("📊 Tamanho da fila ANTES: " + string(_tamanho_antes_ia) + " | DEPOIS: " + string(_tamanho_depois_ia));
         
         // ✅ FORÇAR INÍCIO DE PRODUÇÃO SE ESTIVER OCIOSO
         if (_eh_unidade_aerea) {
@@ -283,12 +299,22 @@ function scr_ia_recrutar_unidade(_ia_id, _tipo_unidade, _quantidade) {
                 show_debug_message("⏸️ Aeroporto da IA já está produzindo - unidade adicionada à fila");
             }
         } else {
-            // Quartéis usam esta_treinando
-            if (!variable_instance_exists(id, "esta_treinando") || !esta_treinando) {
+            // ✅ CORREÇÃO: Quartéis (terrestres E navais) usam esta_treinando
+            if (!variable_instance_exists(id, "esta_treinando")) {
+                esta_treinando = false; // Inicializar se não existe
+            }
+            if (!esta_treinando) {
                 show_debug_message("🚀 Quartel da IA está ocioso - iniciando produção imediatamente!");
                 esta_treinando = true;
+                // Sincronizar com produzindo se existir
+                if (variable_instance_exists(id, "produzindo")) {
+                    produzindo = true;
+                }
                 if (variable_instance_exists(id, "tempo_treinamento_restante")) {
                     tempo_treinamento_restante = 0;
+                }
+                if (variable_instance_exists(id, "timer_producao")) {
+                    timer_producao = 0;
                 }
             } else {
                 show_debug_message("⏸️ Quartel da IA já está treinando - unidade adicionada à fila");

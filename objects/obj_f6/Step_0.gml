@@ -291,52 +291,42 @@ if (estado == "caçando") {
         destino_x = alvo_em_mira.x;
         destino_y = alvo_em_mira.y;
         
-        // ✅ NOVO: Atacar usando mísseis SkyFury (ar-ar) e Ironclad (ar-terra)
+        // ✅ DECREMENTAR TIMER LIT (2ª/3ª geração - apenas LIT)
+        if (variable_instance_exists(id, "timer_lit") && timer_lit > 0) timer_lit--;
+        
         // ✅ VALIDAÇÃO: Verificar se alvo é válido antes de disparar
         var _alvo_valido = (instance_exists(alvo_em_mira) && 
                             alvo_em_mira != noone && 
                             !is_undefined(alvo_em_mira.x) && 
                             !is_undefined(alvo_em_mira.y) &&
-                            point_distance(x, y, alvo_em_mira.x, alvo_em_mira.y) <= radar_alcance);
+                            point_distance(x, y, alvo_em_mira.x, alvo_em_mira.y) <= alcance_ataque);
         
-        if (_alvo_valido && timer_ataque <= 0) {
-            var _missil = noone;
-            var _tipo_missil = "";
-            
-            // Verificar tipo de alvo para usar míssil apropriado
-            var _eh_alvo_aereo = (alvo_em_mira.object_index == obj_helicoptero_militar || 
-                                  alvo_em_mira.object_index == obj_caca_f5 ||
-                                  alvo_em_mira.object_index == obj_f15 ||
-                                  alvo_em_mira.object_index == obj_f6 ||
-                                  alvo_em_mira.object_index == obj_su35 ||
-                                  alvo_em_mira.object_index == obj_c100);
-            
-            if (_eh_alvo_aereo) {
-                // ✅ Alvo aéreo - usar SkyFury (míssil ar-ar)
-                _missil = scr_get_projectile_from_pool(obj_SkyFury_ar, x, y, "Instances");
-                _tipo_missil = "SkyFury (ar-ar)";
-            } else {
-                // ✅ Alvo terrestre/naval - usar Ironclad (míssil ar-terra)
-                _missil = scr_get_projectile_from_pool(obj_Ironclad_terra, x, y, "Instances");
-                _tipo_missil = "Ironclad (ar-terra)";
+        // ✅ DECREMENTAR TIMER LIT (2ª/3ª geração - apenas LIT)
+        if (variable_instance_exists(id, "timer_lit") && timer_lit > 0) timer_lit--;
+        
+        // ✅ DISPARAR LIT quando estiver no alcance de ataque (7 segundos - 2ª/3ª geração)
+        if (_alvo_valido && timer_lit <= 0) {
+            // ✅ CRIAR MÍSSIL LIT (2ª/3ª geração - apenas LIT)
+            var _missil = scr_get_projectile_from_pool(obj_lit, x, y, "Instances");
+            if (!instance_exists(_missil)) {
+                _missil = instance_create_layer(x, y, "Instances", obj_lit);
             }
             
             if (instance_exists(_missil)) {
-                // ✅ VALIDAÇÃO: Verificar se alvo ainda existe antes de atribuir
                 if (instance_exists(alvo_em_mira)) {
-                    _missil.target = alvo_em_mira;
                     _missil.alvo = alvo_em_mira;
                     _missil.dono = id;
+                    var _angulo = point_direction(x, y, alvo_em_mira.x, alvo_em_mira.y);
+                    _missil.direction = _angulo;
+                    _missil.image_angle = _angulo;
+                    timer_lit = intervalo_lit;  // ✅ 7 segundos (420 frames) - 2ª/3ª geração
                     
-                    show_debug_message("🚀 F-6 lançou " + _tipo_missil + " em " + object_get_name(alvo_em_mira.object_index) + "!");
-                    timer_ataque = intervalo_ataque;
+                    if (variable_global_exists("debug_enabled") && global.debug_enabled) {
+                        show_debug_message("🔥 F-6 disparou LIT! Alvo: " + object_get_name(alvo_em_mira.object_index));
+                    }
                 } else {
-                    // Alvo desapareceu - destruir míssil
                     scr_return_projectile_to_pool(_missil);
-                    show_debug_message("⚠️ F-6: Alvo desapareceu antes de configurar míssil");
                 }
-            } else {
-                show_debug_message("⚠️ ERRO: F-6 falhou ao criar míssil " + _tipo_missil);
             }
         }
     } 

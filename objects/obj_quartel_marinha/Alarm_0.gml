@@ -9,9 +9,10 @@ if (produzindo && !ds_queue_empty(fila_producao)) {
     
     // Criar unidade naval - ✅ POSIÇÃO INTELIGENTE COM DISTRIBUIÇÃO ALEATÓRIA
     // Posição baseada no número de unidades já produzidas para evitar sobreposição
+    // ✅ AJUSTE: Aumentar posição em 10% na direção que já criam
     var _offset_base = 150; // ✅ AUMENTADO de 100 para 150
-    var _offset_x = _offset_base + (unidades_produzidas * 50); // ✅ AUMENTADO para 50 para maior espaço
-    var _offset_y = _offset_base + (unidades_produzidas * 40); // ✅ AUMENTADO para 40 para maior espaço
+    var _offset_x = (_offset_base + (unidades_produzidas * 50)) * 1.1; // ✅ AUMENTADO 10% na direção X
+    var _offset_y = (_offset_base + (unidades_produzidas * 40)) * 1.1; // ✅ AUMENTADO 10% na direção Y
     var _variacao_x = random_range(-30, 30); // ✅ NOVO: Variação horizontal aleatória
     var _variacao_y = random_range(-30, 30); // ✅ NOVO: Variação vertical aleatória
     var _spawn_x = x + _offset_x + _variacao_x;
@@ -77,7 +78,12 @@ if (produzindo && !ds_queue_empty(fila_producao)) {
                 show_debug_message("🚢 ID: " + string(_unidade_criada));
                 show_debug_message("🚢 HP: " + string(_unidade_criada.hp_atual) + "/" + string(_unidade_criada.hp_max));
                 show_debug_message("🚢 Velocidade: " + string(_unidade_criada.velocidade_movimento));
-                show_debug_message("🚢 Tem canhão: " + string(instance_exists(_unidade_criada.canhao_instancia)));
+                // ✅ CORREÇÃO: Verificar se variável existe antes de acessar
+                if (variable_instance_exists(_unidade_criada, "canhao_instancia")) {
+                    show_debug_message("🚢 Tem canhão: " + string(instance_exists(_unidade_criada.canhao_instancia)));
+                } else {
+                    show_debug_message("🚢 Canhão: não inicializado ainda");
+                }
             }
         } else {
             show_debug_message("❌ Falha ao criar unidade!");

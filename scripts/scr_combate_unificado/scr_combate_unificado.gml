@@ -269,10 +269,8 @@ function scr_aplicar_dano(unidade, dano) {
             
             scr_debug_log("COMBATE", "Unidade destruída: " + string(unidade.object_index));
             
-            // ✅ NOVO: Se for avião, criar objeto de avião morto antes de destruir
-            if (_eh_aviao) {
-                scr_criar_aviao_morto(_pos_x, _pos_y, _angulo_aviao, _sprite_aviao);
-            }
+            // ✅ NOVO: Criar restos de qualquer unidade antes de destruir (genérico)
+            scr_criar_restos_unidade(unidade);
             
             instance_destroy(unidade);
         } else {

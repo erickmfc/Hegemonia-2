@@ -4,8 +4,8 @@
 // ===============================================
 
 // === CONFIGURAÇÕES BÁSICAS ===
-hp_max = 200;
-hp_atual = 200;
+hp_max = 120; // ✅ ATUALIZADO: Todos os quarteis têm 120 HP
+hp_atual = 120; // ✅ ATUALIZADO: Todos os quarteis têm 120 HP
 nacao_proprietaria = 1;
 selecionado = false;
 

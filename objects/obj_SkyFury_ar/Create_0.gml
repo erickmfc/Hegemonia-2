@@ -1,8 +1,13 @@
 // Míssil Ar-Ar de alta velocidade e precisão
 speed = 9; // Velocidade aumentada para interceptação
-dano = 150; // Dano do míssil ar-ar aumentado
+dano = 150; // Dano base do míssil ar-ar
 dono = noone; // Quem disparou
 target = noone; // Alvo do míssil (usar sempre target, não alvo)
+
+// ✅ APLICAR MULTIPLICADOR DE DANO DO DONO (sistema de gerações)
+if (instance_exists(dono) && variable_instance_exists(dono, "dano_multiplier")) {
+    dano = floor(dano * dono.dano_multiplier);
+}
 
 // Som removido a pedido do usuário
 

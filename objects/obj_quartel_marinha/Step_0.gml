@@ -1,20 +1,15 @@
-// ===============================================
-// HEGEMONIA GLOBAL - QUARTEL DE MARINHA
-// Sistema de Produção Naval - STEP EVENT ATIVO
-// ===============================================
+/// @description Step do Quartel Marinha - Lógica de barra de vida
 
-// ✅ STEP EVENT OTIMIZADO - Debug reduzido
-// Debug apenas quando necessário (a cada 10 segundos)
-if (!variable_instance_exists(id, "step_debug_count")) {
-    step_debug_count = 0;
-}
-step_debug_count++;
-if (step_debug_count % 600 == 0) { // A cada 10 segundos (reduzido)
-    show_debug_message("🔄 Quartel Marinha ID: " + string(id) + " - Produzindo: " + string(produzindo) + " | Fila: " + string(ds_queue_size(fila_producao)));
+// === SISTEMA DE BARRA DE VIDA ===
+if (hp_atual < hp_max) {
+    mostrar_barra_vida = true;
+    timer_barra_vida = 0;
 }
 
-// =========================================================================
-// LÓGICA DE PRODUÇÃO REMOVIDA DO STEP EVENT
-// A produção agora é controlada exclusivamente pelo Alarm[0] para evitar conflitos.
-// O Step Event agora serve apenas para debug e futuras lógicas que não sejam de produção.
-// =========================================================================
+if (mostrar_barra_vida) {
+    timer_barra_vida++;
+    if (timer_barra_vida >= duracao_barra_vida) {
+        mostrar_barra_vida = false;
+        timer_barra_vida = 0;
+    }
+}

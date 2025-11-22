@@ -1,121 +1,116 @@
-/// @description Inicialização da Fragata Independence
+/// @description Independence - Destroyer com canhão
 // ===============================================
-// HEGEMONIA GLOBAL - INDEPENDENCE (HERDA DE NAVIO_BASE)
-// Fragata com Dobro de Vida e 0.9x Velocidade da Constellation
+// HEGEMONIA GLOBAL - INDEPENDENCE
+// Sistema limpo baseado na Lancha Patrulha
 // ===============================================
 
-// ✅ CORREÇÃO GM2040: Herdar do pai com verificação
+// ✅ CORREÇÃO GM2040: Chamar o Create do objeto pai PRIMEIRO
 if (object_get_parent(object_index) != -1) {
     event_inherited();
 }
 
-// === CONFIGURAÇÕES BÁSICAS ===
+// === CONFIGURAÇÕES ESPECÍFICAS DO INDEPENDENCE ===
 nome_unidade = "Independence";
-descricao = "Fragata com canhão e mísseis SkyFury/Ironclad";
-custo = 1000;
 
-// === VARIÁVEIS DE CONTROLE E NAVEGAÇÃO ===
-// ✅ CORREÇÃO: Inicializar variáveis de controle que faltavam
-if (!variable_instance_exists(id, "modo_combate")) {
-    modo_combate = LanchaMode.PASSIVO;
-}
+// Atributos de combate
+hp_atual = 1500;
+hp_max = 1500;
+dano_ataque = 80;
+
+// Navegação (baseado na Lancha)
+velocidade_movimento = 1.5;
+velocidade = 0.95;
+velocidade_rotacao = 2.0;
+
+// Física de movimento (novo sistema)
+moveSpeed = 3.0;
+acceleration = 0.12;
+friction_water = 0.08;
+turnSpeed = 2.0;
+usar_novo_sistema = true; // Usar sistema de física da Lancha
+
+// Alcances
+radar_alcance = 800;
+missil_alcance = 800;
+missil_max_alcance = 800;
+alcance_ataque = 800;
+alcance_visao = 800;
+
+// Sistema de ataque
+reload_time = 120; // 2 segundos
+reload_timer = 0;
+
+// Sistema de patrulha (da Lancha)
 if (!variable_instance_exists(id, "pontos_patrulha")) {
     pontos_patrulha = ds_list_create();
 }
 if (!variable_instance_exists(id, "indice_patrulha_atual")) {
     indice_patrulha_atual = 0;
 }
-if (!variable_instance_exists(id, "direcao_patrulha")) {
-    direcao_patrulha = 1; // 1 = horário (avançar), -1 = anti-horário (retroceder)
-}
-if (!variable_instance_exists(id, "timer_verificacao_inimigos")) {
-    timer_verificacao_inimigos = 0;
-}
-if (!variable_instance_exists(id, "intervalo_verificacao_inimigos")) {
-    intervalo_verificacao_inimigos = 30; // Verificar inimigos a cada 30 frames
-}
-if (!variable_instance_exists(id, "estado_anterior")) {
-    estado_anterior = LanchaState.PARADO;
-}
-if (!variable_instance_exists(id, "selecionado")) {
-    selecionado = false;
-}
 
-// === VARIÁVEIS DE MOVIMENTO E DESTINO ===
-// ✅ CORREÇÃO: Inicializar variáveis de destino que faltavam
-if (!variable_instance_exists(id, "destino_x")) {
-    destino_x = x;
-}
-if (!variable_instance_exists(id, "destino_y")) {
-    destino_y = y;
-}
-if (!variable_instance_exists(id, "alvo_x")) {
-    alvo_x = x;
-}
-if (!variable_instance_exists(id, "alvo_y")) {
-    alvo_y = y;
-}
-if (!variable_instance_exists(id, "alvo_unidade")) {
-    alvo_unidade = noone;
-}
-if (!variable_instance_exists(id, "estado")) {
-    estado = LanchaState.PARADO;
-}
-if (!variable_instance_exists(id, "velocidade_rotacao")) {
-    velocidade_rotacao = 0.8; // Velocidade de rotação em graus por frame
-}
-if (!variable_instance_exists(id, "reload_timer")) {
-    reload_timer = 0;
-}
+// === SISTEMA DE MÍSSEIS MÚLTIPLOS (Hash, Sky, Lit) ===
+pode_disparar_missil = true; // Independence usa Hash, Sky, Lit + Canhão
 
-// === CONFIGURAÇÕES DE COMBATE ===
-// ✅ CORREÇÃO: Copiar stats de ataque do Constellation
-hp_atual = 1600; // Dobro da Constellation (800 * 2)
-hp_max = 1600;
-velocidade_movimento = 1.2; // IGUAL ao Constellation
-radar_alcance = 1000; // IGUAL ao Constellation
-missil_alcance = 1000; // IGUAL ao Constellation
-missil_max_alcance = 1000; // Alcance máximo de mísseis
-alcance_ataque = missil_alcance;
-alcance_visao = radar_alcance; // Alcance de visão igual ao radar
-dano_ataque = 1000; // ✅ CORREÇÃO: IGUAL ao Constellation (1000)
-reload_time = 120; // ✅ CORREÇÃO: IGUAL ao Constellation (120)
+// Timers para mísseis múltiplos (similar ao F-35)
+timer_sky = 0;
+intervalo_sky = 180; // 3 segundos
 
-// Variáveis de mísseis
+timer_iron = 0;
+intervalo_iron = 300; // 5 segundos
+
+timer_hash = 0;
+intervalo_hash = 360; // 6 segundos
+
+timer_lit = 0;
+intervalo_lit = 420; // 7 segundos
+
+// Sistema antigo (mantido para compatibilidade)
 missil_timer = 0;
-missil_cooldown = 90;
+missil_cooldown = 120;
+
+// === SISTEMA DE CANHÃO (PRESERVADO) ===
+metralhadora_ativa = false;
+metralhadora_timer = 0;
+metralhadora_intervalo = 3;
+metralhadora_duracao = 180; // 3 segundos
+metralhadora_tiros = 0;
+metralhadora_max_tiros = 60;
+metralhadora_cooldown_timer = 0;
+metralhadora_cooldown_duration = 180; // 3 segundos de pausa
+
+// Estado e modo
+estado = LanchaState.PARADO;
+modo_combate = LanchaMode.PASSIVO;
+modo_ataque = false;
+
+// Destinos
+destino_x = x;
+destino_y = y;
+target_x = x;
+target_y = y;
+alvo_unidade = noone;
+estado_anterior = LanchaState.PARADO;
+
+// === FUNÇÃO DE MOVIMENTO (DA LANCHA) ===
+ordem_mover = function(dest_x, dest_y) {
+    destino_x = dest_x;
+    destino_y = dest_y;
+    target_x = dest_x;
+    target_y = dest_y;
+    is_moving = true;
+    estado = LanchaState.MOVENDO;
+    distancia_anterior = 0; // Resetar detecção de presa
+    timer_presa = 0;
+    
+    if (variable_global_exists("debug_enabled") && global.debug_enabled) {
+        show_debug_message("🚢 Independence: Movendo para (" + string(dest_x) + ", " + string(dest_y) + ")");
+    }
+}
 
 // === VARIÁVEIS DE FEEDBACK ===
 ultima_acao = "nenhuma";
 cor_feedback = c_white;
 feedback_timer = 0;
-
-// === SISTEMA DE CANHÃO ===
-canhao_instancia = noone; // Instância do canhão
-canhao_offset_x = 0; // Offset X do canhão (centro do navio)
-canhao_offset_y = 0; // Offset Y do canhão (centro do navio)
-
-// === SISTEMA DE METRALHADORA (CANHÃO) ===
-metralhadora_ativa = false;
-metralhadora_timer = 0;
-metralhadora_intervalo = 3; // 3 frames entre tiros = ~20 tiro/segundo
-metralhadora_duracao = 180; // 3 segundos de metralhadora (180 frames)
-metralhadora_tiros = 0;
-metralhadora_max_tiros = 60; // 60 tiros × 3 frames = 180 frames = 3 segundos
-metralhadora_cooldown_timer = 0; // Timer de pausa
-metralhadora_cooldown_duration = 180; // 3 segundos de pausa (180 frames)
-
-// === SISTEMA DE MÍSSEIS ===
-// ✅ CORREÇÃO: Habilitar sistema padrão do obj_navio_base (igual ao Constellation)
-pode_disparar_missil = true; // Independence usa sistema padrão do obj_navio_base (órbita inteligente)
-// Sistema de múltiplos alvos (Step_1.gml) foi desabilitado para usar sistema padrão
-
-// ✅ CORREÇÃO: Usar sistema padrão do obj_navio_base (igual ao Constellation)
-// O sistema de ataque padrão já está implementado no obj_navio_base com órbita inteligente
-// Não precisa sobrescrever func_atacar_alvo - o sistema padrão funciona perfeitamente
-
-// === SISTEMA DE DEBUG ===
-debug_timer = 0;
 
 // =============================================
 // SISTEMA DE FRAME SKIP COM LOD
@@ -125,26 +120,6 @@ force_always_active = false;
 lod_process_index = irandom(99);
 skip_frames_enabled = true;
 
-// === GARANTIR VISIBILIDADE E APARÊNCIA ===
-// ✅ CORREÇÃO: Garantir que o navio seja visível e tenha sprite
-visible = true;
-image_alpha = 1.0;
-if (sprite_index == -1 || !sprite_exists(sprite_index)) {
-    var _spr_independence = asset_get_index("spr_Independence");
-    if (_spr_independence != -1 && sprite_exists(_spr_independence)) {
-        sprite_index = _spr_independence;
-    }
-}
-
-// === GARANTIR NAÇÃO ===
-if (!variable_instance_exists(id, "nacao_proprietaria")) {
-    nacao_proprietaria = 1; // Jogador por padrão
-}
-
-// === GARANTIR TERRAIN ===
-if (!variable_instance_exists(id, "terrenos_permitidos")) {
-    terrenos_permitidos = [TERRAIN.AGUA]; // Só água
-}
-
-// === DEBUG DE CRIAÇÃO ===
-show_debug_message("🚢 Independence criado - HP: " + string(hp_atual) + "/" + string(hp_max) + " | Velocidade: " + string(velocidade_movimento) + " | Posição: (" + string(x) + ", " + string(y) + ")");
+show_debug_message("🚢 Independence criado - Sistema limpo baseado na Lancha");
+show_debug_message("💰 HP: " + string(hp_atual) + " | Velocidade: " + string(velocidade_movimento) + " | Radar: " + string(radar_alcance));
+show_debug_message("🔫 Sistema de Canhão + Mísseis ativo");

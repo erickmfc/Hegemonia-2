@@ -28,13 +28,18 @@ function scr_buscar_inimigo(_x, _y, _raio, _minha_nacao) {
         obj_f15,
         obj_f6,
         obj_c100,
+        obj_caca_f35, // ✅ NOVO: F-35
+        obj_su35,     // ✅ NOVO: SU-35
         obj_lancha_patrulha,
         obj_RonaldReagan,
         obj_Constellation,
         obj_Independence,
         obj_navio_transporte,
         obj_wwhendrick,
-        obj_submarino_base
+        obj_submarino_base,
+        obj_navio_pirata,   // ✅ NOVO: Navios Piratas
+        obj_navio_pirata2,  // ✅ NOVO: Navios Piratas
+        obj_navio_pirata3   // ✅ NOVO: Navios Piratas
     ];
     
     // ✅ NOVO: Verificar se obj_M1A_Abrams existe e adicionar
@@ -64,7 +69,20 @@ function scr_buscar_inimigo(_x, _y, _raio, _minha_nacao) {
     for (var i = 0; i < array_length(_tipos_unidades); i++) {
         with (_tipos_unidades[i]) {
             if (variable_instance_exists(id, "nacao_proprietaria")) {
-                if (nacao_proprietaria != _minha_nacao) {
+                // ✅ CORREÇÃO: Piratas (nação 3) são inimigos de TODAS as outras nações
+                var _eh_inimigo = false;
+                if (nacao_proprietaria == 3) {
+                    // Piratas são inimigos de todos (nação 1, 2, etc)
+                    _eh_inimigo = (_minha_nacao != 3);
+                } else if (_minha_nacao == 3) {
+                    // Se sou pirata, todos os outros são inimigos
+                    _eh_inimigo = (nacao_proprietaria != 3);
+                } else {
+                    // Lógica normal: inimigo se nação diferente
+                    _eh_inimigo = (nacao_proprietaria != _minha_nacao);
+                }
+                
+                if (_eh_inimigo) {
                     var _dist = point_distance(_x, _y, x, y);
                     if (_dist <= _raio && _dist < _menor_distancia) {
                         _menor_distancia = _dist;
@@ -81,7 +99,20 @@ function scr_buscar_inimigo(_x, _y, _raio, _minha_nacao) {
     for (var i = 0; i < array_length(_tipos_estruturas); i++) {
         with (_tipos_estruturas[i]) {
             if (variable_instance_exists(id, "nacao_proprietaria")) {
-                if (nacao_proprietaria != _minha_nacao) {
+                // ✅ CORREÇÃO: Piratas (nação 3) são inimigos de TODAS as outras nações
+                var _eh_inimigo = false;
+                if (nacao_proprietaria == 3) {
+                    // Piratas são inimigos de todos (nação 1, 2, etc)
+                    _eh_inimigo = (_minha_nacao != 3);
+                } else if (_minha_nacao == 3) {
+                    // Se sou pirata, todos os outros são inimigos
+                    _eh_inimigo = (nacao_proprietaria != 3);
+                } else {
+                    // Lógica normal: inimigo se nação diferente
+                    _eh_inimigo = (nacao_proprietaria != _minha_nacao);
+                }
+                
+                if (_eh_inimigo) {
                     var _dist = point_distance(_x, _y, x, y);
                     if (_dist <= _raio && _dist < _menor_distancia) {
                         _menor_distancia = _dist;

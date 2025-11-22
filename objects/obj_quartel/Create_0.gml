@@ -3,16 +3,18 @@
 // Sistema Original com Menu de Recrutamento
 // ===============================================
 
-// Herda todos os eventos e lógicas do pai (obj_estrutura_producao).
-event_inherited();
+// ✅ CORREÇÃO: Verificar se o objeto tem parent antes de chamar event_inherited
+if (object_get_parent(object_index) != -1) {
+    event_inherited();
+}
 
 // === CUSTOS DE CONSTRUÇÃO ===
 custo_dinheiro = 400;
 custo_minerio = 250;
 
 // === SISTEMA DE VIDA ===
-hp_max = 1000; // ✅ AUMENTADO: Mais resistente (era 300)
-hp_atual = 1000; // ✅ AUMENTADO: Mais resistente (era 300)
+hp_max = 120; // ✅ ATUALIZADO: Todos os quarteis têm 120 HP
+hp_atual = 120; // ✅ ATUALIZADO: Todos os quarteis têm 120 HP
 destrutivel = true; // ✅ Quartel pode ser destruído 
 
 // === CONFIGURAÇÕES DE PRODUÇÃO ===
@@ -55,7 +57,7 @@ ds_list_add(unidades_disponiveis, {
     objeto: obj_infantaria,
     custo_dinheiro: 100,
     custo_populacao: 1,
-    tempo_treino: 180, // ✅ MUDADO: 3 segundos (180 frames) - MÁXIMO
+    tempo_treino: 120, // ✅ CORRIGIDO: 2 segundos (120 frames) - mais rápido
     descricao: "Unidade de combate básica com rifle",
     sprite: spr_infantaria
 });
@@ -65,7 +67,7 @@ ds_list_add(unidades_disponiveis, {
     objeto: obj_soldado_antiaereo,
     custo_dinheiro: 200,
     custo_populacao: 1,
-    tempo_treino: 180, // ✅ MUDADO: 3 segundos (180 frames) - MÁXIMO
+    tempo_treino: 120, // ✅ CORRIGIDO: 2 segundos (120 frames) - mais rápido
     descricao: "Especialista com mísseis de longo alcance",
     sprite: spr_soldado_antiaereo,
     categoria: "terrestre"
@@ -76,7 +78,7 @@ ds_list_add(unidades_disponiveis, {
     objeto: obj_tanque,
     custo_dinheiro: 500,
     custo_populacao: 3,
-    tempo_treino: 180, // ✅ MUDADO: 3 segundos (180 frames) - MÁXIMO
+    tempo_treino: 120, // ✅ CORRIGIDO: 2 segundos (120 frames) - mais rápido
     descricao: "Unidade blindada pesada com canhão",
     sprite: spr_tanque
 });
@@ -86,7 +88,7 @@ ds_list_add(unidades_disponiveis, {
     objeto: obj_blindado_antiaereo,
     custo_dinheiro: 800,
     custo_populacao: 4,
-    tempo_treino: 180, // ✅ MUDADO: 3 segundos (180 frames) - MÁXIMO
+    tempo_treino: 120, // ✅ CORRIGIDO: 2 segundos (120 frames) - mais rápido
     descricao: "Veículo especializado em defesa aérea",
     sprite: spr_blindado_antiaereo,
     categoria: "terrestre"
@@ -101,7 +103,7 @@ if (_obj_abrams != -1 && asset_get_type(_obj_abrams) == asset_object) {
         objeto: _obj_abrams,
         custo_dinheiro: 1200, // Mais caro que tanque comum (500) - unidade de elite
         custo_populacao: 5, // Mais população que tanque comum (3)
-        tempo_treino: 180, // ✅ MUDADO: 3 segundos (180 frames) - MÁXIMO
+        tempo_treino: 120, // ✅ CORRIGIDO: 2 segundos (120 frames) - mais rápido
         descricao: "Tanque de elite com torre modular e projétil SABOT",
         sprite: (_spr_abrams != -1 && sprite_exists(_spr_abrams)) ? _spr_abrams : spr_tanque, // Fallback para spr_tanque se não encontrar
         categoria: "terrestre"
@@ -121,7 +123,7 @@ if (_obj_gepard != -1 && asset_get_type(_obj_gepard) == asset_object) {
         objeto: _obj_gepard,
         custo_dinheiro: 1500, // Mais caro que Abrams - unidade especializada anti-aérea
         custo_populacao: 6, // Mais população que Abrams
-        tempo_treino: 180, // ✅ MUDADO: 3 segundos (180 frames) - MÁXIMO
+        tempo_treino: 120, // ✅ CORRIGIDO: 2 segundos (120 frames) - mais rápido
         descricao: "Tanque anti-aéreo com mísseis SAM e projéteis SABOT",
         sprite: (_spr_gepard_casco != -1 && sprite_exists(_spr_gepard_casco)) ? _spr_gepard_casco : spr_tanque, // Fallback para spr_tanque se não encontrar
         categoria: "terrestre"
@@ -129,12 +131,24 @@ if (_obj_gepard != -1 && asset_get_type(_obj_gepard) == asset_object) {
 }
 
 // === FILA DE RECRUTAMENTO SIMPLES ===
+// ✅ CORREÇÃO CRÍTICA: Garantir que cada quartel tenha sua própria fila independente
+// Se a fila já existir (por herança ou outro motivo), destruir e criar uma nova
+if (variable_instance_exists(id, "fila_recrutamento")) {
+    if (ds_exists(fila_recrutamento, ds_type_queue)) {
+        ds_queue_destroy(fila_recrutamento);
+        show_debug_message("⚠️ Quartel ID: " + string(id) + " - Fila antiga destruída, criando nova fila independente");
+    }
+}
+// ✅ SEMPRE criar uma nova fila única para este quartel
 fila_recrutamento = ds_queue_create();
 
 // ✅ GARANTIR QUE FILA ESTÁ VAZIA AO CRIAR
 ds_queue_clear(fila_recrutamento);
 esta_treinando = false; // ✅ GARANTIR QUE NÃO ESTÁ TREINANDO
 tempo_treinamento_restante = 0; // ✅ RESETAR TIMER
+
+// ✅ DEBUG: Confirmar que cada quartel tem sua própria fila
+show_debug_message("✅ Quartel ID: " + string(id) + " - Fila de recrutamento criada (ID da fila: " + string(fila_recrutamento) + ")");
 
 // === VARIÁVEIS PARA COMPATIBILIDADE ===
 ultimo_recrutamento_tanque = false;
@@ -147,6 +161,13 @@ recrutar_tanque = false;
 
 // Contador para debug do Step
 step_counter = 0;
+
+// === SISTEMA DE BARRA DE VIDA ===
+mostrar_barra_vida = false;     // Mostrar quando atingido
+timer_barra_vida = 0;           // Timer para desaparecer
+duracao_barra_vida = 300;       // 5 segundos (300 frames)
+barra_vida_altura = 8;
+barra_vida_largura = 80;
 
 // === PROTEÇÃO CONTRA DESATIVAÇÃO ===
 // ✅ CORREÇÃO: Garantir que quartel sempre esteja visível e ativo

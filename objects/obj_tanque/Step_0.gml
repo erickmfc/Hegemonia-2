@@ -157,7 +157,14 @@ switch (estado) {
             }
         }
         
-        if (point_distance(x, y, destino_x, destino_y) > 6) {
+        // ✅ CORREÇÃO: Se está indo embarcar, não parar mesmo perto do destino
+        var _dist_destino = point_distance(x, y, destino_x, destino_y);
+        var _tolerancia_chegada = 6;
+        if (variable_instance_exists(id, "indo_embarcar") && indo_embarcar) {
+            _tolerancia_chegada = 2; // ✅ Tolerância menor quando indo embarcar (para chegar mais perto)
+        }
+        
+        if (_dist_destino > _tolerancia_chegada) {
             // Calcular direção para o destino
             var dir = point_direction(x, y, destino_x, destino_y);
             
@@ -297,25 +304,7 @@ switch (estado) {
                 estado = "parado";
             }
         } else if (alvo != noone && instance_exists(alvo)) {
-            // ✅ VERIFICAR SE O ALVO É AÉREO - TANQUES NÃO ATACAM AVIÕES
-            var _alvo_aereo = (alvo.object_index == obj_caca_f5 || 
-                              alvo.object_index == obj_f15 || 
-                              alvo.object_index == obj_f6 ||
-                              alvo.object_index == obj_helicoptero_militar ||
-                              alvo.object_index == obj_c100);
-            
-            if (_alvo_aereo) {
-                // É avião - tanques não podem atacar
-                show_debug_message("⚠️ Tanque não pode atacar unidade aérea!");
-                alvo = noone;
-                if (ds_list_size(patrulha) > 0) {
-                    estado = "patrulhando";
-                } else {
-                    estado = "parado";
-                }
-                break;
-            }
-            
+            // ✅ CORREÇÃO: Tanque pode atacar tanto alvos terrestres quanto aéreos
             var dist = point_distance(x, y, alvo.x, alvo.y);
             
             if (dist <= alcance_tiro) {

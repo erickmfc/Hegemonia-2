@@ -6,9 +6,17 @@
 // ✅ BACKUP: Se o Step não executar, este Alarm garante que o código rode
 // Este Alarm processa a fila apenas se o Step não estiver executando
 
+// ✅ CORREÇÃO CRÍTICA: Validar que a fila existe e pertence a este quartel específico
+if (!variable_instance_exists(id, "fila_recrutamento")) {
+    // Se a fila não existe, criar uma nova para este quartel
+    fila_recrutamento = ds_queue_create();
+    show_debug_message("⚠️ Alarm_1 - Quartel ID: " + string(id) + " - Fila recriada (não existia)");
+    exit; // Sair, pois a fila está vazia
+}
+
 // Verificar se há fila para processar
 if (ds_exists(fila_recrutamento, ds_type_queue) && !ds_queue_empty(fila_recrutamento)) {
-    // Se o Step não está executando, forçar processamento aqui
+    // ✅ CORREÇÃO CRÍTICA: Se não está treinando, iniciar imediatamente
     if (!esta_treinando) {
         esta_treinando = true;
         tempo_treinamento_restante = 0;
@@ -18,7 +26,9 @@ if (ds_exists(fila_recrutamento, ds_type_queue) && !ds_queue_empty(fila_recrutam
         
         var _unidade_data = ds_list_find_value(unidades_disponiveis, _indice_unidade);
         if (_unidade_data != undefined) {
-            show_debug_message("🚨 ALARM BACKUP - Quartel ID: " + string(id) + " iniciando treinamento de: " + _unidade_data.nome);
+            show_debug_message("🚨 ALARM - Quartel ID: " + string(id) + " iniciando treinamento de: " + _unidade_data.nome);
+        } else {
+            show_debug_message("⚠️ ALARM - Quartel ID: " + string(id) + " - Unidade com índice " + string(_indice_unidade) + " não encontrada!");
         }
     }
     
@@ -51,7 +61,7 @@ if (ds_exists(fila_recrutamento, ds_type_queue) && !ds_queue_empty(fila_recrutam
             
             // ✅ SISTEMA DE LOTE: Se houver 5+ unidades, criar todas de uma vez
             if (_mesmo_tipo_count >= 5) {
-                var _tempo_lote = 180; // ✅ MUDADO: 3 segundos (180 frames) para lote
+                var _tempo_lote = 120; // ✅ CORRIGIDO: 2 segundos (120 frames) para lote - mais rápido
                 
                 if (tempo_treinamento_restante >= _tempo_lote) {
                     show_debug_message("🚨 ALARM BACKUP - Criando " + string(_mesmo_tipo_count) + "x " + _unidade_data.nome + " em LOTE!");
@@ -180,5 +190,7 @@ if (ds_exists(fila_recrutamento, ds_type_queue) && !ds_queue_empty(fila_recrutam
     }
 }
 
-// Reagendar para próximo frame (executar continuamente)
+// ✅ CRÍTICO: Reagendar para próximo frame (executar continuamente)
+// Isso garante que o Alarm sempre processe a fila, mesmo quando está vazia
+// Quando novas unidades forem adicionadas, o Alarm já estará rodando
 alarm[1] = 1;

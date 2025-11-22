@@ -18,9 +18,9 @@ if (selecionado) {
 
     // --- 2. DEFINE A POSIÇÃO DA CAIXA DE INFORMAÇÕES ACIMA DO AVIÃO ---
     var _info_x = _proj_x;
-    var _info_y = _proj_y - 80; // Posição 80 pixels ACIMA do avião
+    var _info_y = _proj_y - 80 + (display_get_gui_height() * 0.05); // ✅ Movido 5% para baixo
     var _info_w = 150;
-    var _info_h = 90;
+    var _info_h = 60; // ✅ Reduzido para 2 linhas
 
     // --- 3. DESENHA A INTERFACE ---
     // Fundo da caixa de informações
@@ -49,7 +49,7 @@ if (selecionado) {
     draw_text(_text_x, _text_y, "SU-35 Flanker");
     _text_y += 18;
     
-    // HP com cor baseada na porcentagem
+    // ✅ Linha 1: HP com cor baseada na porcentagem
     var _hp_percent = (hp_atual / hp_max) * 100;
     if (_hp_percent < 30) draw_set_color(c_red);
     else if (_hp_percent < 60) draw_set_color(c_yellow);
@@ -58,17 +58,7 @@ if (selecionado) {
     draw_text(_text_x, _text_y, "HP: " + string(round(_hp_percent)) + "%");
     _text_y += 18;
     
-    // Estado de voo atual (simplificado)
-    draw_set_color(make_color_rgb(0, 255, 255)); // Ciano
-    var _estado_texto = "PARADO";
-    if (velocidade_atual > 0) {
-        _estado_texto = "VOANDO";
-    }
-    
-    draw_text(_text_x, _text_y, "Estado: " + _estado_texto);
-    _text_y += 18;
-    
-    // Modo atual (simplificado)
+    // ✅ Linha 2: Modo atual (informação mais útil)
     if (modo_ataque) {
         draw_set_color(c_red);
         draw_text(_text_x, _text_y, "MODO ATAQUE");

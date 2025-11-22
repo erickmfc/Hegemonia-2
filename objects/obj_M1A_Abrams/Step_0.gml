@@ -157,38 +157,70 @@ switch (estado) {
     break;
     
     case "movendo":
-        if (point_distance(x, y, destino_x, destino_y) > 6) {
+        // ✅ NOVO: Verificar destino ANTES de começar a mover
+        if (!scr_unidade_pode_terreno(id, destino_x, destino_y)) {
+            // Destino está em água - encontrar terra próxima
+            var _terra_proxima = scr_encontrar_terra_proxima(id, destino_x, destino_y, 1000);
+            if (_terra_proxima != noone && array_length(_terra_proxima) >= 2) {
+                destino_x = _terra_proxima[0];
+                destino_y = _terra_proxima[1];
+                if (variable_global_exists("debug_enabled") && global.debug_enabled) {
+                    show_debug_message("⚠️ Abrams: Destino em água - redirecionando para terra próxima");
+                }
+            } else {
+                // Sem terra próxima - parar
+                estado = "parado";
+                if (variable_global_exists("debug_enabled") && global.debug_enabled) {
+                    show_debug_message("⚠️ Abrams: Destino em água e sem terra próxima - parando");
+                }
+                break;
+            }
+        }
+        
+        // ✅ CORREÇÃO: Se está indo embarcar, não parar mesmo perto do destino
+        var _dist_destino = point_distance(x, y, destino_x, destino_y);
+        var _tolerancia_chegada = 6;
+        if (variable_instance_exists(id, "indo_embarcar") && indo_embarcar) {
+            _tolerancia_chegada = 2; // ✅ Tolerância menor quando indo embarcar (para chegar mais perto)
+        }
+        
+        if (_dist_destino > _tolerancia_chegada) {
             // Calcular direção para o destino
             var dir = point_direction(x, y, destino_x, destino_y);
+            var _direcao_final = dir;
             
-            // ✅ NOVO: Detectar obstáculos e calcular rota alternativa
-            var _resultado_desvio = scr_detectar_obstaculo(x, y, dir, destino_x, destino_y, 50, id);
-            var _direcao_final = _resultado_desvio[0];
-            var _destino_temp_x = _resultado_desvio[1];
-            var _destino_temp_y = _resultado_desvio[2];
-            
-            // ✅ NOVO: Se encontrou obstáculo, atualizar destino temporário para contornar
-            if (_destino_temp_x != destino_x || _destino_temp_y != destino_y) {
-                // Guardar destino original se ainda não foi guardado
-                if (!variable_instance_exists(id, "destino_original_x")) {
-                    destino_original_x = destino_x;
-                    destino_original_y = destino_y;
-                }
-                // Usar destino temporário para contornar obstáculo
-                destino_x = _destino_temp_x;
-                destino_y = _destino_temp_y;
-                // Recalcular direção para o novo destino
-                _direcao_final = point_direction(x, y, destino_x, destino_y);
-            }
+            // ✅ CORREÇÃO: Desabilitar detecção de obstáculos para evitar desvios desnecessários
+            // O sistema estava fazendo o tanque desviar muito e ir para lugares errados
+            // Apenas usar a direção direta para o destino
             
             // ✅ CORREÇÃO: Normalizar velocidade baseado no zoom
             var _vel_normalizada = scr_normalize_unit_speed(velocidade);
-            // Movimento com desvio se necessário
-            var dx = lengthdir_x(_vel_normalizada, _direcao_final);
-            var dy = lengthdir_y(_vel_normalizada, _direcao_final);
-            x += dx;
-            y += dy;
-            image_angle = _direcao_final; // Casco aponta na direção do movimento
+            // ✅ NOVO: Verificar terreno antes de mover
+            var _proxima_x = x + lengthdir_x(_vel_normalizada, _direcao_final);
+            var _proxima_y = y + lengthdir_y(_vel_normalizada, _direcao_final);
+            
+            // ✅ VERIFICAÇÃO DE TERRENO: Verificar se pode mover para a próxima posição
+            if (scr_unidade_pode_terreno(id, _proxima_x, _proxima_y)) {
+                // Terreno permitido - pode mover
+                x = _proxima_x;
+                y = _proxima_y;
+                image_angle = _direcao_final;
+            } else {
+                // Terreno proibido - parar e tentar encontrar terra próxima
+                var _terra_proxima = scr_encontrar_terra_proxima(id, x, y, 500);
+                if (_terra_proxima != noone && array_length(_terra_proxima) >= 2) {
+                    destino_x = _terra_proxima[0];
+                    destino_y = _terra_proxima[1];
+                    estado = "movendo";
+                    image_angle = point_direction(x, y, destino_x, destino_y);
+                } else {
+                    // Sem terra próxima - parar
+                    estado = "parado";
+                    if (variable_global_exists("debug_enabled") && global.debug_enabled) {
+                        show_debug_message("⚠️ Abrams parou: terreno proibido em (" + string(floor(_proxima_x)) + ", " + string(floor(_proxima_y)) + ")");
+                    }
+                }
+            }
             
             // ✅ NOVO: Atualizar mira mesmo enquanto move (se tiver alvo)
             if (alvo != noone && instance_exists(alvo)) {
@@ -247,7 +279,14 @@ switch (estado) {
             }
             
             // Movimento para o ponto atual
-            if (point_distance(x, y, destino_x, destino_y) > 6) {
+            // ✅ CORREÇÃO: Se está indo embarcar, não parar mesmo perto do destino
+            var _dist_destino_patrulha = point_distance(x, y, destino_x, destino_y);
+            var _tolerancia_chegada_patrulha = 6;
+            if (variable_instance_exists(id, "indo_embarcar") && indo_embarcar) {
+                _tolerancia_chegada_patrulha = 2; // ✅ Tolerância menor quando indo embarcar (para chegar mais perto)
+            }
+            
+            if (_dist_destino_patrulha > _tolerancia_chegada_patrulha) {
                 // ✅ CORREÇÃO: Normalizar velocidade baseado no zoom
                 var _vel_normalizada = scr_normalize_unit_speed(velocidade);
                 var dir = point_direction(x, y, destino_x, destino_y);
@@ -292,25 +331,7 @@ switch (estado) {
                 estado = "parado";
             }
         } else if (alvo != noone && instance_exists(alvo)) {
-            // ✅ VERIFICAR SE O ALVO É AÉREO - TANQUES NÃO ATACAM AVIÕES
-            var _alvo_aereo = (alvo.object_index == obj_caca_f5 || 
-                              alvo.object_index == obj_f15 || 
-                              alvo.object_index == obj_f6 ||
-                              alvo.object_index == obj_helicoptero_militar ||
-                              alvo.object_index == obj_c100);
-            
-            if (_alvo_aereo) {
-                // É avião - tanques não podem atacar
-                show_debug_message("⚠️ M1A Abrams não pode atacar unidade aérea!");
-                alvo = noone;
-                if (ds_list_size(patrulha) > 0) {
-                    estado = "patrulhando";
-                } else {
-                    estado = "parado";
-                }
-                break;
-            }
-            
+            // ✅ CORREÇÃO: M1A Abrams pode atacar tanto alvos terrestres quanto aéreos
             var dist = point_distance(x, y, alvo.x, alvo.y);
             
             // ✅ NOVO: Atualizar mira da torre (lógica inline)

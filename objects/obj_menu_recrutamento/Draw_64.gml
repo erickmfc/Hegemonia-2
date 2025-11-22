@@ -257,6 +257,9 @@ for (var i = 0; i < min(_total_unidades, 6); i++) {
         // ✅ NOVO: Gepard Anti-Aéreo - Desenhar casco + torre/lançador + Type_39_4 (míssil) em cima (igual no jogo)
         // ✅ AJUSTE: Diminuir em 10% (2.025 * 0.9 = 1.8225)
         var _escala_tanque = 1.8225;
+        // ✅ AJUSTE: Subir imagem em 5% (reduzir offset de 10% para 5%)
+        var _offset_descida = _icon_y * 0.05;
+        var _icon_y_gepard = _icon_y + _offset_descida;
         
         var _spr_casco = asset_get_index("TYPE_39_SAM_HULL");
         var _spr_torre = asset_get_index("Type_39_SAM");
@@ -264,47 +267,37 @@ for (var i = 0; i < min(_total_unidades, 6); i++) {
         
         // Desenhar casco (camada 1)
         if (_spr_casco != -1 && sprite_exists(_spr_casco)) {
-            draw_sprite_ext(_spr_casco, 0, _icon_x, _icon_y, _escala_tanque, _escala_tanque, 0, c_white, _anim.alpha);
+            draw_sprite_ext(_spr_casco, 0, _icon_x, _icon_y_gepard, _escala_tanque, _escala_tanque, 0, c_white, _anim.alpha);
             _sprite_desenhado = true;
         }
         
         // Desenhar torre/lançador (camada 2) - mesma posição, sem rotação no menu
         if (_spr_torre != -1 && sprite_exists(_spr_torre)) {
-            draw_sprite_ext(_spr_torre, 0, _icon_x, _icon_y, _escala_tanque, _escala_tanque, 0, c_white, _anim.alpha);
+            draw_sprite_ext(_spr_torre, 0, _icon_x, _icon_y_gepard, _escala_tanque, _escala_tanque, 0, c_white, _anim.alpha);
         }
         
         // ✅ NOVO: Desenhar Type_39_4 (míssil) em cima (camada 3) - posicionado ligeiramente acima
         if (_spr_type39_4 != -1 && sprite_exists(_spr_type39_4)) {
             // Offset para posicionar o míssil em cima do tanque (ajustado para o menu)
             var _offset_y = -8; // Posição vertical do míssil (acima do centro)
-            draw_sprite_ext(_spr_type39_4, 0, _icon_x, _icon_y + _offset_y, _escala_tanque, _escala_tanque, 0, c_white, _anim.alpha);
+            draw_sprite_ext(_spr_type39_4, 0, _icon_x, _icon_y_gepard + _offset_y, _escala_tanque, _escala_tanque, 0, c_white, _anim.alpha);
         }
         
         // Fallback: se não encontrar os sprites modulares, usar sprite da unidade
         if (!_sprite_desenhado && variable_instance_exists(_unidade, "sprite") && sprite_exists(_unidade.sprite)) {
-            draw_sprite_ext(_unidade.sprite, 0, _icon_x, _icon_y, _escala_tanque, _escala_tanque, 0, c_white, _anim.alpha);
+            draw_sprite_ext(_unidade.sprite, 0, _icon_x, _icon_y_gepard, _escala_tanque, _escala_tanque, 0, c_white, _anim.alpha);
             _sprite_desenhado = true;
         }
     }
     
     // Descrição
     // ✅ CORREÇÃO: Reduzido 15% (0.7 → 0.595)
+    // ✅ AJUSTE: Aumentar espaçamento entre linhas (de 18 para 24 para dar mais distância)
     var _desc_y = _icon_y + 60; // Posição abaixo do sprite
     draw_set_color(_can_produce ? make_color_rgb(180, 230, 200) : make_color_rgb(120, 120, 120));
-    draw_text_ext_transformed(_content_x, _desc_y, _unidade.descricao, 18, _card_w - 30, 0.595, 0.595, 0);
+    draw_text_ext_transformed(_content_x, _desc_y, _unidade.descricao, 24, _card_w - 30, 0.595, 0.595, 0);
     
-    // Informações - POSIÇÃO AJUSTADA (sincronizada com Step)
-    // ✅ AJUSTE: Subir informações em 10% (diminuir offset de 120 para 108)
-    var _info_y = _card_y + _card_h - 108; // Posição acima dos botões (subiu 10%)
-    
-    // Custo (Valor)
-    // ✅ AJUSTE: Subir valor em 10% (diminuir Y em 10% do offset atual)
-    // ✅ AJUSTE: Diminuir fonte em 10% adicional (0.68 * 0.9 = 0.612)
-    draw_set_color(_can_produce ? make_color_rgb(255, 215, 0) : make_color_rgb(150, 150, 100));
-    var _valor_y = _info_y - 2; // Subir 10% (diminuir Y em ~2 pixels)
-    draw_text_transformed(_content_x, _valor_y, "$ " + string(_unidade.custo_dinheiro), 0.612, 0.612, 0);
-    
-    // ✅ REMOVIDO: População e Tempo (solicitado pelo usuário)
+    // ✅ REMOVIDO: Informações de custo, população e tempo dos cards (solicitado pelo usuário)
     
     // === BOTÕES DE QUANTIDADE (1, 5, 10) - MELHORADOS ===
     var _btn_quant_y = _card_y + _card_h - 85; // Sincronizado com Step

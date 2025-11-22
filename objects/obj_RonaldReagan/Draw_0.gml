@@ -16,6 +16,16 @@ if (!scr_should_draw(id)) {
     exit;
 }
 
+// Desenhar sombra (simples deslocamento preto com transparência)
+draw_set_color(c_black);
+draw_set_alpha(0.4);
+draw_sprite_ext(sprite_index, image_index, x + 4, y + 4, image_xscale, image_yscale, image_angle, c_black, 0.4);
+
+// Desenhar sprite do navio
+draw_set_color(c_white);
+draw_set_alpha(1.0);
+draw_self();
+
 // Chamar Draw do pai
 // GM2040: Verificar se há parent antes de chamar event_inherited
 if (object_get_parent(object_index) != -1) {

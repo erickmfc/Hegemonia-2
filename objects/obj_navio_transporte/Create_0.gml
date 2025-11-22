@@ -9,8 +9,32 @@ event_inherited();
 // Atributos básicos
 hp_atual = 150;
 hp_max = 150;
-velocidade_movimento = 1.4;
+velocidade_movimento = 1.2; // ✅ Navio Transporte (leve - HP 150)
+velocidade = 1.2; // Velocidade para sistema direto
 nacao_proprietaria = 1; // 1 = jogador
+
+// === FÍSICA DE MOVIMENTO (NOVO SISTEMA) ===
+// ✅ Navio Transporte: 1.2 (leve)
+moveSpeed = 2.4;             // Velocidade máxima (1.2x base)
+acceleration = 0.12;         // Aceleração
+friction_water = 0.08;       // Resistência da água
+turnSpeed = 2.0;             // Velocidade de rotação
+usar_novo_sistema = true;    // ✅ SEMPRE usar novo sistema
+target_x = x;
+target_y = y;
+click_x = x;
+click_y = y;
+
+// === SISTEMA DE NAVEGAÇÃO DIRETO (IGUAL LANCHA) ===
+velocidade_rotacao = 1.0;      // Velocidade de rotação (graus por frame)
+tolerancia_chegada = 40;       // Distância mínima para considerar chegada
+// Sistema de detecção de "presa" (evita travamentos)
+distancia_anterior = 0;
+timer_presa = 0;
+max_timer_presa = 120; // Se não se aproximar por 120 frames, considerar presa
+// Destinos
+destino_x = x;
+destino_y = y;
 
 // Estado e modo
 estado = LanchaState.PARADO;
@@ -30,6 +54,9 @@ alvo_y = y;
 pontos_patrulha = ds_list_create();
 indice_patrulha_atual = 0;
 direcao_patrulha = 1; // 1 = horário (avançar), -1 = anti-horário (retroceder)
+
+// ✅ CORREÇÃO: Inicializar is_moving
+is_moving = false;
 
 // === TERRENOS PERMITIDOS ===
 terrenos_permitidos = [TERRAIN.AGUA]; // Só água
@@ -82,9 +109,15 @@ unidades_embarcadas = ds_list_create();
 soldados_embarcados = ds_list_create();
 
 raio_embarque = 80; // Raio de detecção para embarque (será usado como metade da largura/altura do retângulo)
-largura_embarque = 136; // ✅ REDUZIDO 20%: era 170, agora 136 (170 * 0.8 = 136)
-altura_embarque = 163; // ✅ REDUZIDO 20%: era 204, agora 163 (204 * 0.8 = 163)
+largura_embarque = 293.76; // ✅ AUMENTADO 50%: era 195.84, agora 293.76 (195.84 * 1.5 = 293.76)
+altura_embarque = 352.08; // ✅ AUMENTADO 50%: era 234.72, agora 352.08 (234.72 * 1.5 = 352.08)
 desembarque_offset_angulo = 0; // Ângulo para desembarque radial
+
+// === SISTEMA DE SELEÇÃO DE UNIDADES PARA DESEMBARQUE ===
+unidade_selecionada_desembarque = -1; // ID da unidade selecionada para desembarcar
+tipo_unidade_selecionada = ""; // "soldado", "veiculo", "aeronave"
+desembarcando_todas = false; // Flag para desembarcar todas as unidades
+pausar_desembarque = false; // Flag para pausar o desembarque
 
 // === VARIÁVEIS DE COMANDOS ===
 ultimo_comando = "nenhum";
@@ -97,6 +130,7 @@ ordem_mover = function(dest_x, dest_y) {
     destino_x = _dx;
     destino_y = _dy;
     estado = LanchaState.MOVENDO;
+    is_moving = true; // ✅ CORREÇÃO: Definir is_moving para mostrar linha de movimento
     alvo_unidade = noone;
     show_debug_message("🚢 " + nome_unidade + " recebeu ordem de movimento para (" + string(destino_x) + ", " + string(destino_y) + "). Estado: MOVENDO");
 }
@@ -165,7 +199,9 @@ tipo_unidade = function(unidade) {
         _nome == "obj_f15" ||
         _nome == "obj_f6" ||
         _nome == "obj_helicoptero_militar" ||
-        _nome == "obj_c100") {
+        _nome == "obj_c100" ||
+        _nome == "obj_caca_f35" ||
+        _nome == "obj_su35") {
         return "aereo";
     }
     
@@ -303,7 +339,7 @@ funcao_desembarcar_soldado = function() {
     soldados_count--;
     
     if (instance_exists(unidade_id)) {
-        // ✅ CORREÇÃO: Desembarcar na PROA (frente) do navio
+        // ✅ LANÇAR PARA FRENTE: Desembarcar na PROA (frente) do navio com velocidade
         var _distancia_proa = 120; // Distância da proa
         var _angulo_proa = image_angle; // Direção da proa (frente do navio)
         
@@ -311,16 +347,19 @@ funcao_desembarcar_soldado = function() {
         unidade_id.y = y + lengthdir_y(_distancia_proa, _angulo_proa);
         unidade_id.visible = true;
         
-        // Parar a unidade ao desembarcar
+        // ✅ LANÇAR PARA FRENTE: Dar velocidade na direção da proa
         if (variable_instance_exists(unidade_id, "velocidade_atual")) {
-            unidade_id.velocidade_atual = 0;
+            unidade_id.velocidade_atual = 2; // Velocidade inicial
+        }
+        if (variable_instance_exists(unidade_id, "direcao")) {
+            unidade_id.direcao = _angulo_proa;
         }
         if (variable_instance_exists(unidade_id, "estado")) {
             unidade_id.estado = "parado";
         }
     }
     
-    show_debug_message("✅ Soldado desembarcou na proa!");
+    show_debug_message("✅ Soldado desembarcou e foi lançado para frente!");
 }
 
 // Função para desembarcar aeronave
@@ -331,25 +370,28 @@ funcao_desembarcar_aeronave = function() {
     ds_list_delete(avioes_embarcados, 0);
     avioes_count--;
     
-    var offset_x = lengthdir_x(40, desembarque_offset_angulo);
-    var offset_y = lengthdir_y(40, desembarque_offset_angulo);
-    desembarque_offset_angulo += 45;
-    
     if (instance_exists(aeronave_id)) {
-        var _offset_x_final = x + offset_x;
-        var _offset_y_final = y + offset_y;
+        // ✅ LANÇAR PARA FRENTE: Desembarcar na PROA (frente) do navio
+        var _distancia_proa = 150; // Distância da proa para aeronaves
+        var _angulo_proa = image_angle; // Direção da proa (frente do navio)
         
-        aeronave_id.x = _offset_x_final;
-        aeronave_id.y = _offset_y_final;
-        aeronave_id.visible = true;  // Mostrar visualmente ANTES de dar velocidade
+        aeronave_id.x = x + lengthdir_x(_distancia_proa, _angulo_proa);
+        aeronave_id.y = y + lengthdir_y(_distancia_proa, _angulo_proa);
+        aeronave_id.visible = true;
         
-        // Dar velocidade ao avião ao desembarcar
+        // ✅ LANÇAR PARA FRENTE: Dar velocidade na direção da proa
         if (variable_instance_exists(aeronave_id, "velocidade_atual")) {
             aeronave_id.velocidade_atual = 5;
         }
+        if (variable_instance_exists(aeronave_id, "direcao")) {
+            aeronave_id.direcao = _angulo_proa;
+        }
+        if (variable_instance_exists(aeronave_id, "image_angle")) {
+            aeronave_id.image_angle = _angulo_proa;
+        }
     }
     
-    show_debug_message("✅ Aeronave desembarcou! Restantes: " + string(avioes_count));
+    show_debug_message("✅ Aeronave desembarcou e foi lançada para frente! Restantes: " + string(avioes_count));
 }
 
 // Função para desembarcar veículo
@@ -361,7 +403,7 @@ funcao_desembarcar_veiculo = function() {
     unidades_count--;
     
     if (instance_exists(veiculo_id)) {
-        // ✅ CORREÇÃO: Desembarcar na PROA (frente) do navio
+        // ✅ LANÇAR PARA FRENTE: Desembarcar na PROA (frente) do navio com velocidade
         var _distancia_proa = 150; // Distância maior para veículos
         var _angulo_proa = image_angle; // Direção da proa (frente do navio)
         
@@ -369,16 +411,102 @@ funcao_desembarcar_veiculo = function() {
         veiculo_id.y = y + lengthdir_y(_distancia_proa, _angulo_proa);
         veiculo_id.visible = true;
         
-        // Parar o veículo ao desembarcar
+        // ✅ LANÇAR PARA FRENTE: Dar velocidade na direção da proa
         if (variable_instance_exists(veiculo_id, "velocidade_atual")) {
-            veiculo_id.velocidade_atual = 0;
+            veiculo_id.velocidade_atual = 2.5; // Velocidade inicial
+        }
+        if (variable_instance_exists(veiculo_id, "direcao")) {
+            veiculo_id.direcao = _angulo_proa;
         }
         if (variable_instance_exists(veiculo_id, "estado")) {
             veiculo_id.estado = "parado";
         }
     }
     
-    show_debug_message("✅ Veículo desembarcou na proa!");
+    show_debug_message("✅ Veículo desembarcou e foi lançado para frente!");
+}
+
+// ✅ NOVA FUNÇÃO: Desembarcar unidade selecionada
+funcao_desembarcar_unidade_selecionada = function() {
+    if (unidade_selecionada_desembarque == -1 || tipo_unidade_selecionada == "") return;
+    
+    var _unidade_id = unidade_selecionada_desembarque;
+    var _encontrado = false;
+    var _indice = -1;
+    
+    // Procurar e remover da lista apropriada
+    if (tipo_unidade_selecionada == "aeronave") {
+        for (var i = 0; i < ds_list_size(avioes_embarcados); i++) {
+            if (avioes_embarcados[| i] == _unidade_id) {
+                _indice = i;
+                _encontrado = true;
+                break;
+            }
+        }
+        if (_encontrado) {
+            ds_list_delete(avioes_embarcados, _indice);
+            avioes_count--;
+        }
+    } else if (tipo_unidade_selecionada == "veiculo") {
+        for (var i = 0; i < ds_list_size(unidades_embarcadas); i++) {
+            if (unidades_embarcadas[| i] == _unidade_id) {
+                _indice = i;
+                _encontrado = true;
+                break;
+            }
+        }
+        if (_encontrado) {
+            ds_list_delete(unidades_embarcadas, _indice);
+            unidades_count--;
+        }
+    } else if (tipo_unidade_selecionada == "soldado") {
+        for (var i = 0; i < ds_list_size(soldados_embarcados); i++) {
+            if (soldados_embarcados[| i] == _unidade_id) {
+                _indice = i;
+                _encontrado = true;
+                break;
+            }
+        }
+        if (_encontrado) {
+            ds_list_delete(soldados_embarcados, _indice);
+            soldados_count--;
+        }
+    }
+    
+    // Desembarcar a unidade
+    if (_encontrado && instance_exists(_unidade_id)) {
+        // ✅ LANÇAR PARA FRENTE: Desembarcar na PROA (frente) do navio
+        var _distancia_proa = 120;
+        if (tipo_unidade_selecionada == "aeronave") _distancia_proa = 150;
+        else if (tipo_unidade_selecionada == "veiculo") _distancia_proa = 150;
+        
+        var _angulo_proa = image_angle; // Direção da proa (frente do navio)
+        
+        _unidade_id.x = x + lengthdir_x(_distancia_proa, _angulo_proa);
+        _unidade_id.y = y + lengthdir_y(_distancia_proa, _angulo_proa);
+        _unidade_id.visible = true;
+        
+        // ✅ LANÇAR PARA FRENTE: Dar velocidade na direção da proa
+        var _velocidade = 2;
+        if (tipo_unidade_selecionada == "aeronave") _velocidade = 5;
+        else if (tipo_unidade_selecionada == "veiculo") _velocidade = 2.5;
+        
+        if (variable_instance_exists(_unidade_id, "velocidade_atual")) {
+            _unidade_id.velocidade_atual = _velocidade;
+        }
+        if (variable_instance_exists(_unidade_id, "direcao")) {
+            _unidade_id.direcao = _angulo_proa;
+        }
+        if (variable_instance_exists(_unidade_id, "image_angle") && tipo_unidade_selecionada == "aeronave") {
+            _unidade_id.image_angle = _angulo_proa;
+        }
+        
+        show_debug_message("✅ " + tipo_unidade_selecionada + " selecionada desembarcou e foi lançada para frente!");
+    }
+    
+    // Resetar seleção
+    unidade_selecionada_desembarque = -1;
+    tipo_unidade_selecionada = "";
 }
 
 // Callbacks

@@ -18,11 +18,26 @@ if (!produzindo && !ds_queue_empty(fila_producao)) {
     produzindo = true;
     timer_producao = 0;
     
-    var _unidade_data = ds_queue_head(fila_producao);
-    if (_unidade_data != undefined) {
-        show_debug_message("🚀 Aeroporto iniciando produção de: " + _unidade_data.nome);
-        show_debug_message("📊 Unidades na fila: " + string(ds_queue_size(fila_producao)));
+    // ✅ CORREÇÃO: Obter dados corretamente (pode ser índice ou estrutura)
+    var _item_fila = ds_queue_head(fila_producao);
+    var _unidade_data_init = undefined;
+    
+    if (is_real(_item_fila) || is_int32(_item_fila)) {
+        // É um índice - obter dados de unidades_disponiveis
+        if (ds_exists(unidades_disponiveis, ds_type_list) && _item_fila >= 0 && _item_fila < ds_list_size(unidades_disponiveis)) {
+            _unidade_data_init = ds_list_find_value(unidades_disponiveis, _item_fila);
+        }
+    } else if (is_struct(_item_fila)) {
+        // Já é uma estrutura
+        _unidade_data_init = _item_fila;
     }
+    
+    if (_unidade_data_init != undefined && is_struct(_unidade_data_init) && variable_struct_exists(_unidade_data_init, "nome")) {
+        show_debug_message("🚀 Aeroporto iniciando produção de: " + _unidade_data_init.nome);
+    } else {
+        show_debug_message("🚀 Aeroporto iniciando produção (índice: " + string(_item_fila) + ")");
+    }
+    show_debug_message("📊 Unidades na fila: " + string(ds_queue_size(fila_producao)));
 }
 
 if (produzindo && !ds_queue_empty(fila_producao)) {
@@ -30,12 +45,26 @@ if (produzindo && !ds_queue_empty(fila_producao)) {
     // Incrementar timer
     timer_producao++;
     
-    // Obter dados da unidade atual
-    var _unidade_data = ds_queue_head(fila_producao);
+    // ✅ CORREÇÃO: Obter item da fila e converter para estrutura (igual ao quartel naval)
+    var _item_fila = ds_queue_head(fila_producao);
+    var _unidade_data = undefined;
+    var _idx_valido = -1;
+    
+    // Verificar se é um índice (número) ou estrutura
+    if (is_real(_item_fila) || is_int32(_item_fila)) {
+        // É um índice - obter dados de unidades_disponiveis
+        if (ds_exists(unidades_disponiveis, ds_type_list) && _item_fila >= 0 && _item_fila < ds_list_size(unidades_disponiveis)) {
+            _idx_valido = _item_fila;
+            _unidade_data = ds_list_find_value(unidades_disponiveis, _item_fila);
+        }
+    } else if (is_struct(_item_fila)) {
+        // Já é uma estrutura
+        _unidade_data = _item_fila;
+    }
     
     // ✅ CORREÇÃO: Verificar se dados da unidade são válidos
     if (_unidade_data == undefined || !is_struct(_unidade_data)) {
-        show_debug_message("❌ ERRO: Dados da unidade inválidos na fila!");
+        show_debug_message("❌ ERRO: Dados da unidade inválidos na fila! Item: " + string(_item_fila) + " | Índice: " + string(_idx_valido));
         // Remover item inválido e continuar
         ds_queue_dequeue(fila_producao);
         if (!ds_queue_empty(fila_producao)) {
@@ -67,50 +96,28 @@ if (produzindo && !ds_queue_empty(fila_producao)) {
         
         // Posição de spawn (mais à direita do aeroporto - área de estacionamento)
         // ✅ MELHORADO: Variação aleatória maior para distribuição
+        // ✅ AJUSTE: Aumentar posição em 10% na direção que já criam
         var _variacao_x = random_range(-40, 40);  // Variação horizontal maior
         var _variacao_y = random_range(-30, 30);  // Variação vertical maior
         
-        var _spawn_x = x + 220 + _variacao_x; // Mais à direita com maior espaçamento
+        var _offset_base = 220 * 1.1; // ✅ AUMENTADO 10% na direção X (220 * 1.1 = 242)
+        var _spawn_x = x + _offset_base + _variacao_x; // Mais à direita com maior espaçamento
         var _spawn_y = y + _variacao_y;       // Mesma altura do aeroporto (não abaixo)
         
-        // Remover unidade da fila
-        var _unidade_data_final = ds_queue_dequeue(fila_producao);
+        // Remover unidade da fila (já temos _unidade_data válida do início)
+        ds_queue_dequeue(fila_producao);
         
-        // ✅ CORREÇÃO: Verificar se dados são válidos antes de criar
-        if (_unidade_data_final == undefined || !is_struct(_unidade_data_final)) {
-            show_debug_message("❌ ERRO: Dados da unidade inválidos ao remover da fila!");
-            // Continuar para próxima unidade ou parar
-            if (!ds_queue_empty(fila_producao)) {
-                timer_producao = 0;
-            } else {
-                produzindo = false;
-                timer_producao = 0;
-            }
-            exit;
-        }
+        // ✅ CORREÇÃO: Usar _unidade_data que já foi validada no início
+        // (não precisamos verificar novamente, já está correto)
         
-        // ✅ CORREÇÃO: Verificar se tem nome e objeto definidos
-        if (!variable_struct_exists(_unidade_data_final, "nome") || !variable_struct_exists(_unidade_data_final, "objeto")) {
-            show_debug_message("❌ ERRO: Unidade na fila não tem nome ou objeto definido!");
-            show_debug_message("   Dados: " + string(_unidade_data_final));
-            // Continuar para próxima unidade ou parar
-            if (!ds_queue_empty(fila_producao)) {
-                timer_producao = 0;
-            } else {
-                produzindo = false;
-                timer_producao = 0;
-            }
-            exit;
-        }
-        
-        show_debug_message("✈️ Criando: " + _unidade_data_final.nome);
+        show_debug_message("✈️ Criando: " + _unidade_data.nome);
         show_debug_message("📍 Posição de spawn: (" + string(_spawn_x) + ", " + string(_spawn_y) + ")");
         show_debug_message("📍 Posição do aeroporto: (" + string(x) + ", " + string(y) + ")");
         show_debug_message("🛫 Decolando da área de estacionamento!");
         
         // Criar unidade aérea
         var _unidade_criada = noone;
-        var _objeto_unidade = _unidade_data_final.objeto;
+        var _objeto_unidade = _unidade_data.objeto;
         
         // ✅ CORREÇÃO: Verificar se objeto existe antes de criar
         if (!object_exists(_objeto_unidade)) {
@@ -131,7 +138,7 @@ if (produzindo && !ds_queue_empty(fila_producao)) {
         if (instance_exists(_unidade_criada)) {
             unidades_produzidas++;
             _unidade_criada.nacao_proprietaria = nacao_proprietaria;
-            show_debug_message("✅ " + _unidade_data_final.nome + " criado! ID: " + string(_unidade_criada));
+            show_debug_message("✅ " + _unidade_data.nome + " criado! ID: " + string(_unidade_criada));
             
             // ✅ NOVO - FASE 4: Comandar unidade criada se for da IA
             if (nacao_proprietaria == 2) {

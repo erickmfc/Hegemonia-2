@@ -7,7 +7,7 @@ if (!selecionado) exit;
 // ✅ CORREÇÃO: Usar coordenadas de mundo para que o status fique sempre perto do C-100, independente do zoom
 // Posição acima da unidade (em coordenadas de mundo)
 var _world_x = x;
-var _world_y = y - 40;
+var _world_y = y - 40 + (display_get_gui_height() * 0.05); // ✅ Movido 5% para baixo
 
 draw_set_font(-1);
 draw_set_halign(fa_center);

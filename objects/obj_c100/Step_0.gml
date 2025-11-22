@@ -205,11 +205,18 @@ y = _proxima_y;
 
 // --- 4. SISTEMA DE EMBARQUE SIMPLIFICADO (10 UNIDADES MÁXIMO) ---
 if (modo_receber_carga && altura_voo == 0 && estado == "pousado") {
-    // ✅ CORREÇÃO: Verificar unidades terrestres específicas em vez de "all" (incluindo Abrams)
+    // ✅ CORREÇÃO: Verificar unidades terrestres específicas em vez de "all" (incluindo Abrams e Gepard)
     var _obj_abrams = asset_get_index("obj_M1A_Abrams");
+    var _obj_gepard = asset_get_index("obj_Gepard_Anti_Aereo");
+    if (_obj_gepard == -1) {
+        _obj_gepard = asset_get_index("obj_gepard"); // Fallback para nome alternativo
+    }
     var _tipos_embarcaveis = [obj_infantaria, obj_tanque, obj_soldado_antiaereo, obj_blindado_antiaereo];
     if (_obj_abrams != -1 && asset_get_type(_obj_abrams) == asset_object) {
         array_push(_tipos_embarcaveis, _obj_abrams); // ✅ NOVO: Adicionar Abrams
+    }
+    if (_obj_gepard != -1 && asset_get_type(_obj_gepard) == asset_object) {
+        array_push(_tipos_embarcaveis, _obj_gepard); // ✅ NOVO: Adicionar Gepard
     }
     var _unidade_proxima = noone;
     

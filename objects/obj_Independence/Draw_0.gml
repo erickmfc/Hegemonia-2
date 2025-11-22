@@ -16,8 +16,24 @@ if (!scr_should_draw(id)) {
     exit;
 }
 
+// Desenhar sombra (simples deslocamento preto com transparência)
+draw_set_color(c_black);
+draw_set_alpha(0.4);
+if (sprite_index != -1 && sprite_exists(sprite_index)) {
+    draw_sprite_ext(sprite_index, image_index, x + 4, y + 4, image_xscale, image_yscale, image_angle, c_black, 0.4);
+} else {
+    // Fallback: tentar carregar sprite
+    var _spr_independence = asset_get_index("spr_Independence");
+    if (_spr_independence != -1 && sprite_exists(_spr_independence)) {
+        sprite_index = _spr_independence;
+        draw_sprite_ext(sprite_index, image_index, x + 4, y + 4, image_xscale, image_yscale, image_angle, c_black, 0.4);
+    }
+}
+
 // ✅ CORREÇÃO: Desenhar sprite do navio PRIMEIRO
 // Garantir que o sprite seja desenhado mesmo se o pai não desenhar
+draw_set_color(c_white);
+draw_set_alpha(1.0);
 if (sprite_index != -1 && sprite_exists(sprite_index)) {
     draw_self();
 } else {
@@ -87,8 +103,57 @@ if (selecionado) {
         draw_circle(x, y, radar_alcance, true);
     }
     
-    // ✅ CORREÇÃO: Removida linha amarela direta - usa apenas caminho A* do objeto pai
-    // A linha do caminho A* já é desenhada pelo obj_navio_base (objeto pai)
+    // ✅ LINHA VISUAL: Do navio até o destino (quando movendo)
+    // ✅ CORREÇÃO: Verificar estado diretamente (mais confiável que is_moving)
+    var _esta_movendo = false;
+    if (variable_instance_exists(id, "estado")) {
+        // Verificar estado diretamente (mais confiável)
+        _esta_movendo = (estado == LanchaState.MOVENDO);
+        // Também verificar is_moving se existir (para compatibilidade)
+        if (variable_instance_exists(id, "is_moving")) {
+            _esta_movendo = _esta_movendo || is_moving;
+        }
+    } else if (variable_instance_exists(id, "is_moving")) {
+        // Fallback: usar is_moving se estado não existir
+        _esta_movendo = is_moving;
+    }
+    
+    if (_esta_movendo) {
+        var _target_x = variable_instance_exists(id, "target_x") ? target_x : destino_x;
+        var _target_y = variable_instance_exists(id, "target_y") ? target_y : destino_y;
+        
+        // ✅ PRIORIDADE: Desenhar caminho A* se existir (mais preciso)
+        if (variable_instance_exists(id, "meu_caminho") && meu_caminho != noone) {
+            draw_set_color(c_aqua);
+            draw_set_alpha(0.6);
+            var _num_segments = 30; // Número de segmentos para desenhar o caminho
+            var _prev_x = x;
+            var _prev_y = y;
+            
+            // ✅ CORREÇÃO: path_get_x/y usa posição (0.0 a 1.0), não pixels
+            for (var i = 1; i <= _num_segments; i++) {
+                var _pos = i / _num_segments; // Posição de 0.0 a 1.0
+                var _seg_x = path_get_x(meu_caminho, _pos);
+                var _seg_y = path_get_y(meu_caminho, _pos);
+                if (!is_undefined(_seg_x) && !is_undefined(_seg_y)) {
+                    draw_line(_prev_x, _prev_y, _seg_x, _seg_y);
+                    _prev_x = _seg_x;
+                    _prev_y = _seg_y;
+                }
+            }
+        } else {
+            // ✅ FALLBACK: Desenhar linha direta se não houver caminho A*
+            draw_set_color(c_aqua);
+            draw_set_alpha(0.6);
+            draw_line(x, y, _target_x, _target_y);
+            
+            // Círculo no destino (marcador visual)
+            draw_circle(_target_x, _target_y, 8, false);
+            draw_circle(_target_x, _target_y, 4, true);
+        }
+        
+        draw_set_alpha(1);
+    }
     
     // Desenhar linha quando atacando (apenas para alvo)
     if (variable_instance_exists(id, "estado") && estado == LanchaState.ATACANDO) {

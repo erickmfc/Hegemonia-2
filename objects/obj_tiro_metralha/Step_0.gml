@@ -101,6 +101,11 @@ if (alvo != noone && instance_exists(alvo)) {
                 }
                 
                 if (vida_atual <= 0) {
+                    // ✅ CORREÇÃO: Verificar se função existe antes de chamar
+                    var _script_restos = asset_get_index("scr_criar_restos_unidade");
+                    if (_script_restos != -1) {
+                        scr_criar_restos_unidade(alvo);
+                    }
                     instance_destroy(alvo);
                 }
             }

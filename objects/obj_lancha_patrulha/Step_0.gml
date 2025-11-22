@@ -9,140 +9,15 @@
 
 var should_always_process = (selecionado || 
                               (variable_instance_exists(id, "force_always_active") && force_always_active) ||
-                              estado == LanchaState.ATACANDO || estado_string == "atacando");
+                              estado == LanchaState.ATACANDO || estado_string == "atacando" ||
+                              estado == LanchaState.MOVENDO ||
+                              estado == LanchaState.PATRULHANDO);
 
 if (!should_always_process && skip_frames_enabled) {
     var current_lod = scr_get_lod_level();
     var should_process = scr_calculate_frame_skip(current_lod, lod_process_index);
     
     if (!should_process) {
-        // ✅ CORREÇÃO: Se há um path A* ativo, não processar movimento manual (o GameMaker cuida disso)
-        if (path_index != noone) {
-            // Path A* está ativo - apenas verificar se chegou ao destino
-            if (path_position >= 1.0) {
-                path_end();
-                estado = LanchaState.PARADO;
-                estado_string = "parado";
-                if (variable_instance_exists(id, "meu_caminho") && meu_caminho != noone) {
-                    path_delete(meu_caminho);
-                    meu_caminho = noone;
-                }
-            }
-            exit; // Sair - o GameMaker processa o path automaticamente
-        }
-        
-        if (estado == LanchaState.MOVENDO || estado == LanchaState.PATRULHANDO || estado_string == "movendo" || estado_string == "patrulhando") {
-            var speed_mult = scr_get_speed_multiplier(current_lod, lod_process_index);
-            if (variable_instance_exists(id, "destino_x")) {
-                // ✅ CORREÇÃO: Normalizar velocidade antes de aplicar multiplicador do LOD
-                var _vel_normalizada = scr_normalize_unit_speed(velocidade_movimento);
-                var still_moving = scr_process_lod_simple_movement(id, destino_x, destino_y, _vel_normalizada, speed_mult);
-                if (!still_moving && (estado == LanchaState.MOVENDO || estado_string == "movendo")) {
-                    estado = LanchaState.PARADO;
-                    estado_string = "parado";
-                }
-            }
-            
-            // ✅ CORREÇÃO: Incrementar timer de espuma mesmo quando frame skip está ativo
-            // Isso garante que a espuma seja criada mesmo quando frames são pulados
-            if (!variable_instance_exists(id, "timer_espuma")) {
-                timer_espuma = 0;
-            }
-            timer_espuma++;
-            if (timer_espuma >= 3) {
-                timer_espuma = 0;
-                // ✅ NOVO: Criar espuma mesmo em frame skip usando ambos os objetos
-                var _distancia_popa = 20;
-                var _angulo_popa = image_angle + 180;
-                var _layer_navio = layer_get_name(layer);
-                
-                // ✅ CORREÇÃO: Apenas obj_WTrail4 no MEIO do navio com 20% de transparência
-                var _obj_espuma = obj_WTrail4;
-                
-                if (object_exists(_obj_espuma)) {
-                    // Posição no MEIO do navio (centro)
-                    var _pos_espuma_x = x;
-                    var _pos_espuma_y = y;
-                    
-                    var _espuma = noone;
-                    
-                    if (layer_exists(_layer_navio)) {
-                        _espuma = instance_create_layer(_pos_espuma_x, _pos_espuma_y, _layer_navio, _obj_espuma);
-                    }
-                    
-                    if (!instance_exists(_espuma) && layer_exists("Instances")) {
-                        _espuma = instance_create_layer(_pos_espuma_x, _pos_espuma_y, "Instances", _obj_espuma);
-                    }
-                    
-                    if (instance_exists(_espuma)) {
-                        _espuma.timer_duracao = 90;
-                        _espuma.timer_atual = 0;
-                        
-                        // ✅ CRÍTICO: Garantir que o sprite está definido
-                        if (_espuma.sprite_index == -1) {
-                            _espuma.sprite_index = asset_get_index("WTrail4");
-                        }
-                        
-                        // ✅ CORREÇÃO: Reduzir escala em 80% (de 5.0-7.0 para 1.0-1.4)
-                        _espuma.image_xscale = 1.0 + random(0.4);
-                        _espuma.image_yscale = 1.0 + random(0.4);
-                        _espuma.image_blend = c_white;
-                        _espuma.visible = true;
-                        _espuma.image_alpha = 0.2; // ✅ 20% de transparência
-                        
-                        // Depth maior = mais na frente
-                        if (variable_instance_exists(id, "depth")) {
-                            _espuma.depth = depth + 1;
-                        } else {
-                            _espuma.depth = -100;
-                        }
-                        _espuma.image_angle = image_angle + random_range(-5, 5);
-                    }
-                }
-                
-                // ✅ NOVO: obj_WbTrail1 no FINAL do navio (popa) - diferente do trail4 que está no centro
-                if (object_exists(obj_WbTrail1)) {
-                    // Posição na popa (final do sprite do navio) - 50% mais para a popa
-                    // Sprite tem 160px de largura, origem em 80px, então final fica a ~80px do centro
-                    var _distancia_final = 75; // 42 * 1.5 = 63, mas ajustado para 75 para ficar no final do sprite (160px/2 = 80px)
-                    var _pos_popa_x = x + lengthdir_x(_distancia_final, _angulo_popa);
-                    var _pos_popa_y = y + lengthdir_y(_distancia_final, _angulo_popa);
-                    
-                    var _trail_popa = noone;
-                    
-                    if (layer_exists(_layer_navio)) {
-                        _trail_popa = instance_create_layer(_pos_popa_x, _pos_popa_y, _layer_navio, obj_WbTrail1);
-                    }
-                    
-                    if (!instance_exists(_trail_popa) && layer_exists("Instances")) {
-                        _trail_popa = instance_create_layer(_pos_popa_x, _pos_popa_y, "Instances", obj_WbTrail1);
-                    }
-                    
-                    if (instance_exists(_trail_popa)) {
-                        _trail_popa.timer_duracao = 90;
-                        _trail_popa.timer_atual = 0;
-                        
-                        // ✅ Diminuir em 20% (80% do tamanho original = 0.8x)
-                        _trail_popa.image_xscale = 3.0 * 0.8; // 2.4
-                        _trail_popa.image_yscale = 3.0 * 0.8; // 2.4
-                        
-                        // ✅ Mesma transparência do trail4 (alpha = 0.2)
-                        _trail_popa.image_alpha = 0.2;
-                        // ✅ Cor original do sprite
-                        _trail_popa.image_blend = c_white;
-                        _trail_popa.visible = true;
-                        
-                        if (variable_instance_exists(id, "depth")) {
-                            _trail_popa.depth = depth + 1;
-                        } else {
-                            _trail_popa.depth = -100;
-                        }
-                        
-                        _trail_popa.image_angle = image_angle + random_range(-5, 5);
-                    }
-                }
-            }
-        }
         exit;
     }
     lod_level = current_lod;
@@ -165,13 +40,89 @@ if (selecionado) {
     // Comando de Parar (L) - adaptado para lancha
     if (keyboard_check_pressed(ord("L"))) {
         estado = LanchaState.PARADO;
-        modo_definicao_patrulha = false;
+        estado_string = "parado";
         alvo_unidade = noone;
+        speed = 0;
+        is_moving = false;
         if (global.debug_enabled) show_debug_message("⏹️ Lancha PAROU");
     }
     
     // Comandos K, clique esquerdo e clique direito agora são gerenciados pelo obj_input_manager
-    // para evitar conflitos e manter o modo de patrulha persistente
+    // para evitar conflitos e manter o modo de patrulha persistente (igual aos aviões)
+}
+
+// ======================================================================
+// --- 1.5. LÓGICA DE MOVIMENTO COM FÍSICA DE INÉRCIA (NOVO SISTEMA) ---
+// ======================================================================
+// Sistema baseado em motion_add para simular drift na água (estilo Rusted Warfare)
+// Este sistema funciona quando estado == LanchaState.MOVENDO
+// Variável de controle para usar novo sistema ou sistema antigo
+usar_novo_sistema = false;
+
+if (estado == LanchaState.MOVENDO || estado == LanchaState.PATRULHANDO) {
+    // Verificar se novo sistema está ativo (target_x/target_y definidos e diferentes da posição atual)
+    var _tem_target = (variable_instance_exists(id, "target_x") && variable_instance_exists(id, "target_y"));
+    if (_tem_target) {
+        var _dist_target = point_distance(x, y, target_x, target_y);
+        usar_novo_sistema = (_dist_target > 0.1); // Se target está definido e diferente da posição atual
+    }
+    
+    if (usar_novo_sistema) {
+        // === NOVO SISTEMA: Física de inércia com motion_add ===
+        // 1. Verificar se há um destino ativo e se não chegamos lá
+        var dist = point_distance(x, y, target_x, target_y);
+        
+        // ✅ CORREÇÃO: Usar tolerância maior durante patrulha (igual ao case PATRULHANDO)
+        var _tolerancia_chegada = (estado == LanchaState.PATRULHANDO) ? 20 : stop_distance;
+        
+        if (dist > _tolerancia_chegada) {
+            is_moving = true;
+            
+            // 2. Calcular o ângulo desejado para o alvo
+            var target_dir = point_direction(x, y, target_x, target_y);
+            
+            // 3. Rotação Suave (Smooth Turn)
+            // angle_difference calcula o menor caminho para girar (esquerda ou direita)
+            var diff = angle_difference(image_angle, target_dir);
+            
+            // Girar o sprite gradualmente baseado no turnSpeed
+            image_angle -= clamp(diff, -turnSpeed, turnSpeed);
+            
+            // 4. Aceleração Vetorial
+            // Só acelera se o barco estiver quase alinhado com o alvo (evita andar de lado estranho)
+            if (abs(diff) < 60) {
+                motion_add(image_angle, acceleration);
+            }
+            
+        } else {
+            is_moving = false;
+            // Chegou ao destino - parar apenas se não estiver patrulhando
+            speed = 0;
+            if (estado != LanchaState.PATRULHANDO) {
+                estado = LanchaState.PARADO;
+                estado_string = "parado";
+            }
+            // Se estiver patrulhando, o case PATRULHANDO vai gerenciar o próximo ponto
+        }
+        
+        // 5. Limite de Velocidade (Clamp)
+        // Garante que a lancha não ultrapasse a velocidade máxima
+        if (speed > moveSpeed) {
+            speed = moveSpeed;
+        }
+        
+        // 6. Aplicação de Atrito (Física da Água)
+        // A lancha sempre perde um pouco de velocidade (arrasto da água)
+        speed = max(0, speed - friction_water);
+        
+        // 7. Atualizar direção do movimento visual se tiver velocidade suficiente
+        // Isso faz com que colisões ou empurrões atualizem a lógica
+        if (speed > 0.1) {
+            // Opcional: Se quiser que a direção interna do GM siga o sprite
+            // direction = image_angle; 
+        }
+    }
+    // Se não usar novo sistema, o sistema antigo será executado no switch abaixo
 }
 
 // ======================================================================
@@ -186,6 +137,44 @@ if (timer_verificacao_inimigos > 0) {
 // ✅ OTIMIZAÇÃO: Só verificar inimigos periodicamente (quando timer chegar a 0) ou se não tem alvo
 if (modo_combate == LanchaMode.ATAQUE && estado != LanchaState.ATACANDO && (timer_verificacao_inimigos <= 0 || alvo_unidade == noone || !instance_exists(alvo_unidade))) {
     // Prioriza alvos navais primeiro, depois terrestres
+    // ✅ CORREÇÃO: Buscar piratas explicitamente (prioridade alta)
+    var _alvo_pirata = noone;
+    var _menor_dist_pirata = radar_alcance + 100;
+    
+    if (object_exists(obj_navio_pirata)) {
+        with (obj_navio_pirata) {
+            if (nacao_proprietaria == 3) {
+                var _dist = point_distance(other.x, other.y, x, y);
+                if (_dist <= other.radar_alcance && _dist < _menor_dist_pirata) {
+                    _menor_dist_pirata = _dist;
+                    _alvo_pirata = id;
+                }
+            }
+        }
+    }
+    if (object_exists(obj_navio_pirata2)) {
+        with (obj_navio_pirata2) {
+            if (nacao_proprietaria == 3) {
+                var _dist = point_distance(other.x, other.y, x, y);
+                if (_dist <= other.radar_alcance && _dist < _menor_dist_pirata) {
+                    _menor_dist_pirata = _dist;
+                    _alvo_pirata = id;
+                }
+            }
+        }
+    }
+    if (object_exists(obj_navio_pirata3)) {
+        with (obj_navio_pirata3) {
+            if (nacao_proprietaria == 3) {
+                var _dist = point_distance(other.x, other.y, x, y);
+                if (_dist <= other.radar_alcance && _dist < _menor_dist_pirata) {
+                    _menor_dist_pirata = _dist;
+                    _alvo_pirata = id;
+                }
+            }
+        }
+    }
+    
     var _alvo_naval = instance_nearest(x, y, obj_lancha_patrulha);
     var _alvo_helicoptero = instance_nearest(x, y, obj_helicoptero_militar);
     
@@ -206,8 +195,11 @@ if (modo_combate == LanchaMode.ATAQUE && estado != LanchaState.ATACANDO && (time
     var _alvo_encontrado = noone;
     var _tipo_alvo = "";
     
-    // Verifica alvos navais primeiro (prioridade máxima)
-    if (instance_exists(_alvo_naval) && _alvo_naval != id && _alvo_naval.nacao_proprietaria != nacao_proprietaria && point_distance(x, y, _alvo_naval.x, _alvo_naval.y) <= radar_alcance) {
+    // ✅ Priorizar piratas se encontrados (prioridade MÁXIMA)
+    if (instance_exists(_alvo_pirata) && point_distance(x, y, _alvo_pirata.x, _alvo_pirata.y) <= radar_alcance) {
+        _alvo_encontrado = _alvo_pirata;
+        _tipo_alvo = "naval (Pirata)";
+    } else if (instance_exists(_alvo_naval) && _alvo_naval != id && _alvo_naval.nacao_proprietaria != nacao_proprietaria && point_distance(x, y, _alvo_naval.x, _alvo_naval.y) <= radar_alcance) {
         _alvo_encontrado = _alvo_naval;
         _tipo_alvo = "naval (Lancha inimiga)";
     } else if (instance_exists(_alvo_helicoptero) && _alvo_helicoptero.nacao_proprietaria != nacao_proprietaria && point_distance(x, y, _alvo_helicoptero.x, _alvo_helicoptero.y) <= radar_alcance) {
@@ -272,14 +264,8 @@ if (variable_instance_exists(id, "func_sincronizar_timers")) {
 if (variable_instance_exists(id, "func_atualizar_modo_ataque")) {
     func_atualizar_modo_ataque();
 }
-if (variable_instance_exists(id, "func_sincronizar_destino")) {
-    func_sincronizar_destino();
-}
 if (variable_instance_exists(id, "func_sincronizar_estado")) {
     func_sincronizar_estado();
-}
-if (variable_instance_exists(id, "func_sincronizar_indice")) {
-    func_sincronizar_indice();
 }
 // --- FIM DA SINCRONIZAÇÃO ---
 
@@ -291,168 +277,157 @@ if (reload_timer > 0) {
 // --- 4. MÁQUINA DE ESTADOS PRINCIPAL ---
 switch (estado) {
     // ==========================================================
-    // ESTADO: MOVENDO
-    // ==========================================================
-    case LanchaState.MOVENDO:
-        // 1. O navio TEM um caminho para seguir?
-        if (path_index != noone) {
-            // 2. O navio CHEGOU ao fim do caminho?
-            // ✅ CORREÇÃO: Verificar também se está muito próximo do destino final (tolerância)
-            var _chegou_ao_destino = false;
-            if (path_position >= 1.0) {
-                _chegou_ao_destino = true;
-            } else if (variable_instance_exists(id, "destino_final_x") && variable_instance_exists(id, "destino_final_y")) {
-                // Verificar se está muito próximo do destino final (tolerância de 20 pixels)
-                var _dist_final = point_distance(x, y, destino_final_x, destino_final_y);
-                if (_dist_final <= 20) {
-                    _chegou_ao_destino = true;
-                }
-            }
-            
-            if (_chegou_ao_destino) {
-                if (variable_global_exists("debug_enabled") && global.debug_enabled) {
-                    show_debug_message("🚢 " + nome_unidade + " - Chegou ao destino A*. Parando completamente.");
-                }
-                
-                // ✅ CORREÇÃO CRÍTICA: PARAR COMPLETAMENTE quando chegar ao destino
-                // 1. Parar o path PRIMEIRO (múltiplas vezes para garantir)
-                if (path_index != noone) {
-                    path_end();
-                }
-                path_end(); // Garantir que parou
-                
-                // 2. Limpar variáveis de movimento e path
-                speed = 0;
-                if (variable_instance_exists(id, "meu_caminho") && meu_caminho != noone) {
-                    path_delete(meu_caminho);
-                    meu_caminho = noone;
-                }
-                
-                // 3. Garantir que path_index está limpo
-                if (path_index != noone) {
-                    path_end();
-                }
-                
-                // 4. Limpar variáveis de destino para evitar recálculo
-                if (variable_instance_exists(id, "destino_final_x")) {
-                    destino_final_x = x; // Definir como posição atual
-                }
-                if (variable_instance_exists(id, "destino_final_y")) {
-                    destino_final_y = y; // Definir como posição atual
-                }
-                
-                // 5. Mudar para PARADO ANTES de qualquer outra coisa
-                estado = LanchaState.PARADO;
-                if (variable_instance_exists(id, "estado_string")) {
-                    estado_string = "parado";
-                }
-                
-                // 6. ✅ CRÍTICO: Sair do bloco para não executar código de rotação
-                break; // Sair do case MOVENDO imediatamente
-            } else {
-                // --- CORREÇÃO DA ROTAÇÃO (Anti-Spin/Vibração + Anti-Deslizamento) ---
-                // 3. Se ainda estamos nos movendo (velocidade > 0) E path está ativo
-                if (path_index != noone && variable_instance_exists(id, "meu_caminho") && meu_caminho != noone) {
-                    // 4. Calcular direção usando posição atual e próxima do path
-                    // ✅ CORREÇÃO: Calcular manualmente para evitar erro com path_direction
-                    var _dir_caminho = 0; // ✅ CORREÇÃO: Declarar antes do bloco if
-                    var _pos_atual = path_position;
-                    var _pos_proxima = min(_pos_atual + 0.1, 1.0);
-                    var _x_atual = x;
-                    var _y_atual = y;
-                    var _x_proxima = path_get_x(meu_caminho, _pos_proxima);
-                    var _y_proxima = path_get_y(meu_caminho, _pos_proxima);
-                    
-                    // Verificar se as coordenadas são válidas
-                    if (!is_undefined(_x_proxima) && !is_undefined(_y_proxima)) {
-                        _dir_caminho = point_direction(_x_atual, _y_atual, _x_proxima, _y_proxima);
-                        
-                        // 5. ROTAÇÃO SUAVE (Com velocidade limitada para curvas realistas)
-                        // Calcular diferença de ângulo
-                        var _diff_angulo = angle_difference(image_angle, _dir_caminho);
-                        var _abs_diff = abs(_diff_angulo);
-                        
-                        // ✅ NOVO: ANTI-DESLIZAMENTO - Se diferença > 120°, parar e girar primeiro
-                        if (_abs_diff > 120) {
-                            // Curva muito grande (>120°) - PARAR movimento e girar primeiro
-                            if (path_speed > 0) {
-                                // Parar o path temporariamente
-                                var _velocidade_original = path_speed;
-                                path_end();
-                                // Reiniciar com velocidade 0 para parar
-                                path_start(meu_caminho, 0, path_action_stop, false);
-                                if (variable_global_exists("debug_enabled") && global.debug_enabled) {
-                                    show_debug_message("🔄 NAVIO: Parando para girar (diferença: " + string(round(_abs_diff)) + "°)");
-                                }
-                            }
-                        } else if (_abs_diff > 30) {
-                            // Curva grande (30-120°) - Reduzir velocidade enquanto gira
-                            if (path_speed > 0) {
-                                var _velocidade_reduzida = path_speed * 0.3; // Reduzir para 30% da velocidade
-                                path_end();
-                                path_start(meu_caminho, _velocidade_reduzida, path_action_stop, false);
-                            }
-                        } else {
-                            // Curva pequena (<30°) - Velocidade normal
-                            if (path_speed == 0) {
-                                // Se estava parado, retomar movimento normal
-                                var _velocidade = velocidade_movimento;
-                                if (variable_instance_exists(id, "velocidade_max")) {
-                                    _velocidade = velocidade_max;
-                                }
-                                path_end();
-                                path_start(meu_caminho, _velocidade, path_action_stop, false);
-                            }
-                        }
-                        
-                        // Obter velocidade de rotação (padrão se não existir)
-                        var _vel_rot = 0.8; // Velocidade padrão
-                        if (variable_instance_exists(id, "velocidade_rotacao")) {
-                            _vel_rot = velocidade_rotacao;
-                        }
-                        
-                        // Aplicar rotação suave limitada
-                        // Se a diferença for muito grande (> 90°), reduzir velocidade para curva mais realista
-                        if (_abs_diff > 90) {
-                            // Curva muito grande - reduzir velocidade de rotação para curva mais realista
-                            _vel_rot *= 0.5; // Reduzir pela metade para curvas grandes
-                        } else if (_abs_diff > 45) {
-                            // Curva moderada - reduzir um pouco
-                            _vel_rot *= 0.75;
-                        }
-                        
-                        // Aplicar rotação suave
-                        if (abs(_diff_angulo) > 0.5) { // Só rotacionar se diferença for significativa
-                            var _rotacao_aplicar = min(_vel_rot, abs(_diff_angulo));
-                            image_angle += sign(_diff_angulo) * -_rotacao_aplicar;
-                            
-                            // Normalizar ângulo para 0-360
-                            image_angle = (image_angle mod 360 + 360) mod 360;
-                        }
-                    }
-                }
-            }
-        } else {
-            // Se estamos em "MOVENDO" mas não temos caminho, algo deu errado. Parar.
-            estado = LanchaState.PARADO;
-            if (variable_instance_exists(id, "estado_string")) {
-                estado_string = "parado";
-            }
-            speed = 0;
-        }
-        break;
-    
-    // ==========================================================
     // ESTADO: PARADO
     // ==========================================================
     case LanchaState.PARADO:
         speed = 0;
-        // ✅ CORREÇÃO: Garantir que não há path ativo
-        if (path_index != noone) {
-            path_end();
+        break;
+    
+    // ==========================================================
+    // ESTADO: MOVENDO - NAVEGAÇÃO COM ROTAÇÃO MELHORADA (SISTEMA ANTIGO)
+    // ==========================================================
+    // NOTA: Se usar_novo_sistema == true, este bloco será pulado (já processado acima)
+    case LanchaState.MOVENDO:
+        // Se o novo sistema está ativo, pular este bloco
+        if (usar_novo_sistema) {
+            break;
         }
-        // ✅ CORREÇÃO: Não aplicar rotação quando parado
-        // A lógica de procurar inimigos está na seção 2 (Lógica de Aquisição de Alvo)
+        // Verificar se destino é válido
+        if (!variable_instance_exists(id, "destino_x") || !variable_instance_exists(id, "destino_y")) {
+            estado = LanchaState.PARADO;
+            estado_string = "parado";
+            speed = 0;
+            break;
+        }
+        
+        var _dist = point_distance(x, y, destino_x, destino_y);
+        var _dir_destino = point_direction(x, y, destino_x, destino_y);
+        
+        // ✅ DETECÇÃO DE "PRESA" - Verificar se está se aproximando do destino (menos agressivo)
+        if (!variable_instance_exists(id, "distancia_anterior")) {
+            distancia_anterior = _dist;
+            timer_presa = 0;
+        }
+        
+        // Se não está se aproximando significativamente (tolerância maior)
+        if (_dist >= distancia_anterior - 3) { // ✅ AUMENTADO: Tolerância de 3 pixels
+            timer_presa++;
+        } else {
+            // Está se aproximando - resetar timer
+            timer_presa = 0;
+        }
+        
+        distancia_anterior = _dist;
+        
+        // ✅ PRIORIDADE 1: Se chegou ao destino, PARAR
+        if (_dist <= tolerancia_chegada) {
+            estado = LanchaState.PARADO;
+            estado_string = "parado";
+            speed = 0;
+            timer_presa = 0;
+            // ✅ Se está muito perto (dentro da tolerância), mover para o destino exato
+            if (_dist > 0) {
+                x = destino_x;
+                y = destino_y;
+            }
+            if (global.debug_enabled) show_debug_message("🚢 Lancha: Chegou ao destino! Distância: " + string(_dist));
+        } else {
+            // ✅ Se está presa há muito tempo E está muito perto, considerar chegada
+            var _esta_presa = (timer_presa >= max_timer_presa);
+            var _tolerancia_efetiva = _esta_presa ? tolerancia_chegada * 2.5 : tolerancia_chegada;
+            
+            if (_esta_presa && _dist <= _tolerancia_efetiva) {
+                if (global.debug_enabled) show_debug_message("🚢 Lancha: Presa detectada! Considerando chegada. Dist: " + string(_dist));
+                estado = LanchaState.PARADO;
+                estado_string = "parado";
+                speed = 0;
+                timer_presa = 0;
+                break;
+            }
+            // 1. ROTACIONAR em direção ao destino
+            var _angulo_atual = image_angle;
+            var _diff_angulo = angle_difference(_angulo_atual, _dir_destino);
+            var _abs_diff = abs(_diff_angulo);
+            
+            // Rotacionar suavemente em direção ao destino
+            if (_abs_diff > 2) {
+                var _rotacao = min(velocidade_rotacao, _abs_diff);
+                image_angle += sign(_diff_angulo) * -_rotacao;
+                image_angle = (image_angle mod 360 + 360) mod 360;
+            }
+            
+            // 2. MOVER - Sempre tentar chegar ao destino
+            var _dir_movimento = _dir_destino; // Padrão: mover diretamente ao destino
+            
+            // ✅ Se está muito perto do destino (< 60 pixels), mover diretamente (ignorar rotação)
+            if (_dist < 60) {
+                _dir_movimento = _dir_destino; // Sempre direto ao destino quando perto
+            } else if (!_esta_presa) {
+                // Movimento natural apenas se não estiver presa E não estiver muito perto
+                // Se está bem alinhado (diferença < 30°), mover na direção apontada
+                if (_abs_diff < 30) {
+                    _dir_movimento = image_angle;
+                } else if (_abs_diff < 90) {
+                    // Curva moderada - interpolar entre direção atual e destino
+                    var _peso = _abs_diff / 90; // 0 a 1
+                    // Interpolação manual de ângulos
+                    var _diff = angle_difference(image_angle, _dir_destino);
+                    _dir_movimento = image_angle + _diff * (_peso * 0.5);
+                    _dir_movimento = (_dir_movimento mod 360 + 360) mod 360;
+                }
+                // Se diferença > 90°, mover diretamente ao destino para evitar órbitas
+            }
+            // Se está presa, sempre mover diretamente ao destino (já definido acima)
+            
+            _dir_movimento = (_dir_movimento mod 360 + 360) mod 360;
+            
+            // ✅ Se está muito perto do destino (< 80 pixels), mover diretamente ignorando colisões
+            var _muito_perto = (_dist < 80);
+            
+            // Mover
+            var _novo_x = x + lengthdir_x(velocidade, _dir_movimento);
+            var _novo_y = y + lengthdir_y(velocidade, _dir_movimento);
+            
+            // ✅ Se está muito perto, mover diretamente ao destino (ignorar colisões)
+            if (_muito_perto) {
+                // Mover diretamente em direção ao destino
+                var _dist_mov = min(velocidade, _dist); // Não ultrapassar o destino
+                _novo_x = x + lengthdir_x(_dist_mov, _dir_destino);
+                _novo_y = y + lengthdir_y(_dist_mov, _dir_destino);
+                x = _novo_x;
+                y = _novo_y;
+            } else {
+                // ✅ VERIFICAR COLISÃO COM EDIFÍCIOS ANTES DE MOVER (apenas se não estiver muito perto)
+                var _colidiu = (position_meeting(_novo_x, _novo_y, obj_quartel_marinha) || 
+                               position_meeting(_novo_x, _novo_y, obj_quartel) ||
+                               position_meeting(_novo_x, _novo_y, obj_casa) ||
+                               position_meeting(_novo_x, _novo_y, obj_banco));
+                
+                if (_colidiu && !_esta_presa) {
+                    // Tentar se mover perpendicularmente para contornar (apenas se não estiver presa)
+                    var _dir_contorno = _dir_destino + 90;
+                    _novo_x = x + lengthdir_x(velocidade * 0.7, _dir_contorno);
+                    _novo_y = y + lengthdir_y(velocidade * 0.7, _dir_contorno);
+                    
+                    // Se ainda colidir, tentar do outro lado
+                    if (position_meeting(_novo_x, _novo_y, obj_quartel_marinha) || 
+                        position_meeting(_novo_x, _novo_y, obj_quartel)) {
+                        _dir_contorno = _dir_destino - 90;
+                        _novo_x = x + lengthdir_x(velocidade * 0.7, _dir_contorno);
+                        _novo_y = y + lengthdir_y(velocidade * 0.7, _dir_contorno);
+                    }
+                }
+                
+                // Se ainda colidir mas está presa, mover mesmo assim (forçar passagem)
+                // Isso evita que fique completamente travada
+                if (!_colidiu || _esta_presa || !position_meeting(_novo_x, _novo_y, obj_quartel_marinha)) {
+                    x = _novo_x;
+                    y = _novo_y;
+                }
+            }
+            
+            speed = velocidade;
+        }
         break;
     
     // ==========================================================
@@ -461,176 +436,128 @@ switch (estado) {
     case LanchaState.ATACANDO:
         speed = 0;
         
-        if (instance_exists(alvo_unidade)) {
+        // ✅ NOVO: Validação completa do alvo antes de processar
+        var _alvo_valido = (instance_exists(alvo_unidade) && 
+                           alvo_unidade != noone && 
+                           !is_undefined(alvo_unidade.x) && 
+                           !is_undefined(alvo_unidade.y) &&
+                           alvo_unidade.x >= 0 && alvo_unidade.y >= 0);
+        
+        if (_alvo_valido) {
             var _distancia_alvo = point_distance(x, y, alvo_unidade.x, alvo_unidade.y);
             
             // Sistema de tiro à distância
             if (_distancia_alvo <= missil_alcance && reload_timer <= 0) {
-                var _missil = scr_get_projectile_from_pool(obj_tiro_simples, x, y, "Instances");
-                if (instance_exists(_missil)) {
-                    _missil.alvo = alvo_unidade;
-                    _missil.dono = id;
-                    _missil.dano = 35; // Dano ajustado
-                    _missil.speed = 8;
-                    _missil.direction = point_direction(x, y, alvo_unidade.x, alvo_unidade.y);
-                    if (variable_instance_exists(_missil, "timer_vida")) {
-                        _missil.timer_vida = 300;
+                // ✅ NOVO: Verificar novamente se alvo ainda é válido antes de disparar
+                if (instance_exists(alvo_unidade) && !is_undefined(alvo_unidade.x) && !is_undefined(alvo_unidade.y)) {
+                    var _missil = scr_get_projectile_from_pool(obj_tiro_simples, x, y, "Instances");
+                    if (instance_exists(_missil)) {
+                        // ✅ NOVO: Verificar se alvo ainda existe antes de atribuir
+                        if (instance_exists(alvo_unidade) && !is_undefined(alvo_unidade.x) && !is_undefined(alvo_unidade.y)) {
+                            _missil.alvo = alvo_unidade;
+                            _missil.dono = id;
+                            _missil.dano = 35; // Dano ajustado
+                            
+                            // ✅ CORREÇÃO: Reduzir velocidade para alvos terrestres (mais preciso)
+                            var _alvo_aereo = (alvo_unidade.object_index == obj_helicoptero_militar || 
+                                              alvo_unidade.object_index == obj_caca_f5 || 
+                                              alvo_unidade.object_index == obj_f6 ||
+                                              alvo_unidade.object_index == obj_f15 ||
+                                              alvo_unidade.object_index == obj_c100);
+                            
+                            if (_alvo_aereo) {
+                                _missil.speed = 8; // Velocidade normal para alvos aéreos
+                            } else {
+                                _missil.speed = 4; // ✅ REDUZIDO: Velocidade menor para alvos terrestres (mais preciso)
+                            }
+                            
+                            // ✅ CORREÇÃO CRÍTICA: Calcular direção apenas se alvo é válido
+                            var _dir_alvo = point_direction(x, y, alvo_unidade.x, alvo_unidade.y);
+                            if (!is_undefined(_dir_alvo) && !is_nan(_dir_alvo)) {
+                                _missil.direction = _dir_alvo;
+                                _missil.image_angle = _dir_alvo;
+                            } else {
+                                // Direção inválida - destruir míssil
+                                scr_return_projectile_to_pool(_missil);
+                                if (global.debug_enabled) show_debug_message("❌ Lancha: Direção inválida para alvo, míssil cancelado");
+                            }
+                            
+                            if (variable_instance_exists(_missil, "timer_vida")) {
+                                _missil.timer_vida = 300;
+                            }
+                            reload_timer = reload_time;
+                            if (global.debug_enabled) show_debug_message("🚀 Lancha atirou à distância (" + string(round(_distancia_alvo)) + "px) em direção " + string(round(_dir_alvo)) + "°");
+                        } else {
+                            // Alvo desapareceu - destruir míssil
+                            scr_return_projectile_to_pool(_missil);
+                        }
                     }
-                    reload_timer = reload_time;
-                    if (global.debug_enabled) show_debug_message("🚀 Lancha atirou à distância (" + string(round(_distancia_alvo)) + "px)");
                 }
             }
         } else {
-            if (global.debug_enabled) show_debug_message("✅ Alvo destruído! Retornando para: " + string(estado_anterior));
+            if (global.debug_enabled) show_debug_message("✅ Alvo destruído ou inválido! Retornando para: " + string(estado_anterior));
             estado = estado_anterior;
             alvo_unidade = noone;
         }
         break;
-
+    
     // ==========================================================
     // ESTADO: PATRULHANDO
     // ==========================================================
     case LanchaState.PATRULHANDO:
-        // A lógica de patrulha agora é 100% controlada pelo A*
-        
-        if (path_index != noone) {
-            // Chegamos ao ponto de patrulha?
-            if (path_position >= 1.0) {
-                // ✅ NOVO: Parar o movimento atual primeiro
-                path_end();
-                speed = 0;
-                
-                // Pegar o próximo ponto de patrulha
-                if (variable_instance_exists(id, "func_proximo_ponto")) {
-                    func_proximo_ponto();
-                }
-                
-                // Pedir um novo caminho A* para o próximo ponto
-                if (variable_instance_exists(id, "pontos_patrulha") && ds_exists(pontos_patrulha, ds_type_list)) {
-                    if (variable_instance_exists(id, "indice_patrulha_atual")) {
-                        var _p = pontos_patrulha[| indice_patrulha_atual];
-                        
-                        // ✅ NOVO: Calcular direção para o próximo ponto
-                        var _dir_proximo = point_direction(x, y, _p[0], _p[1]);
-                        var _diff_angulo = angle_difference(image_angle, _dir_proximo);
-                        var _abs_diff = abs(_diff_angulo);
-                        
-                        // ✅ NOVO: Se diferença > 30°, girar primeiro antes de iniciar movimento
-                        if (_abs_diff > 30) {
-                            // Ainda precisa girar - não iniciar movimento ainda
-                            // Aplicar rotação suave
-                            var _vel_rot = 0.8;
-                            if (variable_instance_exists(id, "velocidade_rotacao")) {
-                                _vel_rot = velocidade_rotacao;
-                            }
-                            
-                            // Reduzir velocidade de rotação para curvas grandes
-                            if (_abs_diff > 90) {
-                                _vel_rot *= 0.5;
-                            } else if (_abs_diff > 45) {
-                                _vel_rot *= 0.75;
-                            }
-                            
-                            // Aplicar rotação
-                            if (abs(_diff_angulo) > 0.5) {
-                                var _rotacao_aplicar = min(_vel_rot, abs(_diff_angulo));
-                                image_angle += sign(_diff_angulo) * -_rotacao_aplicar;
-                                image_angle = (image_angle mod 360 + 360) mod 360;
-                            }
-                            
-                            // Ainda girando - não iniciar caminho ainda
-                        } else {
-                            // ✅ Alinhado (<30°) - pode iniciar movimento
-                            var _novo_caminho = scr_encontrar_caminho_naval(x, y, _p[0], _p[1], id);
-                            
-                            if (_novo_caminho != noone) {
-                                var _velocidade = velocidade_movimento;
-                                if (variable_instance_exists(id, "velocidade_max")) {
-                                    _velocidade = velocidade_max;
-                                }
-                                path_start(_novo_caminho, _velocidade, path_action_stop, false);
-                                meu_caminho = _novo_caminho; // Guarda o novo caminho
-                            } else {
-                                // Não achou caminho? Parar.
-                                estado = LanchaState.PARADO;
-                                if (variable_instance_exists(id, "estado_string")) {
-                                    estado_string = "parado";
-                                }
-                            }
-                        }
-                    }
-                }
-            } else {
-                // Girar enquanto patrulha (mesma lógica do MOVENDO com anti-deslizamento)
-                if (path_index != noone && variable_instance_exists(id, "meu_caminho") && meu_caminho != noone) {
-                    // ✅ CORREÇÃO: Calcular direção manualmente usando posição atual e próxima do path
-                    var _pos_atual = path_position;
-                    var _pos_proxima = min(_pos_atual + 0.1, 1.0);
-                    var _x_atual = x;
-                    var _y_atual = y;
-                    var _x_proxima = path_get_x(meu_caminho, _pos_proxima);
-                    var _y_proxima = path_get_y(meu_caminho, _pos_proxima);
-                    
-                    // Verificar se as coordenadas são válidas
-                    if (!is_undefined(_x_proxima) && !is_undefined(_y_proxima)) {
-                        var _dir_caminho = point_direction(_x_atual, _y_atual, _x_proxima, _y_proxima);
-                        
-                        // ROTAÇÃO SUAVE (mesma lógica do MOVENDO)
-                        var _diff_angulo = angle_difference(image_angle, _dir_caminho);
-                        var _abs_diff = abs(_diff_angulo);
-                        
-                        // ✅ NOVO: ANTI-DESLIZAMENTO - Se diferença > 120°, parar e girar primeiro
-                        if (_abs_diff > 120) {
-                            // Curva muito grande (>120°) - PARAR movimento e girar primeiro
-                            if (path_speed > 0) {
-                                var _velocidade_original = path_speed;
-                                path_end();
-                                path_start(meu_caminho, 0, path_action_stop, false);
-                            }
-                        } else if (_abs_diff > 30) {
-                            // Curva grande (30-120°) - Reduzir velocidade enquanto gira
-                            if (path_speed > 0) {
-                                var _velocidade_reduzida = path_speed * 0.3;
-                                path_end();
-                                path_start(meu_caminho, _velocidade_reduzida, path_action_stop, false);
-                            }
-                        } else {
-                            // Curva pequena (<30°) - Velocidade normal
-                            if (path_speed == 0) {
-                                var _velocidade = velocidade_movimento;
-                                if (variable_instance_exists(id, "velocidade_max")) {
-                                    _velocidade = velocidade_max;
-                                }
-                                path_end();
-                                path_start(meu_caminho, _velocidade, path_action_stop, false);
-                            }
-                        }
-                        
-                        var _vel_rot = 0.8;
-                        if (variable_instance_exists(id, "velocidade_rotacao")) {
-                            _vel_rot = velocidade_rotacao;
-                        }
-                        
-                        if (_abs_diff > 90) {
-                            _vel_rot *= 0.5;
-                        } else if (_abs_diff > 45) {
-                            _vel_rot *= 0.75;
-                        }
-                        
-                        if (abs(_diff_angulo) > 0.5) {
-                            var _rotacao_aplicar = min(_vel_rot, abs(_diff_angulo));
-                            image_angle += sign(_diff_angulo) * -_rotacao_aplicar;
-                            image_angle = (image_angle mod 360 + 360) mod 360;
-                        }
-                    }
+        // Sistema de patrulha igual aos outros navios/aviões
+        if (variable_instance_exists(id, "pontos_patrulha") && ds_exists(pontos_patrulha, ds_type_list) && ds_list_size(pontos_patrulha) > 0) {
+            // Garantir que indice_patrulha_atual está dentro dos limites
+            if (!variable_instance_exists(id, "indice_patrulha_atual")) {
+                indice_patrulha_atual = 0;
+            }
+            var _total_pontos = ds_list_size(pontos_patrulha);
+            if (indice_patrulha_atual >= _total_pontos) {
+                indice_patrulha_atual = 0;
+            }
+            
+            // ✅ CORREÇÃO: Verificar se chegou ao ponto atual ANTES de definir novo destino
+            var _dist_ponto_atual = point_distance(x, y, destino_x, destino_y);
+            var _tolerancia_patrulha = 20; // Tolerância maior para patrulha (igual aos outros navios)
+            
+            if (_dist_ponto_atual <= _tolerancia_patrulha) {
+                // Chegou ao ponto - ir para o próximo
+                indice_patrulha_atual = (indice_patrulha_atual + 1) % _total_pontos;
+                if (global.debug_enabled) {
+                    show_debug_message("🚢 Lancha: Chegou ao ponto, indo para o próximo (" + string(indice_patrulha_atual + 1) + " de " + string(_total_pontos) + ")");
                 }
             }
+            
+            // Obter ponto atual de patrulha (pode ter mudado se avançou)
+            var _ponto_atual = pontos_patrulha[| indice_patrulha_atual];
+            if (is_array(_ponto_atual) && array_length(_ponto_atual) >= 2) {
+                // Definir destino para o ponto atual
+                destino_x = _ponto_atual[0];
+                destino_y = _ponto_atual[1];
+                target_x = _ponto_atual[0];
+                target_y = _ponto_atual[1];
+                is_moving = true;
+                usar_novo_sistema = true; // Usar novo sistema de física
+            } else {
+                // Ponto inválido - parar
+                estado = LanchaState.PARADO;
+                estado_string = "parado";
+                is_moving = false;
+                speed = 0;
+            }
+        } else {
+            // Sem pontos de patrulha - voltar para parado
+            estado = LanchaState.PARADO;
+            estado_string = "parado";
+            is_moving = false;
+            speed = 0;
         }
         break;
+
 }
 
 // --- 5. EFEITO DE ESPUMA DO MAR (Rastro de água) ---
-// Criar espuma quando estiver se movendo
+// Criar espuma quando estiver se movendo (igual aos outros navios)
 if (estado == LanchaState.MOVENDO || estado == LanchaState.PATRULHANDO) {
     if (!variable_instance_exists(id, "timer_espuma")) {
         timer_espuma = 0;
@@ -673,13 +600,13 @@ if (estado == LanchaState.MOVENDO || estado == LanchaState.PATRULHANDO) {
                 } else {
                     _espuma.depth = -100;
                 }
-                _espuma.image_angle = image_angle + random_range(-5, 5);
+                _espuma.image_angle = image_angle; // ✅ Rastro sempre virado para a proa
             }
         }
         
-        // obj_WbTrail1 no FINAL do navio (popa)
+        // obj_WbTrail1 no FINAL do navio (popa) - Lancha: menor que navios grandes
         if (object_exists(obj_WbTrail1)) {
-            var _distancia_final = 35;
+            var _distancia_final = 15; // Lancha é menor, usar distância menor
             var _pos_popa_x = x + lengthdir_x(_distancia_final, _angulo_popa);
             var _pos_popa_y = y + lengthdir_y(_distancia_final, _angulo_popa);
             var _trail_popa = noone;
@@ -694,8 +621,8 @@ if (estado == LanchaState.MOVENDO || estado == LanchaState.PATRULHANDO) {
             if (instance_exists(_trail_popa)) {
                 _trail_popa.timer_duracao = 90;
                 _trail_popa.timer_atual = 0;
-                _trail_popa.image_xscale = 3.0 * 0.8;
-                _trail_popa.image_yscale = 3.0 * 0.8;
+                _trail_popa.image_xscale = 2.0 * 0.6; // Menor que navios grandes (lancha é menor)
+                _trail_popa.image_yscale = 2.0 * 0.6;
                 _trail_popa.image_alpha = 0.2;
                 _trail_popa.image_blend = c_white;
                 _trail_popa.visible = true;
@@ -704,7 +631,7 @@ if (estado == LanchaState.MOVENDO || estado == LanchaState.PATRULHANDO) {
                 } else {
                     _trail_popa.depth = -100;
                 }
-                _trail_popa.image_angle = image_angle + random_range(-5, 5);
+                _trail_popa.image_angle = image_angle; // ✅ Rastro sempre virado para a proa
             }
         }
     }
@@ -712,17 +639,5 @@ if (estado == LanchaState.MOVENDO || estado == LanchaState.PATRULHANDO) {
     // Parado - resetar timer de espuma
     if (variable_instance_exists(id, "timer_espuma")) {
         timer_espuma = 0;
-    }
-}
-
-// =============================================
-// ✅ SISTEMA DE COLISÃO FÍSICA NAVAL
-// =============================================
-// Verificar colisões apenas a cada 5 frames para melhorar performance
-// ✅ CORREÇÃO: Verificar se a função existe antes de chamar para evitar erro
-if (variable_global_exists("game_frame") && global.game_frame % 5 == 0) {
-    var _script_index = asset_get_index("scr_colisao_fisica_unidades");
-    if (_script_index != -1 && asset_get_type(_script_index) == asset_script) {
-        scr_colisao_fisica_unidades(id, 48, 1.0); // Raio ajustado para lanchas
     }
 }

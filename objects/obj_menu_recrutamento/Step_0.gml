@@ -253,19 +253,33 @@ if (mouse_check_button_pressed(mb_left)) {
                         break;
                     }
                     
+                    // ✅ CORREÇÃO CRÍTICA: Validar que a fila existe e pertence ao quartel correto
                     if (!variable_instance_exists(id_do_quartel, "fila_recrutamento")) {
-                        show_debug_message("❌ ERRO CRÍTICO: fila_recrutamento não existe no quartel!");
+                        show_debug_message("❌ ERRO CRÍTICO: fila_recrutamento não existe no quartel ID: " + string(id_do_quartel));
                         break;
                     }
                     
-                    for (var j = 0; j < _quantidade_clicada; j++) {
-                        ds_queue_enqueue(id_do_quartel.fila_recrutamento, i);
-                        show_debug_message("   ✅ Unidade " + string(j + 1) + " adicionada à fila");
+                    if (!ds_exists(id_do_quartel.fila_recrutamento, ds_type_queue)) {
+                        show_debug_message("❌ ERRO CRÍTICO: fila_recrutamento inválida no quartel ID: " + string(id_do_quartel));
+                        // Recriar a fila para este quartel
+                        id_do_quartel.fila_recrutamento = ds_queue_create();
+                        show_debug_message("⚠️ Fila recriada para quartel ID: " + string(id_do_quartel));
                     }
                     
-                    var _tamanho_fila = ds_queue_size(id_do_quartel.fila_recrutamento);
+                    // ✅ VALIDAÇÃO: Confirmar que estamos usando a fila do quartel correto
+                    var _quartel_id = id_do_quartel;
+                    var _fila_id = id_do_quartel.fila_recrutamento;
+                    var _tamanho_antes = ds_queue_size(id_do_quartel.fila_recrutamento);
+                    
+                    for (var j = 0; j < _quantidade_clicada; j++) {
+                        ds_queue_enqueue(id_do_quartel.fila_recrutamento, i);
+                        show_debug_message("   ✅ Unidade " + string(j + 1) + " adicionada à fila do quartel ID: " + string(_quartel_id));
+                    }
+                    
+                    var _tamanho_depois = ds_queue_size(id_do_quartel.fila_recrutamento);
                     show_debug_message("✅ " + string(_quantidade_clicada) + "x " + _unidade.nome + " adicionadas à fila!");
-                    show_debug_message("📊 Tamanho da fila agora: " + string(_tamanho_fila));
+                    show_debug_message("📊 Quartel ID: " + string(_quartel_id) + " | Fila ID: " + string(_fila_id));
+                    show_debug_message("📊 Tamanho da fila ANTES: " + string(_tamanho_antes) + " | DEPOIS: " + string(_tamanho_depois));
                     show_debug_message("🎯 Estado do quartel - esta_treinando: " + string(id_do_quartel.esta_treinando));
                     
                     // ✅ FORÇAR INÍCIO DE PRODUÇÃO SE ESTIVER OCIOSO
@@ -273,6 +287,11 @@ if (mouse_check_button_pressed(mb_left)) {
                         show_debug_message("🚀 Quartel está ocioso - iniciando produção imediatamente!");
                         id_do_quartel.esta_treinando = true;
                         id_do_quartel.tempo_treinamento_restante = 0;
+                        // ✅ CRÍTICO: Ativar Alarm_1 para processar a fila
+                        if (id_do_quartel.alarm[1] <= 0) {
+                            id_do_quartel.alarm[1] = 1;
+                            show_debug_message("🔔 Alarm_1 ativado para processar fila!");
+                        }
                     } else {
                         show_debug_message("⏸️ Quartel já está treinando - unidade adicionada à fila");
                     }

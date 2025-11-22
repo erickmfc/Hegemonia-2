@@ -81,13 +81,66 @@ if (alvo != noone && instance_exists(alvo)) {
             if (instance_exists(alvo)) {
                 var _dano_aplicado = (variable_instance_exists(id, "dano")) ? dano : 25;
                 
+                // ✅ NOVO: Verificar se é o primeiro dano antes de aplicar
+                var _primeiro_dano = false;
+                var _hp_max_alvo = 1;
+                if (variable_instance_exists(alvo, "hp_atual") && variable_instance_exists(alvo, "hp_max")) {
+                    _primeiro_dano = (alvo.hp_atual >= alvo.hp_max);
+                    _hp_max_alvo = alvo.hp_max;
+                } else if (variable_instance_exists(alvo, "vida") && variable_instance_exists(alvo, "vida_max")) {
+                    _primeiro_dano = (alvo.vida >= alvo.vida_max);
+                    _hp_max_alvo = alvo.vida_max;
+                } else if (variable_instance_exists(alvo, "hp") && variable_instance_exists(alvo, "hp_max")) {
+                    _primeiro_dano = (alvo.hp >= alvo.hp_max);
+                    _hp_max_alvo = alvo.hp_max;
+                }
+                
                 // Aplicar dano (compatível com obj_inimigo e obj_infantaria)
                 if (variable_instance_exists(alvo, "vida")) {
                     alvo.vida -= _dano_aplicado;
+                    
+                    // ✅ NOVO: Ativar exibição de vida quando for atingida pela primeira vez
+                    if (_primeiro_dano && alvo.vida < alvo.vida_max && alvo.vida > 0) {
+                        alvo.mostrar_vida = true;
+                        alvo.timer_vida_visivel = 0;
+                        var _porcentagem = round((alvo.vida / alvo.vida_max) * 100);
+                        show_debug_message("💥 " + object_get_name(alvo.object_index) + " atingido pela primeira vez! Vida: " + string(alvo.vida) + "/" + string(alvo.vida_max) + " (" + string(_porcentagem) + "%)");
+                    } else if (alvo.vida < alvo.vida_max && alvo.vida > 0) {
+                        if (!variable_instance_exists(alvo, "mostrar_vida")) {
+                            alvo.mostrar_vida = true;
+                        }
+                        alvo.timer_vida_visivel = 0;
+                    }
                 } else if (variable_instance_exists(alvo, "hp_atual")) {
                     alvo.hp_atual -= _dano_aplicado;
+                    
+                    // ✅ NOVO: Ativar exibição de vida quando for atingida pela primeira vez
+                    if (_primeiro_dano && alvo.hp_atual < alvo.hp_max && alvo.hp_atual > 0) {
+                        alvo.mostrar_vida = true;
+                        alvo.timer_vida_visivel = 0;
+                        var _porcentagem = round((alvo.hp_atual / alvo.hp_max) * 100);
+                        show_debug_message("💥 " + object_get_name(alvo.object_index) + " atingido pela primeira vez! HP: " + string(alvo.hp_atual) + "/" + string(alvo.hp_max) + " (" + string(_porcentagem) + "%)");
+                    } else if (alvo.hp_atual < alvo.hp_max && alvo.hp_atual > 0) {
+                        if (!variable_instance_exists(alvo, "mostrar_vida")) {
+                            alvo.mostrar_vida = true;
+                        }
+                        alvo.timer_vida_visivel = 0;
+                    }
                 } else if (variable_instance_exists(alvo, "hp")) {
                     alvo.hp -= _dano_aplicado;
+                    
+                    // ✅ NOVO: Ativar exibição de vida quando for atingida pela primeira vez
+                    if (_primeiro_dano && alvo.hp < alvo.hp_max && alvo.hp > 0) {
+                        alvo.mostrar_vida = true;
+                        alvo.timer_vida_visivel = 0;
+                        var _porcentagem = round((alvo.hp / alvo.hp_max) * 100);
+                        show_debug_message("💥 " + object_get_name(alvo.object_index) + " atingido pela primeira vez! HP: " + string(alvo.hp) + "/" + string(alvo.hp_max) + " (" + string(_porcentagem) + "%)");
+                    } else if (alvo.hp < alvo.hp_max && alvo.hp > 0) {
+                        if (!variable_instance_exists(alvo, "mostrar_vida")) {
+                            alvo.mostrar_vida = true;
+                        }
+                        alvo.timer_vida_visivel = 0;
+                    }
                 }
                 
                 // Verificar se alvo morreu
@@ -101,6 +154,11 @@ if (alvo != noone && instance_exists(alvo)) {
                 }
                 
                 if (vida_atual <= 0) {
+                    // ✅ CORREÇÃO: Verificar se função existe antes de chamar
+                    var _script_restos = asset_get_index("scr_criar_restos_unidade");
+                    if (_script_restos != -1) {
+                        scr_criar_restos_unidade(alvo);
+                    }
                     instance_destroy(alvo);
                 }
             }

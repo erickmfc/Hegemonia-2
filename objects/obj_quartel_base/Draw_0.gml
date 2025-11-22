@@ -60,7 +60,8 @@ if (mostrar_menu) {
 }
 
 // === BARRA DE HP ===
-if (hp_atual < hp_max) {
+// ✅ CORREÇÃO: Sempre mostrar barra de vida dos quarteis
+if (true) {  // Sempre mostrar
     var _barra_w = 40;
     var _barra_h = 4;
     var _hp_percent = hp_atual / hp_max;

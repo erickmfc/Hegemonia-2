@@ -1,22 +1,41 @@
 // ===============================================
-// HEGEMONIA GLOBAL - CAÇA SU-35
+// HEGEMONIA GLOBAL - SU-35 FLANKER
+// 4.5ª GERAÇÃO (anos 90-2000) - Manobrabilidade superior
 // ===============================================
+
+// === SISTEMA DE GERAÇÕES ===
+geracao_caca = FighterGeneration.GEN_4_PLUS;
 
 // --- ATRIBUTOS DE VOO ---
 velocidade_atual = 0;
-velocidade_maxima = 5.9; // Velocidade aumentada
+velocidade_maxima = 4.0;  // ✅ 4.5ª geração - velocidade alta
 aceleracao = 0.06;
 desaceleracao = 0.03;
 velocidade_rotacao = 3.5;
 
 // --- ATRIBUTOS DE COMBATE ---
-hp_atual = 800; // Vida dobrada do F-5
-hp_max = 800;
+hp_atual = 500;  // ✅ 4.5ª geração - HP superior ao F-15
+hp_max = 500;
 nacao_proprietaria = 1;
-radar_alcance = 798; // Alcance aumentado em 45% (550 * 1.45 = 797.5 ≈ 798)
+radar_alcance = 850;  // ✅ 4.5ª geração - radar melhorado
+alcance_ataque = 800;  // ✅ Alcance de ataque superior
 timer_ataque = 0;
-intervalo_ataque = 85; // Recarga mais rápida
+intervalo_ataque = 85;
 modo_ataque = true; // Modo ataque ativo por padrão
+
+// --- SISTEMA DE MÍSSEIS MÚLTIPLOS (mais rápido que F-15) ---
+timer_sky = 0;
+intervalo_sky = 240;  // ✅ 4 segundos (mais rápido que F-15)
+timer_iron = 0;
+intervalo_iron = 360;  // ✅ 6 segundos
+timer_hash = 0;
+intervalo_hash = 480;  // ✅ 8 segundos
+dano_multiplier = 1.1;  // ✅ 10% mais dano que F-15
+
+// --- TECNOLOGIA ---
+stealth_ativo = false;  // ✅ Sem stealth
+sensores_avancados = true;  // ✅ Radar melhorado
+manobrabilidade_superior = true;  // ✅ Manobrabilidade superior
 
 // --- MÁQUINA DE ESTADOS ---
 estado = "pousado"; // Estados: "pousado", "decolando", "pousando", "movendo", "patrulhando", "definindo_patrulha", "atacando"

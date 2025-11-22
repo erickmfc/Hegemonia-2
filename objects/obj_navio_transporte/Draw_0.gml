@@ -3,6 +3,14 @@
 // Sistema Visual com Indicadores de Carga
 // ===============================================
 
+// Desenhar sombra (simples deslocamento preto com transparência)
+draw_set_color(c_black);
+draw_set_alpha(0.4);
+draw_sprite_ext(sprite_index, image_index, x + 4, y + 4, image_xscale, image_yscale, image_angle, c_black, 0.4);
+
+// Desenhar sprite do navio
+draw_set_color(c_white);
+draw_set_alpha(1.0);
 draw_self();
 
 // --- FEEDBACK VISUAL (SE SELECIONADO) ---
@@ -19,10 +27,26 @@ if (selecionado) {
     draw_set_alpha(0.2);
     draw_circle(x, _draw_y, radar_alcance, false);
     
-    // ✅ CORREÇÃO: Removida linha amarela direta - usa apenas caminho A*
-    // Desenhar linha do caminho A* quando em movimento (APENAS UMA LINHA)
-    if (estado == LanchaState.MOVENDO) {
-        // ✅ CORREÇÃO: Desenhar apenas o caminho A* completo (removida linha direta duplicada)
+    // ✅ LINHA VISUAL: Do navio até o destino (quando movendo)
+    // ✅ CORREÇÃO: Verificar estado diretamente (mais confiável que is_moving)
+    var _esta_movendo = false;
+    if (variable_instance_exists(id, "estado")) {
+        // Verificar estado diretamente (mais confiável)
+        _esta_movendo = (estado == LanchaState.MOVENDO);
+        // Também verificar is_moving se existir (para compatibilidade)
+        if (variable_instance_exists(id, "is_moving")) {
+            _esta_movendo = _esta_movendo || is_moving;
+        }
+    } else if (variable_instance_exists(id, "is_moving")) {
+        // Fallback: usar is_moving se estado não existir
+        _esta_movendo = is_moving;
+    }
+    
+    if (_esta_movendo) {
+        var _target_x = variable_instance_exists(id, "target_x") ? target_x : destino_x;
+        var _target_y = variable_instance_exists(id, "target_y") ? target_y : destino_y;
+        
+        // ✅ PRIORIDADE: Desenhar caminho A* se existir (mais preciso)
         if (variable_instance_exists(id, "meu_caminho") && meu_caminho != noone) {
             draw_set_color(c_aqua);
             draw_set_alpha(0.6);
@@ -41,7 +65,18 @@ if (selecionado) {
                     _prev_y = _seg_y;
                 }
             }
+        } else {
+            // ✅ FALLBACK: Desenhar linha direta se não houver caminho A*
+            draw_set_color(c_aqua);
+            draw_set_alpha(0.6);
+            draw_line(x, _draw_y, _target_x, _target_y);
+            
+            // Círculo no destino (marcador visual)
+            draw_circle(_target_x, _target_y, 8, false);
+            draw_circle(_target_x, _target_y, 4, true);
         }
+        
+        draw_set_alpha(1);
     }
     
     // Desenhar linha quando atacando
@@ -53,95 +88,8 @@ if (selecionado) {
         }
     }
     
-    // --- INFORMAÇÕES DE STATUS ---
-    draw_set_alpha(1.0);
-    draw_set_halign(fa_center);
-    
-    // ✅ PRIORIDADE: Mostrar status de EMBARQUE primeiro (mais importante e legível)
-    var _transporte_texto = "";
-    var _transporte_cor = c_white;
-    
-    if (estado_transporte == NavioTransporteEstado.EMBARQUE_ATIVO) {
-        _transporte_texto = "EMBARQUE";
-        _transporte_cor = c_yellow;
-    } else if (estado_transporte == NavioTransporteEstado.EMBARQUE_OFF) {
-        _transporte_texto = "EMBARCADO";
-        _transporte_cor = c_lime;
-    } else if (estado_transporte == NavioTransporteEstado.DESEMBARCANDO) {
-        _transporte_texto = "DESEMBARQUE";
-        _transporte_cor = c_orange;
-    } else if (estado_transporte == NavioTransporteEstado.NAVEGANDO) {
-        _transporte_texto = "NAVEGANDO";
-        _transporte_cor = make_color_rgb(0, 255, 255); // c_aqua
-    } else {
-        // Status normal de movimento
-        if (estado == LanchaState.ATACANDO) _transporte_texto = "ATACANDO";
-        else if (estado == LanchaState.PATRULHANDO) _transporte_texto = "PATRULHANDO";
-        else if (estado == LanchaState.MOVENDO) _transporte_texto = "NAVEGANDO";
-        else if (estado == LanchaState.DEFININDO_PATRULHA) _transporte_texto = "DEFININDO ROTA";
-        else _transporte_texto = "PARADO";
-        
-        if (estado == LanchaState.ATACANDO) _transporte_cor = c_red;
-        else if (estado == LanchaState.PATRULHANDO) _transporte_cor = c_orange;
-        else if (estado == LanchaState.MOVENDO) _transporte_cor = make_color_rgb(0, 255, 255); // c_aqua
-        else _transporte_cor = c_gray;
-    }
-    
-    // ✅ NOVO: Fundo escuro para legibilidade do status
-    var _status_x = x;
-    var _status_y = _draw_y - 65;
-    var _status_w = string_width(_transporte_texto) + 20;
-    var _status_h = 25;
-    
-    draw_set_color(c_black);
-    draw_set_alpha(0.8);
-    draw_rectangle(_status_x - _status_w/2, _status_y - _status_h/2, 
-                    _status_x + _status_w/2, _status_y + _status_h/2, false);
-    draw_set_alpha(1.0);
-    
-    // Borda do status
-    draw_set_color(_transporte_cor);
-    draw_set_alpha(0.6);
-    draw_rectangle(_status_x - _status_w/2, _status_y - _status_h/2, 
-                    _status_x + _status_w/2, _status_y + _status_h/2, true);
-    draw_set_alpha(1.0);
-    
-    // Desenhar status PRINCIPAL (GRANDE e legível)
-    draw_set_color(_transporte_cor);
-    draw_set_font(-1);  // Fonte padrão maior
-    draw_text(_status_x, _status_y, _transporte_texto);
-    
-    // Controles (menor, abaixo do status)
-    draw_set_color(c_white);
-    draw_set_alpha(0.9);
-    draw_text(x, _draw_y - 35, "[K] Patrulha | [L] Parar");
-    draw_text(x, _draw_y - 20, "[P] Embarcar | [PP] Fechar | [PPP] Desembarcar");
-    draw_text(x, _draw_y - 5, "[O] Ataque | [J] Menu Carga");
-    draw_set_alpha(1.0);
-    
-    // --- INDICADOR DE CARGA ---
-    var _percentual = ((avioes_count + unidades_count + soldados_count) / (avioes_max + unidades_max + soldados_max)) * 100;
-    var _barra_width = 80;
-    var _barra_height = 6;
-    
-    draw_set_color(c_gray);
-    draw_rectangle(x - _barra_width/2, _draw_y + 10, 
-                    x + _barra_width/2, _draw_y + 10 + _barra_height, false);
-    
-    var _cor_carga = c_green;
-    if (_percentual > 75) _cor_carga = c_orange;
-    if (_percentual >= 100) _cor_carga = c_red;
-    
-    draw_set_color(_cor_carga);
-    draw_rectangle(x - _barra_width/2, _draw_y + 10,
-                    x - _barra_width/2 + (_barra_width * _percentual / 100),
-                    _draw_y + 10 + _barra_height, false);
-    
-    draw_set_color(c_white);
-    draw_set_halign(fa_center);
-    draw_text(x, _draw_y + 20, string(round(_percentual)) + "%");
-    
-    draw_set_halign(fa_left);
+    // ✅ REMOVIDO: Informações de status movidas para o menu de carga (J)
+    // As informações de status agora aparecem apenas no menu J
 }
 
 // === DESENHAR ROTA DE PATRULHA ===
@@ -223,9 +171,9 @@ if (_mostrar_retangulo) {
         draw_set_color(c_lime);
         draw_set_alpha(0.2); // Verde transparente
         
-        // Desenhar retângulo que cobre o navio (reduzido 20%)
-        var _largura = variable_instance_exists(id, "largura_embarque") ? largura_embarque : 136; // ✅ REDUZIDO 20%
-        var _altura = variable_instance_exists(id, "altura_embarque") ? altura_embarque : 163; // ✅ REDUZIDO 20%
+        // Desenhar retângulo que cobre o navio (aumentado 20%)
+        var _largura = variable_instance_exists(id, "largura_embarque") ? largura_embarque : 293.76; // ✅ AUMENTADO 50%
+        var _altura = variable_instance_exists(id, "altura_embarque") ? altura_embarque : 352.08; // ✅ AUMENTADO 50%
         
         // Calcular posição do retângulo baseado na rotação do navio
         var _angulo_rad = degtorad(image_angle);

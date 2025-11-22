@@ -12,6 +12,12 @@ dono = noone; // Quem disparou
 target = noone; // Alvo do míssil
 alvo = noone; // Variável alternativa para compatibilidade com F-15
 
+// ✅ APLICAR MULTIPLICADOR DE DANO DO DONO (sistema de gerações)
+if (instance_exists(dono) && variable_instance_exists(dono, "dano_multiplier")) {
+    dano = floor(dano * dono.dano_multiplier);
+    dano_area = floor(dano_area * dono.dano_multiplier);
+}
+
 // Receber alvo se foi passado pelo dono
 if (variable_instance_exists(id, "alvo_em_mira")) {
     alvo = alvo_em_mira;

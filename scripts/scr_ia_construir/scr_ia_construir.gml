@@ -171,8 +171,13 @@ function scr_ia_construir(_ia_id, _objeto_tipo, _x, _y) {
                     if (_melhor_pos_costa != noone) {
                         _x = _melhor_pos_costa.x;
                         _y = _melhor_pos_costa.y;
-                        _encontrou_agua = true;
-                        show_debug_message("🌊 IA usando posição de costa conhecida: (" + string(_x) + ", " + string(_y) + ")");
+                        // ✅ CORREÇÃO: Validar toda a área de 96x96 antes de marcar como encontrado
+                        if (scr_validar_terreno_construcao(_objeto_tipo, _x, _y, _largura, _altura)) {
+                            _encontrou_agua = true;
+                            show_debug_message("🌊 IA usando posição de costa conhecida validada: (" + string(_x) + ", " + string(_y) + ")");
+                        } else {
+                            show_debug_message("⚠️ Posição de costa não válida para área completa, continuando busca...");
+                        }
                     }
                 }
             }
@@ -183,8 +188,8 @@ function scr_ia_construir(_ia_id, _objeto_tipo, _x, _y) {
                 var _tile_x = floor(_x / _tile_size);
                 var _tile_y = floor(_y / _tile_size);
                 
-                // Procurar água em um raio de 30 tiles (aumentado)
-                for (var _raio = 1; _raio <= 30 && !_encontrou_agua; _raio++) {
+                // Procurar água em um raio de 50 tiles (aumentado para encontrar áreas maiores)
+                for (var _raio = 1; _raio <= 50 && !_encontrou_agua; _raio++) {
                     for (var _dx = -_raio; _dx <= _raio && !_encontrou_agua; _dx++) {
                         for (var _dy = -_raio; _dy <= _raio && !_encontrou_agua; _dy++) {
                             var _check_x = _tile_x + _dx;
@@ -194,10 +199,16 @@ function scr_ia_construir(_ia_id, _objeto_tipo, _x, _y) {
                                 _check_y >= 0 && _check_y < global.map_height) {
                                 var _tile_data = global.map_grid[_check_x][_check_y];
                                 if (!is_undefined(_tile_data) && _tile_data.terreno == TERRAIN.AGUA) {
-                                    _x = _check_x * _tile_size + _tile_size / 2;
-                                    _y = _check_y * _tile_size + _tile_size / 2;
-                                    _encontrou_agua = true;
-                                    show_debug_message("🌊 IA ajustou posição do quartel naval para água: (" + string(_x) + ", " + string(_y) + ")");
+                                    var _px = _check_x * _tile_size + _tile_size / 2;
+                                    var _py = _check_y * _tile_size + _tile_size / 2;
+                                    
+                                    // ✅ CORREÇÃO CRÍTICA: Validar toda a área de 96x96, não apenas um tile
+                                    if (scr_validar_terreno_construcao(_objeto_tipo, _px, _py, _largura, _altura)) {
+                                        _x = _px;
+                                        _y = _py;
+                                        _encontrou_agua = true;
+                                        show_debug_message("🌊 IA ajustou posição do quartel naval para água válida: (" + string(_x) + ", " + string(_y) + ")");
+                                    }
                                 }
                             }
                         }
@@ -206,7 +217,13 @@ function scr_ia_construir(_ia_id, _objeto_tipo, _x, _y) {
             }
             
             if (!_encontrou_agua) {
-                show_debug_message("❌ IA não encontrou água próxima para quartel naval em (" + string(_x) + ", " + string(_y) + ")");
+                show_debug_message("❌ IA não encontrou água próxima com área completa válida para quartel naval em (" + string(_x) + ", " + string(_y) + ")");
+                return false;
+            }
+            
+            // ✅ VALIDAÇÃO FINAL: Garantir que a posição final está válida
+            if (!scr_validar_terreno_construcao(_objeto_tipo, _x, _y, _largura, _altura)) {
+                show_debug_message("❌ ERRO: Posição final de quartel naval não passou na validação final!");
                 return false;
             }
         }

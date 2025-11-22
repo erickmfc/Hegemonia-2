@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_formacao_esquadrao_pirata",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_formacao_esquadrao_pirata",
+  "parent":{
+    "name":"piratas",
+    "path":"folders/Sprites/naval/navios/piratas.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

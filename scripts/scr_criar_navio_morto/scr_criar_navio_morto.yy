@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_criar_navio_morto",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_criar_navio_morto",
+  "parent":{
+    "name":"navios",
+    "path":"folders/Sprites/naval/navios.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

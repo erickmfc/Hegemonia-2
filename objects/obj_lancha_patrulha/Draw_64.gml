@@ -62,9 +62,8 @@ if (selecionado) {
     // Estado atual (CORRIGIDO para lancha)
     draw_set_color(make_color_rgb(0, 255, 255)); // Ciano
     var _estado_texto = "PARADO";
-    if (estado == LanchaState.MOVENDO) _estado_texto = "NAVEGANDO";
-    else if (estado == LanchaState.PATRULHANDO) _estado_texto = "PATRULHANDO";
-    else if (estado == LanchaState.ATACANDO) _estado_texto = "ATACANDO";
+    if (estado == LanchaState.ATACANDO) _estado_texto = "ATACANDO";
+    else if (estado == LanchaState.MOVENDO) _estado_texto = "MOVENDO";
     
     draw_text(_text_x, _text_y, "Estado: " + _estado_texto);
     _text_y += 18;
